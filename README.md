@@ -15,19 +15,20 @@
   <summary>요구사항 명세서</summary>
   <div markdown="1">
 
-![image](https://github.com/user-attachments/assets/302f70d5-4497-4d7c-af3a-8910d614f1ea)
+[요구사항 명세서](https://docs.google.com/spreadsheets/d/e/2PACX-1vQxM_rIHvmLTbkV9LnaKnpo5b7QTwlGp9VqwIbPuwNH_rs0f3UpjXx70gHiFa4FGKJpYlsRoGB4w7w5/pubhtml?gid=594562128&single=true)
 
+![image](https://github.com/user-attachments/assets/302f70d5-4497-4d7c-af3a-8910d614f1ea)
   </div>
 </details>
 
 ### 1-3. 기능 명세서
-
+[기능 명세서](https://docs.google.com/spreadsheets/d/e/2PACX-1vQxM_rIHvmLTbkV9LnaKnpo5b7QTwlGp9VqwIbPuwNH_rs0f3UpjXx70gHiFa4FGKJpYlsRoGB4w7w5/pubhtml?gid=213070244&single=true)
 
 ### 1-4. 시스템 아키텍처
 
 
 ### 1-5. WBS
-
+[WBS](https://docs.google.com/spreadsheets/d/e/2PACX-1vQxM_rIHvmLTbkV9LnaKnpo5b7QTwlGp9VqwIbPuwNH_rs0f3UpjXx70gHiFa4FGKJpYlsRoGB4w7w5/pubhtml?gid=1397057023&single=true)
 
 ### 1-6. ERD
 [ERD Cloud](https://www.erdcloud.com/d/voRzi3kXFkSQWkTTx)
