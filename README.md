@@ -26,7 +26,7 @@
 
 ### 1-4. 시스템 아키텍처
 <details>
-  <summary>요구사항 명세서</summary>
+  <summary>시스템 아키텍처</summary>
   <div markdown="1">
 
 ![image](https://github.com/user-attachments/assets/c0712a6f-9e98-487e-8f6f-c1ec3d18f794)
