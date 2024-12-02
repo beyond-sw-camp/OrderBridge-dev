@@ -1,0 +1,12 @@
+services:
+  mariadb:
+    image: mariadb:latest
+    container_name: mariadb_orderBridge
+    restart: always
+    environment:
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
+      MARIADB_DATABASE: ${MARIADB_DATABASE}
+      MARIADB_USER: ${MARIADB_USER}
+      MARIADB_PASSWORD: ${MARIADB_PASSWORD}
+    ports:
+      - '${MARIADB_PORT}:3306'
