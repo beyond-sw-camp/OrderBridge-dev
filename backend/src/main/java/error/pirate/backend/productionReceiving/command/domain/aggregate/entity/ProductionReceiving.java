@@ -39,5 +39,7 @@ public class ProductionReceiving {
 
     private LocalDateTime productionReceivingModDate; // 생산 입고 수정일
 
+    private Integer productionReceivingExtendedPrice; // 생산 입고 총금액
+
     private String productionReceivingNote; // 생산 입고 비고
 }

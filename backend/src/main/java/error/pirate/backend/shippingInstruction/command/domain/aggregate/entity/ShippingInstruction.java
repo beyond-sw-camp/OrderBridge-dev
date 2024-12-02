@@ -1,6 +1,5 @@
 package error.pirate.backend.shippingInstruction.command.domain.aggregate.entity;
 
-import error.pirate.backend.invoice.command.domain.aggregate.entity.Invoice;
 import error.pirate.backend.salesOrder.command.domain.aggregate.entity.SalesOrder;
 import error.pirate.backend.user.command.domain.aggregate.entity.User;
 import jakarta.persistence.*;
@@ -22,8 +21,8 @@ public class ShippingInstruction {
     private Long shippingInstructionSeq;
 
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
-    @JoinColumn(name = "invoiceSeq")
-    private Invoice invoice; // 출하 지시서
+    @JoinColumn(name = "salesOrderSeq")
+    private SalesOrder salesOrder; // 주문서
 
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinColumn(name = "userSeq")

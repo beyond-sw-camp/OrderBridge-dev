@@ -1,6 +1,7 @@
 package error.pirate.backend.purchaseOrder.command.domain.aggregate.entity;
 
 import error.pirate.backend.client.command.domain.aggregate.entity.Client;
+import error.pirate.backend.salesOrder.command.domain.aggregate.entity.SalesOrder;
 import error.pirate.backend.user.command.domain.aggregate.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -27,6 +28,10 @@ public class PurchaseOrder {
     @JoinColumn(name = "clientSeq")
     private Client client; // 거래처
 
+    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    @JoinColumn(name = "salesOrderSeq")
+    private SalesOrder salesOrder;
+
     private PurchaseOrderStatus purchaseOrderStatus; // 발주서 상태
 
     @CreatedDate
@@ -39,6 +44,8 @@ public class PurchaseOrder {
     private LocalDateTime purchaseOrderDueDate; // 발주서 계약 납기일
 
     private LocalDateTime purchaseOrderTargetDueDate; // 발주서 목표 납기일
+
+    private Integer purchaseOrderExtendedPrice; // 발주서 총금액
 
     private String purchaseOrderNote; // 발주서 비고
 }

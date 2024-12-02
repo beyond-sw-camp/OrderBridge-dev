@@ -38,5 +38,9 @@ public class Quotation {
 
     private LocalDateTime quotationQuotationDate; // 견적서 견적일
 
+    private LocalDateTime quetationEffectiveDate; // 견적서 유효일
+
+    private LocalDateTime quetationExtendedPrice; // 견적서 총금액
+
     private String quotationNote; // 견적서 비고
 }

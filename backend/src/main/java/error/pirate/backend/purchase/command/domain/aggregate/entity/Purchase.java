@@ -43,5 +43,7 @@ public class Purchase {
 
     private PurchaseStatus purchaseStatus; // 구매 상태
 
+    private Integer purchaseExtendedPrice; // 구매서 총금액
+
     private String purchaseNote; // 구매서 비고
 }

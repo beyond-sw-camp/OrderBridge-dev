@@ -40,4 +40,6 @@ public class Item {
     private int itemExpirationHour; // 품목 유통기한(시간)
 
     private String itemImageUrl; // 품목 이미지 주소
+
+    private Integer itemPrice; // 품목 단가
 }

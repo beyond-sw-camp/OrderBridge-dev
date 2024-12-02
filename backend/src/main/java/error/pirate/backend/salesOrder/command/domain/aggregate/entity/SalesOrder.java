@@ -45,5 +45,7 @@ public class SalesOrder {
 
     private LocalDateTime salesOrderDueDate; // 주문서 물품 납기일
 
+    private Integer salesOrderExtendedPrice; // 주문서 총금액
+
     private String salesOrderNote; // 주문서 비고
 }

@@ -1,7 +1,10 @@
 package error.pirate.backend.workOrder.command.domain.aggregate.entity;
 
 import error.pirate.backend.client.command.domain.aggregate.entity.Client;
+import error.pirate.backend.item.command.domain.aggregate.entity.Item;
+import error.pirate.backend.salesOrder.command.domain.aggregate.entity.SalesOrder;
 import error.pirate.backend.user.command.domain.aggregate.entity.User;
+import error.pirate.backend.warehouse.command.domain.aggregate.entity.Warehouse;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -27,6 +30,18 @@ public class WorkOrder {
     @JoinColumn(name = "userSeq")
     private User user; // 작업지시서 담당자
 
+    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    @JoinColumn(name = "salesOrderSeq")
+    private SalesOrder salesOrder; // 주문서
+
+    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    @JoinColumn(name = "warehouseSeq")
+    private Warehouse warehouse; // 창고
+
+    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    @JoinColumn(name = "itemSeq")
+    private Item item; // 품목
+
     @CreatedDate
     private LocalDateTime workOrderRegDate; // 작업지시서 등록일
 
@@ -40,9 +55,15 @@ public class WorkOrder {
 
     private LocalDateTime workOrderDueDate; // 작업지시서 납기일
 
+    private Integer workOrderIndicatedQuantity; // 작업지시서 주문수량
+
     private int workOrderProductionQuantity; // 작업지시서 생산수량
 
+    private Integer workOrderWorkQuantity; // 작업지시서 작업완료수량
+
     private WorkOrderStatus workOrderStatus; // 작업지시서 상태
+
+    private Integer workOrderExtendedPrice; // 작업지시서 총금액
 
     private String workOrderNote; // 작업지시서 비고
 }

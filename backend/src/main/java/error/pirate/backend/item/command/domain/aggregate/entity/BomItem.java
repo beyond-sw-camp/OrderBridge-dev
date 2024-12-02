@@ -12,8 +12,8 @@ public class BomItem {
     @Id @GeneratedValue(strategy = GenerationType.AUTO)
     private Long bomItemSeq;
 
-
-    @OneToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    // OneToOne 하면 재료가 하나로 고정되는 것 아님?
+    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinColumn(name = "itemSeq")
     private Item parentItem; // 상위 품목
 

@@ -30,8 +30,6 @@ public class Client {
 
     private String clientEmail; // 거래처 이메일
 
-    private String clientAddress; // 거래처 주소
-
     @CreatedDate
     private LocalDateTime clientRegDate; // 거래처 등록일
 

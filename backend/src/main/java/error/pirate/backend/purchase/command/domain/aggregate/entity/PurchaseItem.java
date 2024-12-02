@@ -25,9 +25,9 @@ public class PurchaseItem {
 
     private int purchaseItemSettlementQuantity; // 정산 수량
 
-    private LocalDateTime purchaseItemReceiptDate;
+    private LocalDateTime purchaseItemReceiptDate; // 입고일
 
-    private PurchaseItemStatus purchaseItemStatus;
+    private PurchaseItemStatus purchaseItemStatus; // 구매 품목 상태
 
-    private String purchaseItemNote;
+    private String purchaseItemNote; // 구매 품목 비고
 }
