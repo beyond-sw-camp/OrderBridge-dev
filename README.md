@@ -25,7 +25,14 @@
 [기능 명세서](https://docs.google.com/spreadsheets/d/e/2PACX-1vQxM_rIHvmLTbkV9LnaKnpo5b7QTwlGp9VqwIbPuwNH_rs0f3UpjXx70gHiFa4FGKJpYlsRoGB4w7w5/pubhtml?gid=213070244&single=true)
 
 ### 1-4. 시스템 아키텍처
+<details>
+  <summary>요구사항 명세서</summary>
+  <div markdown="1">
 
+![image](https://github.com/user-attachments/assets/c0712a6f-9e98-487e-8f6f-c1ec3d18f794)
+
+  </div>
+</details>
 
 ### 1-5. WBS
 [WBS](https://docs.google.com/spreadsheets/d/e/2PACX-1vQxM_rIHvmLTbkV9LnaKnpo5b7QTwlGp9VqwIbPuwNH_rs0f3UpjXx70gHiFa4FGKJpYlsRoGB4w7w5/pubhtml?gid=1397057023&single=true)
