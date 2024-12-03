@@ -4,7 +4,12 @@ const routes = [
     {
         path: "/",
         component: () => import("@/views/main/MainView.vue")
+    },
+    {
+        path: "/currentSituation",
+        component: () => import("@/components/common/currentSituation/CurrentSituation.vue")
     }
+
 ];
 
 const router = createRouter({
