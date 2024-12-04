@@ -25,8 +25,8 @@ import statisticsIcon from '@/assets/statisticsIcon.svg'
         </b-nav-item-dropdown>
         <b-nav-item-dropdown>
           <template #button-content><salesIcon class="icon" />영업관리</template>
-          <b-dropdown-item href="#">견적 관리</b-dropdown-item>
-          <b-dropdown-item href="#">주문서 관리</b-dropdown-item>
+          <b-dropdown-item href="/quotation">견적 관리</b-dropdown-item>
+          <b-dropdown-item href="/quotation/input">주문서 관리</b-dropdown-item>
           <b-dropdown-item href="#">판매 관리</b-dropdown-item>
           <b-dropdown-item href="#">출하지시서 관리</b-dropdown-item>
           <b-dropdown-item href="#">출하 관리</b-dropdown-item>

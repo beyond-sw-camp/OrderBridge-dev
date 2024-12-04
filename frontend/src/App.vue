@@ -4,8 +4,17 @@ import Header from '@/components/common/Header.vue';
 
 <template>
   <Header />
-  <router-view />
+  <section class="flex-shrink-0">
+    <b-container>
+      <router-view />
+    </b-container>
+  </section>
 </template>
 
 <style scoped>
+
+section {
+  margin-top: 40px;
+}
+
 </style>

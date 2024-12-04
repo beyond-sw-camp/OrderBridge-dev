@@ -10,7 +10,7 @@ function tryDemo() {
 <template>
   <div class="hero-container">
     <div class="hero-left">
-      <img src="@/images/mainImage.jpg" alt="Clouds" class="hero-image" />
+<!--      <img src="@/images/mainImage.jpg" alt="Clouds" class="hero-image" />-->
     </div>
     <div class="hero-right">
       <span class="hero-title">
