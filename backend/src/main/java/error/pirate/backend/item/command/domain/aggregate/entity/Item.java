@@ -11,7 +11,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "tb_item")
+@Table(name = "tb_item") // 품목
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Item {
@@ -21,6 +21,10 @@ public class Item {
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinColumn(name = "userSeq")
     private User user; // 품목 등록자
+
+    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    @JoinColumn(name = "itemUnitSeq")
+    private ItemUnit itemUnit; // 품목 단위
 
     private String itemName; // 품목명
 
@@ -32,10 +36,6 @@ public class Item {
     @LastModifiedDate
     @Column(insertable = false)
     private LocalDateTime itemModDate; // 품목 수정일
-
-    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
-    @JoinColumn(name = "itemUnitSeq")
-    private ItemUnit itemUnit; // 품목 단위
 
     private int itemExpirationHour; // 품목 유통기한(시간)
 

@@ -27,6 +27,7 @@ public class Quotation {
     @JoinColumn(name = "clientSeq")
     private Client client; // 거래처
 
+    private String quotationName; // 견적서 명
     private QuotationStatus quotationStatus; // 견적서 상태
 
     @CreatedDate
@@ -38,9 +39,11 @@ public class Quotation {
 
     private LocalDateTime quotationQuotationDate; // 견적서 견적일
 
-    private LocalDateTime quetationEffectiveDate; // 견적서 유효일
+    private LocalDateTime quotationEffectiveDate; // 견적서 유효일
 
-    private LocalDateTime quetationExtendedPrice; // 견적서 총금액
+    private LocalDateTime quotationExtendedPrice; // 견적서 총금액
+
+    private Integer quotationTotalQuantity; // 견적서 총수량
 
     private String quotationNote; // 견적서 비고
 }

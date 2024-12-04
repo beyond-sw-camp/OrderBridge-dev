@@ -42,6 +42,8 @@ public class WorkOrder {
     @JoinColumn(name = "itemSeq")
     private Item item; // 품목
 
+    private String workOrderName; // 작업지시서 명
+
     @CreatedDate
     private LocalDateTime workOrderRegDate; // 작업지시서 등록일
 
@@ -49,9 +51,9 @@ public class WorkOrder {
     @Column(insertable = false)
     private LocalDateTime workOrderModDate; // 작업지시서 수정일
 
-    private LocalDateTime workOrderIndicatedDate; // 작업지시서 지시일
+    private LocalDateTime workOrderIndicatedDate; // 작업지시서 작업 지시일
 
-    private LocalDateTime workOrderEndDate; // 작업지시서 완료일
+    private LocalDateTime workOrderEndDate; // 작업지시서 작업 완료일
 
     private LocalDateTime workOrderDueDate; // 작업지시서 납기일
 
@@ -63,7 +65,7 @@ public class WorkOrder {
 
     private WorkOrderStatus workOrderStatus; // 작업지시서 상태
 
-    private Integer workOrderExtendedPrice; // 작업지시서 총금액
+    private Integer workOrderPrice; // 작업지시서 총금액
 
     private String workOrderNote; // 작업지시서 비고
 }

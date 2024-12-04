@@ -1,5 +1,6 @@
 package error.pirate.backend.purchase.command.domain.aggregate.entity;
 
+import error.pirate.backend.item.command.domain.aggregate.entity.Item;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -8,7 +9,7 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "tb_purchase_item")
+@Table(name = "tb_purchase_item") // 구매서 품목
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PurchaseItem {
@@ -17,15 +18,17 @@ public class PurchaseItem {
 
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinColumn(name = "purchaseSeq")
-    private Purchase purchase;
+    private Purchase purchase; // 구매서
+
+    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    @JoinColumn(name = "itemSeq")
+    private Item item; // 품목
 
     private int purchaseItemQuantity; // 입고 수량
 
-    private int purchaseItemPrice; // 구매 단가
+    private int purchaseItemPrice; // 구매 품목 단가
 
-    private int purchaseItemSettlementQuantity; // 정산 수량
-
-    private LocalDateTime purchaseItemReceiptDate; // 입고일
+    private LocalDateTime purchaseItemReceiptDate; // 구매 품목 입고일
 
     private PurchaseItemStatus purchaseItemStatus; // 구매 품목 상태
 

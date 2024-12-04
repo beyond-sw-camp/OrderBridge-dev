@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "tb_item_inventory")
+@Table(name = "tb_item_inventory") // 품목 재고
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ItemInventory {

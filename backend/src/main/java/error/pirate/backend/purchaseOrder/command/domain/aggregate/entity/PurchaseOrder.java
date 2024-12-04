@@ -30,7 +30,9 @@ public class PurchaseOrder {
 
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinColumn(name = "salesOrderSeq")
-    private SalesOrder salesOrder;
+    private SalesOrder salesOrder; // 주문서
+
+    private String purchaseOrderName; // 발주서 명
 
     private PurchaseOrderStatus purchaseOrderStatus; // 발주서 상태
 

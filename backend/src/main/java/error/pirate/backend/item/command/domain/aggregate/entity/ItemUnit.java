@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "tb_item_unit")
+@Table(name = "tb_item_unit") // 품목 단위
 @Getter
 @NoArgsConstructor
 public class ItemUnit {

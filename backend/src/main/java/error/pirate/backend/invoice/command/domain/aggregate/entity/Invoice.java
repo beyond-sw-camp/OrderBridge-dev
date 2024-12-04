@@ -36,7 +36,9 @@ public class Invoice {
 
     private LocalDateTime invoiceSaleDate; // 거래 명세서 판매일
 
-    private Integer invoiceExtendedPrice; // 거래 명세서 총금액
+    private Integer invoiceExtendedPrice; // 거래 명세서 총 금액
+
+    private Integer invoiceTotalQuantity; // 거래 명세서 총 수량
 
     private String invoiceNote; // 거래 명세서 비고
 

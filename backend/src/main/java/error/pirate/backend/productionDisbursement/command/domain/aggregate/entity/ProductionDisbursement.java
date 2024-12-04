@@ -13,7 +13,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "tb_production_disbursement") // 생산불출
+@Table(name = "tb_production_disbursement") // 생산 불출
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ProductionDisbursement {
@@ -36,6 +36,9 @@ public class ProductionDisbursement {
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinColumn(name = "workOrderSeq")
     private WorkOrder workOrder; // 작업지시서
+
+    private String productionDisbursementName; // 생산불출명
+
 
     @CreatedDate
     private LocalDateTime productionDisbursementRegDate; // 생산불출 등록일

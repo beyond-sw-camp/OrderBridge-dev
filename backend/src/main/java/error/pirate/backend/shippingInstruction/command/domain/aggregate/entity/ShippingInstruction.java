@@ -28,9 +28,11 @@ public class ShippingInstruction {
     @JoinColumn(name = "userSeq")
     private User user; // 출하 지시서 담당자
 
-    private String shippingInstructionAddress;
+    private String shippingInstructionName; // 출하지시서 명
+
+    private String shippingInstructionAddress; // 출하지시서 주소
     
-    private String shippingInstructionStatus;
+    private ShippingInstructionStatus shippingInstructionStatus; // 출하지시서 상태
     
     @CreatedDate
     private LocalDateTime shippingInstructionRegDate; // 출하 지시서 등록일
@@ -40,6 +42,8 @@ public class ShippingInstruction {
     private LocalDateTime shippingInstructionModDate; // 출하 지시서 수정일
 
     private LocalDateTime shippingInstructionScheduledShipmentDate; // 출하 지시서 출하 예정일
+
+    private String shippingInstructionTotalQuantity; // 출하 지시서 총 수량
     
     private String shippingInstructionNote; // 출하 지시서 비고
 }

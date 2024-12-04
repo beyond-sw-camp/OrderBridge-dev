@@ -32,6 +32,8 @@ public class Purchase {
     @JoinColumn(name = "warehouseSeq")
     private Warehouse warehouse; // 입고 창고
 
+    private String purchaseName; // 구매서 명
+
     private LocalDateTime purchaseContractDate; // 구매 계약일
 
     @CreatedDate

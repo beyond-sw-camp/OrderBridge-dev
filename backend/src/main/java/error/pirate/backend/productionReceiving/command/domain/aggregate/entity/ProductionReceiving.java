@@ -35,6 +35,8 @@ public class ProductionReceiving {
     @JoinColumn(name = "workOrdereq")
     private WorkOrder workOrder; // 작업지시서
 
+    private String productionReceivingName; // 생산 입고명
+
     private LocalDateTime productionReceivingRegDate; // 생산 입고 등록일
 
     private LocalDateTime productionReceivingModDate; // 생산 입고 수정일

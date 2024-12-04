@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "tb_shipping_slip") // 출하전표 품목
+@Table(name = "tb_shipping_slip") // 출하전표
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ShippingSlip {
@@ -25,6 +25,8 @@ public class ShippingSlip {
     @JoinColumn(name = "userSeq")
     private User user; // 출하전표 담당자
 
+    private String shippingSlipName; // 출하전표 명
+
     private String shippingSlipAddress; // 출하전표 주소
 
     private LocalDateTime shippingSlipRegDate; // 출하전표 등록일
@@ -32,6 +34,8 @@ public class ShippingSlip {
     private LocalDateTime shippingSlipModDate; // 출하전표 수정일
 
     private LocalDateTime shippingSlipShippingDate; // 출하전표 출하일
+
+    private Integer shippingSlipTotalQuantity; // 출하전표 총 수량
 
     private String shippingSlipNote; // 출하전표 비고
 }

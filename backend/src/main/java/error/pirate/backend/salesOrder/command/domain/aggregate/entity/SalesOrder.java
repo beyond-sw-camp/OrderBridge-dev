@@ -13,7 +13,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "tb_sales_order")
+@Table(name = "tb_sales_order") // 주문서
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SalesOrder {
@@ -32,6 +32,8 @@ public class SalesOrder {
     @JoinColumn(name = "clientSeq")
     private Client client; // 거래처 번호
 
+    private String salesOrderName; // 주문서 명
+
     private SalesOrderStatus salesOrderStatus; // 주문서 상태
 
     @CreatedDate
@@ -45,7 +47,9 @@ public class SalesOrder {
 
     private LocalDateTime salesOrderDueDate; // 주문서 물품 납기일
 
-    private Integer salesOrderExtendedPrice; // 주문서 총금액
+    private Integer salesOrderExtendedPrice; // 주문서 총 금액
+
+    private Integer salesOrderTotalQuantity; // 주문서 총 수량
 
     private String salesOrderNote; // 주문서 비고
 }
