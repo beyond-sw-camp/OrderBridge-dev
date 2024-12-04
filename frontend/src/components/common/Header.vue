@@ -1,104 +1,67 @@
 <script setup>
-import searchIcon from '@/assets/searchIcon.svg';
+import chatbotIcon from '@/assets/chatbotIcon.svg';
 import notificationIcon from '@/assets/notificationIcon.svg';
 import loginIcon from '@/assets/loginIcon.svg';
 import basicIcon from '@/assets/basicIcon.svg';
 import salesIcon from '@/assets/salesIcon.svg';
 import productionIcon from '@/assets/productionIcon.svg';
 import orderIcon from '@/assets/orderIcon.svg';
-
-import { ref } from "vue";
-
-const activeMenu = ref(null); // 현재 활성화된 메뉴
-
-// 메뉴를 보여줄 때 호출
-function showSubMenu(menu) {
-  activeMenu.value = menu;
-}
-
-// 메뉴를 숨길 때 호출
-function hideSubMenu() {
-  activeMenu.value = null;
-}
-
+import statisticsIcon from '@/assets/statisticsIcon.svg'
 </script>
 
 <template>
-  <nav class="nav">
-    <div class="nav-left">
-      <!-- 로고 -->
-      <div class="navbar-logo">
-        <a href="#">
-          <img src="@/images/logo.png" alt="OrderBridge Logo" class="logo-img" />
-        </a>
-      </div>
-
-      <!-- 네비게이션 -->
-      <ul class="nav-links">
-        <li><a href="#"><basicIcon class="icon" /> 기본등록</a></li>
-        <li><a href="#"><salesIcon class="icon" /> 영업관리</a></li>
-        <li><a href="#"><orderIcon class="icon" /> 주문관리</a></li>
-        <li><a href="#"><productionIcon class="icon" /> 생산관리</a></li>
-        <li><a href="#"><basicIcon class="icon" /> 통계</a></li>
-      </ul>
-    </div>
-      <!-- 오른쪽 아이콘 -->
-      <ul class="nav-icons">
-        <li><a href="#"><searchIcon class="icon" /></a></li>
-        <li><a href="#"><notificationIcon class="icon" /></a></li>
-        <li><a href="#"><loginIcon class="icon" /></a></li>
-      </ul>
-  </nav>
+  <b-navbar toggleable="lg" type="dark" class="header">
+    <!-- 로고 -->
+    <b-navbar-brand href="#">
+      <img src="@/images/logo.png" alt="OrderBridge Logo" class="logo-img" />
+    </b-navbar-brand>
+    <b-collapse id="nav-collapse" is-nav>
+      <b-navbar-nav class="ml-auto">
+        <b-nav-item-dropdown>
+          <template #button-content><basicIcon class="icon"/>기본등록</template>
+          <b-dropdown-item href="#">거래처 등록</b-dropdown-item>
+          <b-dropdown-item href="#">창고 등록</b-dropdown-item>
+          <b-dropdown-item href="#">품목 등록</b-dropdown-item>
+        </b-nav-item-dropdown>
+        <b-nav-item-dropdown>
+          <template #button-content><salesIcon class="icon" />영업관리</template>
+          <b-dropdown-item href="#">견적 관리</b-dropdown-item>
+          <b-dropdown-item href="#">주문서 관리</b-dropdown-item>
+          <b-dropdown-item href="#">판매 관리</b-dropdown-item>
+          <b-dropdown-item href="#">출하지시서 관리</b-dropdown-item>
+          <b-dropdown-item href="#">출하 관리</b-dropdown-item>
+        </b-nav-item-dropdown>
+        <b-nav-item-dropdown>
+          <template #button-content><orderIcon class="icon" />주문관리</template>
+          <b-dropdown-item href="#">발주서 관리</b-dropdown-item>
+          <b-dropdown-item href="#">구매서 관리</b-dropdown-item>
+        </b-nav-item-dropdown>
+        <b-nav-item-dropdown>
+          <template #button-content><productionIcon class="icon" />생산관리</template>
+          <b-dropdown-item href="#">작업지시서 관리</b-dropdown-item>
+          <b-dropdown-item href="#">생산불출 관리</b-dropdown-item>
+          <b-dropdown-item href="#">생산입고 관리</b-dropdown-item>
+        </b-nav-item-dropdown>
+        <b-nav-item-dropdown>
+          <template #button-content><statisticsIcon class="icon" />통계</template>
+          <b-dropdown-item href="#">재고관리 현황</b-dropdown-item>
+          <b-dropdown-item href="#">영업관리 현황</b-dropdown-item>
+          <b-dropdown-item href="#">구매관리 현황</b-dropdown-item>
+          <b-dropdown-item href="#">기타 현황</b-dropdown-item>
+        </b-nav-item-dropdown>
+      </b-navbar-nav>
+    </b-collapse>
+      <!-- Right aligned nav items -->
+    <b-navbar-nav class="ml-auto">
+      <b-nav-item href="#"><chatbotIcon class="icon-right" /></b-nav-item>
+      <b-nav-item href="#"><notificationIcon class="icon-right" /></b-nav-item>
+      <b-nav-item href="#"> <loginIcon class="icon-right" /></b-nav-item>
+    </b-navbar-nav>
+  </b-navbar>
 </template>
 <style scoped>
-/* 네비게이션 스타일 */
-.nav {
-  background-color: #fff8e1; /* 배경 색 */
-  border-bottom: 1px solid #e0e0e0;
-  padding: 0 20px; /* 기본 여백 제거 */
-  display: flex;
-  align-items: center; /* 모든 요소를 수직 중앙 정렬 */
-  justify-content: space-between; /* 좌우 끝 정렬 */
-}
-
-/* 로고와 메뉴를 묶은 컨테이너 */
-.nav-left {
-  display: flex;
-  align-items: center; /* 로고와 메뉴를 수직 중앙 정렬 */
-}
-
-/* 로고 스타일 */
-.navbar-logo {
-  display: flex;
-  align-items: center; /* 로고 수직 정렬 */
-  margin-right: 20px; /* 로고와 메뉴 사이 간격 */
-}
-
 .logo-img {
-  height: 60px; /* 로고 크기 */
-  margin: 0; /* 여백 제거 */
-}
-
-/* 네비게이션 링크 스타일 */
-.nav-links {
-  display: flex;
-  align-items: center; /* 메뉴를 수직 중앙 정렬 */
-  list-style: none;
-  gap: 15px; /* 메뉴 간 간격 */
-  margin: 0; /* 기본 마진 제거 */
-  padding: 0; /* 기본 패딩 제거 */
-}
-
-.nav-links li a {
-  display: flex;
-  align-items: center; /* 텍스트와 아이콘 수직 정렬 */
-  font-size: 16px;
-  color: #333;
-  text-decoration: none;
-}
-
-.nav-links li a:hover {
-  color: #000; /* 호버 효과 */
+  height: 50px; /* 로고 크기 */
 }
 
 .icon {
@@ -108,25 +71,14 @@ function hideSubMenu() {
   fill: #333; /* 아이콘 색상 */
 }
 
-/* 오른쪽 아이콘 스타일 */
-.nav-icons {
-  display: flex;
-  align-items: center; /* 아이콘 수직 정렬 */
-  list-style: none;
-  gap: 15px; /* 아이콘 간 간격 */
-  margin: 0; /* 기본 마진 제거 */
-  padding: 0; /* 기본 패딩 제거 */
+.icon-right {
+  margin-right: 8px; /* 아이콘과 텍스트 간 간격 */
+  width: 30px;
+  height: 30px;
+  fill: #333; /* 아이콘 색상 */
 }
 
-.nav-icons li a {
-  display: flex;
-  align-items: center;
-  font-size: 18px;
-  color: #333;
-  text-decoration: none;
-}
-
-.nav-icons li a:hover {
-  color: #000;
+.header {
+  background-color: #FFF9EA;
 }
 </style>
