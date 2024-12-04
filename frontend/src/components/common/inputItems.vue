@@ -43,7 +43,7 @@ const addItem = () => {
 </script>
 
 <template>
-  <h3>물품 등록</h3>
+  <h5>물품 등록</h5>
   <div class="m-3 d-flex flex-row" v-if="additionalItems">
     <b-img class="p-3" src="https://picsum.photos/200/200/?image=41" fluid alt="Responsive image"></b-img>
     <div class="w-100 p-3">

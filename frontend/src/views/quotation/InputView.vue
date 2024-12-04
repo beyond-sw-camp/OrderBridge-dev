@@ -5,9 +5,7 @@ import InputItems from "@/components/common/inputItems.vue";
 </script>
 
 <template>
-  <div class="main">
-    <h1>입력폼 초안 페이지</h1>
-  </div>
+  <h4 class="title">영업관리 > 견적서 등록</h4>
   <div class="d-flex justify-content-center">
     <InputForm />
   </div>
@@ -18,5 +16,7 @@ import InputItems from "@/components/common/inputItems.vue";
 </template>
 
 <style scoped>
-
+.title {
+  padding-bottom: 20px;
+}
 </style>
