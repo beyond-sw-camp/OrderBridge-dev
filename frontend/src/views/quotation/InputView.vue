@@ -7,18 +7,16 @@ import InputItems from "@/components/common/inputItems.vue";
 <template>
   <div class="main">
     <h1>입력폼 초안 페이지</h1>
-    <div class="input-form-div">
-      <InputForm />
-    </div>
-    <div>
-      <InputItems />
-    </div>
+  </div>
+  <div class="d-flex justify-content-center">
+    <InputForm />
+  </div>
+  <hr>
+  <div>
+    <InputItems />
   </div>
 </template>
 
 <style scoped>
-.input-form-div {
-  display: flex;
-  max-width: 600px;
-}
+
 </style>
