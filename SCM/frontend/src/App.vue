@@ -1,5 +1,6 @@
 <script setup>
 import Header from '@/components/common/Header.vue';
+import SideMenuBar from "@/components/common/SideMenuBar.vue";
 </script>
 
 <template>
@@ -9,6 +10,7 @@ import Header from '@/components/common/Header.vue';
       <router-view />
     </b-container>
   </section>
+  <SideMenuBar />
 </template>
 
 <style scoped>
