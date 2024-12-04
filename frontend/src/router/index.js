@@ -4,6 +4,11 @@ const routes = [
     {
         path: "/",
         component: () => import("@/views/main/MainView.vue")
+    },
+    {
+        path: "/print",
+        name: 'PrintView',
+        component: () => import("@/views/print/PrintView.vue")
     }
 ];
 
