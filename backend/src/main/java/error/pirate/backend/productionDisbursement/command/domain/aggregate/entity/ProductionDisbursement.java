@@ -26,11 +26,11 @@ public class ProductionDisbursement {
     private User user; // 생산불출 담당자
 
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
-    @JoinColumn(name = "warehouseSeq")
+    @JoinColumn(name = "ingredientsWarehouseSeq")
     private Warehouse ingredientsWarehouse; // 원자재 창고
 
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
-    @JoinColumn(name = "warehouseSeq")
+    @JoinColumn(name = "productionWarehouseSeq")
     private Warehouse productionWarehouse; // 생산 공장
 
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)

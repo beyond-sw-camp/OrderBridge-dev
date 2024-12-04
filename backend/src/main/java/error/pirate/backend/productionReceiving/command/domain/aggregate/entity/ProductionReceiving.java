@@ -20,11 +20,11 @@ public class ProductionReceiving {
     private Long productionReceivingSeq;
 
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
-    @JoinColumn(name = "warehouseSeq")
+    @JoinColumn(name = "productionWarehouseSeq")
     private Warehouse productionWarehouse; // 생산 공장
 
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
-    @JoinColumn(name = "warehouseSeq")
+    @JoinColumn(name = "storeWarehouseSeq")
     private Warehouse storeWarehouse; // 입고 창고
 
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
