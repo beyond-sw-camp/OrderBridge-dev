@@ -12,4 +12,9 @@ import Header from '@/components/common/Header.vue';
 </template>
 
 <style scoped>
+
+section {
+  margin-top: 40px;
+}
+
 </style>
