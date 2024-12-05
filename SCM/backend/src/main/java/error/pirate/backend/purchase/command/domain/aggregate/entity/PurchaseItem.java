@@ -30,6 +30,7 @@ public class PurchaseItem {
 
     private LocalDateTime purchaseItemReceiptDate; // 구매 품목 입고일
 
+    @Enumerated(EnumType.STRING)
     private PurchaseItemStatus purchaseItemStatus; // 구매 품목 상태
 
     private String purchaseItemNote; // 구매 품목 비고

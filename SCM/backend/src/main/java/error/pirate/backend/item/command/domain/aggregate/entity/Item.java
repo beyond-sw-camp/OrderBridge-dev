@@ -28,6 +28,7 @@ public class Item {
 
     private String itemName; // 품목명
 
+    @Enumerated(EnumType.STRING)
     private ItemDivision itemDivision; // 품목 구분
 
     @CreatedDate
