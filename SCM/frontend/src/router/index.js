@@ -17,6 +17,10 @@ const routes = [
     {
         path: "/quotation/input",
         component: () => import("@/views/quotation/InputView.vue")
+    },
+    {
+        path: "/currentSituation",
+        component: () => import("@/components/common/CurrentSituation.vue")
     }
 ];
 

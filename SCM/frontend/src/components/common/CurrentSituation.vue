@@ -22,21 +22,39 @@ const filteredItems = computed(() => {
     const inDateRange =
         (!startDate.value || new Date(item.date) >= new Date(startDate.value)) &&
         (!endDate.value || new Date(item.date) <= new Date(endDate.value));
-    const matchesQuery = !searchText.value || item.client.includes(searchText.value);
-    return inDateRange && matchesQuery;
+    const matchesText = !searchText.value || item.client.includes(searchText.value);
+    return inDateRange && matchesText;
   });
 });
 
 // 월별 합계 계산
-const monthlyTotals = computed(() => {
-  const totals = {};
+const monthlyItems = computed(() => {
+  const grouped = {}; // 월별 그룹화
+  const result = [];  // 최종 결과 배열
+
+  // 데이터를 월별로 그룹화
   filteredItems.value.forEach(item => {
     const month = item.date.slice(0, 7); // "YYYY-MM" 형식
-    if (!totals[month]) totals[month] = { quantity: 0, total: 0 };
-    totals[month].quantity += item.quantity;
-    totals[month].total += item.total;
+    if (!grouped[month]) grouped[month] = {
+      items: [], quantity: 0, total: 0
+    };
+    grouped[month].items.push(item);
+    grouped[month].quantity += item.quantity;
+    grouped[month].total += item.total;
   });
-  return totals;
+
+  // 그룹화된 데이터를 출력 형식으로 재구성
+  Object.keys(grouped).forEach(month => {
+    result.push(...grouped[month].items);
+    result.push({
+      monthlyTotal: true, // 합계 여부
+      date: month, // 월
+      quantity: grouped[month].quantity,
+      total: grouped[month].total,
+    });
+  });
+
+  return result;
 });
 
 // 총합 계산
@@ -90,24 +108,21 @@ const grandTotal = computed(() => {
               <th>번호</th>
               <th>○○일</th>
               <th>○○내역(품목)</th>
-              <th>수량</th>
+              <th>총수량</th>
               <th>단가</th>
-              <th>금액</th>
+              <th>총금액</th>
               <th>구분(○○일)</th>
               <th>거래처명</th>
               <th>비고</th>
             </tr>
             </thead>
             <tbody>
-              <!-- 월별 합계 -->
-              <tr v-for="(monthData, month) in monthlyTotals" :key="month" class="monthly-total">
-                <td colspan="3">{{ month }} 합계</td>
-                <td>{{ monthData.quantity }}</td>
-                <td colspan="2">{{ monthData.total.toLocaleString() }} 원</td>
-                <td colspan="3"></td>
-              </tr>
-              <!-- 필터링된 결과 -->
-              <tr v-for="(item, index) in filteredItems" :key=" index">
+            <!-- 필터링된 결과 및 월별 합계 출력 -->
+            <tr
+                v-for="(item, index) in monthlyItems"
+                :key="index"
+                :class="{ 'monthly-total': item.monthlyTotal }"
+            >
                 <td>{{ index+1 }}</td>
                 <td>{{ item.date }}</td>
                 <td>{{ item.document }}</td>
@@ -144,7 +159,7 @@ const grandTotal = computed(() => {
 
 .content{
   display: flex;
-  justify-content: space-evenly;
+  justify-content: space-evenly;  /*내부 균등하게 분배*/
 }
 
 .searchContent{
@@ -155,7 +170,7 @@ const grandTotal = computed(() => {
 
 .table-container {
   width: 70%;
-  overflow-x: auto;
+  overflow-x: auto; /* 가로 자동 스크롤 */
 }
 
 .selectedData{
@@ -212,6 +227,11 @@ th, td {
 
 tfoot {
   font-weight: bold;
+}
+
+.monthly-total {
+  font-weight: bold;
+  background-color: #f9f9f9;
 }
 
 </style>
