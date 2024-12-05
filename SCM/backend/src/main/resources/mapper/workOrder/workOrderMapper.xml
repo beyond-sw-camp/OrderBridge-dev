@@ -1,0 +1,16 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper>
+    <select id="">
+        SELECT wo.work_order_name
+             , i.item_name
+             , c.client_name
+             , wo.work_order_indicated_date
+             , wo.work_order_status
+        FROM tb_work_order wo
+                 JOIN tb_item i ON wo.item_seq = i.item_seq
+                 JOIN tb_client c ON wo.client_seq = c.client_seq ;
+    </select>
+</mapper>
