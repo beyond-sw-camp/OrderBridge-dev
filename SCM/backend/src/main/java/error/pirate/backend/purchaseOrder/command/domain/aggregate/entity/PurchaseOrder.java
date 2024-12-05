@@ -34,6 +34,7 @@ public class PurchaseOrder {
 
     private String purchaseOrderName; // 발주서 명
 
+    @Enumerated(EnumType.STRING)
     private PurchaseOrderStatus purchaseOrderStatus; // 발주서 상태
 
     @CreatedDate

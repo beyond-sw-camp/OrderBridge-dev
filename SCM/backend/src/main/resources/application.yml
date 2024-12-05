@@ -37,6 +37,8 @@ springdoc:
     doc-expansion: none
 
 logging:
+  file:
+    path: C:/logs/orderBridge
   level:
     root: info
     org.springframework.web: info
