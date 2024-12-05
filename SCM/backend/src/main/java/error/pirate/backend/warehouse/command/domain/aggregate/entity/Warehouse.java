@@ -24,6 +24,7 @@ public class Warehouse {
 
     private String warehouseName; // 창고명
 
+    @Enumerated(EnumType.STRING)
     private WarehouseType warehouseType; // 창고 구분
 
     @CreatedDate

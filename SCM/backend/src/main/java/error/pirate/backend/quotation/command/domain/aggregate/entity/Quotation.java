@@ -28,6 +28,8 @@ public class Quotation {
     private Client client; // 거래처
 
     private String quotationName; // 견적서 명
+
+    @Enumerated(EnumType.STRING)
     private QuotationStatus quotationStatus; // 견적서 상태
 
     @CreatedDate

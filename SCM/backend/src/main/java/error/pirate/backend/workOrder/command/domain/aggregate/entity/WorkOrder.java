@@ -63,6 +63,7 @@ public class WorkOrder {
 
     private Integer workOrderWorkQuantity; // 작업지시서 작업완료수량
 
+    @Enumerated(EnumType.STRING)
     private WorkOrderStatus workOrderStatus; // 작업지시서 상태
 
     private Integer workOrderPrice; // 작업지시서 총금액
