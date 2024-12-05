@@ -49,6 +49,7 @@ public class ProductionDisbursement {
 
     private LocalDateTime productionDisbursementDepartureDate; // 생산불출 불출일
 
+    @Enumerated(EnumType.STRING)
     private ProductionDisbursementStatus productionDisbursementStatus; // 생산불출 상태
 
     private String productionDisbursementNote; // 생산불출 비고
