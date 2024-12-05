@@ -1,5 +1,5 @@
 server:
-  port: 8070
+  port: 8089
   servlet:
     encoding:
       charset: UTF-8
@@ -15,7 +15,7 @@ spring:
   jpa:
     show-sql: true
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
       naming:
         physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
     properties:
@@ -41,3 +41,7 @@ logging:
     jdbc.sqlonly: info
     jdbc.resultsettable: info
     jdbc.connection: info
+
+token:
+  secret: jcbbmpPbq7gw8TC1n6vCcAAgNTCQtZVHhRkSOTSuM5iYi6RmW1g/8h9rYkL7OQq/MZZ08cambRHW5O6dQ1p0PQ==
+  expiration_time: 43200000

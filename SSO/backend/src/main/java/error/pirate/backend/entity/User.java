@@ -9,6 +9,8 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "tb_user")
 @Getter
@@ -25,11 +27,11 @@ public class User {
     private String userName;
 
     @CreatedDate
-    private String regDate;
+    private LocalDateTime regDate;
 
     @LastModifiedDate
     @Column(insertable = false)
-    private String modDate;
+    private LocalDateTime modDate;
 
     @Builder
     protected User(String userId, String userPwd, String userEmail, String userName) {
