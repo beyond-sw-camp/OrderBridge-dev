@@ -9,7 +9,9 @@ import InputItems from "@/components/common/inputItems.vue";
   <div class="d-flex justify-content-center">
     <InputForm />
   </div>
-  <hr>
+  <div class="px-4 d-flex flex-column justify-content-center">
+    <hr>
+  </div>
   <div>
     <InputItems />
   </div>
