@@ -1,20 +1,16 @@
-# ?? ?? ??
 server:
-  port: 8090
+  port: 8070
   servlet:
     encoding:
       charset: UTF-8
 
 spring:
   application:
-    name: orderBridge
-  config:
-    import:
-      optional:file:env.properties
+    name: login
   datasource:
-    url: jdbc:log4jdbc:mariadb://${MARIADB_HOST}:${MARIADB_PORT}/${MARIADB_DATABASE}?serverTimezone=Asia/Seoul
-    username: ${MARIADB_USER}
-    password: ${MARIADB_PASSWORD}
+    url: jdbc:log4jdbc:mariadb://localhost:3306/order_bridge_login?serverTimezone=Asia/Seoul
+    username: login
+    password: login
     driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
   jpa:
     show-sql: true
@@ -37,8 +33,6 @@ springdoc:
     doc-expansion: none
 
 logging:
-  file:
-    path: ${LOG_PATH}
   level:
     root: info
     org.springframework.web: info
