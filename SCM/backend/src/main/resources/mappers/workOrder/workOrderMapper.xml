@@ -26,18 +26,18 @@
             <if test="warehouseName != null">
                 AND warehouse_name like concat('%', #{warehouseName}, '%')
             </if>
-            <![CDATA[
             <if test="startDate != null">
                 AND work_order_indicated_date >= #{startDate}
             </if>
             <if test="endDate != null">
+                <![CDATA[
                 AND work_order_indicated_date <= #{endDate}
+                ]]>
             </if>
-            ]]>
         </where>
        ORDER BY wo.work_order_indicated_date DESC
               , wo.work_order_name
-        LIMIT #{size} OFFSET #{offset}
+        LIMIT #{limit} OFFSET #{offset}
     </select>
 
     <!--  작업지시서 목록 개수  -->
@@ -52,14 +52,14 @@
             <if test="warehouseName != null">
                 AND warehouse_name like concat('%', #{warehouseName}, '%')
             </if>
-            <![CDATA[
             <if test="startDate != null">
                 AND work_order_indicated_date >= #{startDate}
             </if>
             <if test="endDate != null">
+                <![CDATA[
                 AND work_order_indicated_date <= #{endDate}
+                ]]>
             </if>
-            ]]>
         </where>
     </select>
 

@@ -48,10 +48,6 @@ dependencies {
     // HikariCP
     implementation 'com.zaxxer:HikariCP:4.0.3'
 
-    // myBatis
-    implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:2.2.2'
-
-
     // QueryDsl
     implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
     annotationProcessor "com.querydsl:querydsl-apt:5.0.0:jakarta"

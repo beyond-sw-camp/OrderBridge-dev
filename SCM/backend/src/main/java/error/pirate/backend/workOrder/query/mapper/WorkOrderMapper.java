@@ -15,8 +15,8 @@ public interface WorkOrderMapper {
                                              @Param("workOrderStatus") String workOrderStatus,
                                              @Param("startDate") LocalDateTime startDate,
                                              @Param("endDate") LocalDateTime endDate,
-                                             @Param("page") Integer page,
-                                             @Param("size") Integer size);
+                                             @Param("offset") int offset,
+                                             @Param("limit") int limit);
 
     long readWorkOrderListCount(@Param("warehouseName") String warehouseName,
                                 @Param("workOrderStatus") String workOrderStatus,
