@@ -1,16 +1,14 @@
 package error.pirate.backend.shippingInstruction.query.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.Builder;
+import lombok.Data;
 
 import java.time.LocalDate;
 import java.util.List;
 
-@Getter
-@Setter
-@ToString
+@Data
+@Builder
 @Schema(description = "출하지시서 리스트 DTO")
 public class ShippingInstructionListDTO {
     private long shippingInstructionSeq;
@@ -19,4 +17,6 @@ public class ShippingInstructionListDTO {
     private LocalDate shippingInstructionScheduledShipmentDate;
     private String clientName;
     private List<String> itemNames;
+
+
 }

@@ -6,7 +6,7 @@ import error.pirate.backend.shippingInstruction.query.dto.ShippingInstructionRes
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 @Mapper
@@ -14,14 +14,14 @@ public interface ShippingInstructionMapper {
     List<ShippingInstructionListDTO> selectShippingInstructionList(
             @Param("offset") int offset,
             @Param("limit") int limit,
-            @Param("startDate") Date startDate,
-            @Param("endDate") Date endDate,
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate,
             @Param("clientName") String clientName,
             @Param("shippingInstructionStatus") String shippingInstructionStatus);
 
     long countShippingInstruction(
-            @Param("startDate") Date startDate,
-            @Param("endDate") Date endDate,
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate,
             @Param("clientName") String clientName,
             @Param("shippingInstructionStatus") String shippingInstructionStatus);
 

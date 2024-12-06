@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -20,7 +20,7 @@ public class ShippingInstructionQueryService {
 
     /* 출하지시서 리스트 조회 */
     @Transactional(readOnly = true)
-    public ShippingInstructionListResponse readShippingInstructionList(int page, int size, Date startDate, Date endDate, String clientName, String shippingInstructionStatus) {
+    public ShippingInstructionListResponse readShippingInstructionList(int page, int size, LocalDate startDate, LocalDate endDate, String clientName, String shippingInstructionStatus) {
         int offset = (page - 1) * size;
         List<ShippingInstructionListDTO> shippingInstructionList
                 = shippingInstructionMapper.selectShippingInstructionList(offset, size, startDate, endDate, clientName, shippingInstructionStatus);

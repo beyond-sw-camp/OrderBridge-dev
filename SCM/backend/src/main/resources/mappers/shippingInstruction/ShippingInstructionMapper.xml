@@ -2,7 +2,7 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper>
+<mapper namespace="error.pirate.backend.shippingInstruction.query.mapper.ShippingInstructionMapper">
 
     <!--    출하지시서 리스트 조회  -->
     <select id="selectShippingInstructionList"
@@ -21,9 +21,10 @@
             ) AS item_names
         FROM tb_shipping_instruction si
         JOIN tb_sales_order so ON si.sales_order_seq = so.sales_order_seq
-        <trim prefix="WHERE" prefixOverrides="AND |OR ">
+        WHERE si.shipping_instruction_status IN ('결재 전', '결재 후')
+        <trim prefixOverrides="AND |OR ">
             <if test="startDate != NULL AND endDate != NULL">
-                si.shipping_instruction_scheduled_shipment_date BETWEEN #{startDate} AND #{endDate}
+                AND si.shipping_instruction_scheduled_shipment_date BETWEEN #{startDate} AND #{endDate}
             </if>
             <if test="clientName != null">
                 AND so.client_name LIKE CONCAT('%', #{clientName}, '%')

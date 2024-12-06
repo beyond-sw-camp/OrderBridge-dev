@@ -1,13 +1,11 @@
 package error.pirate.backend.shippingInstruction.query.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.Builder;
+import lombok.Data;
 
-@Getter
-@Setter
-@ToString
+@Data
+@Builder
 @Schema(description = "품목 DTO (임시)")
 public class ItemDTO {
     private String itemName;

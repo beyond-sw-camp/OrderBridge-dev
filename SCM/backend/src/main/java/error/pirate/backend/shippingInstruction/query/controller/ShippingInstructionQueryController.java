@@ -10,8 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
-
+import java.time.LocalDate;
 
 @Tag(name = "출하지시서 컨트롤러", description = "출하지시서 조회")
 @RestController(value = "shippingInstructionController")
@@ -26,8 +25,8 @@ public class ShippingInstructionQueryController {
     public ResponseEntity<ShippingInstructionListResponse> readShippingInstructionList(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) Date startDate,
-            @RequestParam(required = false) Date endDate,
+            @RequestParam(required = false) LocalDate startDate,
+            @RequestParam(required = false) LocalDate endDate,
             @RequestParam(required = false) String clientName,
             @RequestParam(required = false) String shippingInstructionStatus
     ) {
@@ -47,4 +46,6 @@ public class ShippingInstructionQueryController {
 
         return ResponseEntity.ok(response);
     }
+
+
 }
