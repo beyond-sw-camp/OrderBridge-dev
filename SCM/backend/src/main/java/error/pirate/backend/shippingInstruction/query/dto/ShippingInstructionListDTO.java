@@ -16,7 +16,7 @@ public class ShippingInstructionListDTO {
     private String shippingInstructionStatus;
     private LocalDate shippingInstructionScheduledShipmentDate;
     private String clientName;
-    private List<String> itemNames;
+    private String itemName;
 
 
 }
