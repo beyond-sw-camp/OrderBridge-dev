@@ -24,7 +24,11 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
 
     // Entity 값을 getter로 꺼내어 DTO 객체를 생성해 setter 하는 과정을 쉽게할 수 있도록 도와준다.
-    implementation 'org.modelmapper:modelmapper:3.1.1' // ModelMapper
+    implementation 'org.modelmapper:modelmapper:3.1.1'  // ModelMapper
+
+    // mybatis
+    implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.4'
+    testImplementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter-test:3.0.4'
 
     // mariaDB
     runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
