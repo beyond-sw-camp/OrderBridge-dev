@@ -16,11 +16,11 @@ public class ShippingInstructionItem {
     private Long shippingInstructionItemSeq;
 
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
-    @JoinColumn(name = "shippingInstructionSeq")
+    @JoinColumn(name = "shipping_instruction_seq")
     private ShippingInstruction shippingInstruction; // 출하 지시서
 
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
-    @JoinColumn(name = "itemSeq")
+    @JoinColumn(name = "item_seq")
     private Item item; // 품목
 
     private int shippingInstructionItemQuantity; // 출하 지시서 수량

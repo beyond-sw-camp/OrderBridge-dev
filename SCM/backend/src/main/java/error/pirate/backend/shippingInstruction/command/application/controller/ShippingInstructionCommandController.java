@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "출하지시서", description = "출하지시서 등록/수정/삭제")
-@RestController(value = "shippingInstructionController")
+@RestController
 @RequiredArgsConstructor
 @RequestMapping("api/v1/shipping-instruction")
 @Slf4j
@@ -31,6 +31,6 @@ public class ShippingInstructionCommandController {
 
         shippingInstructionApplicationService.createShippingInstruction(evaluationRequest);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body("평가작성성공");
+        return ResponseEntity.status(HttpStatus.CREATED).body("출하지시서 작성성공");
     }
 }

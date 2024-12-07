@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 
-@Tag(name = "출하지시서 컨트롤러", description = "출하지시서 조회")
-@RestController(value = "shippingInstructionController")
+@Tag(name = "출하지시서", description = "출하지시서 조회")
+@RestController
 @RequiredArgsConstructor    // final 을 받은 필드의 생성자를 주입
 @RequestMapping("/api/v1")
 @Slf4j
@@ -47,5 +47,5 @@ public class ShippingInstructionQueryController {
         return ResponseEntity.ok(response);
     }
 
-
+    /* 현황, 생산 완료 상태 주문서 조회 구현 */
 }
