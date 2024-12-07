@@ -20,24 +20,27 @@
         FROM tb_work_order wo
         LEFT JOIN tb_warehouse w ON wo.warehouse_seq = w.warehouse_seq
         <where>
-            <if test="workOrderStatus != null">
-                work_order_status = #{workOrderStatus}
+             <!--작업상태 필터링-->
+            <if test="filter.workOrderStatus != null">
+                work_order_status = #{filter.workOrderStatus}
             </if>
-            <if test="warehouseName != null">
-                AND warehouse_name like concat('%', #{warehouseName}, '%')
+            <!--생산창고 이름 필터링 -->
+            <if test="filter.warehouseName != null">
+                AND warehouse_name like concat('%', #{filter.warehouseName}, '%')
             </if>
-            <if test="startDate != null">
-                AND work_order_indicated_date >= #{startDate}
+            <!-- 작업지시일 검색 필터링 -->
+            <if test="filter.startDate != null">
+                AND work_order_indicated_date >= #{filter.startDate}
             </if>
-            <if test="endDate != null">
+            <if test="filter.endDate != null">
                 <![CDATA[
-                AND work_order_indicated_date <= #{endDate}
+                AND work_order_indicated_date <= #{filter.endDate}
                 ]]>
             </if>
         </where>
        ORDER BY wo.work_order_indicated_date DESC
               , wo.work_order_name
-        LIMIT #{limit} OFFSET #{offset}
+        LIMIT #{filter.size} OFFSET #{offset}
     </select>
 
     <!--  작업지시서 목록 개수  -->
@@ -46,18 +49,18 @@
         FROM tb_work_order wo
         LEFT JOIN tb_warehouse w ON wo.warehouse_seq = w.warehouse_seq
         <where>
-            <if test="workOrderStatus != null">
-                work_order_status = #{workOrderStatus}
+            <if test="filter.workOrderStatus != null">
+                work_order_status = #{filter.workOrderStatus}
             </if>
-            <if test="warehouseName != null">
-                AND warehouse_name like concat('%', #{warehouseName}, '%')
+            <if test="filter.warehouseName != null">
+                AND warehouse_name like concat('%', #{filter.warehouseName}, '%')
             </if>
-            <if test="startDate != null">
-                AND work_order_indicated_date >= #{startDate}
+            <if test="filter.startDate != null">
+                AND work_order_indicated_date >= #{filter.startDate}
             </if>
-            <if test="endDate != null">
+            <if test="filter.endDate != null">
                 <![CDATA[
-                AND work_order_indicated_date <= #{endDate}
+                AND work_order_indicated_date <= #{filter.endDate}
                 ]]>
             </if>
         </where>
