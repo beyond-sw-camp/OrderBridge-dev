@@ -1,8 +1,6 @@
 package error.pirate.backend.quotation.query.mapper;
 
-import error.pirate.backend.quotation.query.dto.QuotationDTO;
-import error.pirate.backend.quotation.query.dto.QuotationItemDTO;
-import error.pirate.backend.quotation.query.dto.QuotationListItemDTO;
+import error.pirate.backend.quotation.query.dto.*;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.data.repository.query.Param;
 
@@ -34,4 +32,7 @@ public interface QuotationMapper {
     // 견적서 상세 품목 조회
     List<QuotationItemDTO> selectQuotationItem(
             @Param("quotationSeq") Long quotationSeq);
+
+    // 견적서 현황 조회
+    List<QuotationSituationDTO> selectQuotationSituation(LocalDate startDate, LocalDate endDate, String clientName);
 }
