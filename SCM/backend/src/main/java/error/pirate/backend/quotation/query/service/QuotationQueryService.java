@@ -50,4 +50,12 @@ public class QuotationQueryService {
 
         return response;
     }
+
+    // 견적서 현황 조회
+    public QuotationSituationResponse getQuotationSituation(
+            LocalDate startDate, LocalDate endDate, String clientName) {
+
+        // 견적서 현황 조회
+        return new QuotationSituationResponse(quotationMapper.selectQuotationSituation(startDate, endDate, clientName));
+    }
 }
