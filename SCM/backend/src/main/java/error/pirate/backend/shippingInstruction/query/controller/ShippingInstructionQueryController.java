@@ -1,5 +1,6 @@
 package error.pirate.backend.shippingInstruction.query.controller;
 
+import error.pirate.backend.shippingInstruction.query.dto.ShippingInstructionListRequest;
 import error.pirate.backend.shippingInstruction.query.dto.ShippingInstructionListResponse;
 import error.pirate.backend.shippingInstruction.query.dto.ShippingInstructionResponse;
 import error.pirate.backend.shippingInstruction.query.dto.ShippingInstructionSituationRequest;
@@ -25,15 +26,10 @@ public class ShippingInstructionQueryController {
     @Operation(summary = "출하지시서 조회", description = "출하지시서 조회")
     @GetMapping("/shipping-instruction")
     public ResponseEntity<ShippingInstructionListResponse> readShippingInstructionList(
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) LocalDate startDate,
-            @RequestParam(required = false) LocalDate endDate,
-            @RequestParam(required = false) String clientName,
-            @RequestParam(required = false) String shippingInstructionStatus
+            @ModelAttribute ShippingInstructionListRequest request
     ) {
         ShippingInstructionListResponse response
-                = shippingInstructionQueryService.readShippingInstructionList(page, size, startDate, endDate, clientName, shippingInstructionStatus);
+                = shippingInstructionQueryService.readShippingInstructionList(request);
 
         return ResponseEntity.ok(response);
     }
