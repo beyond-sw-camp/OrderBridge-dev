@@ -138,4 +138,17 @@ public class ShippingInstructionApplicationService {
                     = shippingInstructionItemDomainService.saveShippingInstructionItem(newShippingInstructionItemList);
         }
     }
+
+    /* 출하지시서 상태 변경 */
+    @Transactional
+    public void updateShippingInstructionStatus(Long shippingInstructionSeq) {
+        /* 출하지시서 찾기(결재전 상태일 때만) */
+        ShippingInstruction shippingInstruction = shippingInstructionDomainService.findByShippingInstructionSeq(shippingInstructionSeq);
+
+        /* 수정이 가능한 상태인지 체크 */
+        shippingInstructionDomainService.checkShippingInstructionStatus(shippingInstruction.getShippingInstructionStatus());
+
+        /* 상태 변경 */
+        shippingInstructionDomainService.updateShippingInstructionStatus(shippingInstruction);
+    }
 }

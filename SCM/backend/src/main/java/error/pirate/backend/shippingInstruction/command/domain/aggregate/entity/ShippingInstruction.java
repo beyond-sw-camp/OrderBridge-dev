@@ -76,4 +76,9 @@ public class ShippingInstruction {
         this.shippingInstructionTotalQuantity = itemTotalQuantity;
         this.shippingInstructionNote = shippingInstructionNote;
     }
+
+    // 상태를 변경하는 메소드
+    public void updateStatus(String status) {
+        this.shippingInstructionStatus = ShippingInstructionStatus.valueOf(status);
+    }
 }

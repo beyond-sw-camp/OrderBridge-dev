@@ -43,4 +43,16 @@ public class ShippingInstructionCommandController {
 
         return ResponseEntity.status(HttpStatus.CREATED).body("출하지시서 수정성공");
     }
+
+    // 출하지시서 상태 변경
+    @Operation(summary = "출하지시서 상태 변경", description = "출하지시서의 상태를 변경한다.")
+    @PutMapping("/{shippingInstructionSeq}/status")
+    public ResponseEntity<String> updateShippingInstructionStatus(
+            @PathVariable Long shippingInstructionSeq
+    ) {
+
+        shippingInstructionApplicationService.updateShippingInstructionStatus(shippingInstructionSeq);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body("출하지시서 상태 변경 성공");
+    }
 }

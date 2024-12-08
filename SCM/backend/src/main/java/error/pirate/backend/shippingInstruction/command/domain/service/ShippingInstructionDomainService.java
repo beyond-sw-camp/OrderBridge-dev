@@ -128,4 +128,10 @@ public class ShippingInstructionDomainService {
     public boolean checkShippingInstructionSalesOrder(SalesOrder salesOrder, SalesOrder newSalesOrder) {
         return !Objects.equals(salesOrder.getSalesOrderSeq(), newSalesOrder.getSalesOrderSeq());
     }
+
+    /* 상태를 수정하는 로직 */
+    public void updateShippingInstructionStatus(ShippingInstruction shippingInstruction) {
+        /* 수정을 위해 엔터티 정보 변경 */
+        shippingInstruction.updateStatus("결재후");
+    }
 }
