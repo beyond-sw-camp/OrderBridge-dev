@@ -2,9 +2,11 @@ package error.pirate.backend.salesOrder.query.service;
 
 import error.pirate.backend.salesOrder.query.dto.SalesOrderListItemDTO;
 import error.pirate.backend.salesOrder.query.dto.SalesOrderListResponse;
+import error.pirate.backend.salesOrder.query.dto.SalesOrderResponse;
 import error.pirate.backend.salesOrder.query.dto.SalesOrderSituationResponse;
 import error.pirate.backend.salesOrder.query.mapper.SalesOrderMapper;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -14,6 +16,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SalesOrderQueryService {
 
+    private final ModelMapper modelMapper;
     private final SalesOrderMapper salesOrderMapper;
 
     // 주문서 목록 조회
@@ -35,6 +38,19 @@ public class SalesOrderQueryService {
                 (int) Math.ceil((double) totalSalesOrder / size),
                 totalSalesOrder
         );
+    }
+
+    // 주문서 상세 조회
+    public SalesOrderResponse getSalesOrder(Long salesOrderSeq) {
+
+        // 주문서 상세 조회
+        SalesOrderResponse response = modelMapper.map(
+                salesOrderMapper.selectSalesOrder(salesOrderSeq), SalesOrderResponse.class);
+
+        // 주문서 품목 목록 조회
+        response.setSalesOrderItem(salesOrderMapper.selectSalesOrderItem(salesOrderSeq));
+
+        return response;
     }
 
     // 주문서 현황 조회

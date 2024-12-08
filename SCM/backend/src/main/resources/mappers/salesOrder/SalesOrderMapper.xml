@@ -56,6 +56,40 @@
         </if>
     </select>
     
+    <!--  주문서 상세 조회  -->
+    <select id="selectSalesOrder" resultType="error.pirate.backend.salesOrder.query.dto.SalesOrderDTO">
+        SELECT
+            tb_sales_order.sales_order_seq,
+            tb_sales_order.sales_order_name,
+            tb_client.client_name,
+            tb_sales_order.sales_order_extended_price,
+            tb_sales_order.sales_order_total_quantity,
+            tb_user.user_name,
+            tb_sales_order.sales_order_order_date,
+            tb_sales_order.sales_order_due_date,
+            tb_sales_order.sales_order_note
+        FROM tb_sales_order
+        JOIN tb_user USING (user_seq)
+        JOIN tb_client USING (client_seq)
+        WHERE tb_sales_order.sales_order_seq = #{salesOrderSeq}
+    </select>
+    
+    <!--  주문서 상세 품목 조회  -->
+    <select id="selectSalesOrderItem" resultType="error.pirate.backend.salesOrder.query.dto.SalesOrderItemDTO">
+        SELECT
+            tb_sales_order_item.sales_order_item_seq,
+            tb_sales_order_item.item_seq,
+            tb_item.item_image_url,
+            tb_item.item_division,
+            tb_item.item_name,
+            tb_sales_order_item.sales_order_item_quantity,
+            tb_sales_order_item.sales_order_item_price,
+            tb_sales_order_item.sales_order_item_note
+        FROM tb_sales_order_item
+        JOIN tb_item USING (item_seq)
+        WHERE tb_sales_order_item.sales_order_seq = #{salesOrderSeq}
+    </select>
+    
     <!--  주문서 현황 조회  -->
     <select id="selectSalesOrderSituation" resultType="error.pirate.backend.salesOrder.query.dto.SalesOrderSituationDTO">
         SELECT
