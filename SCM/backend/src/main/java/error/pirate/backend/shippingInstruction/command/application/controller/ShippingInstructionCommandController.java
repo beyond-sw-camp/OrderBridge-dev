@@ -8,10 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "출하지시서", description = "출하지시서 조회/등록/수정/삭제")
 @RestController
@@ -32,5 +29,18 @@ public class ShippingInstructionCommandController {
         shippingInstructionApplicationService.createShippingInstruction(evaluationRequest);
 
         return ResponseEntity.status(HttpStatus.CREATED).body("출하지시서 작성성공");
+    }
+
+    // 출하지시서 수정
+    @Operation(summary = "출하지시서 수정", description = "출하지시서를 수정한다.")
+    @PutMapping("/{shippingInstructionSeq}")
+    public ResponseEntity<String> updateShippingInstruction(
+            @PathVariable Long shippingInstructionSeq,
+            @RequestBody ShippingInstructionRequest shippingInstructionRequest
+    ) {
+
+        shippingInstructionApplicationService.updateShippingInstruction(shippingInstructionSeq, shippingInstructionRequest);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body("출하지시서 수정성공");
     }
 }

@@ -64,4 +64,16 @@ public class ShippingInstruction {
     public static ShippingInstruction create(SalesOrder salesOrder, User user, String shippingInstructionName, String shippingInstructionAddress, String status, LocalDateTime shippingInstructionScheduledShipmentDate, int itemTotalQuantity, String shippingInstructionNote) {
         return new ShippingInstruction(salesOrder, user, shippingInstructionName, shippingInstructionAddress, status, shippingInstructionScheduledShipmentDate, itemTotalQuantity, shippingInstructionNote);
     }
+
+    // 다른 필드를 변경하는 메소드
+    public void update(SalesOrder salesOrder, User user, String shippingInstructionName, String shippingInstructionAddress, String 결재전, LocalDateTime shippingInstructionScheduledShipmentDate, int itemTotalQuantity, String shippingInstructionNote) {
+        this.salesOrder = salesOrder;
+        this.user = user;
+        this.shippingInstructionName = shippingInstructionName;
+        this.shippingInstructionAddress = shippingInstructionAddress;
+        this.shippingInstructionScheduledShipmentDate = shippingInstructionScheduledShipmentDate;
+        this.shippingInstructionStatus = ShippingInstructionStatus.결재전;
+        this.shippingInstructionTotalQuantity = itemTotalQuantity;
+        this.shippingInstructionNote = shippingInstructionNote;
+    }
 }
