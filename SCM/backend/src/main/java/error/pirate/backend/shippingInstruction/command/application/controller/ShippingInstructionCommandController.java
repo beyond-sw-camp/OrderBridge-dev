@@ -23,10 +23,10 @@ public class ShippingInstructionCommandController {
     @Operation(summary = "출하지시서 작성", description = "출하지시서를 작성한다.")
     @PostMapping
     public ResponseEntity<String> createShippingInstruction(
-            @RequestBody ShippingInstructionRequest evaluationRequest
+            @RequestBody ShippingInstructionRequest shippingInstructionRequest
     ) {
 
-        shippingInstructionApplicationService.createShippingInstruction(evaluationRequest);
+        shippingInstructionApplicationService.createShippingInstruction(shippingInstructionRequest);
 
         return ResponseEntity.status(HttpStatus.CREATED).body("출하지시서 작성성공");
     }
@@ -54,5 +54,17 @@ public class ShippingInstructionCommandController {
         shippingInstructionApplicationService.updateShippingInstructionStatus(shippingInstructionSeq);
 
         return ResponseEntity.status(HttpStatus.CREATED).body("출하지시서 상태 변경 성공");
+    }
+
+    // 출하지시서 수정
+    @Operation(summary = "출하지시서 삭제", description = "출하지시서를 삭제한다.")
+    @DeleteMapping("/{shippingInstructionSeq}")
+    public ResponseEntity<String> deleteShippingInstruction(
+            @PathVariable Long shippingInstructionSeq
+    ) {
+
+        shippingInstructionApplicationService.deleteShippingInstruction(shippingInstructionSeq);
+
+        return ResponseEntity.status(HttpStatus.OK).body("출하지시서 삭제 성공");
     }
 }
