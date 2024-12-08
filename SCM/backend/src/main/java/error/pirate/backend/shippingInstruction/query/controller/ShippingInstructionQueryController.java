@@ -3,6 +3,8 @@ package error.pirate.backend.shippingInstruction.query.controller;
 import error.pirate.backend.shippingInstruction.query.dto.ShippingInstructionListRequest;
 import error.pirate.backend.shippingInstruction.query.dto.ShippingInstructionListResponse;
 import error.pirate.backend.shippingInstruction.query.dto.ShippingInstructionResponse;
+import error.pirate.backend.shippingInstruction.query.dto.ShippingInstructionSituationRequest;
+import error.pirate.backend.shippingInstruction.query.dto.ShippingInstructionSituationResponse;
 import error.pirate.backend.shippingInstruction.query.service.ShippingInstructionQueryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -13,16 +15,16 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 
-@Tag(name = "출하지시서", description = "출하지시서 조회")
+@Tag(name = "출하지시서 컨트롤러", description = "출하지시서 조회")
 @RestController
 @RequiredArgsConstructor    // final 을 받은 필드의 생성자를 주입
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/shipping-instruction")
 @Slf4j
 public class ShippingInstructionQueryController {
     private final ShippingInstructionQueryService shippingInstructionQueryService;
 
     @Operation(summary = "출하지시서 조회", description = "출하지시서 조회")
-    @GetMapping("/shipping-instruction")
+    @GetMapping
     public ResponseEntity<ShippingInstructionListResponse> readShippingInstructionList(
             @ModelAttribute ShippingInstructionListRequest request
     ) {
@@ -33,7 +35,7 @@ public class ShippingInstructionQueryController {
     }
 
     @Operation(summary = "출하지시서 상세조회", description = "출하지시서 상세조회")
-    @GetMapping("/shipping-instruction/{shippingInstructionSeq}")
+    @GetMapping("/{shippingInstructionSeq}")
     public ResponseEntity<ShippingInstructionResponse> readShippingInstruction(
             @PathVariable long shippingInstructionSeq
     ) {
@@ -43,5 +45,14 @@ public class ShippingInstructionQueryController {
         return ResponseEntity.ok(response);
     }
 
-    /* 현황, 생산 완료 상태 주문서 조회 구현 */
+    @Operation(summary = "출하지시서 현황 조회", description = "출하지시서 현황 조회")
+    @GetMapping("/situation")
+    public ResponseEntity<ShippingInstructionSituationResponse> readShippingInstructionSituation(
+            @ModelAttribute ShippingInstructionSituationRequest request
+    ) {
+        ShippingInstructionSituationResponse response
+                = shippingInstructionQueryService.readShippingInstructionSituation(request);
+
+        return ResponseEntity.ok(response);
+    }
 }
