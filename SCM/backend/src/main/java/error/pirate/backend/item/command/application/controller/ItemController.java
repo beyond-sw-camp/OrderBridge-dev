@@ -1,6 +1,7 @@
 package error.pirate.backend.item.command.application.controller;
 
 import error.pirate.backend.item.command.application.dto.ItemDTO;
+import error.pirate.backend.item.command.application.dto.UpdateItemReqDTO;
 import error.pirate.backend.item.command.application.service.ItemService;
 import error.pirate.backend.item.command.domain.aggregate.entity.Item;
 import io.swagger.v3.oas.annotations.Operation;
@@ -20,10 +21,16 @@ public class ItemController {
 
     private final ItemService itemService;
 
-    @GetMapping("/create")
-    @Operation(summary = "품목 검색", description = "품목을 검색한다.")
-    public ResponseEntity<Item> createItem(@Valid @RequestBody ItemDTO itemDTO) {
-        Item createdItem = itemService.createItem(itemDTO);
-        return ResponseEntity.ok(createdItem);
+    @PostMapping("/create")
+    @Operation(summary = "품목 등록", description = "품목을 등록한다.")
+    public ResponseEntity<Void> createItem(@Valid @RequestBody ItemDTO itemDTO) {
+        itemService.createItem(itemDTO);
+        return ResponseEntity.ok().build();
+    }
+    @PutMapping("/update/{itemSeq}")
+    @Operation(summary = "품목 수정", description =  "품목을 수정한다.")
+    public ResponseEntity<Void> updateItem(@PathVariable Long itemSeq, @RequestBody UpdateItemReqDTO updateItemReqDTO) {
+        itemService.updateItem(itemSeq, updateItemReqDTO);
+        return ResponseEntity.ok().build();
     }
 }
