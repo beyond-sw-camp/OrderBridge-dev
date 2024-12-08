@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 
 @Data
-@Builder
 @Schema(description = "품목 DTO (임시)")
 public class ShippingInstructionItemDTO {
     private long shippingInstructionItemSeq;

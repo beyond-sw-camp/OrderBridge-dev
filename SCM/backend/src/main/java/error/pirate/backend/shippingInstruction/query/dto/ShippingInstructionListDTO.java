@@ -7,7 +7,6 @@ import lombok.Data;
 import java.time.LocalDate;
 
 @Data
-@Builder
 @Schema(description = "출하지시서 리스트 DTO")
 public class ShippingInstructionListDTO {
     private long shippingInstructionSeq;

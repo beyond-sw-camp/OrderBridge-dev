@@ -30,10 +30,10 @@
         <if test="request.endDate != null"><![CDATA[
             AND #{request.endDate} >= si.shipping_instruction_scheduled_shipment_date
             ]]></if>
-        <if test="request.clientName != ''">
+        <if test="request.clientName != '' and request.clientName != null">
             AND c.client_name LIKE CONCAT('%', #{request.clientName}, '%')
         </if>
-        <if test="request.shippingInstructionStatus != ''">
+        <if test="request.shippingInstructionStatus != '' and request.shippingInstructionStatus != null">
             AND si.shipping_instruction_status LIKE #{request.shippingInstructionStatus}
         </if>
         LIMIT #{request.size} OFFSET #{offset}
@@ -50,12 +50,12 @@
             AND #{request.startDate} <= si.shipping_instruction_scheduled_shipment_date
              ]]></if>
         <if test="request.endDate != null"><![CDATA[
-            AND #{request.endDate} >= tsi.shipping_instruction_scheduled_shipment_date
+            AND #{request.endDate} >= si.shipping_instruction_scheduled_shipment_date
             ]]></if>
-        <if test="request.clientName != ''">
+        <if test="request.clientName != '' and request.clientName != null">
             AND c.client_name LIKE CONCAT('%', #{request.clientName}, '%')
         </if>
-        <if test="request.shippingInstructionStatus != ''">
+        <if test="request.shippingInstructionStatus != '' and request.shippingInstructionStatus != null">
             AND si.shipping_instruction_status LIKE #{request.shippingInstructionStatus}
         </if>
     </select>
