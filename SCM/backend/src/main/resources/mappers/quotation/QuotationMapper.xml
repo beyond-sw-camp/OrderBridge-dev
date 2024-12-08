@@ -90,4 +90,27 @@
         WHERE tb_quotation_item.quotation_seq = #{quotationSeq}
     </select>
 
+    <!--  견적서 현황 조회  -->
+    <select id="selectQuotationSituation" resultType="error.pirate.backend.quotation.query.dto.QuotationSituationDTO">
+        SELECT
+            tb_quotation.quotation_seq,
+            tb_quotation.quotation_quotation_date,
+            tb_quotation.quotation_name,
+            tb_quotation.quotation_total_quantity,
+            tb_quotation.quotation_extended_price,
+            tb_client.client_name,
+            tb_quotation.quotation_note
+        FROM tb_quotation
+        JOIN tb_client USING (client_seq)
+        WHERE TRUE
+        <if test="startDate != null"><![CDATA[
+            AND #{startDate} <= tb_quotation.quotation_quotation_date
+        ]]></if>
+        <if test="endDate != null"><![CDATA[
+            AND #{endDate} >= tb_quotation.quotation_quotation_date
+        ]]></if>
+        <if test="clientName != null">
+            AND tb_client.client_name LIKE CONCAT('%', #{clientName}, '%')
+        </if>
+    </select>
 </mapper>
