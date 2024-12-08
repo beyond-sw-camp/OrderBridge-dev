@@ -16,6 +16,5 @@ public class ShippingInstructionRequest {
     private String clientName;  // 거래처명
     private String shippingInstructionAddress;  // 출하 주소
     private String shippingInstructionNote; // 출하 지시서 비고
-    private int itemTotalQuantity;   // 총수량
     private List<ShippingInstructionItemDTO> shippingInstructionItems; // 물품 리스트
 }

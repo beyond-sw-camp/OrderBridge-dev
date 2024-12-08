@@ -50,7 +50,7 @@ public class ShippingInstruction {
 
     private String shippingInstructionNote; // 출하 지시서 비고
 
-    public ShippingInstruction(SalesOrder salesOrder, User user, String shippingInstructionName, String shippingInstructionAddress, String status, LocalDateTime shippingInstructionScheduledShipmentDate, int itemTotalQuantity, String shippingInstructionNote) {
+    private ShippingInstruction(SalesOrder salesOrder, User user, String shippingInstructionName, String shippingInstructionAddress, String status, LocalDateTime shippingInstructionScheduledShipmentDate, int itemTotalQuantity, String shippingInstructionNote) {
         this.salesOrder = salesOrder;
         this.user = user;
         this.shippingInstructionName = shippingInstructionName;

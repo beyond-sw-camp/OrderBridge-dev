@@ -8,7 +8,7 @@ import error.pirate.backend.user.command.domain.aggregate.entity.User;
 import java.time.LocalDateTime;
 
 public class ShippingInstructionMapper {
-    public static ShippingInstruction toEntity(ShippingInstructionRequest shippingInstructionRequest, SalesOrder salesOrder, User user, String shippingInstructionName, LocalDateTime shippingInstructionScheduledShipmentDate) {
+    public static ShippingInstruction toEntity(ShippingInstructionRequest shippingInstructionRequest, SalesOrder salesOrder, User user, String shippingInstructionName, LocalDateTime shippingInstructionScheduledShipmentDate, int itemTotalQuantity) {
         return ShippingInstruction.create(
                 salesOrder,
                 user,
@@ -16,7 +16,7 @@ public class ShippingInstructionMapper {
                 shippingInstructionRequest.getShippingInstructionAddress(),
                 "결재전",
                 shippingInstructionScheduledShipmentDate,
-                shippingInstructionRequest.getItemTotalQuantity(),
+                itemTotalQuantity,
                 shippingInstructionRequest.getShippingInstructionNote()
         );
     }

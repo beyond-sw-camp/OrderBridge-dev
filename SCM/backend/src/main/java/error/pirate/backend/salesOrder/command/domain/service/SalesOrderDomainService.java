@@ -15,6 +15,9 @@ public class SalesOrderDomainService {
 
     /* 주문서명으로 주문서 불러오기 */
     public SalesOrder findBySalesOrderName(String salesOrderName) {
+        if ( salesOrderRepository.findBySalesOrderName(salesOrderName) == null ) {
+            throw new IllegalArgumentException("SalesOrder not found: " + salesOrderName);
+        }
         return salesOrderRepository.findBySalesOrderName(salesOrderName);
     }
 }

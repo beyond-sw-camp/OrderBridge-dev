@@ -1,6 +1,7 @@
 package error.pirate.backend.shippingInstruction.command.domain.service;
 
 import error.pirate.backend.salesOrder.command.domain.aggregate.entity.SalesOrder;
+import error.pirate.backend.shippingInstruction.command.application.dto.ShippingInstructionItemDTO;
 import error.pirate.backend.shippingInstruction.command.application.dto.ShippingInstructionRequest;
 import error.pirate.backend.shippingInstruction.command.domain.aggregate.entity.ShippingInstruction;
 import error.pirate.backend.shippingInstruction.command.domain.repository.ShippingInstructionRepository;
@@ -27,12 +28,12 @@ public class ShippingInstructionDomainService {
     public ShippingInstruction createShippingInstruction(
             ShippingInstructionRequest shippingInstructionRequest,
             SalesOrder salesOrder, User user, String shippingInstructionName,
-            LocalDateTime shippingInstructionScheduledShipmentDate
-    ) {
+            LocalDateTime shippingInstructionScheduledShipmentDate,
+            int itemTotalQuantity) {
 
         /* dto to entity */
         ShippingInstruction newShippingInstruction = ShippingInstructionMapper.toEntity(
-                shippingInstructionRequest, salesOrder, user, shippingInstructionName, shippingInstructionScheduledShipmentDate);
+                shippingInstructionRequest, salesOrder, user, shippingInstructionName, shippingInstructionScheduledShipmentDate, itemTotalQuantity);
         return newShippingInstruction;
     }
 
@@ -66,5 +67,17 @@ public class ShippingInstructionDomainService {
         return formattedDate + " - " + (count+1);
     }
 
+    /* 총수량 계산 */
+    public int calculateTotalQuantity(ShippingInstructionRequest request) {
+        // Null 검사를 수행하여 NPE 방지
+        if (request.getShippingInstructionItems() == null || request.getShippingInstructionItems().isEmpty()) {
+            return 0;
+        }
 
+        // stream을 사용해 shippingInstructionItemQuantity 필드 합산
+        return request.getShippingInstructionItems()
+                .stream()
+                .mapToInt(ShippingInstructionItemDTO::getShippingInstructionItemQuantity)
+                .sum();
+    }
 }

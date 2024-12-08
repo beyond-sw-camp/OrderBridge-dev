@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "출하지시서", description = "출하지시서 등록/수정/삭제")
+@Tag(name = "출하지시서", description = "출하지시서 조회/등록/수정/삭제")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/v1/shipping-instruction")
