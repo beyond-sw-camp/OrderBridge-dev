@@ -58,7 +58,4 @@ public class ShippingInstructionQueryService {
                 .shippingInstructionSituationList(shippingInstructionSituationList)
                 .build();
     }
-
-
-
 }

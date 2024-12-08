@@ -9,13 +9,13 @@ import java.time.LocalDateTime;
 @Data
 @Schema(description = "출하지시서 DTO")
 public class ShippingInstructionDTO {
-    private long shippingInstructionSeq;
-    private String shippingInstructionName;
-    private String shippingInstructionStatus;
-    private LocalDateTime shippingInstructionScheduledShipmentDate;
-    private String clientName;
-    private int shippingInstructionTotalQuantity;
-    private String shippingInstructionAddress;
-    private String userName;
-    private String shippingInstructionNote;
+    private long shippingInstructionSeq;    // 출하지시서 번호
+    private String shippingInstructionName; // 출하지시서명
+    private String shippingInstructionStatus;   // 출하지시서 상태
+    private LocalDateTime shippingInstructionScheduledShipmentDate; // 출하예정일
+    private String clientName;  // 거래처명
+    private int shippingInstructionTotalQuantity;   // 출하지시서 총수량
+    private String shippingInstructionAddress;  // 출하지시서 주소
+    private String userName;    // 출하지시서 담당자
+    private String shippingInstructionNote; // 출하지시서 비고
 }

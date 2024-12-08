@@ -7,6 +7,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
+@Builder
 @Schema(description = "출하지시서 상세 응답")
 public class ShippingInstructionResponse {
     private ShippingInstructionDTO shippingInstructionDTO;

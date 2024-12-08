@@ -16,15 +16,15 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 
 @Tag(name = "출하지시서 컨트롤러", description = "출하지시서 조회")
-@RestController(value = "shippingInstructionController")
+@RestController
 @RequiredArgsConstructor    // final 을 받은 필드의 생성자를 주입
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/shipping-instruction")
 @Slf4j
 public class ShippingInstructionQueryController {
     private final ShippingInstructionQueryService shippingInstructionQueryService;
 
     @Operation(summary = "출하지시서 조회", description = "출하지시서 조회")
-    @GetMapping("/shipping-instruction")
+    @GetMapping
     public ResponseEntity<ShippingInstructionListResponse> readShippingInstructionList(
             @ModelAttribute ShippingInstructionListRequest request
     ) {
@@ -35,7 +35,7 @@ public class ShippingInstructionQueryController {
     }
 
     @Operation(summary = "출하지시서 상세조회", description = "출하지시서 상세조회")
-    @GetMapping("/shipping-instruction/{shippingInstructionSeq}")
+    @GetMapping("/{shippingInstructionSeq}")
     public ResponseEntity<ShippingInstructionResponse> readShippingInstruction(
             @PathVariable long shippingInstructionSeq
     ) {
@@ -46,7 +46,7 @@ public class ShippingInstructionQueryController {
     }
 
     @Operation(summary = "출하지시서 현황 조회", description = "출하지시서 현황 조회")
-    @GetMapping("/shipping-instruction/situation")
+    @GetMapping("/situation")
     public ResponseEntity<ShippingInstructionSituationResponse> readShippingInstructionSituation(
             @ModelAttribute ShippingInstructionSituationRequest request
     ) {

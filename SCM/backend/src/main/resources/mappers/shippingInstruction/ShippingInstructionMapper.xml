@@ -92,33 +92,34 @@
             i.item_price,
             sii.shipping_instruction_item_quantity,
             sii.shipping_instruction_item_note,
-            (i.item_price * sii.shipping_instruction_item_quantity) AS itemTotalQuantity
+            (i.item_price * sii.shipping_instruction_item_quantity) AS itemTotalAmount
         FROM tb_shipping_instruction_item sii
         JOIN tb_item i ON sii.item_seq = i.item_seq
         WHERE sii.shipping_instruction_seq = #{shippingInstructionSeq}
     </select>
 
     <!--  출하지시서 현황 조회  -->
-    <select id="selectShippingInstructionSituationList" resultType="error.pirate.backend.quotation.query.dto.ShippingInstructionSituationDTO">
+    <select id="selectShippingInstructionSituationList" resultType="error.pirate.backend.shippingInstruction.query.dto.ShippingInstructionSituationDTO">
         SELECT
             si.shipping_instruction_seq,
             si.shipping_instruction_scheduled_shipment_date,
             si.shipping_instruction_name,
             si.shipping_instruction_total_quantity,
-            so.client_name,
-            si.shipping_instruction_address
+            c.client_name,
+            si.shipping_instruction_address,
             si.shipping_instruction_note
         FROM tb_shipping_instruction si
-        JOIN tb_sales_order so ON si.sales_order_seq = so.sales_order_seq
-        WHERE TRUE
-        <if test="startDate != null"><![CDATA[
-            AND #{startDate} <= tb_quotation.quotation_quotation_date
+        JOIN tb_sales_order so ON (si.sales_order_seq = so.sales_order_seq)
+        JOIN tb_client c ON (so.client_seq = c.client_seq)
+        WHERE si.shipping_instruction_status IN ('결재전', '결재후')
+        <if test="request.startDate != null"><![CDATA[
+            AND #{request.startDate} <= si.shipping_instruction_scheduled_shipment_date
         ]]></if>
-        <if test="endDate != null"><![CDATA[
-            AND #{endDate} >= tb_quotation.quotation_quotation_date
+        <if test="request.endDate != null"><![CDATA[
+            AND #{endDate} >= si.shipping_instruction_scheduled_shipment_date
         ]]></if>
-        <if test="clientName != null">
-            AND tb_client.client_name LIKE CONCAT('%', #{clientName}, '%')
+        <if test="request.clientName != '' and request.clientName != null">
+            AND c.client_name LIKE CONCAT('%', #{request.clientName}, '%')
         </if>
     </select>
 </mapper>
