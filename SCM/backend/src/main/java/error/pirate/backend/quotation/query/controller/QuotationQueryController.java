@@ -2,6 +2,7 @@ package error.pirate.backend.quotation.query.controller;
 
 import error.pirate.backend.quotation.query.dto.QuotationListResponse;
 import error.pirate.backend.quotation.query.dto.QuotationResponse;
+import error.pirate.backend.quotation.query.dto.QuotationSituationResponse;
 import error.pirate.backend.quotation.query.service.QuotationQueryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -43,5 +45,16 @@ public class QuotationQueryController {
             @RequestParam Long quotationSeq) {
 
         return ResponseEntity.ok(quotationQueryService.getQuotation(quotationSeq));
+    }
+
+    @GetMapping("/situation")
+    @Operation(summary = "견적서 현황 조회")
+    public ResponseEntity<QuotationSituationResponse> getQuotationSituation(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @RequestParam(required = false) String clientName) {
+
+        return ResponseEntity.ok(quotationQueryService.getQuotationSituation(
+                startDate, endDate, clientName));
     }
 }
