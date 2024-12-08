@@ -1,9 +1,6 @@
 package error.pirate.backend.shippingInstruction.query.service;
 
-import error.pirate.backend.shippingInstruction.query.dto.ItemDTO;
-import error.pirate.backend.shippingInstruction.query.dto.ShippingInstructionListDTO;
-import error.pirate.backend.shippingInstruction.query.dto.ShippingInstructionListResponse;
-import error.pirate.backend.shippingInstruction.query.dto.ShippingInstructionResponse;
+import error.pirate.backend.shippingInstruction.query.dto.*;
 import error.pirate.backend.shippingInstruction.query.mapper.ShippingInstructionMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -52,4 +49,18 @@ public class ShippingInstructionQueryService {
 
         return shippingInstruction;
     }
+
+    /* 출하지시서 현황 조회 */
+    @Transactional(readOnly = true)
+    public ShippingInstructionSituationResponse readShippingInstructionSituation(ShippingInstructionSituationRequest request) {
+        List<ShippingInstructionSituationDTO> shippingInstructionSituationList
+                = shippingInstructionMapper.selectShippingInstructionSituationList(request);
+
+        return ShippingInstructionSituationResponse.builder()
+                .shippingInstructionSituationList(shippingInstructionSituationList)
+                .build();
+    }
+
+
+
 }

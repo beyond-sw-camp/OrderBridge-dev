@@ -1,8 +1,6 @@
 package error.pirate.backend.shippingInstruction.query.mapper;
 
-import error.pirate.backend.shippingInstruction.query.dto.ItemDTO;
-import error.pirate.backend.shippingInstruction.query.dto.ShippingInstructionListDTO;
-import error.pirate.backend.shippingInstruction.query.dto.ShippingInstructionResponse;
+import error.pirate.backend.shippingInstruction.query.dto.*;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -28,4 +26,7 @@ public interface ShippingInstructionMapper {
     ShippingInstructionResponse selectShippingInstructionByShippingInstructionSeq(long shippingInstructionSeq);
 
     List<ItemDTO> selectItemListByShippingInstructionSeq(long shippingInstructionSeq);
+
+    List<ShippingInstructionSituationDTO> selectShippingInstructionSituationList(
+            @Param("request") ShippingInstructionSituationRequest request);
 }

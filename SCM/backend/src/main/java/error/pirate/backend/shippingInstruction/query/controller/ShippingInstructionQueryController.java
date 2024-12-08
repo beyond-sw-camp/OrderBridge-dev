@@ -2,6 +2,8 @@ package error.pirate.backend.shippingInstruction.query.controller;
 
 import error.pirate.backend.shippingInstruction.query.dto.ShippingInstructionListResponse;
 import error.pirate.backend.shippingInstruction.query.dto.ShippingInstructionResponse;
+import error.pirate.backend.shippingInstruction.query.dto.ShippingInstructionSituationRequest;
+import error.pirate.backend.shippingInstruction.query.dto.ShippingInstructionSituationResponse;
 import error.pirate.backend.shippingInstruction.query.service.ShippingInstructionQueryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -47,5 +49,14 @@ public class ShippingInstructionQueryController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "출하지시서 현황 조회", description = "출하지시서 현황 조회")
+    @GetMapping("/shipping-instruction/situation")
+    public ResponseEntity<ShippingInstructionSituationResponse> readShippingInstructionSituation(
+            @ModelAttribute ShippingInstructionSituationRequest request
+    ) {
+        ShippingInstructionSituationResponse response
+                = shippingInstructionQueryService.readShippingInstructionSituation(request);
 
+        return ResponseEntity.ok(response);
+    }
 }
