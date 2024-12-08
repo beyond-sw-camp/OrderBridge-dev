@@ -12,6 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -29,6 +31,11 @@ public class ShippingInstructionApplicationService {
         // 출하지시서 유저는 주문서 작성 유저
         User user = salesOrder.getUser();
 
+        /* 출하예정일을 서울 시간으로 변경 */
+        LocalDateTime shippingInstructionScheduledShipmentDate
+                = shippingInstructionDomainService.setShippingInstructionScheduledShipmentDate(
+                        shippingInstructionRequest.getShippingInstructionScheduledShipmentDate());
+
         /* 등록일을 기반으로 ShippingInstruction 명 설정 */
         long count = shippingInstructionDomainService.countTodayShippingInstruction();
         String shippingInstructionName = shippingInstructionDomainService.setShippingInstructionName(count);
@@ -37,7 +44,8 @@ public class ShippingInstructionApplicationService {
 
         /* ShippingInstruction 도메인 생성 로직 실행, entity 반환 */
         ShippingInstruction newShippingInstruction
-                = shippingInstructionDomainService.createShippingInstruction(shippingInstructionRequest, salesOrder, user, shippingInstructionName);
+                = shippingInstructionDomainService.createShippingInstruction(
+                        shippingInstructionRequest, salesOrder, user, shippingInstructionName, shippingInstructionScheduledShipmentDate);
 
         /* save 로직 실행 */
         ShippingInstruction shippingInstruction

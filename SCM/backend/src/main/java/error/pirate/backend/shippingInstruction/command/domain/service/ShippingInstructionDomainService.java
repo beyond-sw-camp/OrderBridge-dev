@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 @Slf4j
@@ -23,16 +24,28 @@ public class ShippingInstructionDomainService {
     private final ShippingInstructionRepository shippingInstructionRepository; ;
 
     /* 도메인 객체를 생성하는 로직 */
-    public ShippingInstruction createShippingInstruction(ShippingInstructionRequest shippingInstructionRequest, SalesOrder salesOrder, User user, String shippingInstructionName) {
+    public ShippingInstruction createShippingInstruction(
+            ShippingInstructionRequest shippingInstructionRequest,
+            SalesOrder salesOrder, User user, String shippingInstructionName,
+            LocalDateTime shippingInstructionScheduledShipmentDate
+    ) {
 
         /* dto to entity */
-        ShippingInstruction newShippingInstruction = ShippingInstructionMapper.toEntity(shippingInstructionRequest, salesOrder, user, shippingInstructionName);
+        ShippingInstruction newShippingInstruction = ShippingInstructionMapper.toEntity(
+                shippingInstructionRequest, salesOrder, user, shippingInstructionName, shippingInstructionScheduledShipmentDate);
         return newShippingInstruction;
     }
 
     /* 도메인 객체를 저장하는 로직 */
     public ShippingInstruction saveShippingInstruction(ShippingInstruction newShippingInstruction) {
         return shippingInstructionRepository.save(newShippingInstruction);
+    }
+
+    /* 출하예정일 서울시간 설정 */
+    public LocalDateTime setShippingInstructionScheduledShipmentDate(LocalDateTime shippingInstructionScheduledShipmentDate) {
+        ZonedDateTime systemZonedDateTime = shippingInstructionScheduledShipmentDate.atZone(ZoneId.systemDefault());
+        ZonedDateTime seoulZonedDateTime = systemZonedDateTime.withZoneSameInstant(ZoneId.of("Asia/Seoul"));
+        return seoulZonedDateTime.toLocalDateTime();
     }
 
     /* 오늘날짜의 등록된 출하지지서 갯수 찾기 */
@@ -52,4 +65,6 @@ public class ShippingInstructionDomainService {
 
         return formattedDate + " - " + (count+1);
     }
+
+
 }
