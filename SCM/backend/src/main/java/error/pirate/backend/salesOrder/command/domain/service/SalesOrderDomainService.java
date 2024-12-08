@@ -13,6 +13,7 @@ public class SalesOrderDomainService {
     
     private final SalesOrderRepository salesOrderRepository;
 
+    /* 주문서명으로 주문서 불러오기 */
     public SalesOrder findBySalesOrderName(String salesOrderName) {
         return salesOrderRepository.findBySalesOrderName(salesOrderName);
     }
