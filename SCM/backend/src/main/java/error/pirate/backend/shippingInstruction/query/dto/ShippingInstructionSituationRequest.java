@@ -12,8 +12,8 @@ import java.time.LocalDate;
 @Schema(description = "출하지시서 현황 요청")
 public class ShippingInstructionSituationRequest {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-    LocalDate startDate;
+    private LocalDate startDate;
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-    LocalDate endDate;
-    String clientName;
+    private LocalDate endDate;
+    private String clientName;
 }

@@ -52,7 +52,7 @@ public class ShippingInstructionQueryService {
     @Transactional(readOnly = true)
     public ShippingInstructionSituationResponse readShippingInstructionSituation(ShippingInstructionSituationRequest request) {
         List<ShippingInstructionSituationDTO> shippingInstructionSituationList
-                = shippingInstructionMapper.selectShippingInstructionSituationList(request);
+                = shippingInstructionMapper.selectShippingInstructionSituation(request);
 
         return ShippingInstructionSituationResponse.builder()
                 .shippingInstructionSituationList(shippingInstructionSituationList)
