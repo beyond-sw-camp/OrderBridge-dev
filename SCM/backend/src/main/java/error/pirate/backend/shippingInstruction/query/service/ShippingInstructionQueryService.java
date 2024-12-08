@@ -47,4 +47,15 @@ public class ShippingInstructionQueryService {
                 .itemList(itemList)
                 .build();
     }
+
+    /* 출하지시서 현황 조회 */
+    @Transactional(readOnly = true)
+    public ShippingInstructionSituationResponse readShippingInstructionSituation(ShippingInstructionSituationRequest request) {
+        List<ShippingInstructionSituationDTO> shippingInstructionSituationList
+                = shippingInstructionMapper.selectShippingInstructionSituationList(request);
+
+        return ShippingInstructionSituationResponse.builder()
+                .shippingInstructionSituationList(shippingInstructionSituationList)
+                .build();
+    }
 }
