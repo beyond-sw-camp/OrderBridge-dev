@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PurchaseOrder {
-    @Id @GeneratedValue(strategy = GenerationType.AUTO)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long purchaseOrderSeq;
 
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)

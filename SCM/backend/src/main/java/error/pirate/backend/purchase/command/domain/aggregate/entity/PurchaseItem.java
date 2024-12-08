@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PurchaseItem {
-    @Id @GeneratedValue(strategy = GenerationType.AUTO)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long purchaseItemSeq;
 
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)

@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ProductionDisbursementItem {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long productionDisbursementItemId;
 
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)

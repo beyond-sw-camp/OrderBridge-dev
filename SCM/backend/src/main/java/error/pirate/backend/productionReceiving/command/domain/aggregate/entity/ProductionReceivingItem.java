@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ProductionReceivingItem {
 
-    @Id @GeneratedValue(strategy = GenerationType.AUTO)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long productionReceivingItemSeq;
 
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
@@ -22,12 +22,12 @@ public class ProductionReceivingItem {
     private Item item; // 품목
 
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
-    @JoinColumn(name = "salesOrderSeq")
-    private SalesOrder salesOrder; // 생산 입고
+    @JoinColumn(name = "productionReceivingSeq")
+    private ProductionReceiving productionReceiving; // 생산 입고
 
     private int productionReceivingItemQuantity; // 생산 입고 품목 수량
 
-    private int productionReceivingItemUnitPrice; // 생산 단가
+    private int productionReceivingUnitPrice; // 생산 단가
 
     private String productionReceivingItemNote; // 생산 입고 품목 비고
 }

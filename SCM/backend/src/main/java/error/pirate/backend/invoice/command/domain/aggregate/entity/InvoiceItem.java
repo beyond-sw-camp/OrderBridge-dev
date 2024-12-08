@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class InvoiceItem {
-    @Id @GeneratedValue(strategy = GenerationType.AUTO)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long invoiceItemSeq;
 
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
