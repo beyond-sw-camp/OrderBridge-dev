@@ -17,17 +17,17 @@ public class ShippingInstructionQueryService {
 
     /* 출하지시서 리스트 조회 */
     @Transactional(readOnly = true)
-    public ShippingInstructionListResponse readShippingInstructionList(int page, int size, LocalDate startDate, LocalDate endDate, String clientName, String shippingInstructionStatus) {
-        int offset = (page - 1) * size;
+    public ShippingInstructionListResponse readShippingInstructionList(ShippingInstructionListRequest request) {
+        int offset = (request.getPage() - 1) * request.getSize();
         List<ShippingInstructionListDTO> shippingInstructionList
-                = shippingInstructionMapper.selectShippingInstructionList(offset, size, startDate, endDate, clientName, shippingInstructionStatus);
+                = shippingInstructionMapper.selectShippingInstructionList(offset, request);
 
-        long totalItems = shippingInstructionMapper.countShippingInstruction(startDate, endDate, clientName, shippingInstructionStatus);
+        long totalItems = shippingInstructionMapper.countShippingInstruction(request);
 
         return ShippingInstructionListResponse.builder()
                 .shippingInstructionList(shippingInstructionList)
-                .currentPage(page)
-                .totalPages((int) Math.ceil((double) totalItems / size))
+                .currentPage(request.getPage())
+                .totalPages((int) Math.ceil((double) totalItems / request.getSize()))
                 .totalItems(totalItems)
                 .build();
     }

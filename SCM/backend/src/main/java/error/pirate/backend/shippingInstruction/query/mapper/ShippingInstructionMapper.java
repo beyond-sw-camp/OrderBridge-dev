@@ -3,6 +3,7 @@ package error.pirate.backend.shippingInstruction.query.mapper;
 import error.pirate.backend.shippingInstruction.query.dto.ShippingInstructionDTO;
 import error.pirate.backend.shippingInstruction.query.dto.ShippingInstructionItemDTO;
 import error.pirate.backend.shippingInstruction.query.dto.ShippingInstructionListDTO;
+import error.pirate.backend.shippingInstruction.query.dto.ShippingInstructionListRequest;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -13,17 +14,10 @@ import java.util.List;
 public interface ShippingInstructionMapper {
     List<ShippingInstructionListDTO> selectShippingInstructionList(
             @Param("offset") int offset,
-            @Param("limit") int limit,
-            @Param("startDate") LocalDate startDate,
-            @Param("endDate") LocalDate endDate,
-            @Param("clientName") String clientName,
-            @Param("shippingInstructionStatus") String shippingInstructionStatus);
+            @Param("request") ShippingInstructionListRequest request);
 
     long countShippingInstruction(
-            @Param("startDate") LocalDate startDate,
-            @Param("endDate") LocalDate endDate,
-            @Param("clientName") String clientName,
-            @Param("shippingInstructionStatus") String shippingInstructionStatus);
+            @Param("request") ShippingInstructionListRequest request);
 
     ShippingInstructionDTO selectShippingInstructionByShippingInstructionSeq(long shippingInstructionSeq);
 
