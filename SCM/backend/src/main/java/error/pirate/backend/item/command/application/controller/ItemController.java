@@ -20,10 +20,9 @@ public class ItemController {
 
     private final ItemService itemService;
 
-
-    @PostMapping
+    @GetMapping("/create")
+    @Operation(summary = "품목 검색", description = "품목을 검색한다.")
     public ResponseEntity<Item> createItem(@Valid @RequestBody ItemDTO itemDTO) {
-        log.info("품목 등록: {}", itemDTO);
         Item createdItem = itemService.createItem(itemDTO);
         return ResponseEntity.ok(createdItem);
     }
