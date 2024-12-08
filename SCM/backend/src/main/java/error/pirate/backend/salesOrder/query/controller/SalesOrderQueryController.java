@@ -1,6 +1,7 @@
 package error.pirate.backend.salesOrder.query.controller;
 
 import error.pirate.backend.salesOrder.query.dto.SalesOrderListResponse;
+import error.pirate.backend.salesOrder.query.dto.SalesOrderSituationResponse;
 import error.pirate.backend.salesOrder.query.service.SalesOrderQueryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -34,5 +35,16 @@ public class SalesOrderQueryController {
 
         return ResponseEntity.ok(salesOrderQueryService.getSalesOrderList(
                 page, size, startDate, endDate, clientName, salesOrderStatus));
+    }
+
+    @GetMapping("/situation")
+    @Operation(summary = "주문서 현황 조회")
+    public ResponseEntity<SalesOrderSituationResponse> getSalesOrderSituation(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @RequestParam(required = false) String clientName) {
+
+        return ResponseEntity.ok(salesOrderQueryService.getSalesOrderSituation(
+                startDate, endDate, clientName));
     }
 }

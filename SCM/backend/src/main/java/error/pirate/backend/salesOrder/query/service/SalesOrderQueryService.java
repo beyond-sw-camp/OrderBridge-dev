@@ -2,6 +2,7 @@ package error.pirate.backend.salesOrder.query.service;
 
 import error.pirate.backend.salesOrder.query.dto.SalesOrderListItemDTO;
 import error.pirate.backend.salesOrder.query.dto.SalesOrderListResponse;
+import error.pirate.backend.salesOrder.query.dto.SalesOrderSituationResponse;
 import error.pirate.backend.salesOrder.query.mapper.SalesOrderMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -34,5 +35,14 @@ public class SalesOrderQueryService {
                 (int) Math.ceil((double) totalSalesOrder / size),
                 totalSalesOrder
         );
+    }
+
+    // 주문서 현황 조회
+    public SalesOrderSituationResponse getSalesOrderSituation(
+            LocalDate startDate, LocalDate endDate, String clientName) {
+
+        // 주문서 현황 조회
+        return new SalesOrderSituationResponse(salesOrderMapper.selectSalesOrderSituation(
+                startDate, endDate, clientName));
     }
 }

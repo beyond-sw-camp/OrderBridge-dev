@@ -55,4 +55,28 @@
             AND tb_sales_order.sales_order_status LIKE #{salesOrderStatus}
         </if>
     </select>
+    
+    <!--  주문서 현황 조회  -->
+    <select id="selectSalesOrderSituation" resultType="error.pirate.backend.salesOrder.query.dto.SalesOrderSituationDTO">
+        SELECT
+            tb_sales_order.sales_order_seq,
+            tb_sales_order.sales_order_order_date,
+            tb_sales_order.sales_order_name,
+            tb_sales_order.sales_order_total_quantity,
+            tb_sales_order.sales_order_extended_price,
+            tb_client.client_name,
+            tb_sales_order.sales_order_note
+        FROM tb_sales_order
+        JOIN tb_client USING (client_seq)
+        WHERE TRUE
+        <if test="startDate != null"><![CDATA[
+            AND #{startDate} <= tb_sales_order.sales_order_order_date
+        ]]></if>
+        <if test="endDate != null"><![CDATA[
+            AND #{endDate} >= tb_sales_order.sales_order_order_date
+        ]]></if>
+        <if test="clientName != null">
+            AND tb_client.client_name LIKE CONCAT('%', #{clientName}, '%')
+        </if>
+    </select>
 </mapper>
