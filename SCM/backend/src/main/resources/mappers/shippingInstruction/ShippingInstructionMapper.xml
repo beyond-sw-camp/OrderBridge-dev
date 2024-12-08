@@ -99,7 +99,8 @@
     </select>
 
     <!--  출하지시서 현황 조회  -->
-    <select id="selectShippingInstructionSituationList" resultType="error.pirate.backend.shippingInstruction.query.dto.ShippingInstructionSituationDTO">
+    <select id="selectShippingInstructionSituation"
+            resultType="error.pirate.backend.shippingInstruction.query.dto.ShippingInstructionSituationDTO">
         SELECT
             si.shipping_instruction_seq,
             si.shipping_instruction_scheduled_shipment_date,
@@ -116,7 +117,7 @@
             AND #{request.startDate} <= si.shipping_instruction_scheduled_shipment_date
         ]]></if>
         <if test="request.endDate != null"><![CDATA[
-            AND #{endDate} >= si.shipping_instruction_scheduled_shipment_date
+            AND #{request.endDate} >= si.shipping_instruction_scheduled_shipment_date
         ]]></if>
         <if test="request.clientName != '' and request.clientName != null">
             AND c.client_name LIKE CONCAT('%', #{request.clientName}, '%')

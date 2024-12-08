@@ -4,7 +4,6 @@ import error.pirate.backend.shippingInstruction.query.dto.*;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Mapper
@@ -20,6 +19,6 @@ public interface ShippingInstructionMapper {
 
     List<ShippingInstructionItemDTO> selectItemListByShippingInstructionSeq(long shippingInstructionSeq);
 
-    List<ShippingInstructionSituationDTO> selectShippingInstructionSituationList(
+    List<ShippingInstructionSituationDTO> selectShippingInstructionSituation(
             @Param("request") ShippingInstructionSituationRequest request);
 }
