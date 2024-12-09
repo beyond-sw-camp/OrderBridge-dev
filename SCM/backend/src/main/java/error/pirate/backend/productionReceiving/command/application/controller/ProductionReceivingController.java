@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-@RequestMapping("/api/v1/productionReceiving/")
+@RequestMapping("/api/v1/productionReceiving")
 @Tag(name = "생산입고 API", description = "생산입고 API")
 public class ProductionReceivingController {
 
