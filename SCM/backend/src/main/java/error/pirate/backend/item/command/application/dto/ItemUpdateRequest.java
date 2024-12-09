@@ -6,9 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class UpdateItemReqDTO {
+public class ItemUpdateRequest {
 
     private Long itemUnitSeq;            // 품목 단위 ID
     private String itemName;             // 품목 이름
