@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 @Table(name = "tb_production_receiving") // 생산 입고
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@SQLDelete(sql = "UPDATE tb_production_receiving SET production_receiving_status = 'DELETE' WHERE production_receiving_seq = ?")
+@SQLDelete(sql = "UPDATE tb_production_receiving SET production_receiving_status = 'DELETE' WHERE production_receiving_seq = ? AND production_receiving_status = 'BEFORE'")
 public class ProductionReceiving {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)

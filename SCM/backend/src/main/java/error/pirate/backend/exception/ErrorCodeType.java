@@ -23,8 +23,22 @@ public enum ErrorCodeType {
     // 공통 오류
     COMMON_ERROR(HttpStatus.BAD_REQUEST, "COMMON_ERROR", "오류가 발생하였습니다. 관리자에게 문의 바랍니다."),
 
-    ;
+    // 상품입고 관련 오류
+    PRODUCTION_RECEIVING_NOT_FOUND(HttpStatus.NOT_FOUND, "PRODUCTION_RECEIVING_ERROR_001", "생산입고를 찾을 수 없습니다."),
+    PRODUCTION_RECEIVING_UPDATE_ERROR(HttpStatus.BAD_REQUEST, "PRODUCTION_RECEIVING_ERROR_003", "이미 결재가 완료된 상품입고입니다."),
 
+    // 창고 관련 오류
+    WAREHOUSE_NOT_FOUND(HttpStatus.NOT_FOUND, "WAREHOUSE_ERROR_001", "창고를 찾을 수 없습니다."),
+
+    // 작업지시서 오류
+    WORK_ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, "WORK_ORDER_ERROR_001", "작업지시서를 찾을 수 없습니다."),
+
+    // 회원 오류
+    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "USER_ERROR_001", "회원을 찾을 수 없습니다."),
+
+    // 물품 오류
+    ITEM_NOT_FOUND(HttpStatus.NOT_FOUND, "ITEM_ERROR_001", "물품을 찾을 수 없습니다."),
+    ;
     private final HttpStatus httpStatus;
     private final String code;
     private final String message;
