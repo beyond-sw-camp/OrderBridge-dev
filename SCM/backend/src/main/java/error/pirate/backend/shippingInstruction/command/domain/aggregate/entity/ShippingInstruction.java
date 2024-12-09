@@ -66,13 +66,12 @@ public class ShippingInstruction {
     }
 
     // 다른 필드를 변경하는 메소드
-    public void update(SalesOrder salesOrder, User user, String shippingInstructionName, String shippingInstructionAddress, String 결재전, LocalDateTime shippingInstructionScheduledShipmentDate, int itemTotalQuantity, String shippingInstructionNote) {
+    public void update(SalesOrder salesOrder, User user, String shippingInstructionAddress, LocalDateTime shippingInstructionScheduledShipmentDate, int itemTotalQuantity, String shippingInstructionNote) {
         this.salesOrder = salesOrder;
         this.user = user;
-        this.shippingInstructionName = shippingInstructionName;
         this.shippingInstructionAddress = shippingInstructionAddress;
         this.shippingInstructionScheduledShipmentDate = shippingInstructionScheduledShipmentDate;
-        this.shippingInstructionStatus = ShippingInstructionStatus.결재전;
+        this.shippingInstructionStatus = ShippingInstructionStatus.BEFORE;
         this.shippingInstructionTotalQuantity = itemTotalQuantity;
         this.shippingInstructionNote = shippingInstructionNote;
     }
