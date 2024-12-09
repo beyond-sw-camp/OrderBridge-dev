@@ -56,6 +56,9 @@ public class ProductionReceivingService {
     @Transactional
     public void updateProductionReceiving(Long productionReceivingSeq, ProductionReceivingUpdateRequest request) {
         ProductionReceiving productionReceiving = productionReceivingRepository.findById(productionReceivingSeq).orElseThrow();
+        /*if(!productionReceiving.getProductionReceivingStatus().equals(ProductionReceivingStatus.BEFORE)) {
+            throw new CustomException(ErrorCodeType.COMMON_ERROR);
+        }*/
         Warehouse productionWarehouse = null;
         Warehouse storeWarehouse = null;
         if(NullCheck.nullOrZeroCheck(request.getProductionWarehouseSeq())) {
@@ -80,5 +83,10 @@ public class ProductionReceivingService {
                 productionReceivingItemRepository.save(productionReceivingItem);
             }
         }
+    }
+
+    @Transactional
+    public void deleteProductionReceiving(Long productionReceivingSeq) {
+        productionReceivingRepository.deleteById(productionReceivingSeq);
     }
 }
