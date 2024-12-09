@@ -6,7 +6,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -50,14 +49,15 @@ public class WorkOrderQueryController {
             @RequestParam(required = false) LocalDate startDate,
             @RequestParam(required = false) LocalDate endDate,
             @RequestParam(required = false) String clientName,
-            @RequestParam(required = false) String wareHouseName
+            @RequestParam(required = false) String warehouseName
     ) {
         log.info("-------------- GET /api/v1/workOrder/currentSituation 작업지시서 현황조회 요청 --------------");
-        WorkOrderSituationResponse response = workOrderQueryService.readWorkOrderSituation(startDate, endDate, clientName, wareHouseName);
+        WorkOrderSituationResponse response = workOrderQueryService.readWorkOrderSituation(startDate, endDate, clientName, warehouseName);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     /* 전표조회 */
+
 
 }

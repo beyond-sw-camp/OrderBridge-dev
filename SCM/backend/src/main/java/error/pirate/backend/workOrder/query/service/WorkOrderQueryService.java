@@ -1,5 +1,7 @@
 package error.pirate.backend.workOrder.query.service;
 
+import error.pirate.backend.exception.CustomException;
+import error.pirate.backend.exception.ErrorCodeType;
 import error.pirate.backend.workOrder.query.dto.*;
 import error.pirate.backend.workOrder.query.mapper.WorkOrderMapper;
 import lombok.RequiredArgsConstructor;
@@ -8,7 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +27,20 @@ public class WorkOrderQueryService {
     public WorkOrderListResponse readWorkOrderList(WorkOrderFilterDTO filter) {
         log.info("-------------- 작업지시서 목록조회 서비스 진입 :목록조회 필터링 조건 - filter: {} --------------", filter);
 
+        // 시작일이 종료일보다 나중인 경우 에러처리
+        if (filter.getStartDate().isAfter(filter.getEndDate())) {
+            throw new CustomException(ErrorCodeType.INVALID_DATE_RANGE);
+        }
+
+        // 기본 날짜 값 설정
+        if (filter.getStartDate() == null) {
+            filter.setStartDate(LocalDate.of(2023, 1, 1));
+        }
+        if (filter.getEndDate() == null) {
+            filter.setEndDate(LocalDate.now());
+        }
+
+        // 페이지 설정
         int offset = (filter.getPage() - 1) * filter.getSize();
 
         // 총 개수
@@ -54,6 +69,9 @@ public class WorkOrderQueryService {
 
         // 품목 제외 작업지시서 조회
         WorkOrderDetailDTO workOrderDetail = workOrderMapper.readWorkOrder(workOrderSeq);
+        if (workOrderDetail == null) {
+            throw new CustomException(ErrorCodeType.WORK_ORDER_NOT_FOUND);
+        }
 
         // 해당 품목 조회
         WorkOrderItemDTO workOrderItem = workOrderMapper.readItemByWorkOrderSeq(workOrderSeq);
@@ -66,12 +84,17 @@ public class WorkOrderQueryService {
 
     /* 작업지시서 현황조회 */
     @Transactional(readOnly = true)
-    public WorkOrderSituationResponse readWorkOrderSituation(LocalDate startDate, LocalDate endDate, String clientName, String wareHouseName) {
-        log.info("-------------- 작업지시서 현황조회 서비스 진입 필터링 조건- startDate: {}, endDate: {}, clientName: {}, wareHouseName: {} --------------"
-                , startDate, endDate, clientName, wareHouseName);
+    public WorkOrderSituationResponse readWorkOrderSituation(LocalDate startDate, LocalDate endDate, String clientName, String warehouseName) {
+        log.info("-------------- 작업지시서 현황조회 서비스 진입 필터링 조건- startDate: {}, endDate: {}, clientName: {}, warehouseName: {} --------------"
+                , startDate, endDate, clientName, warehouseName);
+
+        // 시작일이 종료일보다 나중인 경우 에러처리
+        if (startDate.isAfter(endDate)) {
+            throw new CustomException(ErrorCodeType.INVALID_DATE_RANGE);
+        }
 
         // 데이터 조회
-        List<WorkOrderSituationDTO> situations = workOrderMapper.readWorkOrderSituations(startDate, endDate, clientName, wareHouseName);
+        List<WorkOrderSituationDTO> situations = workOrderMapper.readWorkOrderSituations(startDate, endDate, clientName, warehouseName);
 
         // 월별 그룹화
         Map<String, List<WorkOrderSituationDTO>> groupedByMonth = situations.stream()

@@ -6,7 +6,6 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Mapper
@@ -20,12 +19,16 @@ public interface WorkOrderMapper {
     long readWorkOrderListCount(@Param("filter") WorkOrderFilterDTO filter);
 
     /* 작업지시서 상세 조회 */
-    WorkOrderDetailDTO readWorkOrder(Long workOrderSeq);
+    WorkOrderDetailDTO readWorkOrder(@Param("workOrderSeq") Long workOrderSeq);
 
     /* 작업지시서 상세품목 조회 */
-    WorkOrderItemDTO readItemByWorkOrderSeq(Long workOrderSeq);
+    WorkOrderItemDTO readItemByWorkOrderSeq(@Param("workOrderSeq") Long workOrderSeq);
 
     /* 작업지시서 현황 조회 */
-    List<WorkOrderSituationDTO> readWorkOrderSituations(LocalDate startDate, LocalDate endDate, String clientName, String wareHouseName);
+    List<WorkOrderSituationDTO> readWorkOrderSituations(
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate,
+            @Param("clientName") String clientName,
+            @Param("warehouseName") String warehouseName);
 
 }

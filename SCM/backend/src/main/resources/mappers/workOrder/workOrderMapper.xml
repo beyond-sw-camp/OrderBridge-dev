@@ -100,7 +100,7 @@
         WHERE wo.work_order_seq = #{workOrderSeq}
     </select>
 
-    <select id="readWorkOrderSituations" resultType="error.pirate.backend.workOrder.query.WorkOrderSituationDTO">
+    <select id="readWorkOrderSituations" resultType="error.pirate.backend.workOrder.query.dto.WorkOrderSituationDTO">
         SELECT i.item_name
              , c.client_name
              , wo.work_order_seq
@@ -132,7 +132,7 @@
                 AND i.item_name LIKE CONCAT('%', #{warehouseName}, '%')
             </if>
         </where>
-         ORDER BY wo.work_order_indicated_date ASC
+         ORDER BY wo.work_order_indicated_date
     </select>
     
 </mapper>

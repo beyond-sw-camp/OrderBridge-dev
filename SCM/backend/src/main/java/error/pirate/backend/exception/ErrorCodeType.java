@@ -20,6 +20,10 @@ public enum ErrorCodeType {
     // 주문서 관련 오류
     SALES_ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, "SALES_ORDER_ERROR_001", "주문서를 찾을 수 없습니다."),
 
+    // 작업지시서 관련 오류
+    WORK_ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, "WORK_ORDER_ERROR_001", "조회된 작업지시서가 없습니다."),
+    INVALID_DATE_RANGE(HttpStatus.BAD_REQUEST, "WORK_ORDER_ERROR_002", "유효하지 않은 날짜 범위입니다."),
+
     // 공통 오류
     COMMON_ERROR(HttpStatus.BAD_REQUEST, "COMMON_ERROR", "오류가 발생하였습니다. 관리자에게 문의 바랍니다."),
 
