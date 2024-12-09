@@ -4,6 +4,7 @@ import error.pirate.backend.salesOrder.command.domain.aggregate.entity.SalesOrde
 import error.pirate.backend.shippingInstruction.command.application.dto.ShippingInstructionItemDTO;
 import error.pirate.backend.shippingInstruction.command.application.dto.ShippingInstructionRequest;
 import error.pirate.backend.shippingInstruction.command.domain.aggregate.entity.ShippingInstruction;
+import error.pirate.backend.shippingInstruction.command.domain.aggregate.entity.ShippingInstructionStatus;
 import error.pirate.backend.shippingInstruction.command.domain.repository.ShippingInstructionRepository;
 import error.pirate.backend.shippingInstruction.command.mapper.ShippingInstructionMapper;
 import error.pirate.backend.user.command.domain.aggregate.entity.User;
@@ -16,13 +17,15 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class ShippingInstructionDomainService {
 
-    private final ShippingInstructionRepository shippingInstructionRepository; ;
+    private final ShippingInstructionRepository shippingInstructionRepository;
+    ;
 
     /* 도메인 객체를 생성하는 로직 */
     public ShippingInstruction createShippingInstruction(
@@ -51,7 +54,11 @@ public class ShippingInstructionDomainService {
 
     /* 오늘날짜의 등록된 출하지지서 갯수 찾기 */
     public long countTodayShippingInstruction() {
-        LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
+        // 서울 시간대(Asia/Seoul)를 지정하여 시작과 끝 시간 생성
+        ZoneId seoulZoneId = ZoneId.of("Asia/Seoul");
+
+        // 서울 시간대 기준으로 오늘의 시작과 끝 시간을 계산
+        LocalDateTime startOfDay = LocalDate.now(seoulZoneId).atStartOfDay();
         LocalDateTime endOfDay = startOfDay.plusDays(1).minusNanos(1);
         return shippingInstructionRepository.countByShippingInstructionRegDateBetween(startOfDay, endOfDay);
     }
@@ -64,7 +71,7 @@ public class ShippingInstructionDomainService {
         // yyyy-MM-dd 형식으로 변환
         String formattedDate = today.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 
-        return formattedDate + " - " + (count+1);
+        return formattedDate + " - " + (count + 1);
     }
 
     /* 총수량 계산 */
@@ -79,5 +86,49 @@ public class ShippingInstructionDomainService {
                 .stream()
                 .mapToInt(ShippingInstructionItemDTO::getShippingInstructionItemQuantity)
                 .sum();
+    }
+
+    /* 출하지시서 번호로 출하지시서 찾기 */
+    public ShippingInstruction findByShippingInstructionSeq(Long shippingInstructionSeq) {
+        return shippingInstructionRepository.findById(shippingInstructionSeq)
+                .orElseThrow(() -> new IllegalArgumentException("shippingInstruction not found: " + shippingInstructionSeq));
+    }
+
+    /* 도메인 객체를 수정하는 로직 */
+    public ShippingInstruction updateShippingInstruction(
+            ShippingInstruction shippingInstruction, ShippingInstructionRequest shippingInstructionRequest,
+            SalesOrder salesOrder, User user, LocalDateTime shippingInstructionScheduledShipmentDate,
+            int itemTotalQuantity) {
+
+        /* 수정을 위해 엔터티 정보 변경 */
+        shippingInstruction.update(
+                salesOrder,
+                user,
+                shippingInstructionRequest.getShippingInstructionAddress(),
+                shippingInstructionScheduledShipmentDate,
+                itemTotalQuantity,
+                shippingInstructionRequest.getShippingInstructionNote()
+        );
+
+        return shippingInstruction;
+    }
+
+    /* 수정이 가능한 상태인지 체크 */
+    public void checkShippingInstructionStatus(ShippingInstructionStatus shippingInstructionStatus) {
+        /* 결재전이 아니라면 변경 불가*/
+        if (!shippingInstructionStatus.equals(ShippingInstructionStatus.BEFORE)) {
+            throw new IllegalArgumentException("shippingInstructionStatus not found: " + shippingInstructionStatus);
+        }
+    }
+
+    /* 주문서가 변경되었는지 체크 */
+    public boolean checkShippingInstructionSalesOrder(SalesOrder salesOrder, SalesOrder newSalesOrder) {
+        return !Objects.equals(salesOrder.getSalesOrderSeq(), newSalesOrder.getSalesOrderSeq());
+    }
+
+    /* 상태를 수정하는 로직 */
+    public void updateShippingInstructionStatus(ShippingInstruction shippingInstruction) {
+        /* 수정을 위해 엔터티 정보 변경 */
+        shippingInstruction.updateStatus("AFTER");
     }
 }
