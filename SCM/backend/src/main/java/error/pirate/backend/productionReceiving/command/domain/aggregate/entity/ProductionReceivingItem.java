@@ -1,9 +1,7 @@
 package error.pirate.backend.productionReceiving.command.domain.aggregate.entity;
 
 import error.pirate.backend.item.command.domain.aggregate.entity.Item;
-import error.pirate.backend.productionReceiving.command.application.dto.ProductionReceivingCreateRequest;
 import error.pirate.backend.productionReceiving.command.application.dto.ProductionReceivingItemDTO;
-import error.pirate.backend.warehouse.command.domain.aggregate.entity.Warehouse;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -32,8 +30,7 @@ public class ProductionReceivingItem {
 
     private String productionReceivingItemNote; // 생산 입고 품목 비고
 
-    public static ProductionReceivingItem createProductionReceivingItem(Item item, ProductionReceiving productionReceiving,
-                                                                        ProductionReceivingItemDTO dto) {
+    public static ProductionReceivingItem createProductionReceivingItem(Item item, ProductionReceiving productionReceiving, ProductionReceivingItemDTO dto) {
         ProductionReceivingItem productionReceivingItem = new ProductionReceivingItem(dto);
         productionReceivingItem.specifyItem(item);
         productionReceivingItem.specifyProductionReceiving(productionReceiving);

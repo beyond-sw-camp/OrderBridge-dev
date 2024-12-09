@@ -1,6 +1,5 @@
 package error.pirate.backend.productionReceiving.command.application.dto;
 
-import error.pirate.backend.productionReceiving.command.domain.aggregate.entity.ProductionReceivingStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

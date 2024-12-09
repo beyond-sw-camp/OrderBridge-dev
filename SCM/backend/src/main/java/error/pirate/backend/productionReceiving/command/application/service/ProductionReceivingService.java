@@ -1,9 +1,11 @@
 package error.pirate.backend.productionReceiving.command.application.service;
 
+import error.pirate.backend.common.NullCheck;
 import error.pirate.backend.item.command.domain.aggregate.entity.Item;
 import error.pirate.backend.item.command.domain.repository.ItemRepository;
 import error.pirate.backend.productionReceiving.command.application.dto.ProductionReceivingCreateRequest;
 import error.pirate.backend.productionReceiving.command.application.dto.ProductionReceivingItemDTO;
+import error.pirate.backend.productionReceiving.command.application.dto.ProductionReceivingUpdateRequest;
 import error.pirate.backend.productionReceiving.command.domain.aggregate.entity.ProductionReceiving;
 import error.pirate.backend.productionReceiving.command.domain.aggregate.entity.ProductionReceivingItem;
 import error.pirate.backend.productionReceiving.command.domain.repository.ProductionReceivingItemRepository;
@@ -17,6 +19,8 @@ import error.pirate.backend.workOrder.command.domain.repository.WorkOrderReposit
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -46,6 +50,35 @@ public class ProductionReceivingService {
 
             ProductionReceivingItem productionReceivingItem = ProductionReceivingItem.createProductionReceivingItem(item, productionReceiving, dto);
             productionReceivingItemRepository.save(productionReceivingItem);
+        }
+    }
+
+    @Transactional
+    public void updateProductionReceiving(Long productionReceivingSeq, ProductionReceivingUpdateRequest request) {
+        ProductionReceiving productionReceiving = productionReceivingRepository.findById(productionReceivingSeq).orElseThrow();
+        Warehouse productionWarehouse = null;
+        Warehouse storeWarehouse = null;
+        if(NullCheck.nullOrZeroCheck(request.getProductionWarehouseSeq())) {
+            productionWarehouse = warehouseRepository.findById(request.getProductionWarehouseSeq()).orElseThrow();
+        }
+
+        if(NullCheck.nullOrZeroCheck(request.getStoreWarehouseSeq())) {
+            storeWarehouse = warehouseRepository.findById(request.getStoreWarehouseSeq()).orElseThrow();
+        }
+
+        productionReceiving.updateProductionReceiving(productionWarehouse, storeWarehouse, request);
+
+        /* 생산 입고 품목 수정 시 모두 삭제 처리 후 재등록 */
+        List<ProductionReceivingItem> productionReceivingItems = productionReceivingItemRepository.findAllByProductionReceiving(productionReceiving);
+        productionReceivingItemRepository.deleteAllInBatch(productionReceivingItems);
+
+        if(NullCheck.nullCheck(request.getProductionReceivingItemList())) {
+            for(ProductionReceivingItemDTO dto : request.getProductionReceivingItemList()) {
+                Item item = itemRepository.findById(dto.getItemSeq()).orElseThrow();
+
+                ProductionReceivingItem productionReceivingItem = ProductionReceivingItem.createProductionReceivingItem(item, productionReceiving, dto);
+                productionReceivingItemRepository.save(productionReceivingItem);
+            }
         }
     }
 }
