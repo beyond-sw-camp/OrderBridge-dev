@@ -55,4 +55,8 @@ public class SalesOrder {
     private Integer salesOrderTotalQuantity; // 주문서 총 수량
 
     private String salesOrderNote; // 주문서 비고
+
+    public void updateSalesOrderStatus(SalesOrderStatus salesOrderStatus) {
+        this.salesOrderStatus = salesOrderStatus;
+    }
 }

@@ -4,6 +4,8 @@ import error.pirate.backend.common.NullCheck;
 import error.pirate.backend.exception.CustomException;
 import error.pirate.backend.exception.ErrorCodeType;
 import error.pirate.backend.item.command.domain.aggregate.entity.Item;
+import error.pirate.backend.item.command.domain.aggregate.entity.ItemInventory;
+import error.pirate.backend.item.command.domain.repository.ItemInventoryRepository;
 import error.pirate.backend.item.command.domain.repository.ItemRepository;
 import error.pirate.backend.productionReceiving.command.application.dto.ProductionReceivingCreateRequest;
 import error.pirate.backend.productionReceiving.command.application.dto.ProductionReceivingItemDTO;
@@ -14,6 +16,7 @@ import error.pirate.backend.productionReceiving.command.domain.aggregate.entity.
 import error.pirate.backend.productionReceiving.command.domain.repository.ProductionReceivingItemRepository;
 import error.pirate.backend.productionReceiving.command.domain.repository.ProductionReceivingRepository;
 import error.pirate.backend.salesOrder.command.domain.aggregate.entity.SalesOrder;
+import error.pirate.backend.salesOrder.command.domain.aggregate.entity.SalesOrderStatus;
 import error.pirate.backend.salesOrder.command.domain.repository.SalesOrderRepository;
 import error.pirate.backend.user.command.domain.aggregate.entity.User;
 import error.pirate.backend.user.command.domain.repository.UserRepository;
@@ -39,6 +42,7 @@ public class ProductionReceivingService {
     private final ItemRepository itemRepository;
     private final ProductionReceivingItemRepository productionReceivingItemRepository;
     private final SalesOrderRepository salesOrderRepository;
+    private final ItemInventoryRepository itemInventoryRepository;
 
     @Transactional
     public void createProductionReceiving(ProductionReceivingCreateRequest request) {
@@ -114,6 +118,7 @@ public class ProductionReceivingService {
         productionReceiving.updateProductionReceivingApproval();
     }
 
+    // 생산입고 완료
     @Transactional
     public void updateProductionReceivingComplete(Long productionReceivingSeq) {
         ProductionReceiving productionReceiving = productionReceivingRepository.findById(productionReceivingSeq).orElseThrow(() -> new CustomException(ErrorCodeType.PRODUCTION_RECEIVING_NOT_FOUND));
@@ -121,6 +126,23 @@ public class ProductionReceivingService {
             throw new CustomException(ErrorCodeType.PRODUCTION_RECEIVING_UPDATE_COMPLETE_ERROR);
         }
 
+        productionReceiving.updateProductionReceivingComplete(); // 생산완료 상태 변경
+
         SalesOrder salesOrder = salesOrderRepository.findByProductionReceivingSeq(productionReceivingSeq);
+
+        salesOrder.updateSalesOrderStatus(SalesOrderStatus.PRODUCTIONCOMPLETION); // 주문서의 상태를 생산완료로 변경
+
+        /*
+        * 품목 재고에 생산입고 수량만큼 추가
+        * */
+        List<ProductionReceivingItem> productionReceivingItems = productionReceivingItemRepository.findAllByProductionReceiving(productionReceiving);
+        for(ProductionReceivingItem productionReceivingItem : productionReceivingItems) {
+            Item item = itemRepository.findById(productionReceivingItem.getItem().getItemSeq()).orElseThrow(() -> new CustomException(ErrorCodeType.ITEM_NOT_FOUND));
+            ItemInventory itemInventory = ItemInventory.createItemInventory(
+                    item,
+                    productionReceivingItem.getProductionReceivingItemQuantity(),
+                    productionReceivingItem.getProductionReceivingItemQuantity());
+            itemInventoryRepository.save(itemInventory);
+        }
     }
 }

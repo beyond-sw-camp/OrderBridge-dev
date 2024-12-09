@@ -116,4 +116,9 @@ public class ProductionReceiving {
     public void updateProductionReceivingApproval() {
         this.productionReceivingStatus = ProductionReceivingStatus.AFTER;
     }
+
+    // 생산입고 완료 시 생산완료로 상태 변경
+    public void updateProductionReceivingComplete() {
+        this.productionReceivingStatus = ProductionReceivingStatus.COMPLETE;
+    }
 }

@@ -35,7 +35,7 @@ public class ProductionReceivingController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    @PutMapping("/payment/{productionReceivingSeq}")
+    @PutMapping("/approval/{productionReceivingSeq}")
     @Operation(summary = "생산입고 결재")
     public ResponseEntity<Void> updateProductionReceivingApproval(@PathVariable Long productionReceivingSeq) {
         productionReceivingService.updateProductionReceivingApproval(productionReceivingSeq);
