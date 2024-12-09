@@ -73,7 +73,7 @@ class ProductionReceivingServiceTest {
                 arguments(2L, null, null, null, null, "수정한 생산입고", null, null),
                 arguments(3L, null, null, "2024/12/08-1-수정", null, null, null, itemArguments),
                 arguments(4L, 2L, 12L, "2024/12/08-1-수정", 2000000, "수정한 생산입고", null, null),
-                arguments(4L, null, null, null, null, null, ProductionReceivingStatus.AFTER, null)
+                arguments(5L, null, null, null, null, null, ProductionReceivingStatus.AFTER, null)
         );
     }
 
