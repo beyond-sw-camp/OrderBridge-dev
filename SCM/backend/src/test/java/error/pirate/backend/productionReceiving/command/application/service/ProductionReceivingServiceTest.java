@@ -15,6 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 @Transactional
 class ProductionReceivingServiceTest {
+
     @Autowired
     ProductionReceivingService productionReceivingService;
 
@@ -30,8 +31,7 @@ class ProductionReceivingServiceTest {
         productionReceivingCreateRequest.setProductionReceivingNote("생산입고 비고 입력 테스트");
         productionReceivingCreateRequest.setProductionReceivingItemList(getProductionReceivingItemList());
 
-        productionReceivingService.createProductionReceiving(productionReceivingCreateRequest);
-
+        assertDoesNotThrow(() -> productionReceivingService.createProductionReceiving(productionReceivingCreateRequest));
     }
 
     private static List<ProductionReceivingItemDTO> getProductionReceivingItemList() {

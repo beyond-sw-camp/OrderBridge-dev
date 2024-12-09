@@ -1,7 +1,7 @@
 package error.pirate.backend.item.query.controller;
 
-import error.pirate.backend.item.query.dto.ItemFilterDTO;
-import error.pirate.backend.item.query.dto.ItemSearchDTO;
+import error.pirate.backend.item.query.dto.ItemFilterRequest;
+import error.pirate.backend.item.query.dto.ItemDTO;
 import error.pirate.backend.item.query.service.ItemQueryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -23,9 +23,9 @@ public class ItemQueryContoller {
 
     @GetMapping
     @Operation(summary = "품목 검색", description = "품목을 검색한다.")
-    public ResponseEntity<List<ItemSearchDTO>> searchItem(ItemFilterDTO itemFilterDTO) {
-        List<ItemSearchDTO> itemSearchDTO = itemQueryService.findItem(itemFilterDTO);
-        return ResponseEntity.ok(itemSearchDTO);
+    public ResponseEntity<List<ItemDTO>> readItemList(ItemFilterRequest itemFilterRequest) {
+        List<ItemDTO> itemDTO = itemQueryService.readItemList(itemFilterRequest);
+        return ResponseEntity.ok(itemDTO);
     }
 }
 

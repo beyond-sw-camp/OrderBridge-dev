@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ItemSaveDTO {
+public class ItemCreateRequest {
 
     private Long itemSeq;
 

@@ -1,5 +1,6 @@
 package error.pirate.backend.item.command.domain.aggregate.entity;
 
+import error.pirate.backend.item.command.application.dto.ItemUpdateRequest;
 import error.pirate.backend.user.command.domain.aggregate.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -43,4 +44,25 @@ public class Item {
     private String itemImageUrl; // 품목 이미지 주소
 
     private Integer itemPrice; // 품목 단가
+
+    public void updateItem(ItemUnit itemUnit, ItemUpdateRequest request) {
+        if(itemUnit != null) {
+            this.itemUnit = itemUnit;
+        }
+        if(request != null) {
+            this.itemName = request.getItemName();
+        }
+        if(request != null) {
+            this.itemDivision = request.getItemDivision();
+        }
+        if(request != null) {
+            this.itemExpirationHour = request.getItemExpirationHour();
+        }
+        if(request != null) {
+            this.itemImageUrl = request.getItemImageUrl();
+        }
+        if(request != null) {
+            this.itemPrice = request.getItemPrice();
+        }
+    }
 }
