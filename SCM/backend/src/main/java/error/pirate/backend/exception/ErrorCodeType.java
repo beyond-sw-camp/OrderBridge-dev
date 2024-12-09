@@ -19,6 +19,11 @@ public enum ErrorCodeType {
 
     // 주문서 관련 오류
     SALES_ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, "SALES_ORDER_ERROR_001", "주문서를 찾을 수 없습니다."),
+    SALES_ORDER_STATE_BAD_REQUEST(HttpStatus.BAD_REQUEST, "SALES_ORDER_ERROR_002", "주문서의 상태를 확인해주세요"),
+
+    // 출하지시서 관련 오류
+    SHIPPING_INSTRUCTION_NOT_FOUND(HttpStatus.NOT_FOUND, "SHIPPING_INSTRUCTION_ERROR_001", "출하지시서를 찾을 수 없습니다."),
+    SHIPPING_INSTRUCTION_STATE_BAD_REQUEST(HttpStatus.BAD_REQUEST, "SHIPPING_INSTRUCTION_ERROR_002", "출하지시서의 상태를 확인해주세요"),
 
     // 공통 오류
     COMMON_ERROR(HttpStatus.BAD_REQUEST, "COMMON_ERROR", "오류가 발생하였습니다. 관리자에게 문의 바랍니다."),
