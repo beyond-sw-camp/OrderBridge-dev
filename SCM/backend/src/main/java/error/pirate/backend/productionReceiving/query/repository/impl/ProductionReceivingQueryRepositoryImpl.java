@@ -48,7 +48,9 @@ public class ProductionReceivingQueryRepositoryImpl implements ProductionReceivi
                 .leftJoin(productionReceiving.storeWarehouse, storeWarehouse)
                 .where(productReceivingNameEq(request.getSearchName()),
                         productReceivingStatusIn(request.getSearchStatus()),
-                        productReceivingRegDateGoeLoe(request.getSearchStartDate(), request.getSearchEndDate()))
+                        productReceivingRegDateGoeLoe(request.getSearchStartDate(), request.getSearchEndDate()),
+                        productionReceiving.productionReceivingStatus.ne(ProductionReceivingStatus.DELETE))
+                .orderBy(productionReceiving.productionReceivingSeq.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();

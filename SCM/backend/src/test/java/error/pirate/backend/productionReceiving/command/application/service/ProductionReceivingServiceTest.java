@@ -4,7 +4,6 @@ import error.pirate.backend.productionReceiving.command.application.dto.Producti
 import error.pirate.backend.productionReceiving.command.application.dto.ProductionReceivingItemDTO;
 import error.pirate.backend.productionReceiving.command.application.dto.ProductionReceivingUpdateRequest;
 import error.pirate.backend.productionReceiving.command.domain.aggregate.entity.ProductionReceivingStatus;
-import error.pirate.backend.productionReceiving.query.dto.ProductionReceivingListRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -12,8 +11,6 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
@@ -72,30 +69,49 @@ class ProductionReceivingServiceTest {
         itemArguments.add(new ProductionReceivingItemDTO(3L, 50, 10000, "만원짜리 음식2"));
 
         return Stream.of(
-                arguments(21L, 2L, 12L, "2024/12/08-1-수정", 2000000, "수정한 생산입고", itemArguments),
-                arguments(2L, null, null, null, null, "수정한 생산입고", null),
-                arguments(3L, null, null, "2024/12/08-1-수정", null, null, itemArguments),
-                arguments(4L, 2L, 12L, "2024/12/08-1-수정", 2000000, "수정한 생산입고", null)
+                arguments(21L, 2L, 12L, "2024/12/08-1-수정", 2000000, "수정한 생산입고", null, itemArguments),
+                arguments(2L, null, null, null, null, "수정한 생산입고", null, null),
+                arguments(3L, null, null, "2024/12/08-1-수정", null, null, null, itemArguments),
+                arguments(4L, 2L, 12L, "2024/12/08-1-수정", 2000000, "수정한 생산입고", null, null),
+                arguments(5L, null, null, null, null, null, ProductionReceivingStatus.AFTER, null)
         );
     }
 
     @DisplayName("생산입고 수정")
-    @ParameterizedTest(autoCloseArguments = true)
+    @ParameterizedTest()
     @MethodSource("updateProductionReceivingParam")
     void updateProductionReceiving(Long productionReceivingSeq,
                                      Long productionWarehouseSeq, Long storeWarehouseSeq,
                                      String productionReceivingName, Integer productionReceivingExtendedPrice,
-                                     String productionReceivingNote, List<ProductionReceivingItemDTO> productionReceivingItemList) {
+                                     String productionReceivingNote, ProductionReceivingStatus productionReceivingStatus,
+                                   List<ProductionReceivingItemDTO> productionReceivingItemList) {
 
         ProductionReceivingUpdateRequest request = new ProductionReceivingUpdateRequest(
                 productionWarehouseSeq,
                 storeWarehouseSeq,
                 productionReceivingName,
                 productionReceivingExtendedPrice,
+                productionReceivingStatus,
                 productionReceivingNote,
                 productionReceivingItemList
         );
 
         assertDoesNotThrow(() -> productionReceivingService.updateProductionReceiving(productionReceivingSeq, request));
+    }
+
+    private static Stream<Arguments> deleteProductionReceivingParam() {
+
+        return Stream.of(
+                arguments(21L),
+                arguments(25L)
+        );
+    }
+
+    @DisplayName("생산입고 삭제")
+    @ParameterizedTest()
+    @MethodSource("deleteProductionReceivingParam")
+    void deleteProductionReceiving(Long productionReceivingSeq) {
+
+        assertDoesNotThrow(() -> productionReceivingService.deleteProductionReceiving(productionReceivingSeq));
     }
 }
