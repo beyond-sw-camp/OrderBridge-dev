@@ -37,4 +37,9 @@ public class ShippingInstructionItemDomainService {
     public List<ShippingInstructionItem> saveShippingInstructionItem(List<ShippingInstructionItem> newShippingInstructionItemList) {
         return shippingInstructionItemRepository.saveAll(newShippingInstructionItemList);
     }
+
+    /* 출하지시서 번호로 도메인 객체 삭제하는 로직 */
+    public void deleteByShippingInstruction(ShippingInstruction newShippingInstruction) {
+        shippingInstructionItemRepository.deleteByShippingInstruction(newShippingInstruction);
+    }
 }
