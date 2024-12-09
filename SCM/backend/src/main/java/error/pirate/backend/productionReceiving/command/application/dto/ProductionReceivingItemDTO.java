@@ -13,6 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 public class ProductionReceivingItemDTO {
     private Long itemSeq;
+    private Long productionReceivingSeq;
     private Integer productionReceivingItemQuantity;
     private Integer productionReceivingUnitPrice;
     private String productionReceivingItemNote;
