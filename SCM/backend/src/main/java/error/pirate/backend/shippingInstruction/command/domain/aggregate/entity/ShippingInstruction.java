@@ -50,18 +50,18 @@ public class ShippingInstruction {
 
     private String shippingInstructionNote; // 출하 지시서 비고
 
-    private ShippingInstruction(SalesOrder salesOrder, User user, String shippingInstructionName, String shippingInstructionAddress, String status, LocalDateTime shippingInstructionScheduledShipmentDate, int itemTotalQuantity, String shippingInstructionNote) {
+    private ShippingInstruction(SalesOrder salesOrder, User user, String shippingInstructionName, String shippingInstructionAddress, LocalDateTime shippingInstructionScheduledShipmentDate, int itemTotalQuantity, String shippingInstructionNote) {
         this.salesOrder = salesOrder;
         this.user = user;
         this.shippingInstructionName = shippingInstructionName;
         this.shippingInstructionAddress = shippingInstructionAddress;
         this.shippingInstructionScheduledShipmentDate = shippingInstructionScheduledShipmentDate;
-        this.shippingInstructionStatus = ShippingInstructionStatus.결재전;
+        this.shippingInstructionStatus = ShippingInstructionStatus.BEFORE;
         this.shippingInstructionTotalQuantity = itemTotalQuantity;
         this.shippingInstructionNote = shippingInstructionNote;
     }
 
-    public static ShippingInstruction create(SalesOrder salesOrder, User user, String shippingInstructionName, String shippingInstructionAddress, String status, LocalDateTime shippingInstructionScheduledShipmentDate, int itemTotalQuantity, String shippingInstructionNote) {
-        return new ShippingInstruction(salesOrder, user, shippingInstructionName, shippingInstructionAddress, status, shippingInstructionScheduledShipmentDate, itemTotalQuantity, shippingInstructionNote);
+    public static ShippingInstruction create(SalesOrder salesOrder, User user, String shippingInstructionName, String shippingInstructionAddress, LocalDateTime shippingInstructionScheduledShipmentDate, int itemTotalQuantity, String shippingInstructionNote) {
+        return new ShippingInstruction(salesOrder, user, shippingInstructionName, shippingInstructionAddress, shippingInstructionScheduledShipmentDate, itemTotalQuantity, shippingInstructionNote);
     }
 }

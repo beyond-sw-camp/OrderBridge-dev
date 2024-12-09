@@ -1,7 +1,7 @@
 package error.pirate.backend.shippingInstruction.command.application.service;
 
+import error.pirate.backend.item.command.application.service.ItemService;
 import error.pirate.backend.item.command.domain.aggregate.entity.Item;
-import error.pirate.backend.item.command.domain.service.ItemDomainService;
 import error.pirate.backend.salesOrder.command.domain.aggregate.entity.SalesOrder;
 import error.pirate.backend.salesOrder.command.domain.service.SalesOrderDomainService;
 import error.pirate.backend.shippingInstruction.command.application.dto.ShippingInstructionItemDTO;
@@ -27,7 +27,7 @@ public class ShippingInstructionApplicationService {
     private final ShippingInstructionDomainService shippingInstructionDomainService;
     private final ShippingInstructionItemDomainService shippingInstructionItemDomainService;
     private final SalesOrderDomainService salesOrderDomainService;
-    private final ItemDomainService itemDomainService;
+    private final ItemService itemService;
 
     /* 출하지시서 등록 */
     @Transactional
@@ -63,7 +63,7 @@ public class ShippingInstructionApplicationService {
                 .stream()
                 .map(ShippingInstructionItemDTO::getItemSeq) // itemSeq 필드 추출
                 .toList(); // 추출한 값을 List로 변환
-        List<Item> itemList = itemDomainService.findAllById(itemNameList);
+        List<Item> itemList = itemService.findAllById(itemNameList);
 
         /* ShippingInstructionItem 도메인 생성 로직 실행, entity 반환 */
         List<ShippingInstructionItem> newShippingInstructionItemList
