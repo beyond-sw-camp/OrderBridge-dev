@@ -29,8 +29,8 @@ class ShippingInstructionQueryServiceTest {
                 arguments(new ShippingInstructionListRequest(1, 10, null, LocalDate.of(2024, 12, 25), null, null)),
                 arguments(new ShippingInstructionListRequest(1, 10, LocalDate.of(2024, 12, 20), LocalDate.of(2024, 12, 25), null, null)),
                 arguments(new ShippingInstructionListRequest(1, 10, null, null, "대한항공", null)),
-                arguments(new ShippingInstructionListRequest(1, 10, null, null, null, "결재전")),
-                arguments(new ShippingInstructionListRequest(1, 10, null, null, null, "결재후"))
+                arguments(new ShippingInstructionListRequest(1, 10, null, null, null, "BEFORE")),
+                arguments(new ShippingInstructionListRequest(1, 10, null, null, null, "AFTER"))
         );
     }
 

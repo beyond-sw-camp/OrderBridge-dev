@@ -1,7 +1,7 @@
 package error.pirate.backend.shippingInstruction.command.domain.aggregate.entity;
 
 public enum ShippingInstructionStatus {
-    결재전,
-    결재후,
-    삭제
+    BEFORE, // 결재전
+    AFTER,  // 결재후
+    DELETE  // 삭제
 }
