@@ -25,8 +25,8 @@ public class ProductionReceivingQueryController {
 
     @GetMapping
     @Operation(summary = "생산입고 리스트 조회")
-    public ResponseEntity<ProductionReceivingListResponse> getProductionReceivingList(@ModelAttribute ProductionReceivingListRequest request, Pageable pageable) {
+    public ResponseEntity<ProductionReceivingListResponse> readProductionReceivingList(@ModelAttribute ProductionReceivingListRequest request, Pageable pageable) {
         log.info("request : {}" , request);
-        return ResponseEntity.ok(productionReceivingQueryService.getProductionReceivingList(request, pageable));
+        return ResponseEntity.ok(productionReceivingQueryService.readProductionReceivingList(request, pageable));
     }
 }
