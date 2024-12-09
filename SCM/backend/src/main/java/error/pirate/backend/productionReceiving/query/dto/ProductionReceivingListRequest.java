@@ -1,10 +1,7 @@
 package error.pirate.backend.productionReceiving.query.dto;
 
 import error.pirate.backend.productionReceiving.command.domain.aggregate.entity.ProductionReceivingStatus;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
@@ -13,7 +10,9 @@ import java.time.LocalDate;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 public class ProductionReceivingListRequest {
+    private Long userSeq;
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate searchStartDate;
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)

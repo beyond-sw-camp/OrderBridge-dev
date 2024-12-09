@@ -8,6 +8,7 @@ import error.pirate.backend.productionReceiving.command.domain.aggregate.entity.
 import error.pirate.backend.productionReceiving.query.dto.ProductionReceivingDTO;
 import error.pirate.backend.productionReceiving.query.dto.ProductionReceivingListRequest;
 import error.pirate.backend.productionReceiving.query.repository.ProductionReceivingQueryRepository;
+import error.pirate.backend.warehouse.command.domain.aggregate.entity.QWarehouse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -18,9 +19,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
-import java.util.Optional;
 
-import static error.pirate.backend.productionReceiving.command.domain.aggregate.entity.QProductionReceiving;
+import static error.pirate.backend.productionReceiving.command.domain.aggregate.entity.QProductionReceiving.productionReceiving;
+import static error.pirate.backend.user.command.domain.aggregate.entity.QUser.user;
 
 @Repository
 @RequiredArgsConstructor
@@ -35,18 +36,19 @@ public class ProductionReceivingQueryRepositoryImpl implements ProductionReceivi
         QWarehouse storeWarehouse = new QWarehouse("storeWarehouse");
 
         List<ProductionReceivingDTO> results = queryFactory
-                .select(Projections.fields(ProductionReceivingDTO.class,
+                .select(Projections.constructor(ProductionReceivingDTO.class,
                         productionReceiving.productionReceivingName,
                         productionReceiving.productionReceivingRegDate,
                         productionReceiving.productionReceivingStatus,
-                        productionWarehouse.warehouseName,
-                        storeWarehouse.warehouseName
+                        productionWarehouse.warehouseName.as("productionWarehouse"),
+                        storeWarehouse.warehouseName.as("storeWarehouse")
                 ))
                 .from(productionReceiving)
-                .leftJoin(user, productionReceiving.user)
-                .leftJoin(productionWarehouse, productionReceiving.productionWarehouse)
-                .leftJoin(storeWarehouse, productionReceiving.productionWarehouse)
-                .where(productReceivingNameEq(request.getSearchName()),
+                .leftJoin(productionReceiving.user, user)
+                .leftJoin(productionReceiving.productionWarehouse, productionWarehouse)
+                .leftJoin(productionReceiving.storeWarehouse, storeWarehouse)
+                .where(userSeqEq(request.getUserSeq()),
+                        productReceivingNameEq(request.getSearchName()),
                         productReceivingStatusIn(request.getSearchStatus()),
                         productReceivingRegDateGoeLoe(request.getSearchStartDate(), request.getSearchEndDate()))
                 .offset(pageable.getOffset())
@@ -56,20 +58,24 @@ public class ProductionReceivingQueryRepositoryImpl implements ProductionReceivi
         return new PageImpl<>(results, pageable, results.size());
     }
 
+    private BooleanExpression userSeqEq(Long userSeq) {
+        return userSeq == null ? null : productionReceiving.user.userSeq.eq(userSeq);
+    }
+
     private BooleanExpression productReceivingNameEq(String searchName) {
-        return productReceivingName == null ? null : productReceiving.productReceivingName.eq(searchName);
+        return searchName == null ? null : productionReceiving.productionReceivingName.eq(searchName);
     }
 
     private BooleanExpression productReceivingStatusIn(ProductionReceivingStatus searchStatus) {
-        return searchStatus == null ? null : productReceiving.productReceivingStatus.in(searchStatus);
+        return searchStatus == null ? null : productionReceiving.productionReceivingStatus.in(searchStatus);
     }
 
     // 날짜 필터
     private BooleanExpression productReceivingRegDateGoeLoe(LocalDate searchStartDate, LocalDate searchEndDate) {
 
         //goe, loe 사용
-        BooleanExpression isGoeStartDate = searchStartDate == null ? null : productReceiving.productReceivingRegDate.goe(LocalDateTime.of(searchStartDate, LocalTime.MIN));
-        BooleanExpression isLoeEndDate = searchEndDate == null ? null : productReceiving.productReceivingRegDate.loe(LocalDateTime.of(searchEndDate, LocalTime.MAX).withNano(0));
+        BooleanExpression isGoeStartDate = searchStartDate == null ? null : productionReceiving.productionReceivingRegDate.goe(LocalDateTime.of(searchStartDate, LocalTime.MIN));
+        BooleanExpression isLoeEndDate = searchEndDate == null ? null : productionReceiving.productionReceivingRegDate.loe(LocalDateTime.of(searchEndDate, LocalTime.MAX).withNano(0));
 
         return Expressions.allOf(isGoeStartDate, isLoeEndDate);
     }

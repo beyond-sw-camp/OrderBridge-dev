@@ -6,6 +6,7 @@ import error.pirate.backend.productionReceiving.query.service.ProductionReceivin
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/productionReceiving")
+@Slf4j
 @Tag(name = "생산입고 API", description = "생산입고 API")
 public class ProductionReceivingQueryController {
 
@@ -24,6 +26,7 @@ public class ProductionReceivingQueryController {
     @GetMapping
     @Operation(summary = "생산입고 리스트 조회")
     public ResponseEntity<ProductionReceivingListResponse> getProductionReceivingList(@ModelAttribute ProductionReceivingListRequest request, Pageable pageable) {
+        log.info("request : {}" , request);
         return ResponseEntity.ok(productionReceivingQueryService.getProductionReceivingList(request, pageable));
     }
 }
