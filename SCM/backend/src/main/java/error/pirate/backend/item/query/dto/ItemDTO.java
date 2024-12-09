@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ItemSearchDTO {
+public class ItemDTO {
 
     private Long itemSeq;
     private String itemName;

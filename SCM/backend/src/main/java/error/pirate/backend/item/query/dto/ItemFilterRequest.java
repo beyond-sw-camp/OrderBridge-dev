@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ItemFilterDTO {
+public class ItemFilterRequest {
     private String itemName;          // 품목명
     private String itemDivision;      // 품목 구분
     private Integer itemExpirationHour; // 유통기한

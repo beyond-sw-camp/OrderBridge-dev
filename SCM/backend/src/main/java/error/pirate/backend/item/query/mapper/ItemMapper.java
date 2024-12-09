@@ -1,6 +1,6 @@
 package error.pirate.backend.item.query.mapper;
 
-import error.pirate.backend.item.query.dto.ItemSearchDTO;
+import error.pirate.backend.item.query.dto.ItemDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -9,7 +9,7 @@ import java.util.List;
 @Mapper
 public interface ItemMapper {
 
-    List<ItemSearchDTO> findItemsByFilter(
+    List<ItemDTO> findItemListByFilter(
             @Param("itemName") String itemName,
             @Param("itemDivision") String itemDivision,
             @Param("itemExpirationHour") Integer itemExpirationHour,

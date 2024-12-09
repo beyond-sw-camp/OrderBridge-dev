@@ -1,4 +1,4 @@
-package error.pirate.backend.item.command.Infrastructure.repository;
+package error.pirate.backend.item.command.domain.repository;
 
 import error.pirate.backend.item.command.domain.aggregate.entity.ItemUnit;
 import org.springframework.data.jpa.repository.JpaRepository;
