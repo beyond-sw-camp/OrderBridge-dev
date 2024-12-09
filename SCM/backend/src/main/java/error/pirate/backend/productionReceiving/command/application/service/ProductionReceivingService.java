@@ -1,6 +1,8 @@
 package error.pirate.backend.productionReceiving.command.application.service;
 
 import error.pirate.backend.common.NullCheck;
+import error.pirate.backend.exception.CustomException;
+import error.pirate.backend.exception.ErrorCodeType;
 import error.pirate.backend.item.command.domain.aggregate.entity.Item;
 import error.pirate.backend.item.command.domain.repository.ItemRepository;
 import error.pirate.backend.productionReceiving.command.application.dto.ProductionReceivingCreateRequest;
@@ -8,6 +10,7 @@ import error.pirate.backend.productionReceiving.command.application.dto.Producti
 import error.pirate.backend.productionReceiving.command.application.dto.ProductionReceivingUpdateRequest;
 import error.pirate.backend.productionReceiving.command.domain.aggregate.entity.ProductionReceiving;
 import error.pirate.backend.productionReceiving.command.domain.aggregate.entity.ProductionReceivingItem;
+import error.pirate.backend.productionReceiving.command.domain.aggregate.entity.ProductionReceivingStatus;
 import error.pirate.backend.productionReceiving.command.domain.repository.ProductionReceivingItemRepository;
 import error.pirate.backend.productionReceiving.command.domain.repository.ProductionReceivingRepository;
 import error.pirate.backend.user.command.domain.aggregate.entity.User;
@@ -36,17 +39,17 @@ public class ProductionReceivingService {
     @Transactional
     public void createProductionReceiving(ProductionReceivingCreateRequest request) {
 
-        Warehouse productionWarehouse = warehouseRepository.findById(request.getProductionWarehouseSeq()).orElseThrow();
-        Warehouse storeWarehouse = warehouseRepository.findById(request.getStoreWarehouseSeq()).orElseThrow();
-        User user = userRepository.findById(request.getUserSeq()).orElseThrow();
-        WorkOrder workOrder = workOrderRepository.findById(request.getWorkOrderSeq()).orElseThrow();
+        Warehouse productionWarehouse = warehouseRepository.findById(request.getProductionWarehouseSeq()).orElseThrow(() -> new CustomException(ErrorCodeType.WAREHOUSE_NOT_FOUND));
+        Warehouse storeWarehouse = warehouseRepository.findById(request.getStoreWarehouseSeq()).orElseThrow(() -> new CustomException(ErrorCodeType.WAREHOUSE_NOT_FOUND));
+        User user = userRepository.findById(request.getUserSeq()).orElseThrow(() -> new CustomException(ErrorCodeType.USER_NOT_FOUND));
+        WorkOrder workOrder = workOrderRepository.findById(request.getWorkOrderSeq()).orElseThrow(() -> new CustomException(ErrorCodeType.WORK_ORDER_NOT_FOUND));
 
         ProductionReceiving productionReceiving = ProductionReceiving.createProductionReceiving(productionWarehouse, storeWarehouse, user, workOrder, request);
 
         productionReceivingRepository.save(productionReceiving);
 
         for(ProductionReceivingItemDTO dto : request.getProductionReceivingItemList()) {
-            Item item = itemRepository.findById(dto.getItemSeq()).orElseThrow();
+            Item item = itemRepository.findById(dto.getItemSeq()).orElseThrow(() -> new CustomException(ErrorCodeType.USER_NOT_FOUND));
 
             ProductionReceivingItem productionReceivingItem = ProductionReceivingItem.createProductionReceivingItem(item, productionReceiving, dto);
             productionReceivingItemRepository.save(productionReceivingItem);
@@ -55,18 +58,18 @@ public class ProductionReceivingService {
 
     @Transactional
     public void updateProductionReceiving(Long productionReceivingSeq, ProductionReceivingUpdateRequest request) {
-        ProductionReceiving productionReceiving = productionReceivingRepository.findById(productionReceivingSeq).orElseThrow();
-        /*if(!productionReceiving.getProductionReceivingStatus().equals(ProductionReceivingStatus.BEFORE)) {
-            throw new CustomException(ErrorCodeType.COMMON_ERROR);
-        }*/
+        ProductionReceiving productionReceiving = productionReceivingRepository.findById(productionReceivingSeq).orElseThrow(() -> new CustomException(ErrorCodeType.PRODUCTION_RECEIVING_NOT_FOUND));
+        if(!ProductionReceivingStatus.BEFORE.equals(productionReceiving.getProductionReceivingStatus())) {
+            throw new CustomException(ErrorCodeType.PRODUCTION_RECEIVING_UPDATE_ERROR);
+        }
         Warehouse productionWarehouse = null;
         Warehouse storeWarehouse = null;
         if(NullCheck.nullOrZeroCheck(request.getProductionWarehouseSeq())) {
-            productionWarehouse = warehouseRepository.findById(request.getProductionWarehouseSeq()).orElseThrow();
+            productionWarehouse = warehouseRepository.findById(request.getProductionWarehouseSeq()).orElseThrow(() -> new CustomException(ErrorCodeType.WAREHOUSE_NOT_FOUND));
         }
 
         if(NullCheck.nullOrZeroCheck(request.getStoreWarehouseSeq())) {
-            storeWarehouse = warehouseRepository.findById(request.getStoreWarehouseSeq()).orElseThrow();
+            storeWarehouse = warehouseRepository.findById(request.getStoreWarehouseSeq()).orElseThrow(() -> new CustomException(ErrorCodeType.WAREHOUSE_NOT_FOUND));
         }
 
         productionReceiving.updateProductionReceiving(productionWarehouse, storeWarehouse, request);
@@ -77,7 +80,7 @@ public class ProductionReceivingService {
 
         if(NullCheck.nullCheck(request.getProductionReceivingItemList())) {
             for(ProductionReceivingItemDTO dto : request.getProductionReceivingItemList()) {
-                Item item = itemRepository.findById(dto.getItemSeq()).orElseThrow();
+                Item item = itemRepository.findById(dto.getItemSeq()).orElseThrow(() -> new CustomException(ErrorCodeType.ITEM_NOT_FOUND));
 
                 ProductionReceivingItem productionReceivingItem = ProductionReceivingItem.createProductionReceivingItem(item, productionReceiving, dto);
                 productionReceivingItemRepository.save(productionReceivingItem);
@@ -87,6 +90,11 @@ public class ProductionReceivingService {
 
     @Transactional
     public void deleteProductionReceiving(Long productionReceivingSeq) {
-        productionReceivingRepository.deleteById(productionReceivingSeq);
+        ProductionReceiving productionReceiving = productionReceivingRepository.findById(productionReceivingSeq).orElseThrow(() -> new CustomException(ErrorCodeType.PRODUCTION_RECEIVING_NOT_FOUND));
+        if(!ProductionReceivingStatus.BEFORE.equals(productionReceiving.getProductionReceivingStatus())) {
+            throw new CustomException(ErrorCodeType.PRODUCTION_RECEIVING_UPDATE_ERROR);
+        }
+
+        productionReceivingRepository.delete(productionReceiving);
     }
 }
