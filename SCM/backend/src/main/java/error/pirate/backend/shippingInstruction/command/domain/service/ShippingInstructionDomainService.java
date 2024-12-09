@@ -1,6 +1,9 @@
 package error.pirate.backend.shippingInstruction.command.domain.service;
 
+import error.pirate.backend.exception.CustomException;
+import error.pirate.backend.exception.ErrorCodeType;
 import error.pirate.backend.salesOrder.command.domain.aggregate.entity.SalesOrder;
+import error.pirate.backend.salesOrder.command.domain.aggregate.entity.SalesOrderStatus;
 import error.pirate.backend.shippingInstruction.command.application.dto.ShippingInstructionItemDTO;
 import error.pirate.backend.shippingInstruction.command.application.dto.ShippingInstructionRequest;
 import error.pirate.backend.shippingInstruction.command.domain.aggregate.entity.ShippingInstruction;
@@ -25,7 +28,6 @@ import java.util.Objects;
 public class ShippingInstructionDomainService {
 
     private final ShippingInstructionRepository shippingInstructionRepository;
-    ;
 
     /* 도메인 객체를 생성하는 로직 */
     public ShippingInstruction createShippingInstruction(
@@ -43,6 +45,13 @@ public class ShippingInstructionDomainService {
     /* 도메인 객체를 저장하는 로직 */
     public ShippingInstruction saveShippingInstruction(ShippingInstruction newShippingInstruction) {
         return shippingInstructionRepository.save(newShippingInstruction);
+    }
+
+    /* 주문서 상태가 생산완료인지 체크 */
+    public void checkShippingInstructionSalesOrder(SalesOrder salesOrder) {
+        if (!salesOrder.getSalesOrderStatus().equals(SalesOrderStatus.PRODUCTIONCOMPLETION)) {
+            throw new CustomException(ErrorCodeType.SALES_ORDER_STATE_BAD_REQUEST);
+        }
     }
 
     /* 출하예정일 서울시간 설정 */
@@ -91,7 +100,7 @@ public class ShippingInstructionDomainService {
     /* 출하지시서 번호로 출하지시서 찾기 */
     public ShippingInstruction findByShippingInstructionSeq(Long shippingInstructionSeq) {
         return shippingInstructionRepository.findById(shippingInstructionSeq)
-                .orElseThrow(() -> new IllegalArgumentException("shippingInstruction not found: " + shippingInstructionSeq));
+                .orElseThrow(() -> new CustomException(ErrorCodeType.SALES_ORDER_NOT_FOUND));
     }
 
     /* 도메인 객체를 수정하는 로직 */
@@ -113,16 +122,16 @@ public class ShippingInstructionDomainService {
         return shippingInstruction;
     }
 
-    /* 수정이 가능한 상태인지 체크 */
+    /* 출하지시서 수정이 가능한 상태인지 체크 */
     public void checkShippingInstructionStatus(ShippingInstructionStatus shippingInstructionStatus) {
         /* 결재전이 아니라면 변경 불가*/
         if (!shippingInstructionStatus.equals(ShippingInstructionStatus.BEFORE)) {
-            throw new IllegalArgumentException("shippingInstructionStatus not found: " + shippingInstructionStatus);
+            throw new CustomException(ErrorCodeType.SHIPPING_INSTRUCTION_STATE_BAD_REQUEST);
         }
     }
 
     /* 주문서가 변경되었는지 체크 */
-    public boolean checkShippingInstructionSalesOrder(SalesOrder salesOrder, SalesOrder newSalesOrder) {
+    public boolean checkChangedSalesOrder(SalesOrder salesOrder, SalesOrder newSalesOrder) {
         return !Objects.equals(salesOrder.getSalesOrderSeq(), newSalesOrder.getSalesOrderSeq());
     }
 

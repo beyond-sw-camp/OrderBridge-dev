@@ -34,6 +34,9 @@ public class ShippingInstructionApplicationService {
     public void createShippingInstruction(ShippingInstructionRequest shippingInstructionRequest) {
         SalesOrder salesOrder = salesOrderDomainService.findById(shippingInstructionRequest.getSalesOrderSeq());
 
+        // 주문서가 생산완료 상태인지 체크
+        shippingInstructionDomainService.checkShippingInstructionSalesOrder(salesOrder);
+
         // 출하지시서 유저는 주문서 작성 유저
         User user = salesOrder.getUser();
 
@@ -91,6 +94,9 @@ public class ShippingInstructionApplicationService {
         // 등록과 동일
         SalesOrder newSalesOrder = salesOrderDomainService.findById(shippingInstructionRequest.getSalesOrderSeq());
 
+        // 주문서가 생산완료 상태인지 체크
+        shippingInstructionDomainService.checkShippingInstructionSalesOrder(newSalesOrder);
+
         // 출하지시서 유저는 주문서 작성 유저
         User user = newSalesOrder.getUser();
 
@@ -111,7 +117,7 @@ public class ShippingInstructionApplicationService {
 
         /* 주문서가 변경되었는지 체크 */
         boolean changeSalesOrder =
-                shippingInstructionDomainService.checkShippingInstructionSalesOrder(salesOrder, newSalesOrder);
+                shippingInstructionDomainService.checkChangedSalesOrder(salesOrder, newSalesOrder);
 
         /* 주문서가 변경되었다면 출하지시서 품목도 변경*/
         if (changeSalesOrder){
@@ -135,7 +141,7 @@ public class ShippingInstructionApplicationService {
         }
     }
 
-    /* 출하지시서 상태 변경 */
+    /* 출하지시서 결재 상태 변경 */
     @Transactional
     public void updateShippingInstructionStatus(Long shippingInstructionSeq) {
         /* 출하지시서 찾기 */
@@ -144,7 +150,7 @@ public class ShippingInstructionApplicationService {
         /* 결재전인지 체크 */
         shippingInstructionDomainService.checkShippingInstructionStatus(shippingInstruction.getShippingInstructionStatus());
 
-        /* 상태 변경 */
+        /* 결재후 상태로 변경 */
         shippingInstructionDomainService.updateShippingInstructionStatus(shippingInstruction);
     }
 
