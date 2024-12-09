@@ -13,5 +13,4 @@ import org.springframework.data.domain.Pageable;
 @NoArgsConstructor
 public class ProductionReceivingListResponse {
     private Page<ProductionReceivingDTO> productionReceivingList;
-    private Pageable pageable;
 }

@@ -10,6 +10,7 @@ import error.pirate.backend.productionReceiving.query.dto.ProductionReceivingLis
 import error.pirate.backend.productionReceiving.query.repository.ProductionReceivingQueryRepository;
 import error.pirate.backend.warehouse.command.domain.aggregate.entity.QWarehouse;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -63,7 +64,7 @@ public class ProductionReceivingQueryRepositoryImpl implements ProductionReceivi
     }
 
     private BooleanExpression productReceivingNameEq(String searchName) {
-        return searchName == null ? null : productionReceiving.productionReceivingName.eq(searchName);
+        return StringUtils.isBlank(searchName) ? null : productionReceiving.productionReceivingName.eq(searchName);
     }
 
     private BooleanExpression productReceivingStatusIn(ProductionReceivingStatus searchStatus) {

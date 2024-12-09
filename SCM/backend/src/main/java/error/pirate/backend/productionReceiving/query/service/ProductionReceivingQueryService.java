@@ -15,10 +15,9 @@ import org.springframework.stereotype.Service;
 public class ProductionReceivingQueryService {
 
     private final ProductionReceivingRepository productionReceivingRepository;
-    private final ProductionReceivingItemRepository productionReceivingItemRepository;
 
     public ProductionReceivingListResponse readProductionReceivingList(ProductionReceivingListRequest request, Pageable pageable) {
         Page<ProductionReceivingDTO> productionReceivingList = productionReceivingRepository.findAllByFilter(request, pageable);
-        return new ProductionReceivingListResponse(productionReceivingList, pageable);
+        return new ProductionReceivingListResponse(productionReceivingList);
     }
 }
