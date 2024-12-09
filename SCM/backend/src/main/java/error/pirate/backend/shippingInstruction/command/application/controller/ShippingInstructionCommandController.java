@@ -51,9 +51,9 @@ public class ShippingInstructionCommandController {
             @PathVariable Long shippingInstructionSeq
     ) {
 
-        shippingInstructionApplicationService.updateShippingInstructionStatus(shippingInstructionSeq);
+        shippingInstructionApplicationService.updateShippingInstructionApprovalStatus(shippingInstructionSeq);
 
-        return ResponseEntity.status(HttpStatus.OK).body("출하지시서 상태 변경 성공");
+        return ResponseEntity.status(HttpStatus.OK).body("출하지시서 결재 상태 변경 성공");
     }
 
     // 출하지시서 삭제

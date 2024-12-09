@@ -86,7 +86,7 @@ public class ShippingInstructionApplicationService {
         ShippingInstruction shippingInstruction = shippingInstructionDomainService.findByShippingInstructionSeq(shippingInstructionSeq);
 
         /* 수정이 가능한 상태인지 체크 */
-        shippingInstructionDomainService.checkShippingInstructionStatus(shippingInstruction.getShippingInstructionStatus());
+        shippingInstructionDomainService.checkShippingInstructionApprovalStatus(shippingInstruction.getShippingInstructionStatus());
 
         /* 현재 주문서 저장 */
         SalesOrder salesOrder = shippingInstruction.getSalesOrder();
@@ -143,15 +143,15 @@ public class ShippingInstructionApplicationService {
 
     /* 출하지시서 결재 상태 변경 */
     @Transactional
-    public void updateShippingInstructionStatus(Long shippingInstructionSeq) {
+    public void updateShippingInstructionApprovalStatus(Long shippingInstructionSeq) {
         /* 출하지시서 찾기 */
         ShippingInstruction shippingInstruction = shippingInstructionDomainService.findByShippingInstructionSeq(shippingInstructionSeq);
 
         /* 결재전인지 체크 */
-        shippingInstructionDomainService.checkShippingInstructionStatus(shippingInstruction.getShippingInstructionStatus());
+        shippingInstructionDomainService.checkShippingInstructionApprovalStatus(shippingInstruction.getShippingInstructionStatus());
 
         /* 결재후 상태로 변경 */
-        shippingInstructionDomainService.updateShippingInstructionStatus(shippingInstruction);
+        shippingInstructionDomainService.updateShippingInstructionApprovalStatus(shippingInstruction);
     }
 
     /* 출하지시서 삭제 */
@@ -161,7 +161,7 @@ public class ShippingInstructionApplicationService {
         ShippingInstruction shippingInstruction = shippingInstructionDomainService.findByShippingInstructionSeq(shippingInstructionSeq);
 
         /* 결재전인지 체크 */
-        shippingInstructionDomainService.checkShippingInstructionStatus(shippingInstruction.getShippingInstructionStatus());
+        shippingInstructionDomainService.checkShippingInstructionApprovalStatus(shippingInstruction.getShippingInstructionStatus());
 
         /* 삭제 상태로 변경 */
         shippingInstructionDomainService.deleteShippingInstruction(shippingInstruction);

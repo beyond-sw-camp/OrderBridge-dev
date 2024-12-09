@@ -113,12 +113,12 @@ class ShippingInstructionApplicationServiceTest {
         );
     }
 
-    @DisplayName("출하지시서 상태 수정")
+    @DisplayName("출하지시서 결재 상태 변경")
     @ParameterizedTest(autoCloseArguments = true)
     @MethodSource("updateShippingInstructionStateArguments")
     void updateShippingInstructionStatusTest(Long shippingInstructionSeq) {
         assertDoesNotThrow(
-                () -> shippingInstructionApplicationService.updateShippingInstructionStatus(shippingInstructionSeq)
+                () -> shippingInstructionApplicationService.updateShippingInstructionApprovalStatus(shippingInstructionSeq)
         );
     }
 

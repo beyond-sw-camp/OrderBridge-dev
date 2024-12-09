@@ -123,7 +123,7 @@ public class ShippingInstructionDomainService {
     }
 
     /* 출하지시서 수정이 가능한 상태인지 체크 */
-    public void checkShippingInstructionStatus(ShippingInstructionStatus shippingInstructionStatus) {
+    public void checkShippingInstructionApprovalStatus(ShippingInstructionStatus shippingInstructionStatus) {
         /* 결재전이 아니라면 변경 불가*/
         if (!shippingInstructionStatus.equals(ShippingInstructionStatus.BEFORE)) {
             throw new CustomException(ErrorCodeType.SHIPPING_INSTRUCTION_STATE_BAD_REQUEST);
@@ -136,7 +136,7 @@ public class ShippingInstructionDomainService {
     }
 
     /* 상태를 수정하는 로직 */
-    public void updateShippingInstructionStatus(ShippingInstruction shippingInstruction) {
+    public void updateShippingInstructionApprovalStatus(ShippingInstruction shippingInstruction) {
         /* 수정을 위해 엔터티 정보 변경 */
         shippingInstruction.updateStatus("AFTER");
     }
