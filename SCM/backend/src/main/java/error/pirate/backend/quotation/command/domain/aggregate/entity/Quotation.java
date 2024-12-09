@@ -43,9 +43,25 @@ public class Quotation {
 
     private LocalDateTime quotationEffectiveDate; // 견적서 유효일
 
-    private LocalDateTime quotationExtendedPrice; // 견적서 총금액
+    private Integer quotationExtendedPrice; // 견적서 총금액
 
     private Integer quotationTotalQuantity; // 견적서 총수량
 
     private String quotationNote; // 견적서 비고
+
+    public Quotation(
+            User user, Client client, String quotationName, LocalDateTime quotationQuotationDate, String quotationNote) {
+        this.user = user;
+        this.client = client;
+        this.quotationName = quotationName;
+        this.quotationStatus = QuotationStatus.BEFORE;
+        this.quotationQuotationDate = quotationQuotationDate;
+        this.quotationEffectiveDate = LocalDateTime.now().plusMonths(1);
+        this.quotationNote = quotationNote;
+    }
+
+    public void itemCalculate(Integer quotationExtendedPrice, Integer quotationTotalQuantity) {
+        this.quotationExtendedPrice = quotationExtendedPrice;
+        this.quotationTotalQuantity = quotationTotalQuantity;
+    }
 }

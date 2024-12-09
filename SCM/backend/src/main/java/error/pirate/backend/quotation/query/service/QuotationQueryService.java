@@ -7,7 +7,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -57,5 +56,10 @@ public class QuotationQueryService {
 
         // 견적서 현황 조회
         return new QuotationSituationResponse(quotationMapper.selectQuotationSituation(startDate, endDate, clientName));
+    }
+
+    // 오늘 견적서 개수 조회
+    public String makeQuotationName() {
+        return quotationMapper.makeQuotationName();
     }
 }

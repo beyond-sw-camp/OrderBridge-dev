@@ -113,4 +113,12 @@
             AND tb_client.client_name LIKE CONCAT('%', #{clientName}, '%')
         </if>
     </select>
+
+    <!--  오늘 견적서 개수 조회  -->
+    <select id="makeQuotationName" resultType="String">
+        SELECT
+            CONCAT(DATE_FORMAT(CURDATE(), '%Y/%m/%d'), ' - ', (COUNT(*) + 1))
+        FROM tb_quotation
+        WHERE DATE(tb_quotation.quotation_quotation_date) = CURDATE()
+    </select>
 </mapper>
