@@ -5,7 +5,7 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import error.pirate.backend.productionReceiving.command.domain.aggregate.entity.ProductionReceivingStatus;
-import error.pirate.backend.productionReceiving.query.dto.ProductionReceivingDTO;
+import error.pirate.backend.productionReceiving.query.dto.ProductionReceivingListDTO;
 import error.pirate.backend.productionReceiving.query.dto.ProductionReceivingListRequest;
 import error.pirate.backend.productionReceiving.query.repository.ProductionReceivingQueryRepository;
 import error.pirate.backend.warehouse.command.domain.aggregate.entity.QWarehouse;
@@ -22,7 +22,6 @@ import java.time.LocalTime;
 import java.util.List;
 
 import static error.pirate.backend.productionReceiving.command.domain.aggregate.entity.QProductionReceiving.productionReceiving;
-import static error.pirate.backend.user.command.domain.aggregate.entity.QUser.user;
 
 @Repository
 @RequiredArgsConstructor
@@ -31,13 +30,13 @@ public class ProductionReceivingQueryRepositoryImpl implements ProductionReceivi
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public Page<ProductionReceivingDTO> findAllByFilter(ProductionReceivingListRequest request, Pageable pageable) {
+    public Page<ProductionReceivingListDTO> findAllByFilter(ProductionReceivingListRequest request, Pageable pageable) {
 
         QWarehouse productionWarehouse = new QWarehouse("productionWarehouse");
         QWarehouse storeWarehouse = new QWarehouse("storeWarehouse");
 
-        List<ProductionReceivingDTO> results = queryFactory
-                .select(Projections.constructor(ProductionReceivingDTO.class,
+        List<ProductionReceivingListDTO> results = queryFactory
+                .select(Projections.constructor(ProductionReceivingListDTO.class,
                         productionReceiving.productionReceivingName,
                         productionReceiving.productionReceivingRegDate,
                         productionReceiving.productionReceivingStatus,

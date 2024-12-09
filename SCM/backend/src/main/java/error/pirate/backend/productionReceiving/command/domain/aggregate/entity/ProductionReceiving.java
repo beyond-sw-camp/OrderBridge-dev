@@ -54,7 +54,7 @@ public class ProductionReceiving {
     private String productionReceivingNote; // 생산 입고 비고
 
     @Enumerated(value = EnumType.STRING)
-    private ProductionReceivingStatus productionReceivingStatus; // 생산 입고 상태
+    private final ProductionReceivingStatus productionReceivingStatus = ProductionReceivingStatus.BEFORE; // 생산 입고 상태
 
     public static ProductionReceiving createProductionReceiving(Warehouse productionWarehouse, Warehouse storeWarehouse,
                                                                 User user, WorkOrder workOrder,
