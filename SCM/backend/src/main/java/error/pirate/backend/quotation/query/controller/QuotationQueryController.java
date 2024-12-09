@@ -9,10 +9,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -42,7 +39,7 @@ public class QuotationQueryController {
     @GetMapping("/{quotationSeq}")
     @Operation(summary = "견적서 상세 조회")
     public ResponseEntity<QuotationResponse> getQuotation(
-            @RequestParam Long quotationSeq) {
+            @PathVariable Long quotationSeq) {
 
         return ResponseEntity.ok(quotationQueryService.getQuotation(quotationSeq));
     }
