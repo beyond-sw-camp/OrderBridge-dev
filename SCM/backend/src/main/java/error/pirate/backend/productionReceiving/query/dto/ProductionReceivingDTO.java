@@ -1,10 +1,7 @@
 package error.pirate.backend.productionReceiving.query.dto;
 
 import error.pirate.backend.productionReceiving.command.domain.aggregate.entity.ProductionReceivingStatus;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -12,10 +9,12 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 public class ProductionReceivingDTO {
-    private String productReceivingName;
-    private LocalDateTime productReceivingRegDate;
+    private Long productionReceivingSeq;
+    private String productionReceivingName; // 생산 입고명
+    private Integer productionReceivingExtendedPrice; // 생산 입고 총금액
+    private String productionReceivingNote; // 생산 입고 비고
     private ProductionReceivingStatus productionReceivingStatus;
-    private String productionWarehouseName;
-    private String storeWarehouseName;
+    private LocalDateTime productionReceivingRegDate;
 }
