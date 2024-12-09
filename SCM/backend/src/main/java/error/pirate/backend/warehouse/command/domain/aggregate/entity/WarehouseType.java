@@ -1,5 +1,6 @@
 package error.pirate.backend.warehouse.command.domain.aggregate.entity;
 
 public enum WarehouseType {
-    생산, 보관
+    FACTORY, // 생산
+    WAREHOUSE, //보관
 }
