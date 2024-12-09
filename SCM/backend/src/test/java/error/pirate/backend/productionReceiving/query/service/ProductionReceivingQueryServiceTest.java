@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
@@ -38,7 +37,7 @@ class ProductionReceivingQueryServiceTest {
     }
 
     @DisplayName("생산입고 리스트 조회")
-    @ParameterizedTest(autoCloseArguments = true)
+    @ParameterizedTest()
     @MethodSource("readProductionReceivingListParam")
     void readProductionReceivingList(LocalDate searchStartDate,
                                  LocalDate searchEndDate, String searchName,
@@ -61,7 +60,7 @@ class ProductionReceivingQueryServiceTest {
     }
 
     @DisplayName("생산입고 상세 조회")
-    @ParameterizedTest(autoCloseArguments = true)
+    @ParameterizedTest()
     @MethodSource("readProductionReceivingParam")
     void readProductionReceiving(Long productionReceivingSeq) {
 
