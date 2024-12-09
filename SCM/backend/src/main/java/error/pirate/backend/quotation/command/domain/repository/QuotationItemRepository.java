@@ -3,5 +3,5 @@ package error.pirate.backend.quotation.command.domain.repository;
 import error.pirate.backend.quotation.command.domain.aggregate.entity.QuotationItem;
 
 public interface QuotationItemRepository {
-    Void save(QuotationItem quotationItem);
+    QuotationItem save(QuotationItem quotationItem);
 }

@@ -1,6 +1,7 @@
 package error.pirate.backend.quotation.command.domain.aggregate.entity;
 
 import error.pirate.backend.client.command.domain.aggregate.entity.Client;
+import error.pirate.backend.quotation.query.dto.QuotationCalculateSumDTO;
 import error.pirate.backend.user.command.domain.aggregate.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -60,8 +61,8 @@ public class Quotation {
         this.quotationNote = quotationNote;
     }
 
-    public void itemCalculate(Integer quotationExtendedPrice, Integer quotationTotalQuantity) {
-        this.quotationExtendedPrice = quotationExtendedPrice;
-        this.quotationTotalQuantity = quotationTotalQuantity;
+    public void itemCalculate(QuotationCalculateSumDTO quotationCalculateSumDTO) {
+        this.quotationExtendedPrice = quotationCalculateSumDTO.getQuotationExtendedPrice();
+        this.quotationTotalQuantity = quotationCalculateSumDTO.getQuotationTotalQuantity();
     }
 }

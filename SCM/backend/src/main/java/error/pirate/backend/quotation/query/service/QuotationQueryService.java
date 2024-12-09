@@ -62,4 +62,9 @@ public class QuotationQueryService {
     public String makeQuotationName() {
         return quotationMapper.makeQuotationName();
     }
+
+    // 견적서 합계 계산
+    public QuotationCalculateSumDTO calculateSum(Long quotationSeq) {
+        return quotationMapper.calculateSum(quotationSeq);
+    }
 }

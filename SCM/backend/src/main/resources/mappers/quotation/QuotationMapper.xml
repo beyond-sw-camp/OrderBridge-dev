@@ -117,8 +117,17 @@
     <!--  오늘 견적서 개수 조회  -->
     <select id="makeQuotationName" resultType="String">
         SELECT
-            CONCAT(DATE_FORMAT(CURDATE(), '%Y/%m/%d'), ' - ', (COUNT(*) + 1))
+            CONCAT(DATE_FORMAT(CURDATE(), '%Y/%m/%d'), ' - ', (COUNT(*) + 1)) AS quotation_name
         FROM tb_quotation
         WHERE DATE(tb_quotation.quotation_quotation_date) = CURDATE()
+    </select>
+    
+    <!--  견적서 합계 계산  -->
+    <select id="calculateSum" resultType="error.pirate.backend.quotation.query.dto.QuotationCalculateSumDTO">
+        SELECT
+            SUM(tb_quotation_item.quotation_item_quantity * tb_quotation_item.quotation_item_price) AS quotation_extended_price,
+            SUM(tb_quotation_item.quotation_item_quantity) AS quotation_total_quantity
+        FROM tb_quotation_item
+        WHERE tb_quotation_item.quotation_seq = #{quotationSeq}
     </select>
 </mapper>

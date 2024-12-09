@@ -38,4 +38,7 @@ public interface QuotationMapper {
 
     // 오늘 견적서 개수 조회
     String makeQuotationName();
+
+    QuotationCalculateSumDTO calculateSum(
+            @Param("quotationSeq") Long quotationSeq);
 }
