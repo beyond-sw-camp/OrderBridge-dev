@@ -4,5 +4,4 @@ import error.pirate.backend.salesOrder.command.domain.aggregate.entity.SalesOrde
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface SalesOrderRepository extends JpaRepository<SalesOrder, Long> {
-    SalesOrder findBySalesOrderName(String salesOrderName);
 }

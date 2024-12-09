@@ -32,7 +32,7 @@ public class ShippingInstructionApplicationService {
     /* 출하지시서 등록 */
     @Transactional
     public void createShippingInstruction(ShippingInstructionRequest shippingInstructionRequest) {
-        SalesOrder salesOrder = salesOrderDomainService.findBySalesOrderName(shippingInstructionRequest.getSalesOrderName());
+        SalesOrder salesOrder = salesOrderDomainService.findById(shippingInstructionRequest.getSalesOrderSeq());
 
         // 출하지시서 유저는 주문서 작성 유저
         User user = salesOrder.getUser();
@@ -59,11 +59,11 @@ public class ShippingInstructionApplicationService {
                 = shippingInstructionDomainService.saveShippingInstruction(newShippingInstruction);
 
         /* 물품 불러오기 */
-        List<String> itemNameList = shippingInstructionRequest.getShippingInstructionItems()
+        List<Long> itemNameList = shippingInstructionRequest.getShippingInstructionItems()
                 .stream()
-                .map(ShippingInstructionItemDTO::getItemName) // itemName 필드 추출
+                .map(ShippingInstructionItemDTO::getItemSeq) // itemSeq 필드 추출
                 .toList(); // 추출한 값을 List로 변환
-        List<Item> itemList = itemDomainService.findByItemNameIn(itemNameList);
+        List<Item> itemList = itemDomainService.findAllById(itemNameList);
 
         /* ShippingInstructionItem 도메인 생성 로직 실행, entity 반환 */
         List<ShippingInstructionItem> newShippingInstructionItemList

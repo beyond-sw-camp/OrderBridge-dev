@@ -1,5 +1,7 @@
 package error.pirate.backend.salesOrder.command.domain.service;
 
+import error.pirate.backend.exception.CustomException;
+import error.pirate.backend.exception.ErrorCodeType;
 import error.pirate.backend.salesOrder.command.domain.aggregate.entity.SalesOrder;
 import error.pirate.backend.salesOrder.command.domain.repository.SalesOrderRepository;
 import lombok.RequiredArgsConstructor;
@@ -13,11 +15,9 @@ public class SalesOrderDomainService {
     
     private final SalesOrderRepository salesOrderRepository;
 
-    /* 주문서명으로 주문서 불러오기 */
-    public SalesOrder findBySalesOrderName(String salesOrderName) {
-        if ( salesOrderRepository.findBySalesOrderName(salesOrderName) == null ) {
-            throw new IllegalArgumentException("SalesOrder not found: " + salesOrderName);
-        }
-        return salesOrderRepository.findBySalesOrderName(salesOrderName);
+    /* 주문서 시퀀스로 주문서 불러오기 */
+    public SalesOrder findById(long salesOrderSeq) {
+        return salesOrderRepository.findById(salesOrderSeq)
+                .orElseThrow(() -> new CustomException(ErrorCodeType.SALES_ORDER_NOT_FOUND));
     }
 }

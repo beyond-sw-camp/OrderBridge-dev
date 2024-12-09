@@ -23,16 +23,16 @@ public class ShippingInstructionItemMapper {
         List<ShippingInstructionItemDTO> itemDTOList  = shippingInstructionRequest.getShippingInstructionItems();
 
         // itemList를 Map으로 변환하여 매핑 속도 향상
-        Map<String, Item> itemMap = itemList.stream()
-                .collect(Collectors.toMap(Item::getItemName, item -> item));
+        Map<Long, Item> itemMap = itemList.stream()
+                .collect(Collectors.toMap(Item::getItemSeq, item -> item));
 
         // DTO 리스트를 순회하며 ShippingInstructionItem 생성
         for (ShippingInstructionItemDTO itemDTO : itemDTOList) {
-            Item item = itemMap.get(itemDTO.getItemName()); // itemName으로 Item 매핑
+            Item item = itemMap.get(itemDTO.getItemSeq()); // itemSeq으로 Item 매핑
 
             if (item == null) {
                 // 매핑되지 않은 Item이 있으면 예외 처리 (필요 시 Custom Exception 사용)
-                throw new IllegalArgumentException("Item not found: " + itemDTO.getItemName());
+                throw new IllegalArgumentException("Item not found: " + itemDTO.getItemSeq());
             }
 
             // ShippingInstructionItem 생성 및 리스트에 추가
