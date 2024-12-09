@@ -23,15 +23,15 @@ public class SalesOrder {
     private Long salesOrderSeq;
 
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
-    @JoinColumn(name = "quotation_seq")
+    @JoinColumn(name = "quotationSeq")
     private Quotation quotation; // 견적서
 
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_seq")
+    @JoinColumn(name = "userSeq")
     private User user; // 주문서 담당자 번호
 
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
-    @JoinColumn(name = "client_seq")
+    @JoinColumn(name = "clientSeq")
     private Client client; // 거래처 번호
 
     private String salesOrderName; // 주문서 명
