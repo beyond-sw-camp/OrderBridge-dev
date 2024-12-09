@@ -8,6 +8,7 @@ import error.pirate.backend.warehouse.command.domain.aggregate.entity.Warehouse;
 import error.pirate.backend.workOrder.command.domain.aggregate.entity.WorkOrder;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.SQLDelete;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
@@ -17,6 +18,7 @@ import java.time.LocalDateTime;
 @Table(name = "tb_production_receiving") // 생산 입고
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SQLDelete(sql = "UPDATE tb_production_receiving SET production_receiving_status = 'DELETE' WHERE production_receiving_seq = ?")
 public class ProductionReceiving {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -52,7 +54,7 @@ public class ProductionReceiving {
     private String productionReceivingNote; // 생산 입고 비고
 
     @Enumerated(value = EnumType.STRING)
-    private final ProductionReceivingStatus productionReceivingStatus = ProductionReceivingStatus.BEFORE; // 생산 입고 상태
+    private ProductionReceivingStatus productionReceivingStatus; // 생산 입고 상태
 
     public static ProductionReceiving createProductionReceiving(Warehouse productionWarehouse, Warehouse storeWarehouse,
                                                                 User user, WorkOrder workOrder,
@@ -70,6 +72,7 @@ public class ProductionReceiving {
     protected ProductionReceiving(ProductionReceivingCreateRequest request) {
         this.productionReceivingName = request.getProductionReceivingName();
         this.productionReceivingExtendedPrice = request.getProductionReceivingExtendedPrice();
+        this.productionReceivingStatus = ProductionReceivingStatus.BEFORE;
         this.productionReceivingNote = request.getProductionReceivingNote();
     }
 
@@ -103,6 +106,9 @@ public class ProductionReceiving {
         }
         if(NullCheck.nullOrZeroCheck(request.getProductionReceivingExtendedPrice())) {
             this.productionReceivingExtendedPrice = request.getProductionReceivingExtendedPrice();
+        }
+        if(NullCheck.nullCheck(request.getProductionReceivingStatus())) {
+            this.productionReceivingStatus = request.getProductionReceivingStatus();
         }
         if(NullCheck.nullCheck(request.getProductionReceivingNote())) {
             this.productionReceivingNote = request.getProductionReceivingNote();
