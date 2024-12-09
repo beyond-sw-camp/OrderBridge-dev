@@ -21,7 +21,7 @@ class ShippingInstructionQueryServiceTest {
     @Autowired
     private ShippingInstructionQueryService shippingInstructionQueryService;
 
-    private static Stream<Arguments> getShippingInstructionListArguments() {
+    private static Stream<Arguments> readShippingInstructionListArguments() {
         return Stream.of(
                 arguments(new ShippingInstructionListRequest(1, 10, null, null, null, null)),
                 arguments(new ShippingInstructionListRequest(2, 10, null, null, null, null)),
@@ -36,7 +36,7 @@ class ShippingInstructionQueryServiceTest {
 
     @DisplayName("출하지시서 목록 조회")
     @ParameterizedTest(autoCloseArguments = true)
-    @MethodSource("getShippingInstructionListArguments")
+    @MethodSource("readShippingInstructionListArguments")
     void readShippingInstructionListTest(
             ShippingInstructionListRequest request
     ) {
@@ -44,7 +44,7 @@ class ShippingInstructionQueryServiceTest {
                 () -> shippingInstructionQueryService.readShippingInstructionList(request));
     }
 
-    private static Stream<Arguments> getShippingInstructionArguments() {
+    private static Stream<Arguments> readShippingInstructionArguments() {
         return Stream.of(
                 arguments(1L),
                 arguments(2L),
@@ -56,7 +56,7 @@ class ShippingInstructionQueryServiceTest {
 
     @DisplayName("출하지시서 상세 조회")
     @ParameterizedTest(autoCloseArguments = true)
-    @MethodSource("getShippingInstructionArguments")
+    @MethodSource("readShippingInstructionArguments")
     void readShippingInstructionTest(
             long shippingInstructionSeq
     ) {
@@ -64,7 +64,7 @@ class ShippingInstructionQueryServiceTest {
                 () -> shippingInstructionQueryService.readShippingInstruction(shippingInstructionSeq));
     }
 
-    private static Stream<Arguments> getShippingInstructionSituationArguments() {
+    private static Stream<Arguments> readShippingInstructionSituationArguments() {
         return Stream.of(
                 arguments(new ShippingInstructionSituationRequest(LocalDate.of(2024, 12, 20), null, null)),
                 arguments(new ShippingInstructionSituationRequest(null, LocalDate.of(2024, 12, 25), null)),
@@ -75,7 +75,7 @@ class ShippingInstructionQueryServiceTest {
 
     @DisplayName("출하지시서 현황 조회")
     @ParameterizedTest(autoCloseArguments = true)
-    @MethodSource("getShippingInstructionSituationArguments")
+    @MethodSource("readShippingInstructionSituationArguments")
     void readShippingInstructionSituationTest(
             ShippingInstructionSituationRequest request
     ) {

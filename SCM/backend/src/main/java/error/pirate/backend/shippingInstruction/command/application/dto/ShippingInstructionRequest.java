@@ -1,6 +1,7 @@
 package error.pirate.backend.shippingInstruction.command.application.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -8,7 +9,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
-@RequiredArgsConstructor    // 모든 값을 전달받은 생성자 생성
+@AllArgsConstructor
 @Schema(description = "출하지시서 요청 데이터")
 public class ShippingInstructionRequest {
     private LocalDateTime shippingInstructionScheduledShipmentDate; // 출하예정일
