@@ -2,6 +2,7 @@ package error.pirate.backend.workOrder.query.dto;
 
 import error.pirate.backend.item.command.domain.aggregate.entity.Item;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -19,6 +20,7 @@ public class WorkOrderListDTO {
     private String workOrderName;
     private String workOrderStatus;
     private LocalDateTime workOrderIndicatedDate;
-    private Long warehouseSeq;
-    private List<WorkOrderItemDTO> itemLists;
+    private String warehouseName;
+    private String itemName;
+
 }

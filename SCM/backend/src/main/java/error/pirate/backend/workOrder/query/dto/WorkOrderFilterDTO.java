@@ -1,13 +1,16 @@
 package error.pirate.backend.workOrder.query.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
+@Schema(description = "작업지시서 목록 필터링 DTO")
 public class WorkOrderFilterDTO {
 
     private String warehouseName;          // 생산창고 이름

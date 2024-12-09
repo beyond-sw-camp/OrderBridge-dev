@@ -1,0 +1,22 @@
+package error.pirate.backend.workOrder.query.dto;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.time.LocalDateTime;
+
+@Getter
+@Setter
+@Schema(description = "작업지시서 현황 DTO")
+public class WorkOrderSituationDTO {
+
+    private String ItemName;
+    private String ClientName;
+    private String warehouseName;
+    private String workOrderName;
+    private int workOrderIndicatedQuantity;
+    private LocalDateTime workOrderIndicatedDate;
+    private LocalDateTime workOrderDueDate;
+
+}
