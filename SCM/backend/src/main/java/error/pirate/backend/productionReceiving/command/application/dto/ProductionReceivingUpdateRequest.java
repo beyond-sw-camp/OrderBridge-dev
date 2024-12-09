@@ -1,5 +1,6 @@
 package error.pirate.backend.productionReceiving.command.application.dto;
 
+import error.pirate.backend.productionReceiving.command.domain.aggregate.entity.ProductionReceivingStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,6 +17,7 @@ public class ProductionReceivingUpdateRequest {
     private Long storeWarehouseSeq; // 입고 창고 번호
     private String productionReceivingName; // 생산입고명
     private Integer productionReceivingExtendedPrice; // 생산입고 총액
+    private ProductionReceivingStatus productionReceivingStatus; // 생산입고 상태
     private String productionReceivingNote; // 생산입고 비고
-    private List<ProductionReceivingItemDTO> productionReceivingItemList;
+    private List<ProductionReceivingItemDTO> productionReceivingItemList; // 생산입고 품목
 }
