@@ -24,7 +24,7 @@ public class QuotationQueryController {
 
     @GetMapping("")
     @Operation(summary = "견적서 목록 조회")
-    public ResponseEntity<QuotationListResponse> getQuotationList(
+    public ResponseEntity<QuotationListResponse> readQuotationList(
             @RequestParam(defaultValue = "1") Integer page,
             @RequestParam(defaultValue = "10") Integer size,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
@@ -32,26 +32,26 @@ public class QuotationQueryController {
             @RequestParam(required = false) String clientName,
             @RequestParam(required = false) String quotationStatus) {
 
-        return ResponseEntity.ok(quotationQueryService.getQuotationList(
+        return ResponseEntity.ok(quotationQueryService.readQuotationList(
                 page, size, startDate, endDate, clientName, quotationStatus));
     }
 
     @GetMapping("/{quotationSeq}")
     @Operation(summary = "견적서 상세 조회")
-    public ResponseEntity<QuotationResponse> getQuotation(
+    public ResponseEntity<QuotationResponse> readQuotation(
             @PathVariable Long quotationSeq) {
 
-        return ResponseEntity.ok(quotationQueryService.getQuotation(quotationSeq));
+        return ResponseEntity.ok(quotationQueryService.readQuotation(quotationSeq));
     }
 
     @GetMapping("/situation")
     @Operation(summary = "견적서 현황 조회")
-    public ResponseEntity<QuotationSituationResponse> getQuotationSituation(
+    public ResponseEntity<QuotationSituationResponse> readQuotationSituation(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
             @RequestParam(required = false) String clientName) {
 
-        return ResponseEntity.ok(quotationQueryService.getQuotationSituation(
+        return ResponseEntity.ok(quotationQueryService.readQuotationSituation(
                 startDate, endDate, clientName));
     }
 }

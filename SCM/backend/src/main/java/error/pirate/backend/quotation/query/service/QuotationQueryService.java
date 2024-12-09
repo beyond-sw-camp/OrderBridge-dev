@@ -18,7 +18,7 @@ public class QuotationQueryService {
     private final QuotationMapper quotationMapper;
 
     // 견적서 목록 조회
-    public QuotationListResponse getQuotationList(
+    public QuotationListResponse readQuotationList(
             Integer page, Integer size,
             LocalDate startDate, LocalDate endDate,
             String clientName, String quotationStatus) {
@@ -39,7 +39,7 @@ public class QuotationQueryService {
     }
 
     // 견적서 상세 조회
-    public QuotationResponse getQuotation(Long quotationSeq) {
+    public QuotationResponse readQuotation(Long quotationSeq) {
 
         // 견적서 상세 조회
         QuotationResponse response = modelMapper.map(
@@ -52,7 +52,7 @@ public class QuotationQueryService {
     }
 
     // 견적서 현황 조회
-    public QuotationSituationResponse getQuotationSituation(
+    public QuotationSituationResponse readQuotationSituation(
             LocalDate startDate, LocalDate endDate, String clientName) {
 
         // 견적서 현황 조회

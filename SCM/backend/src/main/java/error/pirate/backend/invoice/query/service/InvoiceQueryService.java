@@ -20,7 +20,7 @@ public class InvoiceQueryService {
     private final ModelMapper modelMapper;
 
     // 거래 명세서 목록 조회
-    public InvoiceListResponse getInvoiceList(
+    public InvoiceListResponse readInvoiceList(
             Integer page, Integer size, LocalDate startDate, LocalDate endDate, String clientName) {
 
         // 거래 명세서 목록 조회
@@ -33,7 +33,7 @@ public class InvoiceQueryService {
     }
 
     // 거래 명세서 상세 조회
-    public InvoiceResponse getInvoice(Long invoiceSeq) {
+    public InvoiceResponse readInvoice(Long invoiceSeq) {
 
         // 거래 명세서 상세 조회
         InvoiceResponse response = modelMapper.map(
@@ -46,7 +46,7 @@ public class InvoiceQueryService {
     }
 
     // 거래 명세서 현황 조회
-    public InvoiceSituationResponse getInvoiceSituation(LocalDate startDate, LocalDate endDate, String clientName) {
+    public InvoiceSituationResponse readInvoiceSituation(LocalDate startDate, LocalDate endDate, String clientName) {
 
         // 거래 명세서 현황 조회
         return new InvoiceSituationResponse(invoiceMapper.selectInvoiceSituation(startDate, endDate, clientName));

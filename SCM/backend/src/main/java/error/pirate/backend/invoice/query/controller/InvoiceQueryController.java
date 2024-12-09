@@ -23,33 +23,33 @@ public class InvoiceQueryController {
 
     @GetMapping("")
     @Operation(summary = "거래 명세서 목록 조회")
-    public ResponseEntity<InvoiceListResponse> getInvoiceList(
+    public ResponseEntity<InvoiceListResponse> readInvoiceList(
             @RequestParam(defaultValue = "1") Integer page,
             @RequestParam(defaultValue = "10") Integer size,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
             @RequestParam(required = false) String clientName) {
 
-        return ResponseEntity.ok(invoiceQueryService.getInvoiceList(
+        return ResponseEntity.ok(invoiceQueryService.readInvoiceList(
                 page, size, startDate, endDate, clientName));
     }
 
     @GetMapping("/{invoiceSeq}")
     @Operation(summary = "거래 명세서 상세 조회")
-    public ResponseEntity<InvoiceResponse> getInvoice(
+    public ResponseEntity<InvoiceResponse> readInvoice(
             @PathVariable Long invoiceSeq) {
 
-        return ResponseEntity.ok(invoiceQueryService.getInvoice(invoiceSeq));
+        return ResponseEntity.ok(invoiceQueryService.readInvoice(invoiceSeq));
     }
 
     @GetMapping("/situation")
     @Operation(summary = "거래 명세서 현황 조회")
-    public ResponseEntity<InvoiceSituationResponse> getInvoiceSituation(
+    public ResponseEntity<InvoiceSituationResponse> readInvoiceSituation(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
             @RequestParam(required = false) String clientName) {
 
-        return ResponseEntity.ok(invoiceQueryService.getInvoiceSituation(
+        return ResponseEntity.ok(invoiceQueryService.readInvoiceSituation(
                 startDate, endDate, clientName));
     }
 }
