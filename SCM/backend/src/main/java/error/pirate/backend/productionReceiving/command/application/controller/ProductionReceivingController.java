@@ -35,6 +35,8 @@ public class ProductionReceivingController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+
+
     @DeleteMapping("/{productionReceivingSeq}")
     @Operation(summary = "생산입고 삭제")
     public ResponseEntity<Void> deleteProductionReceiving(@PathVariable Long productionReceivingSeq) {

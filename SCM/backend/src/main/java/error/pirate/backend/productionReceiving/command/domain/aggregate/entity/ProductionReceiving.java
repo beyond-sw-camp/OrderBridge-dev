@@ -107,9 +107,6 @@ public class ProductionReceiving {
         if(NullCheck.nullOrZeroCheck(request.getProductionReceivingExtendedPrice())) {
             this.productionReceivingExtendedPrice = request.getProductionReceivingExtendedPrice();
         }
-        if(NullCheck.nullCheck(request.getProductionReceivingStatus())) {
-            this.productionReceivingStatus = request.getProductionReceivingStatus();
-        }
         if(NullCheck.nullCheck(request.getProductionReceivingNote())) {
             this.productionReceivingNote = request.getProductionReceivingNote();
         }

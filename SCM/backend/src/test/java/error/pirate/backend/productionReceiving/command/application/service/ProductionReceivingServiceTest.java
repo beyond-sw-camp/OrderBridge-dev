@@ -69,11 +69,11 @@ class ProductionReceivingServiceTest {
         itemArguments.add(new ProductionReceivingItemDTO(3L, 50, 10000, "만원짜리 음식2"));
 
         return Stream.of(
-                arguments(21L, 2L, 12L, "2024/12/08-1-수정", 2000000, "수정한 생산입고", null, itemArguments),
-                arguments(2L, null, null, null, null, "수정한 생산입고", null, null),
-                arguments(3L, null, null, "2024/12/08-1-수정", null, null, null, itemArguments),
-                arguments(4L, 2L, 12L, "2024/12/08-1-수정", 2000000, "수정한 생산입고", null, null),
-                arguments(5L, null, null, null, null, null, ProductionReceivingStatus.AFTER, null)
+                arguments(21L, 2L, 12L, "2024/12/08-1-수정", 2000000, "수정한 생산입고", itemArguments),
+                arguments(2L, null, null, null, null, "수정한 생산입고", null),
+                arguments(3L, null, null, "2024/12/08-1-수정", null, null, itemArguments),
+                arguments(4L, 2L, 12L, "2024/12/08-1-수정", 2000000, "수정한 생산입고", null),
+                arguments(5L, null, null, null, null, null, null)
         );
     }
 
@@ -83,15 +83,13 @@ class ProductionReceivingServiceTest {
     void updateProductionReceiving(Long productionReceivingSeq,
                                      Long productionWarehouseSeq, Long storeWarehouseSeq,
                                      String productionReceivingName, Integer productionReceivingExtendedPrice,
-                                     String productionReceivingNote, ProductionReceivingStatus productionReceivingStatus,
-                                   List<ProductionReceivingItemDTO> productionReceivingItemList) {
+                                     String productionReceivingNote, List<ProductionReceivingItemDTO> productionReceivingItemList) {
 
         ProductionReceivingUpdateRequest request = new ProductionReceivingUpdateRequest(
                 productionWarehouseSeq,
                 storeWarehouseSeq,
                 productionReceivingName,
                 productionReceivingExtendedPrice,
-                productionReceivingStatus,
                 productionReceivingNote,
                 productionReceivingItemList
         );
