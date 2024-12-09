@@ -141,7 +141,7 @@ public class ShippingInstructionApplicationService {
         /* 출하지시서 찾기 */
         ShippingInstruction shippingInstruction = shippingInstructionDomainService.findByShippingInstructionSeq(shippingInstructionSeq);
 
-        /* 수정이 가능한 상태인지 체크 */
+        /* 결재전인지 체크 */
         shippingInstructionDomainService.checkShippingInstructionStatus(shippingInstruction.getShippingInstructionStatus());
 
         /* 상태 변경 */
@@ -153,6 +153,9 @@ public class ShippingInstructionApplicationService {
     public void deleteShippingInstruction(Long shippingInstructionSeq) {
         /* 출하지시서 찾기 */
         ShippingInstruction shippingInstruction = shippingInstructionDomainService.findByShippingInstructionSeq(shippingInstructionSeq);
+
+        /* 결재전인지 체크 */
+        shippingInstructionDomainService.checkShippingInstructionStatus(shippingInstruction.getShippingInstructionStatus());
 
         /* 삭제 상태로 변경 */
         shippingInstructionDomainService.deleteShippingInstruction(shippingInstruction);

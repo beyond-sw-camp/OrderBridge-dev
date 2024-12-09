@@ -135,6 +135,6 @@ public class ShippingInstructionDomainService {
     /* 도메인 객체를 삭제 로직 */
     public void deleteShippingInstruction(ShippingInstruction shippingInstruction) {
         /* 수정을 위해 엔터티 정보 변경 */
-        shippingInstruction.updateStatus("삭제");
+        shippingInstruction.updateStatus("DELETE");
     }
 }
