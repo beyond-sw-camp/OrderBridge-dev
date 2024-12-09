@@ -1,7 +1,12 @@
 package error.pirate.backend.productionReceiving.command.application.service;
 
+import error.pirate.backend.item.command.domain.aggregate.entity.Item;
+import error.pirate.backend.item.command.domain.repository.ItemRepository;
 import error.pirate.backend.productionReceiving.command.application.dto.ProductionReceivingCreateRequest;
+import error.pirate.backend.productionReceiving.command.application.dto.ProductionReceivingItemDTO;
 import error.pirate.backend.productionReceiving.command.domain.aggregate.entity.ProductionReceiving;
+import error.pirate.backend.productionReceiving.command.domain.aggregate.entity.ProductionReceivingItem;
+import error.pirate.backend.productionReceiving.command.domain.repository.ProductionReceivingItemRepository;
 import error.pirate.backend.productionReceiving.command.domain.repository.ProductionReceivingRepository;
 import error.pirate.backend.user.command.domain.aggregate.entity.User;
 import error.pirate.backend.user.command.domain.repository.UserRepository;
@@ -21,6 +26,8 @@ public class ProductionReceivingService {
     private final WarehouseRepository warehouseRepository;
     private final UserRepository userRepository;
     private final WorkOrderRepository workOrderRepository;
+    private final ItemRepository itemRepository;
+    private final ProductionReceivingItemRepository productionReceivingItemRepository;
 
     @Transactional
     public void createProductionReceiving(ProductionReceivingCreateRequest request) {
@@ -33,5 +40,12 @@ public class ProductionReceivingService {
         ProductionReceiving productionReceiving = ProductionReceiving.createProductionReceiving(productionWarehouse, storeWarehouse, user, workOrder, request);
 
         productionReceivingRepository.save(productionReceiving);
+
+        for(ProductionReceivingItemDTO dto : request.getProductionReceivingItemList()) {
+            Item item = itemRepository.findById(dto.getItemSeq()).orElseThrow();
+
+            ProductionReceivingItem productionReceivingItem = ProductionReceivingItem.createProductionReceivingItem(item, productionReceiving, dto);
+            productionReceivingItemRepository.save(productionReceivingItem);
+        }
     }
 }

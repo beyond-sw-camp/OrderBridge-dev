@@ -14,20 +14,21 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/items")
+@RequestMapping("/api/v1/item")
 @Tag(name = "품목 관리", description = "품목 관리 API")
 @Slf4j
 public class ItemController {
 
     private final ItemService itemService;
 
-    @PostMapping("/create")
+    @PostMapping
     @Operation(summary = "품목 등록", description = "품목을 등록한다.")
-    public ResponseEntity<Void> createItem(@Valid @RequestBody ItemDTO itemDTO) {
-        itemService.createItem(itemDTO);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<Item> createItem(@Valid @RequestBody ItemDTO itemDTO) {
+        Item createdItem = itemService.createItem(itemDTO);
+        return ResponseEntity.ok(createdItem);
     }
-    @PutMapping("/update/{itemSeq}")
+
+    @PutMapping("/{itemSeq}")
     @Operation(summary = "품목 수정", description =  "품목을 수정한다.")
     public ResponseEntity<Void> updateItem(@PathVariable Long itemSeq, @RequestBody UpdateItemReqDTO updateItemReqDTO) {
         itemService.updateItem(itemSeq, updateItemReqDTO);

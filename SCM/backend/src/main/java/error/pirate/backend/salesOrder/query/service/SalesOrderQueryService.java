@@ -20,7 +20,7 @@ public class SalesOrderQueryService {
     private final SalesOrderMapper salesOrderMapper;
 
     // 주문서 목록 조회
-    public SalesOrderListResponse getSalesOrderList(
+    public SalesOrderListResponse readSalesOrderList(
             Integer page, Integer size,
             LocalDate startDate, LocalDate endDate,
             String clientName, String salesOrderStatus) {
@@ -41,7 +41,7 @@ public class SalesOrderQueryService {
     }
 
     // 주문서 상세 조회
-    public SalesOrderResponse getSalesOrder(Long salesOrderSeq) {
+    public SalesOrderResponse readSalesOrder(Long salesOrderSeq) {
 
         // 주문서 상세 조회
         SalesOrderResponse response = modelMapper.map(
@@ -54,7 +54,7 @@ public class SalesOrderQueryService {
     }
 
     // 주문서 현황 조회
-    public SalesOrderSituationResponse getSalesOrderSituation(
+    public SalesOrderSituationResponse readSalesOrderSituation(
             LocalDate startDate, LocalDate endDate, String clientName) {
 
         // 주문서 현황 조회

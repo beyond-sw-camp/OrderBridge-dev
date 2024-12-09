@@ -19,7 +19,6 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 @SpringBootTest(classes = BackendApplication.class)
 @Transactional
-@TestPropertySource(locations = "file:/env.properties")// 임시
 class ItemServiceTest {
 
     @Autowired
