@@ -112,4 +112,8 @@ public class ProductionReceiving {
         }
     }
 
+    // 결재 시 결재 후로 상태 변경
+    public void updateProductionReceivingApproval() {
+        this.productionReceivingStatus = ProductionReceivingStatus.AFTER;
+    }
 }

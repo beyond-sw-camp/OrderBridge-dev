@@ -13,11 +13,14 @@ import error.pirate.backend.productionReceiving.command.domain.aggregate.entity.
 import error.pirate.backend.productionReceiving.command.domain.aggregate.entity.ProductionReceivingStatus;
 import error.pirate.backend.productionReceiving.command.domain.repository.ProductionReceivingItemRepository;
 import error.pirate.backend.productionReceiving.command.domain.repository.ProductionReceivingRepository;
+import error.pirate.backend.salesOrder.command.domain.aggregate.entity.SalesOrder;
+import error.pirate.backend.salesOrder.command.domain.repository.SalesOrderRepository;
 import error.pirate.backend.user.command.domain.aggregate.entity.User;
 import error.pirate.backend.user.command.domain.repository.UserRepository;
 import error.pirate.backend.warehouse.command.domain.aggregate.entity.Warehouse;
 import error.pirate.backend.warehouse.command.domain.repository.WarehouseRepository;
 import error.pirate.backend.workOrder.command.domain.aggregate.entity.WorkOrder;
+import error.pirate.backend.workOrder.command.domain.aggregate.entity.WorkOrderStatus;
 import error.pirate.backend.workOrder.command.domain.repository.WorkOrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -35,6 +38,7 @@ public class ProductionReceivingService {
     private final WorkOrderRepository workOrderRepository;
     private final ItemRepository itemRepository;
     private final ProductionReceivingItemRepository productionReceivingItemRepository;
+    private final SalesOrderRepository salesOrderRepository;
 
     @Transactional
     public void createProductionReceiving(ProductionReceivingCreateRequest request) {
@@ -43,7 +47,9 @@ public class ProductionReceivingService {
         Warehouse storeWarehouse = warehouseRepository.findById(request.getStoreWarehouseSeq()).orElseThrow(() -> new CustomException(ErrorCodeType.WAREHOUSE_NOT_FOUND));
         User user = userRepository.findById(request.getUserSeq()).orElseThrow(() -> new CustomException(ErrorCodeType.USER_NOT_FOUND));
         WorkOrder workOrder = workOrderRepository.findById(request.getWorkOrderSeq()).orElseThrow(() -> new CustomException(ErrorCodeType.WORK_ORDER_NOT_FOUND));
-
+        if(!WorkOrderStatus.COMPLETION.equals(workOrder.getWorkOrderStatus())) {
+            throw new CustomException(ErrorCodeType.WORK_ORDER_STATUS_ERROR);
+        }
         ProductionReceiving productionReceiving = ProductionReceiving.createProductionReceiving(productionWarehouse, storeWarehouse, user, workOrder, request);
 
         productionReceivingRepository.save(productionReceiving);
@@ -96,5 +102,25 @@ public class ProductionReceivingService {
         }
 
         productionReceivingRepository.delete(productionReceiving);
+    }
+
+    @Transactional
+    public void updateProductionReceivingApproval(Long productionReceivingSeq) {
+        ProductionReceiving productionReceiving = productionReceivingRepository.findById(productionReceivingSeq).orElseThrow(() -> new CustomException(ErrorCodeType.PRODUCTION_RECEIVING_NOT_FOUND));
+        if(!ProductionReceivingStatus.BEFORE.equals(productionReceiving.getProductionReceivingStatus())) {
+            throw new CustomException(ErrorCodeType.PRODUCTION_RECEIVING_UPDATE_ERROR);
+        }
+
+        productionReceiving.updateProductionReceivingApproval();
+    }
+
+    @Transactional
+    public void updateProductionReceivingComplete(Long productionReceivingSeq) {
+        ProductionReceiving productionReceiving = productionReceivingRepository.findById(productionReceivingSeq).orElseThrow(() -> new CustomException(ErrorCodeType.PRODUCTION_RECEIVING_NOT_FOUND));
+        if(!ProductionReceivingStatus.AFTER.equals(productionReceiving.getProductionReceivingStatus())) {
+            throw new CustomException(ErrorCodeType.PRODUCTION_RECEIVING_UPDATE_COMPLETE_ERROR);
+        }
+
+        SalesOrder salesOrder = salesOrderRepository.findByProductionReceivingSeq(productionReceivingSeq);
     }
 }

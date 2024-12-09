@@ -25,13 +25,15 @@ public enum ErrorCodeType {
 
     // 상품입고 관련 오류
     PRODUCTION_RECEIVING_NOT_FOUND(HttpStatus.NOT_FOUND, "PRODUCTION_RECEIVING_ERROR_001", "생산입고를 찾을 수 없습니다."),
-    PRODUCTION_RECEIVING_UPDATE_ERROR(HttpStatus.BAD_REQUEST, "PRODUCTION_RECEIVING_ERROR_003", "이미 결재가 완료된 상품입고입니다."),
+    PRODUCTION_RECEIVING_UPDATE_ERROR(HttpStatus.BAD_REQUEST, "PRODUCTION_RECEIVING_ERROR_002", "이미 결재가 완료된 상품입고입니다."),
+    PRODUCTION_RECEIVING_UPDATE_COMPLETE_ERROR(HttpStatus.BAD_REQUEST, "PRODUCTION_RECEIVING_ERROR_003", "결재가 완료된 상품입고만 상품입고 완료 상태로 변경할 수 있습니다."),
 
     // 창고 관련 오류
     WAREHOUSE_NOT_FOUND(HttpStatus.NOT_FOUND, "WAREHOUSE_ERROR_001", "창고를 찾을 수 없습니다."),
 
     // 작업지시서 오류
     WORK_ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, "WORK_ORDER_ERROR_001", "작업지시서를 찾을 수 없습니다."),
+    WORK_ORDER_STATUS_ERROR(HttpStatus.BAD_REQUEST, "WORK_ORDER_ERROR_002", "작업지시가 완료된 경우만 생산 입고를 작성할 수 있습니다."),
 
     // 회원 오류
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "USER_ERROR_001", "회원을 찾을 수 없습니다."),
