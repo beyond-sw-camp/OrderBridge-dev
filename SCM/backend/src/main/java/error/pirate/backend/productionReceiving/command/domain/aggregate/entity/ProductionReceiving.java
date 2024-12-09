@@ -1,9 +1,10 @@
 package error.pirate.backend.productionReceiving.command.domain.aggregate.entity;
 
+import error.pirate.backend.common.NullCheck;
 import error.pirate.backend.productionReceiving.command.application.dto.ProductionReceivingCreateRequest;
+import error.pirate.backend.productionReceiving.command.application.dto.ProductionReceivingUpdateRequest;
 import error.pirate.backend.user.command.domain.aggregate.entity.User;
 import error.pirate.backend.warehouse.command.domain.aggregate.entity.Warehouse;
-import error.pirate.backend.warehouse.command.domain.repository.WarehouseRepository;
 import error.pirate.backend.workOrder.command.domain.aggregate.entity.WorkOrder;
 import jakarta.persistence.*;
 import lombok.*;
@@ -11,9 +12,6 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 @Entity
 @Table(name = "tb_production_receiving") // 생산 입고
@@ -89,6 +87,26 @@ public class ProductionReceiving {
 
     private void specifyWorkOrder(WorkOrder workOrder) {
         this.workOrder = workOrder;
+    }
+
+    public void updateProductionReceiving(
+            Warehouse productionWarehouse, Warehouse storeWarehouse,
+            ProductionReceivingUpdateRequest request) {
+        if(NullCheck.nullCheck(productionWarehouse)) {
+           this.productionWarehouse = productionWarehouse;
+        }
+        if(NullCheck.nullCheck(storeWarehouse)) {
+            this.storeWarehouse = storeWarehouse;
+        }
+        if(NullCheck.nullCheck(request.getProductionReceivingName())) {
+            this.productionReceivingName = request.getProductionReceivingName();
+        }
+        if(NullCheck.nullOrZeroCheck(request.getProductionReceivingExtendedPrice())) {
+            this.productionReceivingExtendedPrice = request.getProductionReceivingExtendedPrice();
+        }
+        if(NullCheck.nullCheck(request.getProductionReceivingNote())) {
+            this.productionReceivingNote = request.getProductionReceivingNote();
+        }
     }
 
 }
