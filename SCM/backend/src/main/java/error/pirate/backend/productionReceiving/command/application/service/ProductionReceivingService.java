@@ -59,7 +59,7 @@ public class ProductionReceivingService {
     @Transactional
     public void updateProductionReceiving(Long productionReceivingSeq, ProductionReceivingUpdateRequest request) {
         ProductionReceiving productionReceiving = productionReceivingRepository.findById(productionReceivingSeq).orElseThrow(() -> new CustomException(ErrorCodeType.PRODUCTION_RECEIVING_NOT_FOUND));
-        if(!productionReceiving.getProductionReceivingStatus().equals(ProductionReceivingStatus.BEFORE)) {
+        if(!ProductionReceivingStatus.BEFORE.equals(productionReceiving.getProductionReceivingStatus())) {
             throw new CustomException(ErrorCodeType.PRODUCTION_RECEIVING_UPDATE_ERROR);
         }
         Warehouse productionWarehouse = null;
@@ -91,7 +91,7 @@ public class ProductionReceivingService {
     @Transactional
     public void deleteProductionReceiving(Long productionReceivingSeq) {
         ProductionReceiving productionReceiving = productionReceivingRepository.findById(productionReceivingSeq).orElseThrow(() -> new CustomException(ErrorCodeType.PRODUCTION_RECEIVING_NOT_FOUND));
-        if(!productionReceiving.getProductionReceivingStatus().equals(ProductionReceivingStatus.BEFORE)) {
+        if(!ProductionReceivingStatus.BEFORE.equals(productionReceiving.getProductionReceivingStatus())) {
             throw new CustomException(ErrorCodeType.PRODUCTION_RECEIVING_UPDATE_ERROR);
         }
 
