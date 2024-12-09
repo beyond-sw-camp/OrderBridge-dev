@@ -1,8 +1,7 @@
 package error.pirate.backend.productionReceiving.command.domain.aggregate.entity;
 
 import error.pirate.backend.item.command.domain.aggregate.entity.Item;
-import error.pirate.backend.salesOrder.command.domain.aggregate.entity.SalesOrder;
-import error.pirate.backend.warehouse.command.domain.aggregate.entity.Warehouse;
+import error.pirate.backend.productionReceiving.command.application.dto.ProductionReceivingItemDTO;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -30,4 +29,26 @@ public class ProductionReceivingItem {
     private int productionReceivingUnitPrice; // 생산 단가
 
     private String productionReceivingItemNote; // 생산 입고 품목 비고
+
+    public static ProductionReceivingItem createProductionReceivingItem(Item item, ProductionReceiving productionReceiving, ProductionReceivingItemDTO dto) {
+        ProductionReceivingItem productionReceivingItem = new ProductionReceivingItem(dto);
+        productionReceivingItem.specifyItem(item);
+        productionReceivingItem.specifyProductionReceiving(productionReceiving);
+
+        return productionReceivingItem;
+    }
+
+    protected ProductionReceivingItem(ProductionReceivingItemDTO dto) {
+        this.productionReceivingItemQuantity = dto.getProductionReceivingItemQuantity();
+        this.productionReceivingUnitPrice = dto.getProductionReceivingUnitPrice();
+        this.productionReceivingItemNote = dto.getProductionReceivingItemNote();
+    }
+
+    private void specifyProductionReceiving(ProductionReceiving productionReceiving) {
+        this.productionReceiving = productionReceiving;
+    }
+
+    private void specifyItem(Item item) {
+        this.item = item;
+    }
 }

@@ -1,17 +1,17 @@
 package error.pirate.backend.productionReceiving.command.domain.aggregate.entity;
 
+import error.pirate.backend.common.NullCheck;
 import error.pirate.backend.productionReceiving.command.application.dto.ProductionReceivingCreateRequest;
+import error.pirate.backend.productionReceiving.command.application.dto.ProductionReceivingUpdateRequest;
 import error.pirate.backend.user.command.domain.aggregate.entity.User;
 import error.pirate.backend.warehouse.command.domain.aggregate.entity.Warehouse;
-import error.pirate.backend.warehouse.command.domain.repository.WarehouseRepository;
 import error.pirate.backend.workOrder.command.domain.aggregate.entity.WorkOrder;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 @Entity
 @Table(name = "tb_production_receiving") // 생산 입고
@@ -40,15 +40,19 @@ public class ProductionReceiving {
 
     private String productionReceivingName; // 생산 입고명
 
+    @CreatedDate
     private LocalDateTime productionReceivingRegDate; // 생산 입고 등록일
 
+    @LastModifiedDate
+    @Column(insertable = false)
     private LocalDateTime productionReceivingModDate; // 생산 입고 수정일
 
     private Integer productionReceivingExtendedPrice; // 생산 입고 총금액
 
     private String productionReceivingNote; // 생산 입고 비고
 
-    private ProductionReceivingStatus productionReceivingStatus; // 생산 입고 상태
+    @Enumerated(value = EnumType.STRING)
+    private final ProductionReceivingStatus productionReceivingStatus = ProductionReceivingStatus.BEFORE; // 생산 입고 상태
 
     public static ProductionReceiving createProductionReceiving(Warehouse productionWarehouse, Warehouse storeWarehouse,
                                                                 User user, WorkOrder workOrder,
@@ -83,6 +87,26 @@ public class ProductionReceiving {
 
     private void specifyWorkOrder(WorkOrder workOrder) {
         this.workOrder = workOrder;
+    }
+
+    public void updateProductionReceiving(
+            Warehouse productionWarehouse, Warehouse storeWarehouse,
+            ProductionReceivingUpdateRequest request) {
+        if(NullCheck.nullCheck(productionWarehouse)) {
+           this.productionWarehouse = productionWarehouse;
+        }
+        if(NullCheck.nullCheck(storeWarehouse)) {
+            this.storeWarehouse = storeWarehouse;
+        }
+        if(NullCheck.nullCheck(request.getProductionReceivingName())) {
+            this.productionReceivingName = request.getProductionReceivingName();
+        }
+        if(NullCheck.nullOrZeroCheck(request.getProductionReceivingExtendedPrice())) {
+            this.productionReceivingExtendedPrice = request.getProductionReceivingExtendedPrice();
+        }
+        if(NullCheck.nullCheck(request.getProductionReceivingNote())) {
+            this.productionReceivingNote = request.getProductionReceivingNote();
+        }
     }
 
 }

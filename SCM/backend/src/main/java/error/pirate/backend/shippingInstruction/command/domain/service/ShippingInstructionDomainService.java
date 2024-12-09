@@ -97,17 +97,14 @@ public class ShippingInstructionDomainService {
     /* 도메인 객체를 수정하는 로직 */
     public ShippingInstruction updateShippingInstruction(
             ShippingInstruction shippingInstruction, ShippingInstructionRequest shippingInstructionRequest,
-            SalesOrder salesOrder, User user, String shippingInstructionName,
-            LocalDateTime shippingInstructionScheduledShipmentDate,
+            SalesOrder salesOrder, User user, LocalDateTime shippingInstructionScheduledShipmentDate,
             int itemTotalQuantity) {
 
         /* 수정을 위해 엔터티 정보 변경 */
         shippingInstruction.update(
                 salesOrder,
                 user,
-                shippingInstructionName,
                 shippingInstructionRequest.getShippingInstructionAddress(),
-                "결재전",
                 shippingInstructionScheduledShipmentDate,
                 itemTotalQuantity,
                 shippingInstructionRequest.getShippingInstructionNote()
@@ -119,7 +116,7 @@ public class ShippingInstructionDomainService {
     /* 수정이 가능한 상태인지 체크 */
     public void checkShippingInstructionStatus(ShippingInstructionStatus shippingInstructionStatus) {
         /* 결재전이 아니라면 변경 불가*/
-        if (!shippingInstructionStatus.equals(ShippingInstructionStatus.결재전)) {
+        if (!shippingInstructionStatus.equals(ShippingInstructionStatus.BEFORE)) {
             throw new IllegalArgumentException("shippingInstructionStatus not found: " + shippingInstructionStatus);
         }
     }
@@ -132,7 +129,7 @@ public class ShippingInstructionDomainService {
     /* 상태를 수정하는 로직 */
     public void updateShippingInstructionStatus(ShippingInstruction shippingInstruction) {
         /* 수정을 위해 엔터티 정보 변경 */
-        shippingInstruction.updateStatus("결재후");
+        shippingInstruction.updateStatus("AFTER");
     }
 
     /* 도메인 객체를 삭제 로직 */

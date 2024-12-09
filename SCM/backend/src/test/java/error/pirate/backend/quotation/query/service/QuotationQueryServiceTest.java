@@ -20,7 +20,7 @@ class QuotationQueryServiceTest {
     @Autowired
     private QuotationQueryService quotationQueryService;
 
-    private static Stream<Arguments> getQuotationListParam() {
+    private static Stream<Arguments> readQuotationListParam() {
         return Stream.of(
                 arguments(1, 10, null, null, null, null),
                 arguments(2, 10, null, null, null, null),
@@ -34,16 +34,16 @@ class QuotationQueryServiceTest {
 
     @DisplayName("견적서 목록 조회")
     @ParameterizedTest(autoCloseArguments = true)
-    @MethodSource("getQuotationListParam")
-    void getQuotationList(Integer page, Integer size,
+    @MethodSource("readQuotationListParam")
+    void readQuotationList(Integer page, Integer size,
                           LocalDate startDate, LocalDate endDate,
                           String clientName, String quotationStatus) {
 
-        assertDoesNotThrow(() -> quotationQueryService.getQuotationList(
+        assertDoesNotThrow(() -> quotationQueryService.readQuotationList(
                 page, size, startDate, endDate, clientName, quotationStatus));
     }
 
-    private static Stream<Arguments> getQuotationParam() {
+    private static Stream<Arguments> readQuotationParam() {
         return Stream.of(
                 arguments(1L),
                 arguments(2L),
@@ -55,13 +55,13 @@ class QuotationQueryServiceTest {
 
     @DisplayName("견적서 상세 조회")
     @ParameterizedTest(autoCloseArguments = true)
-    @MethodSource("getQuotationParam")
-    void getQuotation(Long quotationSeq) {
+    @MethodSource("readQuotationParam")
+    void readQuotation(Long quotationSeq) {
 
-        assertDoesNotThrow(() -> quotationQueryService.getQuotation(quotationSeq));
+        assertDoesNotThrow(() -> quotationQueryService.readQuotation(quotationSeq));
     }
 
-    private static Stream<Arguments> getQuotationSituationParam() {
+    private static Stream<Arguments> readQuotationSituationParam() {
         return Stream.of(
                 arguments("2024-10-20", null, null),
                 arguments(null, "2024-11-25", null),
@@ -72,9 +72,9 @@ class QuotationQueryServiceTest {
 
     @DisplayName("견적서 현황 조회")
     @ParameterizedTest(autoCloseArguments = true)
-    @MethodSource("getQuotationSituationParam")
-    void getQuotationSituation(LocalDate startDate, LocalDate endDate, String clientName) {
+    @MethodSource("readQuotationSituationParam")
+    void readQuotationSituation(LocalDate startDate, LocalDate endDate, String clientName) {
 
-        assertDoesNotThrow(() -> quotationQueryService.getQuotationSituation(startDate, endDate, clientName));
+        assertDoesNotThrow(() -> quotationQueryService.readQuotationSituation(startDate, endDate, clientName));
     }
 }

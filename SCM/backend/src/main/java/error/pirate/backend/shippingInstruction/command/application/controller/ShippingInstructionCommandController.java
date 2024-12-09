@@ -41,7 +41,7 @@ public class ShippingInstructionCommandController {
 
         shippingInstructionApplicationService.updateShippingInstruction(shippingInstructionSeq, shippingInstructionRequest);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body("출하지시서 수정성공");
+        return ResponseEntity.status(HttpStatus.OK).body("출하지시서 수정성공");
     }
 
     // 출하지시서 상태 변경
@@ -53,7 +53,7 @@ public class ShippingInstructionCommandController {
 
         shippingInstructionApplicationService.updateShippingInstructionStatus(shippingInstructionSeq);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body("출하지시서 상태 변경 성공");
+        return ResponseEntity.status(HttpStatus.OK).body("출하지시서 상태 변경 성공");
     }
 
     // 출하지시서 수정
