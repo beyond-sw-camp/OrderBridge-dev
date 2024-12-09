@@ -55,4 +55,16 @@ public class ShippingInstructionCommandController {
 
         return ResponseEntity.status(HttpStatus.OK).body("출하지시서 상태 변경 성공");
     }
+
+    // 출하지시서 삭제
+    @Operation(summary = "출하지시서 삭제", description = "출하지시서를 삭제한다.")
+    @DeleteMapping("/{shippingInstructionSeq}")
+    public ResponseEntity<String> deleteShippingInstruction(
+            @PathVariable Long shippingInstructionSeq
+    ) {
+
+        shippingInstructionApplicationService.deleteShippingInstruction(shippingInstructionSeq);
+
+        return ResponseEntity.status(HttpStatus.OK).body("출하지시서 삭제 성공");
+    }
 }
