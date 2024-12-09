@@ -79,7 +79,7 @@ public class ShippingInstructionApplicationService {
     /* 출하지시서 수정 */
     @Transactional
     public void updateShippingInstruction(Long shippingInstructionSeq, ShippingInstructionRequest shippingInstructionRequest) {
-        /* 출하지시서 찾기(결재전 상태일 때만) */
+        /* 출하지시서 찾기 */
         ShippingInstruction shippingInstruction = shippingInstructionDomainService.findByShippingInstructionSeq(shippingInstructionSeq);
 
         /* 수정이 가능한 상태인지 체크 */
@@ -88,7 +88,8 @@ public class ShippingInstructionApplicationService {
         /* 현재 주문서 저장 */
         SalesOrder salesOrder = shippingInstruction.getSalesOrder();
 
-        SalesOrder newSalesOrder = salesOrderDomainService.findBySalesOrderName(shippingInstructionRequest.getSalesOrderName());
+        // 등록과 동일
+        SalesOrder newSalesOrder = salesOrderDomainService.findById(shippingInstructionRequest.getSalesOrderSeq());
 
         // 출하지시서 유저는 주문서 작성 유저
         User user = newSalesOrder.getUser();
@@ -98,10 +99,6 @@ public class ShippingInstructionApplicationService {
                 shippingInstructionDomainService.setShippingInstructionScheduledShipmentDate(
                         shippingInstructionRequest.getShippingInstructionScheduledShipmentDate());
 
-        /* 등록일을 기반으로 ShippingInstruction 명 설정 */
-        long count = shippingInstructionDomainService.countTodayShippingInstruction();
-        String newShippingInstructionName = shippingInstructionDomainService.setShippingInstructionName(count);
-
         /* 총수량 연산 */
         int itemTotalQuantity = shippingInstructionDomainService.calculateTotalQuantity(shippingInstructionRequest);
 
@@ -109,8 +106,7 @@ public class ShippingInstructionApplicationService {
         ShippingInstruction newShippingInstruction =
                 shippingInstructionDomainService.updateShippingInstruction(
                         shippingInstruction, shippingInstructionRequest, newSalesOrder, user,
-                        newShippingInstructionName, shippingInstructionScheduledShipmentDate,
-                        itemTotalQuantity
+                        shippingInstructionScheduledShipmentDate, itemTotalQuantity
                 );
 
         /* 주문서가 변경되었는지 체크 */
@@ -120,13 +116,13 @@ public class ShippingInstructionApplicationService {
         /* 주문서가 변경되었다면 출하지시서 품목도 변경*/
         if (changeSalesOrder){
             /* 물품 불러오기 */
-            List<String> itemNameList = shippingInstructionRequest.getShippingInstructionItems()
+            List<Long> itemNameList = shippingInstructionRequest.getShippingInstructionItems()
                     .stream()
-                    .map(ShippingInstructionItemDTO::getItemName) // itemName 필드 추출
+                    .map(ShippingInstructionItemDTO::getItemSeq) // itemSeq 필드 추출
                     .toList(); // 추출한 값을 List로 변환
-            List<Item> itemList = itemDomainService.findByItemNameIn(itemNameList);
+            List<Item> itemList = itemService.findAllById(itemNameList);
 
-            /* 기존에 저장된 출하지시서 품목 삭제 */
+            /* 기존에 저장된 출하지시서 품목 리스트 삭제 */
             shippingInstructionItemDomainService.deleteByShippingInstruction(newShippingInstruction);
 
             /* ShippingInstructionItem 도메인 생성 로직 실행, entity 반환 */
@@ -142,7 +138,7 @@ public class ShippingInstructionApplicationService {
     /* 출하지시서 상태 변경 */
     @Transactional
     public void updateShippingInstructionStatus(Long shippingInstructionSeq) {
-        /* 출하지시서 찾기(결재전 상태일 때만) */
+        /* 출하지시서 찾기 */
         ShippingInstruction shippingInstruction = shippingInstructionDomainService.findByShippingInstructionSeq(shippingInstructionSeq);
 
         /* 수정이 가능한 상태인지 체크 */
