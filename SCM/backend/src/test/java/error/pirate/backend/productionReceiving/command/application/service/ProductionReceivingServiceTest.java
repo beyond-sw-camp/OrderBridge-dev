@@ -112,4 +112,36 @@ class ProductionReceivingServiceTest {
 
         assertDoesNotThrow(() -> productionReceivingService.deleteProductionReceiving(productionReceivingSeq));
     }
+
+    private static Stream<Arguments> updateProductionReceivingApprovalParam() {
+
+        return Stream.of(
+                arguments(8L),
+                arguments(10L)
+        );
+    }
+
+    @DisplayName("생산입고 결재")
+    @ParameterizedTest()
+    @MethodSource("updateProductionReceivingApprovalParam")
+    void updateProductionReceivingApproval(Long productionReceivingSeq) {
+
+        assertDoesNotThrow(() -> productionReceivingService.updateProductionReceivingApproval(productionReceivingSeq));
+    }
+
+    private static Stream<Arguments> updateProductionReceivingCompleteParam() {
+
+        return Stream.of(
+                arguments(9L),
+                arguments(11L)
+        );
+    }
+
+    @DisplayName("생산입고 완료")
+    @ParameterizedTest()
+    @MethodSource("updateProductionReceivingCompleteParam")
+    void updateProductionReceivingComplete(Long productionReceivingSeq) {
+
+        assertDoesNotThrow(() -> productionReceivingService.updateProductionReceivingApproval(productionReceivingSeq));
+    }
 }
