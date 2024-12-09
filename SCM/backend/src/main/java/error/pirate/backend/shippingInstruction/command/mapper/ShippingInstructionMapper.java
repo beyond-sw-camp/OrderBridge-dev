@@ -14,7 +14,6 @@ public class ShippingInstructionMapper {
                 user,
                 shippingInstructionName,
                 shippingInstructionRequest.getShippingInstructionAddress(),
-                "결재전",
                 shippingInstructionScheduledShipmentDate,
                 itemTotalQuantity,
                 shippingInstructionRequest.getShippingInstructionNote()

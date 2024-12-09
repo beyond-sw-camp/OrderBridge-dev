@@ -23,10 +23,10 @@ public class ShippingInstructionCommandController {
     @Operation(summary = "출하지시서 작성", description = "출하지시서를 작성한다.")
     @PostMapping
     public ResponseEntity<String> createShippingInstruction(
-            @RequestBody ShippingInstructionRequest evaluationRequest
+            @RequestBody ShippingInstructionRequest shippingInstructionRequest
     ) {
 
-        shippingInstructionApplicationService.createShippingInstruction(evaluationRequest);
+        shippingInstructionApplicationService.createShippingInstruction(shippingInstructionRequest);
 
         return ResponseEntity.status(HttpStatus.CREATED).body("출하지시서 작성성공");
     }

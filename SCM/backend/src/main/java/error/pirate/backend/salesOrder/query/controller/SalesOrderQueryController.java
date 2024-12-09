@@ -23,7 +23,7 @@ public class SalesOrderQueryController {
 
     @GetMapping("")
     @Operation(summary = "주문서 목록 조회")
-    public ResponseEntity<SalesOrderListResponse> getSalesOrderList(
+    public ResponseEntity<SalesOrderListResponse> readSalesOrderList(
             @RequestParam(defaultValue = "1") Integer page,
             @RequestParam(defaultValue = "10") Integer size,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
@@ -31,26 +31,26 @@ public class SalesOrderQueryController {
             @RequestParam(required = false) String clientName,
             @RequestParam(required = false) String salesOrderStatus) {
 
-        return ResponseEntity.ok(salesOrderQueryService.getSalesOrderList(
+        return ResponseEntity.ok(salesOrderQueryService.readSalesOrderList(
                 page, size, startDate, endDate, clientName, salesOrderStatus));
     }
 
     @GetMapping("/{salesOrderSeq}")
     @Operation(summary = "주문서 상세 조회")
-    public ResponseEntity<SalesOrderResponse> getSalesOrder(
+    public ResponseEntity<SalesOrderResponse> readSalesOrder(
             @PathVariable Long salesOrderSeq) {
 
-        return ResponseEntity.ok(salesOrderQueryService.getSalesOrder(salesOrderSeq));
+        return ResponseEntity.ok(salesOrderQueryService.readSalesOrder(salesOrderSeq));
     }
 
     @GetMapping("/situation")
     @Operation(summary = "주문서 현황 조회")
-    public ResponseEntity<SalesOrderSituationResponse> getSalesOrderSituation(
+    public ResponseEntity<SalesOrderSituationResponse> readSalesOrderSituation(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
             @RequestParam(required = false) String clientName) {
 
-        return ResponseEntity.ok(salesOrderQueryService.getSalesOrderSituation(
+        return ResponseEntity.ok(salesOrderQueryService.readSalesOrderSituation(
                 startDate, endDate, clientName));
     }
 }

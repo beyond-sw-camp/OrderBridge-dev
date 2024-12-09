@@ -23,11 +23,11 @@ public class ShippingInstruction {
     private Long shippingInstructionSeq;
 
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
-    @JoinColumn(name = "sales_order_seq")
+    @JoinColumn(name = "salesOrderSeq")
     private SalesOrder salesOrder; // 주문서
 
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_seq")
+    @JoinColumn(name = "userSeq")
     private User user; // 출하 지시서 담당자
 
     private String shippingInstructionName; // 출하지시서 명
@@ -50,19 +50,19 @@ public class ShippingInstruction {
 
     private String shippingInstructionNote; // 출하 지시서 비고
 
-    private ShippingInstruction(SalesOrder salesOrder, User user, String shippingInstructionName, String shippingInstructionAddress, String status, LocalDateTime shippingInstructionScheduledShipmentDate, int itemTotalQuantity, String shippingInstructionNote) {
+    private ShippingInstruction(SalesOrder salesOrder, User user, String shippingInstructionName, String shippingInstructionAddress, LocalDateTime shippingInstructionScheduledShipmentDate, int itemTotalQuantity, String shippingInstructionNote) {
         this.salesOrder = salesOrder;
         this.user = user;
         this.shippingInstructionName = shippingInstructionName;
         this.shippingInstructionAddress = shippingInstructionAddress;
         this.shippingInstructionScheduledShipmentDate = shippingInstructionScheduledShipmentDate;
-        this.shippingInstructionStatus = ShippingInstructionStatus.결재전;
+        this.shippingInstructionStatus = ShippingInstructionStatus.BEFORE;
         this.shippingInstructionTotalQuantity = itemTotalQuantity;
         this.shippingInstructionNote = shippingInstructionNote;
     }
 
-    public static ShippingInstruction create(SalesOrder salesOrder, User user, String shippingInstructionName, String shippingInstructionAddress, String status, LocalDateTime shippingInstructionScheduledShipmentDate, int itemTotalQuantity, String shippingInstructionNote) {
-        return new ShippingInstruction(salesOrder, user, shippingInstructionName, shippingInstructionAddress, status, shippingInstructionScheduledShipmentDate, itemTotalQuantity, shippingInstructionNote);
+    public static ShippingInstruction create(SalesOrder salesOrder, User user, String shippingInstructionName, String shippingInstructionAddress, LocalDateTime shippingInstructionScheduledShipmentDate, int itemTotalQuantity, String shippingInstructionNote) {
+        return new ShippingInstruction(salesOrder, user, shippingInstructionName, shippingInstructionAddress, shippingInstructionScheduledShipmentDate, itemTotalQuantity, shippingInstructionNote);
     }
 
     // 다른 필드를 변경하는 메소드
