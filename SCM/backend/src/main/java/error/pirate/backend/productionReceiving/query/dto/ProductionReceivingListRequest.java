@@ -12,7 +12,6 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @ToString
 public class ProductionReceivingListRequest {
-    private Long userSeq;
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate searchStartDate;
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)

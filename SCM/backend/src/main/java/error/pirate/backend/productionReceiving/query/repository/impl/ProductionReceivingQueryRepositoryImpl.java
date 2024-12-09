@@ -45,11 +45,9 @@ public class ProductionReceivingQueryRepositoryImpl implements ProductionReceivi
                         storeWarehouse.warehouseName.as("storeWarehouse")
                 ))
                 .from(productionReceiving)
-                .leftJoin(productionReceiving.user, user)
                 .leftJoin(productionReceiving.productionWarehouse, productionWarehouse)
                 .leftJoin(productionReceiving.storeWarehouse, storeWarehouse)
-                .where(userSeqEq(request.getUserSeq()),
-                        productReceivingNameEq(request.getSearchName()),
+                .where(productReceivingNameEq(request.getSearchName()),
                         productReceivingStatusIn(request.getSearchStatus()),
                         productReceivingRegDateGoeLoe(request.getSearchStartDate(), request.getSearchEndDate()))
                 .offset(pageable.getOffset())
