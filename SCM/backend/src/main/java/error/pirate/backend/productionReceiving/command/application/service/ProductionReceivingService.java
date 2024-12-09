@@ -72,11 +72,13 @@ public class ProductionReceivingService {
         List<ProductionReceivingItem> productionReceivingItems = productionReceivingItemRepository.findAllByProductionReceiving(productionReceiving);
         productionReceivingItemRepository.deleteAllInBatch(productionReceivingItems);
 
-        for(ProductionReceivingItemDTO dto : request.getProductionReceivingItemList()) {
-            Item item = itemRepository.findById(dto.getItemSeq()).orElseThrow();
+        if(NullCheck.nullCheck(request.getProductionReceivingItemList())) {
+            for(ProductionReceivingItemDTO dto : request.getProductionReceivingItemList()) {
+                Item item = itemRepository.findById(dto.getItemSeq()).orElseThrow();
 
-            ProductionReceivingItem productionReceivingItem = ProductionReceivingItem.createProductionReceivingItem(item, productionReceiving, dto);
-            productionReceivingItemRepository.save(productionReceivingItem);
+                ProductionReceivingItem productionReceivingItem = ProductionReceivingItem.createProductionReceivingItem(item, productionReceiving, dto);
+                productionReceivingItemRepository.save(productionReceivingItem);
+            }
         }
     }
 }
