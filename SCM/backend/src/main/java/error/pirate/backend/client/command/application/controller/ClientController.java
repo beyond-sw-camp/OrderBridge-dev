@@ -30,4 +30,9 @@ public class ClientController {
         clientService.updateClient(clientSeq, request);
         return ResponseEntity.ok().build();
     }
+    @DeleteMapping("/{clientSeq}")
+    @Operation(summary = "거래처 삭제", description = "거래처를 삭제합니다.")
+    public ResponseEntity<Void> deleteClient(@PathVariable Long clientSeq) {clientService.deleteClient(clientSeq);
+        return ResponseEntity.noContent().build();
+    }
 }

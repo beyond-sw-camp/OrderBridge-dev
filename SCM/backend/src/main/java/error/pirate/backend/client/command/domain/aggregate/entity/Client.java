@@ -40,6 +40,9 @@ public class Client {
     @Column(insertable = false)
     private LocalDateTime clientModDate; // 거래처 수정일
 
+    @Enumerated(EnumType.STRING)
+    private ClientStatus clientStatus = ClientStatus.ACTIVE;
+
     public void updateClient(ClientUpdateRequest request) {
         if (request.getClientName() != null) {
             this.clientName = request.getClientName();
@@ -54,7 +57,8 @@ public class Client {
             this.clientRegistrationNo = request.getClientRegistrationNo();
         }
     }
-
-
+    public void delete() {
+        this.clientStatus = ClientStatus.DELETED;
+    }
 }
 

@@ -43,5 +43,13 @@ public class ClientService {
 
         client.updateClient(request);
     }
+    @Transactional
+    public void deleteClient(Long clientSeq) {
+        Client client = clientRepository.findById(clientSeq)
+                .orElseThrow(() -> new CustomException(ErrorCodeType.CLIENT_STATUS_ERROR));
+
+        // 상태를 DELETED로 변경
+        client.delete();
+    }
 }
 
