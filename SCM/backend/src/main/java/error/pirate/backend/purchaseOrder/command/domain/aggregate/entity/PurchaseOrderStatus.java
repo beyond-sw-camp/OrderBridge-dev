@@ -1,7 +1,15 @@
 package error.pirate.backend.purchaseOrder.command.domain.aggregate.entity;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+@Getter
+@RequiredArgsConstructor
 public enum PurchaseOrderStatus {
-    BEFORE, // 구매전
-    AFTER,  // 구매후
-    REFUSAL // 반려
+    APPROVAL_BEFORE("구매전"),
+    APPROVAL_AFTER("구매후"),
+    APPROVAL_REFUSAL("반려");
+
+    private final String value;
+
 }
