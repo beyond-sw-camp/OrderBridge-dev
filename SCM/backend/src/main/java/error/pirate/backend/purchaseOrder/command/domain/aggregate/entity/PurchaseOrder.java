@@ -34,7 +34,7 @@ public class PurchaseOrder {
     @JoinColumn(name = "salesOrderSeq")
     private SalesOrder salesOrder; // 주문서
 
-    private String purchaseOrderName; // 발주서 명
+    private String purchaseOrderName; // 발주서명
 
     @Enumerated(EnumType.STRING)
     private PurchaseOrderStatus purchaseOrderStatus; // 발주서 상태
