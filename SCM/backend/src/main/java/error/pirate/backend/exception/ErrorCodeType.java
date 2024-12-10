@@ -27,6 +27,7 @@ public enum ErrorCodeType {
 
     // 공통 오류
     COMMON_ERROR(HttpStatus.BAD_REQUEST, "COMMON_ERROR", "오류가 발생하였습니다. 관리자에게 문의 바랍니다."),
+    INVALID_DATE_RANGE(HttpStatus.BAD_REQUEST, "COMMON_ERROR_002", "유효하지 않은 날짜 범위입니다."),
 
     // 상품입고 관련 오류
     PRODUCTION_RECEIVING_NOT_FOUND(HttpStatus.NOT_FOUND, "PRODUCTION_RECEIVING_ERROR_001", "생산입고를 찾을 수 없습니다."),

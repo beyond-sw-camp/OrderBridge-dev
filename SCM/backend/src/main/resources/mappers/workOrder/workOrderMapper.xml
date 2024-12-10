@@ -16,7 +16,7 @@
              , (SELECT GROUP_CONCAT(i.item_name SEPARATOR ', ')
                   FROM tb_item i
                  WHERE i.item_seq = wo.item_seq
-                )   AS item_names
+                )   AS item_name
         FROM tb_work_order wo
         LEFT JOIN tb_warehouse w ON wo.warehouse_seq = w.warehouse_seq
         <where>
@@ -67,7 +67,72 @@
     </select>
 
     <select id="readWorkOrder" resultType="error.pirate.backend.workOrder.query.dto.WorkOrderDetailDTO">
+        SELECT wo.work_order_seq
+             , wo.work_order_name
+             , w.warehouse_name
+             , wo.work_order_indicated_date
+             , wo.work_order_status
+             , wo.work_order_indicated_quantity
+             , wo.work_order_price
+             , u.user_name
+             , c.client_name
+             , wo.work_order_reg_date
+             , wo.work_order_mod_date
+             , wo.work_order_end_date
+             , wo.work_order_due_date
+             , wo.work_order_work_quantity
+             , wo.work_order_note
+        FROM tb_work_order wo
+        JOIN tb_warehouse w ON wo.warehouse_seq = w.warehouse_seq
+        JOIN tb_client c ON wo.client_seq = c.client_seq
+        JOIN tb_user u ON wo.user_seq = u.user_seq
+        JOIN tb_sales_order so ON wo.sales_order_seq = so.sales_order_seq
+       WHERE wo.work_order_seq = #{workOrderSeq}
+    </select>
 
+    <select id="readItemByWorkOrderSeq" resultType="error.pirate.backend.workOrder.query.dto.WorkOrderItemDTO">
+        SELECT  i.item_seq
+              , i.item_name
+              , i.item_image_url
+              , i.item_price
+         FROM tb_work_order wo
+         JOIN tb_item i ON wo.item_seq = i.item_seq
+        WHERE wo.work_order_seq = #{workOrderSeq}
+    </select>
+
+    <select id="readWorkOrderSituations" resultType="error.pirate.backend.workOrder.query.dto.WorkOrderSituationDTO">
+        SELECT i.item_name
+             , c.client_name
+             , wo.work_order_seq
+             , wo.work_order_name
+             , w.warehouse_name
+             , wo.work_order_indicated_quantity
+             , wo.work_order_indicated_date
+             , wo.work_order_due_date
+          FROM tb_work_order wo
+          LEFT JOIN tb_item i ON wo.item_seq = i.item_seq
+          LEFT JOIN tb_client c ON wo.client_seq = c.client_seq
+          LEFT JOIN tb_warehouse w ON w.warehouse_seq = wo.warehouse_seq
+        <where>
+            <!-- 작업지시일 검색 필터링 -->
+            <if test="startDate != null">
+                AND wo.work_order_indicated_date >= #{startDate}
+            </if>
+            <if test="endDate != null">
+                <![CDATA[
+                AND wo.work_order_indicated_date <= #{endDate}
+                ]]>
+            </if>
+            <!-- 거래처명 필터링 -->
+            <if test="clientName != null">
+                AND c.client_name LIKE CONCAT('%', #{clientName}, '%')
+            </if>
+            <!-- 생산창고 필터링 -->
+            <if test="warehouseName != null">
+                AND i.item_name LIKE CONCAT('%', #{warehouseName}, '%')
+            </if>
+        </where>
+         ORDER BY wo.work_order_indicated_date
     </select>
     
 </mapper>
