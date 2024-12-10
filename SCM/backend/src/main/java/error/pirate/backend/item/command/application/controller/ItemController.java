@@ -1,5 +1,6 @@
 package error.pirate.backend.item.command.application.controller;
 
+import error.pirate.backend.item.command.application.dto.ItemCreateRequest;
 import error.pirate.backend.item.command.application.dto.ItemDTO;
 import error.pirate.backend.item.command.application.dto.ItemUpdateRequest;
 import error.pirate.backend.item.command.application.service.ItemService;
@@ -23,15 +24,15 @@ public class ItemController {
 
     @PostMapping
     @Operation(summary = "품목 등록", description = "품목을 등록한다.")
-    public ResponseEntity<Item> createItem(@Valid @RequestBody ItemDTO itemDTO) {
-        Item createdItem = itemService.createItem(itemDTO);
+    public ResponseEntity<Item> createItem(@Valid @RequestBody ItemCreateRequest request) {
+        Item createdItem = itemService.createItem(request);
         return ResponseEntity.ok(createdItem);
     }
 
     @PutMapping("/{itemSeq}")
     @Operation(summary = "품목 수정", description =  "품목을 수정한다.")
-    public ResponseEntity<Void> updateItem(@PathVariable Long itemSeq, @RequestBody ItemUpdateRequest updateItemReqDTO) {
-        itemService.updateItem(itemSeq, updateItemReqDTO);
+    public ResponseEntity<Void> updateItem(@PathVariable Long itemSeq, @RequestBody ItemUpdateRequest request) {
+        itemService.updateItem(itemSeq, request);
         return ResponseEntity.ok().build();
     }
 }

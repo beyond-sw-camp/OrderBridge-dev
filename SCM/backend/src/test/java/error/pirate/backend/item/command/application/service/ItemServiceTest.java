@@ -1,6 +1,7 @@
 package error.pirate.backend.item.command.application.service;
 
 import error.pirate.backend.BackendApplication;
+import error.pirate.backend.item.command.application.dto.ItemCreateRequest;
 import error.pirate.backend.item.command.application.dto.ItemDTO;
 import error.pirate.backend.item.command.domain.aggregate.entity.ItemDivision;
 import jakarta.transaction.Transactional;
@@ -26,17 +27,17 @@ class ItemServiceTest {
 
     private static Stream<Arguments> getCreateItemArguments() {
         return Stream.of(
-                arguments(new ItemDTO(1L, 1L, "Test Item 1", ItemDivision.FINISHED, 720, "http://example.com/item1.jpg", 1000)),
-                arguments(new ItemDTO(1L, 2L, "Test Item 2", ItemDivision.RAW, 1440, "http://example.com/item2.jpg", 2000)),
-                arguments(new ItemDTO(2L, 1L, "Test Item 3", ItemDivision.PART, null, "http://example.com/item3.jpg", 500)),
-                arguments(new ItemDTO(3L, 3L, "Test Item 4", ItemDivision.SUB, 0, null, 1500))
+                arguments(new ItemCreateRequest(1L, 1L, "Test Item 1", ItemDivision.FINISHED, 720, "https://example.com/item1.jpg", 1000)),
+                arguments(new ItemCreateRequest(1L, 2L, "Test Item 2", ItemDivision.RAW, 1440, "https://example.com/item2.jpg", 2000)),
+                arguments(new ItemCreateRequest(2L, 1L, "Test Item 3", ItemDivision.PART, null, "https://example.com/item3.jpg", 500)),
+                arguments(new ItemCreateRequest(3L, 3L, "Test Item 4", ItemDivision.SUB, 0, null, 1500))
         );
     }
 
     @DisplayName("품목 등록 테스트 - 성공")
     @ParameterizedTest
     @MethodSource("getCreateItemArguments")
-    void createItemTest(ItemDTO itemDTO) {
-        assertDoesNotThrow(() -> itemService.createItem(itemDTO));
+    void createItemTest(ItemCreateRequest request) {
+        assertDoesNotThrow(() -> itemService.createItem(request));
     }
 }
