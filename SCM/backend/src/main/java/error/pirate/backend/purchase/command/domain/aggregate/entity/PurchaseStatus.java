@@ -1,6 +1,13 @@
 package error.pirate.backend.purchase.command.domain.aggregate.entity;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+@Getter
+@RequiredArgsConstructor
 public enum PurchaseStatus {
-    PROGRESS, // 정산 중
-    COMPLETE // 정산 완료
+    PROGRESS("정산중"),
+    COMPLETE("정산완료");
+
+    private final String value;
 }
