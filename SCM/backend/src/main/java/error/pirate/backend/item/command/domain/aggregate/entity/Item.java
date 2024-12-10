@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
@@ -15,6 +16,7 @@ import java.time.LocalDateTime;
 @Table(name = "tb_item") // 품목
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EntityListeners(AuditingEntityListener.class)
 public class Item {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long itemSeq;
@@ -45,24 +47,29 @@ public class Item {
 
     private Integer itemPrice; // 품목 단가
 
+    private String itemNote;
+
     public void updateItem(ItemUnit itemUnit, ItemUpdateRequest request) {
         if(itemUnit != null) {
             this.itemUnit = itemUnit;
         }
-        if(request != null) {
+        if(request.getItemName() != null) {
             this.itemName = request.getItemName();
         }
-        if(request != null) {
+        if(request.getItemDivision() != null) {
             this.itemDivision = request.getItemDivision();
         }
-        if(request != null) {
+        if(request.getItemExpirationHour() != null) {
             this.itemExpirationHour = request.getItemExpirationHour();
         }
-        if(request != null) {
+        if(request.getItemImageUrl() != null) {
             this.itemImageUrl = request.getItemImageUrl();
         }
-        if(request != null) {
+        if(request.getItemPrice() != null) {
             this.itemPrice = request.getItemPrice();
+        }
+        if(request.getItemNote() != null) {
+            this.itemNote = request.getItemNote();
         }
     }
 }

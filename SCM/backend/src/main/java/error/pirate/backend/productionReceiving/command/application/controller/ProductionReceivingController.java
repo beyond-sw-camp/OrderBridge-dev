@@ -35,6 +35,22 @@ public class ProductionReceivingController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+    @PutMapping("/approval/{productionReceivingSeq}")
+    @Operation(summary = "생산입고 결재")
+    public ResponseEntity<Void> updateProductionReceivingApproval(@PathVariable Long productionReceivingSeq) {
+        productionReceivingService.updateProductionReceivingApproval(productionReceivingSeq);
+
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @PutMapping("/complete/{productionReceivingSeq}")
+    @Operation(summary = "생산입고 완료")
+    public ResponseEntity<Void> updateProductionReceivingComplete(@PathVariable Long productionReceivingSeq) {
+        productionReceivingService.updateProductionReceivingComplete(productionReceivingSeq);
+
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
     @DeleteMapping("/{productionReceivingSeq}")
     @Operation(summary = "생산입고 삭제")
     public ResponseEntity<Void> deleteProductionReceiving(@PathVariable Long productionReceivingSeq) {

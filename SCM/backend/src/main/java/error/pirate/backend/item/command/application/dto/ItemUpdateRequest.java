@@ -5,6 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Data
 public class ItemUpdateRequest {
 
@@ -14,4 +17,7 @@ public class ItemUpdateRequest {
     private Integer itemExpirationHour;  // 유통 기한 (시간)
     private String itemImageUrl;         // 이미지 URL
     private Integer itemPrice;           // 품목 가격
+    private String itemNote;             // 품목 비고
+
+    private List<BomItemDTO> bomItemList = new ArrayList<>(); // bom 품목
 }

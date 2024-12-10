@@ -1,6 +1,7 @@
 package error.pirate.backend.quotation.command.domain.aggregate.entity;
 
 import error.pirate.backend.client.command.domain.aggregate.entity.Client;
+import error.pirate.backend.quotation.query.dto.QuotationCalculateSumDTO;
 import error.pirate.backend.user.command.domain.aggregate.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -8,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
@@ -15,6 +17,7 @@ import java.time.LocalDateTime;
 @Table(name = "tb_quotation") // 견적서
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EntityListeners(AuditingEntityListener.class)
 public class Quotation {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long quotationSeq;
@@ -43,9 +46,28 @@ public class Quotation {
 
     private LocalDateTime quotationEffectiveDate; // 견적서 유효일
 
-    private LocalDateTime quotationExtendedPrice; // 견적서 총금액
+    private Integer quotationExtendedPrice; // 견적서 총금액
 
     private Integer quotationTotalQuantity; // 견적서 총수량
 
     private String quotationNote; // 견적서 비고
+
+    public Quotation(
+            User user, Client client, String quotationName, LocalDateTime quotationQuotationDate,
+            Integer quotationExtendedPrice, Integer quotationTotalQuantity, String quotationNote) {
+        this.user = user;
+        this.client = client;
+        this.quotationName = quotationName;
+        this.quotationStatus = QuotationStatus.BEFORE;
+        this.quotationQuotationDate = quotationQuotationDate;
+        this.quotationEffectiveDate = LocalDateTime.now().plusMonths(1);
+        this.quotationExtendedPrice = quotationExtendedPrice;
+        this.quotationTotalQuantity = quotationTotalQuantity;
+        this.quotationNote = quotationNote;
+    }
+
+    public void itemCalculate(QuotationCalculateSumDTO quotationCalculateSumDTO) {
+        this.quotationExtendedPrice = quotationCalculateSumDTO.getQuotationExtendedPrice();
+        this.quotationTotalQuantity = quotationCalculateSumDTO.getQuotationTotalQuantity();
+    }
 }

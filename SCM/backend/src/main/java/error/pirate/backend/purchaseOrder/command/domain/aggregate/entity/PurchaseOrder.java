@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
@@ -16,6 +17,7 @@ import java.time.LocalDateTime;
 @Table(name = "tb_purchase_order") // 발주서
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EntityListeners(AuditingEntityListener.class)
 public class PurchaseOrder {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long purchaseOrderSeq;
@@ -40,8 +42,8 @@ public class PurchaseOrder {
     @CreatedDate
     private LocalDateTime purchaseOrderRegDate; // 발주서 등록일
 
-    @Column(insertable = false)
     @LastModifiedDate
+    @Column(insertable = false)
     private LocalDateTime purchaseOrderModDate; // 발주서 수정일
 
     private LocalDateTime purchaseOrderDueDate; // 발주서 계약 납기일

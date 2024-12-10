@@ -11,6 +11,7 @@ import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
@@ -18,6 +19,7 @@ import java.time.LocalDateTime;
 @Table(name = "tb_production_receiving") // 생산 입고
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EntityListeners(AuditingEntityListener.class)
 @SQLDelete(sql = "UPDATE tb_production_receiving SET production_receiving_status = 'DELETE' WHERE production_receiving_seq = ? AND production_receiving_status = 'BEFORE'")
 public class ProductionReceiving {
 
@@ -107,12 +109,18 @@ public class ProductionReceiving {
         if(NullCheck.nullOrZeroCheck(request.getProductionReceivingExtendedPrice())) {
             this.productionReceivingExtendedPrice = request.getProductionReceivingExtendedPrice();
         }
-        if(NullCheck.nullCheck(request.getProductionReceivingStatus())) {
-            this.productionReceivingStatus = request.getProductionReceivingStatus();
-        }
         if(NullCheck.nullCheck(request.getProductionReceivingNote())) {
             this.productionReceivingNote = request.getProductionReceivingNote();
         }
     }
 
+    // 결재 시 결재 후로 상태 변경
+    public void updateProductionReceivingApproval() {
+        this.productionReceivingStatus = ProductionReceivingStatus.AFTER;
+    }
+
+    // 생산입고 완료 시 생산완료로 상태 변경
+    public void updateProductionReceivingComplete() {
+        this.productionReceivingStatus = ProductionReceivingStatus.COMPLETE;
+    }
 }
