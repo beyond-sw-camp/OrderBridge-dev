@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,15 +25,15 @@ public class ItemController {
 
     @PostMapping
     @Operation(summary = "품목 등록", description = "품목을 등록한다.")
-    public ResponseEntity<Item> createItem(@Valid @RequestBody ItemCreateRequest request) {
-        Item createdItem = itemService.createItem(request);
-        return ResponseEntity.ok(createdItem);
+    public ResponseEntity<String> createItem(@Valid @RequestBody ItemCreateRequest request) {
+        itemService.createItem(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body("품목 등록 성공");
     }
 
     @PutMapping("/{itemSeq}")
     @Operation(summary = "품목 수정", description =  "품목을 수정한다.")
-    public ResponseEntity<Void> updateItem(@PathVariable Long itemSeq, @RequestBody ItemUpdateRequest request) {
+    public ResponseEntity<String> updateItem(@PathVariable Long itemSeq, @RequestBody ItemUpdateRequest request) {
         itemService.updateItem(itemSeq, request);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.OK).body("품목 수정 성공");
     }
 }

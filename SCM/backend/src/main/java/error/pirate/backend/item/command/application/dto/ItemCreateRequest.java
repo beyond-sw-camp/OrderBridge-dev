@@ -10,6 +10,7 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -23,6 +24,7 @@ public class ItemCreateRequest {
     private Integer itemExpirationHour;  // 유통 기한 (시간)
     private String itemImageUrl;         // 이미지 URL
     private Integer itemPrice;           // 품목 가격
+    private String itemNote;             // 품목 비고
 
-    private List<BomItemDTO> bomItemList = new ArrayList<>();
+    private List<BomItemDTO> bomItemList = new ArrayList<>(); // Bom 품목
 }

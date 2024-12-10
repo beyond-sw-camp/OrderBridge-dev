@@ -1,12 +1,16 @@
 package error.pirate.backend.item.command.application.service;
 
+import error.pirate.backend.common.NullCheck;
 import error.pirate.backend.exception.CustomException;
 import error.pirate.backend.exception.ErrorCodeType;
+import error.pirate.backend.item.command.application.dto.BomItemDTO;
 import error.pirate.backend.item.command.application.dto.ItemDTO;
 import error.pirate.backend.item.command.application.dto.ItemCreateRequest;
 import error.pirate.backend.item.command.application.dto.ItemUpdateRequest;
+import error.pirate.backend.item.command.domain.aggregate.entity.BomItem;
 import error.pirate.backend.item.command.domain.aggregate.entity.Item;
 import error.pirate.backend.item.command.domain.aggregate.entity.ItemUnit;
+import error.pirate.backend.item.command.domain.repository.BomItemRepository;
 import error.pirate.backend.item.command.domain.repository.ItemRepository;
 import error.pirate.backend.item.command.domain.repository.ItemUnitRepository;
 import error.pirate.backend.user.command.domain.aggregate.entity.User;
@@ -25,10 +29,11 @@ public class ItemService {
     private final ItemRepository itemRepository;
     private final ItemUnitRepository itemUnitRepository;
     private final UserRepository userRepository;
+    private final BomItemRepository bomItemRepository;
     private final ModelMapper modelMapper;
 
     @Transactional
-    public Item createItem(ItemCreateRequest request) {
+    public void createItem(ItemCreateRequest request) {
         User user = userRepository.findById(request.getUserSeq())
                 .orElseThrow(() -> new CustomException(ErrorCodeType.USER_NOT_FOUND));
 
@@ -41,7 +46,17 @@ public class ItemService {
 
         Item item = modelMapper.map(itemDTO, Item.class);
 
-        return itemRepository.save(item);
+        // bom 등록
+        if(NullCheck.nullCheck(request.getBomItemList())) {
+            for(BomItemDTO bomItemDTO : request.getBomItemList()) {
+                Item childItem = itemRepository.findById(bomItemDTO.getChildItemSeq()).orElseThrow(() -> new CustomException(ErrorCodeType.ITEM_NOT_FOUND));
+                BomItem bomItem = BomItem.createBomItem(item, childItem, bomItemDTO.getBomChildItemQuantity());
+
+                bomItemRepository.save(bomItem);
+            }
+        }
+
+        itemRepository.save(item);
     }
 
     @Transactional
@@ -60,6 +75,22 @@ public class ItemService {
                 .orElseThrow(() -> new IllegalArgumentException("Invalid itemUnitSeq: " + request.getItemUnitSeq()));
 
         item.updateItem(itemUnit, request);
+
+
+        /* bom 수정 로직
+        * 1. 해당 부모 item의 bom 전체 삭제
+        * 2. bom 재등록
+        * */
+        bomItemRepository.deleteAllByParentItem(item);
+
+        if(NullCheck.nullCheck(request.getBomItemList())) {
+            for(BomItemDTO bomItemDTO : request.getBomItemList()) {
+                Item childItem = itemRepository.findById(bomItemDTO.getChildItemSeq()).orElseThrow(() -> new CustomException(ErrorCodeType.ITEM_NOT_FOUND));
+                BomItem bomItem = BomItem.createBomItem(item, childItem, bomItemDTO.getBomChildItemQuantity());
+
+                bomItemRepository.save(bomItem);
+            }
+        }
     }
 
     /* 물품 시퀀스들로 물품 리스트 불러오기 */
