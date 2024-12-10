@@ -30,7 +30,9 @@
             </if>
             <!-- 작업지시일 검색 필터링 -->
             <if test="filter.startDate != null">
+                <![CDATA[
                 AND work_order_indicated_date >= #{filter.startDate}
+                ]]>
             </if>
             <if test="filter.endDate != null">
                 <![CDATA[
@@ -56,7 +58,9 @@
                 AND warehouse_name like concat('%', #{filter.warehouseName}, '%')
             </if>
             <if test="filter.startDate != null">
+                <![CDATA[
                 AND work_order_indicated_date >= #{filter.startDate}
+                ]]>
             </if>
             <if test="filter.endDate != null">
                 <![CDATA[
@@ -121,7 +125,9 @@
         <where>
             <!-- 작업지시일 검색 필터링 -->
             <if test="startDate != null">
+                <![CDATA[
                 AND wo.work_order_indicated_date >= #{startDate}
+                ]]>
             </if>
             <if test="endDate != null">
                 <![CDATA[
@@ -173,5 +179,5 @@
           LEFT JOIN tb_item ci ON bi.child_item_seq = ci.item_seq
          WHERE wo.work_order_seq = #{workOrderSeq};
     </select>
-    
+
 </mapper>
