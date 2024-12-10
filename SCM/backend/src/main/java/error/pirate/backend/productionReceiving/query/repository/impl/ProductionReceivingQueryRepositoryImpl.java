@@ -65,9 +65,6 @@ public class ProductionReceivingQueryRepositoryImpl implements ProductionReceivi
                         productReceivingStatusIn(request.getSearchStatus()),
                         productReceivingRegDateGoeLoe(request.getSearchStartDate(), request.getSearchEndDate()),
                         productionReceiving.productionReceivingStatus.ne(ProductionReceivingStatus.DELETE))
-                .orderBy(productionReceiving.productionReceivingSeq.desc())
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
                 .fetchOne();
 
         return new PageImpl<>(results, pageable, count == null ? 0 : count);

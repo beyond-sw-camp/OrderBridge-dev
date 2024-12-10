@@ -2,33 +2,37 @@
 import {onMounted, ref, watch} from 'vue';
 import axios from "axios";
 
-// 임시 데이터 셋
 const totalCount = ref(0);
 const pageSize = ref(10);
-const pageNumber = ref(0);
+const pageNumber = ref(1);
 const productionReceivingList = ref([]);
-const productionReceivingStatusArr = ref([]);
+const productionReceivingStatusList = ref([]);
 const searchStartDate = ref(null);
 const searchEndDate = ref(null);
 const searchName = ref(null);
-const searchStatus = ref([]);
+const searchStatus = ref(new Set([]));
 
 const fetchProductionReceivingList = async () => {
-  console.log(searchStartDate.value);
   try {
     const response = await axios.get(`http://localhost:8090/api/v1/productionReceiving`, {
       params: {
         searchStartDate: searchStartDate.value,
         searchEndDate: searchEndDate.value,
         searchName: searchName.value,
-        searchStatus: searchStatus.value,
-        pageNumber: pageNumber.value, // Spring Pageable에서 0부터 시작
-        pageSize: pageSize.value
+        searchStatus: searchStatus.value.size === 0 ? null : Array.from(searchStatus.value),
+        page: pageNumber.value - 1, // Spring Pageable에서 0부터 시작
+        size: pageSize.value
+      }, paramsSerializer: (params) => {
+        // null이나 undefined 값을 필터링
+        const filteredParams = Object.fromEntries(
+            Object.entries(params).filter(([_, value]) => value !== null && value !== undefined)
+        );
+        return new URLSearchParams(filteredParams).toString();
       }
     });
-    console.log(response.data);
+
     productionReceivingList.value = response.data.productionReceivingList.content;
-    productionReceivingStatusArr.value = response.data.productionReceivingStatusArr;
+    productionReceivingStatusList.value = response.data.productionReceivingStatusList;
     totalCount.value = response.data.productionReceivingList.totalElements;
 
   } catch (error) {
@@ -40,33 +44,18 @@ onMounted(() => {
   fetchProductionReceivingList();
 });
 
-watch([searchStartDate, searchEndDate], () => {
+watch([searchStartDate, searchEndDate, pageNumber], () => {
   fetchProductionReceivingList();
 })
 
-function search() {
-  fetchProductionReceivingList();
-}
-
 function check(status) {
+  if(searchStatus.value.has(status)) {
+    searchStatus.value.delete(status);
+  } else {
+    searchStatus.value.add(status);
+  }
 
-}
-// 선택한 Item 확장 | 축소
-function itemExtend(event) {
-    // 선택한 list-line의 id 추출
-    let listLine = event.target;
-    for (let i = 0; i < 5; i++) {
-        if (listLine.classList[0] === "list-line") { break; }
-        else { listLine = listLine.parentNode; }
-    }
-    let id = listLine.getElementsByClassName("col-6")[0].innerHTML.split("<br")[0];
-
-    console.log(id);
-    console.log(listLine);
-
-    // 찾은 id 기반으로 API 호출
-
-    // API 응답값으로 list-line 확장 | 축소
+  fetchProductionReceivingList();
 }
 </script>
 
@@ -84,21 +73,21 @@ function itemExtend(event) {
                     <p class="card-title">생산입고명</p>
                     <b-input-group class="mt-3">
                         <b-form-input v-model="searchName"></b-form-input>
-                        <b-button variant="light" class="button" @click="search"><svg width="1em" id="Layer_1" style="enable-background:new 0 0 512 512;" version="1.1" viewBox="0 0 512 512" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><path d="M344.5,298c15-23.6,23.8-51.6,23.8-81.7c0-84.1-68.1-152.3-152.1-152.3C132.1,64,64,132.2,64,216.3  c0,84.1,68.1,152.3,152.1,152.3c30.5,0,58.9-9,82.7-24.4l6.9-4.8L414.3,448l33.7-34.3L339.5,305.1L344.5,298z M301.4,131.2  c22.7,22.7,35.2,52.9,35.2,85c0,32.1-12.5,62.3-35.2,85c-22.7,22.7-52.9,35.2-85,35.2c-32.1,0-62.3-12.5-85-35.2  c-22.7-22.7-35.2-52.9-35.2-85c0-32.1,12.5-62.3,35.2-85c22.7-22.7,52.9-35.2,85-35.2C248.5,96,278.7,108.5,301.4,131.2z"/></svg></b-button>
+                        <b-button variant="light" class="button" @click="fetchProductionReceivingList()"><svg width="1em" id="Layer_1" version="1.1" viewBox="0 0 512 512" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><path d="M344.5,298c15-23.6,23.8-51.6,23.8-81.7c0-84.1-68.1-152.3-152.1-152.3C132.1,64,64,132.2,64,216.3  c0,84.1,68.1,152.3,152.1,152.3c30.5,0,58.9-9,82.7-24.4l6.9-4.8L414.3,448l33.7-34.3L339.5,305.1L344.5,298z M301.4,131.2  c22.7,22.7,35.2,52.9,35.2,85c0,32.1-12.5,62.3-35.2,85c-22.7,22.7-52.9,35.2-85,35.2c-32.1,0-62.3-12.5-85-35.2  c-22.7-22.7-35.2-52.9-35.2-85c0-32.1,12.5-62.3,35.2-85c22.7-22.7,52.9-35.2,85-35.2C248.5,96,278.7,108.5,301.4,131.2z"/></svg></b-button>
                     </b-input-group>
                 </div>
             </div>
             <div class="side-box card">
                 <div class="card-body">
                     <p class="card-title">생산입고 상태</p>
-                    <template v-for="productionReceivingStatus in productionReceivingStatusArr">
-<!--                      <b-form-checkbox v-model="check(productionReceivingStatus.key)">productionReceivingStatus.value</b-form-checkbox>-->
+                    <template v-for="productionReceivingStatus in productionReceivingStatusList">
+                      <b-form-checkbox @click="check(productionReceivingStatus.key)">{{productionReceivingStatus.value}}</b-form-checkbox>
                     </template>
                 </div>
             </div>
         </div>
         <div class="col-md-9">
-            <div style="width: 90%;">
+            <div>
                 <div class="d-flex justify-content-between">
                     <div>검색결과: {{ totalCount }}개</div>
                     <b-button variant="light" size="sm" class="button">생산입고 등록</b-button>
@@ -177,7 +166,7 @@ div {
 }
 
 .pagination {
-    justify-items: center;
+    justify-content: center; /* 가로 중앙 정렬 */
     margin-top: 20px;
 }
 
