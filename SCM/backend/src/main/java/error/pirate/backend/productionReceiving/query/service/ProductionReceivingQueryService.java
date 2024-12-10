@@ -3,6 +3,7 @@ package error.pirate.backend.productionReceiving.query.service;
 import error.pirate.backend.exception.CustomException;
 import error.pirate.backend.exception.ErrorCodeType;
 import error.pirate.backend.productionReceiving.command.domain.aggregate.entity.ProductionReceiving;
+import error.pirate.backend.productionReceiving.command.domain.aggregate.entity.ProductionReceivingStatus;
 import error.pirate.backend.productionReceiving.command.domain.repository.ProductionReceivingRepository;
 import error.pirate.backend.productionReceiving.query.dto.*;
 import error.pirate.backend.warehouse.command.domain.aggregate.entity.Warehouse;
@@ -26,7 +27,8 @@ public class ProductionReceivingQueryService {
 
     public ProductionReceivingListResponse readProductionReceivingList(ProductionReceivingListRequest request, Pageable pageable) {
         Page<ProductionReceivingListDTO> productionReceivingList = productionReceivingRepository.findAllByFilter(request, pageable);
-        return new ProductionReceivingListResponse(productionReceivingList);
+        ProductionReceivingStatus[] productionReceivingStatusArr = ProductionReceivingStatus.class.getEnumConstants();
+        return new ProductionReceivingListResponse(productionReceivingList, productionReceivingStatusArr);
     }
 
     public ProductionReceivingResponse readProductionReceiving(Long productionReceivingSeq) {
