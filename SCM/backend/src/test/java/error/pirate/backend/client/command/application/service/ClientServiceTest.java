@@ -39,6 +39,14 @@ class ClientServiceTest {
         );
     }
 
+    private static Stream<Arguments> deleteClientArguments() {
+        return Stream.of(
+                arguments(1L),
+                arguments(2L),
+                arguments(3L)
+        );
+    }
+
     @DisplayName("거래처 등록 테스트 - 성공")
     @ParameterizedTest
     @MethodSource("createClientArguments")
@@ -51,5 +59,12 @@ class ClientServiceTest {
     @MethodSource("updateClientArguments")
     void updateClientTest(Long clientSeq, ClientUpdateRequest request) {
         assertDoesNotThrow(() -> clientService.updateClient(clientSeq, request));
+    }
+
+    @DisplayName("거래처 삭제 테스트 - 성공")
+    @ParameterizedTest
+    @MethodSource("deleteClientArguments")
+    void deleteClientTest(Long clientSeq) {
+        assertDoesNotThrow(() -> clientService.deleteClient(clientSeq));
     }
 }
