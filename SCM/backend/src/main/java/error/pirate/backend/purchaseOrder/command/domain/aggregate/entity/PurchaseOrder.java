@@ -1,6 +1,7 @@
 package error.pirate.backend.purchaseOrder.command.domain.aggregate.entity;
 
 import error.pirate.backend.client.command.domain.aggregate.entity.Client;
+import error.pirate.backend.purchaseOrder.command.application.dto.PurchaseOrderUpdateRequest;
 import error.pirate.backend.salesOrder.command.domain.aggregate.entity.SalesOrder;
 import error.pirate.backend.user.command.domain.aggregate.entity.User;
 import jakarta.persistence.*;
@@ -53,4 +54,12 @@ public class PurchaseOrder {
     private Integer purchaseOrderExtendedPrice; // 발주서 총금액
 
     private String purchaseOrderNote; // 발주서 비고
+
+    public void updatePurchaseOrder(PurchaseOrderUpdateRequest request) {
+        this.purchaseOrderDueDate = request.getPurchaseOrderDueDate();
+        this.purchaseOrderTargetDueDate = request.getPurchaseOrderTargetDueDate();
+        this.purchaseOrderExtendedPrice = request.getPurchaseOrderExtendedPrice();
+        this.purchaseOrderNote = request.getPurchaseOrderNote();
+    }
+
 }
