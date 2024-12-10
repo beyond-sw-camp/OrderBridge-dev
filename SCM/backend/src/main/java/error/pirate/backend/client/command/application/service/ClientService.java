@@ -2,6 +2,7 @@ package error.pirate.backend.client.command.application.service;
 
 import error.pirate.backend.client.command.application.dto.ClientCreateRequest;
 import error.pirate.backend.client.command.application.dto.ClientDTO;
+import error.pirate.backend.client.command.application.dto.ClientUpdateRequest;
 import error.pirate.backend.client.command.domain.aggregate.entity.Client;
 import error.pirate.backend.client.command.domain.repository.ClientRepository;
 import error.pirate.backend.exception.CustomException;
@@ -33,4 +34,14 @@ public class ClientService {
 
         clientRepository.save(client);
     }
+
+    @Transactional
+    public void updateClient(Long clientSeq, ClientUpdateRequest request) {
+        Client client = clientRepository.findById(clientSeq)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid clientSeq: " + clientSeq));
+
+
+        client.updateClient(request);
+    }
 }
+
