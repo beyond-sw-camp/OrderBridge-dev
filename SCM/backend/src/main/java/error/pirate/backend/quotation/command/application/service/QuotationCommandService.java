@@ -15,6 +15,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class QuotationCommandService {
@@ -27,13 +29,26 @@ public class QuotationCommandService {
     @Transactional
     public void createQuotation(CreateQuotationRequest request) {
 
-        // 견적서 등록
+        // 엔티티 요구 변수 작성
         Client client = entityManager.getReference(Client.class, request.getClientSeq());
         User user = entityManager.getReference(User.class, request.getUserSeq());
         String quotationName = quotationQueryService.makeQuotationName();
 
+        // 견적서 합계 계산
+        int quotationExtendedPrice = 0;
+        int quotationTotalQuantity = 0;
+
+        for (QuotationItemDTO quotationItemDTO : request.getQuotationItem()) {
+            quotationExtendedPrice +=
+                    quotationItemDTO.getQuotationItemQuantity() * quotationItemDTO.getQuotationItemPrice();
+            quotationTotalQuantity +=
+                    quotationItemDTO.getQuotationItemPrice();
+        }
+
+        // 견적서 등록
         Quotation quotation = new Quotation(
-                user, client, quotationName, request.getQuotationQuotationDate(), request.getQuotationNote());
+                user, client, quotationName, request.getQuotationQuotationDate(),
+                quotationExtendedPrice, quotationTotalQuantity, request.getQuotationNote());
 
         Long quotationSeq = quotationRepository.save(quotation).getQuotationSeq();
 
@@ -47,9 +62,5 @@ public class QuotationCommandService {
                     quotationItemDTO.getQuotationItemNote());
             quotationItemRepository.save(quotationItem);
         }
-
-        // 견적서 합계 계산
-        quotation.itemCalculate(quotationQueryService.calculateSum(quotationSeq));
-        quotationRepository.save(quotation);
     }
 }

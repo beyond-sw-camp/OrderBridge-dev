@@ -51,13 +51,16 @@ public class Quotation {
     private String quotationNote; // 견적서 비고
 
     public Quotation(
-            User user, Client client, String quotationName, LocalDateTime quotationQuotationDate, String quotationNote) {
+            User user, Client client, String quotationName, LocalDateTime quotationQuotationDate,
+            Integer quotationExtendedPrice, Integer quotationTotalQuantity, String quotationNote) {
         this.user = user;
         this.client = client;
         this.quotationName = quotationName;
         this.quotationStatus = QuotationStatus.BEFORE;
         this.quotationQuotationDate = quotationQuotationDate;
         this.quotationEffectiveDate = LocalDateTime.now().plusMonths(1);
+        this.quotationExtendedPrice = quotationExtendedPrice;
+        this.quotationTotalQuantity = quotationTotalQuantity;
         this.quotationNote = quotationNote;
     }
 
