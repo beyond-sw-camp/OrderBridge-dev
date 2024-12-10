@@ -107,12 +107,18 @@ public class ProductionReceiving {
         if(NullCheck.nullOrZeroCheck(request.getProductionReceivingExtendedPrice())) {
             this.productionReceivingExtendedPrice = request.getProductionReceivingExtendedPrice();
         }
-        if(NullCheck.nullCheck(request.getProductionReceivingStatus())) {
-            this.productionReceivingStatus = request.getProductionReceivingStatus();
-        }
         if(NullCheck.nullCheck(request.getProductionReceivingNote())) {
             this.productionReceivingNote = request.getProductionReceivingNote();
         }
     }
 
+    // 결재 시 결재 후로 상태 변경
+    public void updateProductionReceivingApproval() {
+        this.productionReceivingStatus = ProductionReceivingStatus.AFTER;
+    }
+
+    // 생산입고 완료 시 생산완료로 상태 변경
+    public void updateProductionReceivingComplete() {
+        this.productionReceivingStatus = ProductionReceivingStatus.COMPLETE;
+    }
 }
