@@ -1,13 +1,14 @@
 package error.pirate.backend.item.command.domain.aggregate.entity;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "tb_bom_item") // BOM 품목
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class BomItem {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long bomItemSeq;
