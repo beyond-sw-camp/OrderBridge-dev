@@ -37,6 +37,7 @@ public class ProductionReceivingQueryRepositoryImpl implements ProductionReceivi
 
         List<ProductionReceivingListDTO> results = queryFactory
                 .select(Projections.constructor(ProductionReceivingListDTO.class,
+                        productionReceiving.productionReceivingSeq,
                         productionReceiving.productionReceivingName,
                         productionReceiving.productionReceivingRegDate,
                         productionReceiving.productionReceivingStatus,
@@ -55,7 +56,21 @@ public class ProductionReceivingQueryRepositoryImpl implements ProductionReceivi
                 .limit(pageable.getPageSize())
                 .fetch();
 
-        return new PageImpl<>(results, pageable, results.size());
+        Long count = queryFactory
+                .select(productionReceiving.count())
+                .from(productionReceiving)
+                .leftJoin(productionReceiving.productionWarehouse, productionWarehouse)
+                .leftJoin(productionReceiving.storeWarehouse, storeWarehouse)
+                .where(productReceivingNameEq(request.getSearchName()),
+                        productReceivingStatusIn(request.getSearchStatus()),
+                        productReceivingRegDateGoeLoe(request.getSearchStartDate(), request.getSearchEndDate()),
+                        productionReceiving.productionReceivingStatus.ne(ProductionReceivingStatus.DELETE))
+                .orderBy(productionReceiving.productionReceivingSeq.desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetchOne();
+
+        return new PageImpl<>(results, pageable, count == null ? 0 : count);
     }
 
     private BooleanExpression userSeqEq(Long userSeq) {
@@ -66,7 +81,7 @@ public class ProductionReceivingQueryRepositoryImpl implements ProductionReceivi
         return StringUtils.isBlank(searchName) ? null : productionReceiving.productionReceivingName.eq(searchName);
     }
 
-    private BooleanExpression productReceivingStatusIn(ProductionReceivingStatus searchStatus) {
+    private BooleanExpression productReceivingStatusIn(ProductionReceivingStatus[] searchStatus) {
         return searchStatus == null ? null : productionReceiving.productionReceivingStatus.in(searchStatus);
     }
 
