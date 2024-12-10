@@ -16,6 +16,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -27,8 +30,14 @@ public class ProductionReceivingQueryService {
 
     public ProductionReceivingListResponse readProductionReceivingList(ProductionReceivingListRequest request, Pageable pageable) {
         Page<ProductionReceivingListDTO> productionReceivingList = productionReceivingRepository.findAllByFilter(request, pageable);
-        ProductionReceivingStatus[] productionReceivingStatusArr = ProductionReceivingStatus.class.getEnumConstants();
-        return new ProductionReceivingListResponse(productionReceivingList, productionReceivingStatusArr);
+        // Enum Type을 리스트로 변환
+        List<ProductionReceivingStatus.ProductionReceivingStatusResponse> productionReceivingStatusList =
+                Arrays.stream(ProductionReceivingStatus.class.getEnumConstants()).map(key ->
+                        new ProductionReceivingStatus.ProductionReceivingStatusResponse(
+                                key.toString(), ProductionReceivingStatus.valueOf(key.toString())
+                        )).toList();
+
+        return new ProductionReceivingListResponse(productionReceivingList, productionReceivingStatusList);
     }
 
     public ProductionReceivingResponse readProductionReceiving(Long productionReceivingSeq) {

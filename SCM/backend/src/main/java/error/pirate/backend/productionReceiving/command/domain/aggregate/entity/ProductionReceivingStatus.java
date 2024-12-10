@@ -1,5 +1,6 @@
 package error.pirate.backend.productionReceiving.command.domain.aggregate.entity;
 
+import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -12,4 +13,15 @@ public enum ProductionReceivingStatus {
     DELETE("삭제"); // 삭제
 
     private final String value;
+
+    @Data
+    public static class ProductionReceivingStatusResponse {
+        private String key;
+        private String value;
+
+        public ProductionReceivingStatusResponse(String key, ProductionReceivingStatus productionReceivingStatus) {
+            this.key = key;
+            this.value = productionReceivingStatus.getValue();
+        }
+    }
 }

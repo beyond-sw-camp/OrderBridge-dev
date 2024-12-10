@@ -7,11 +7,13 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.domain.Page;
 
+import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProductionReceivingListResponse {
     private Page<ProductionReceivingListDTO> productionReceivingList;
-    private ProductionReceivingStatus[] productionReceivingStatusList;
+    private List<ProductionReceivingStatus.ProductionReceivingStatusResponse> productionReceivingStatusList;
 }
