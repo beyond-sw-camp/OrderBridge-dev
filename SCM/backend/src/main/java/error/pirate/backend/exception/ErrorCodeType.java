@@ -46,6 +46,9 @@ public enum ErrorCodeType {
 
     // 물품 오류
     ITEM_NOT_FOUND(HttpStatus.NOT_FOUND, "ITEM_ERROR_001", "물품을 찾을 수 없습니다."),
+
+    // 물품 단위 오류
+    ITEM_UNIT_NOT_FOUND(HttpStatus.NOT_FOUND, "ITEM_UNIT_ERROR_001", "물품 단위를 찾을 수 없습니다."),
     ;
     private final HttpStatus httpStatus;
     private final String code;

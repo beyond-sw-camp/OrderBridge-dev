@@ -58,11 +58,13 @@ public class ProductionReceivingService {
 
         productionReceivingRepository.save(productionReceiving);
 
-        for(ProductionReceivingItemDTO dto : request.getProductionReceivingItemList()) {
-            Item item = itemRepository.findById(dto.getItemSeq()).orElseThrow(() -> new CustomException(ErrorCodeType.USER_NOT_FOUND));
+        if(NullCheck.nullCheck(request.getProductionReceivingItemList())) {
+            for(ProductionReceivingItemDTO dto : request.getProductionReceivingItemList()) {
+                Item item = itemRepository.findById(dto.getItemSeq()).orElseThrow(() -> new CustomException(ErrorCodeType.ITEM_NOT_FOUND));
 
-            ProductionReceivingItem productionReceivingItem = ProductionReceivingItem.createProductionReceivingItem(item, productionReceiving, dto);
-            productionReceivingItemRepository.save(productionReceivingItem);
+                ProductionReceivingItem productionReceivingItem = ProductionReceivingItem.createProductionReceivingItem(item, productionReceiving, dto);
+                productionReceivingItemRepository.save(productionReceivingItem);
+            }
         }
     }
 

@@ -29,7 +29,7 @@ class ProductionReceivingServiceTest {
     ProductionReceivingService productionReceivingService;
 
     @Test
-    void createProductionReceiving() {
+    void createProductionReceivingTest() {
         ProductionReceivingCreateRequest productionReceivingCreateRequest = new ProductionReceivingCreateRequest();
         productionReceivingCreateRequest.setProductionWarehouseSeq(1L);
         productionReceivingCreateRequest.setStoreWarehouseSeq(11L);
@@ -80,7 +80,7 @@ class ProductionReceivingServiceTest {
     @DisplayName("생산입고 수정")
     @ParameterizedTest()
     @MethodSource("updateProductionReceivingParam")
-    void updateProductionReceiving(Long productionReceivingSeq,
+    void updateProductionReceivingTest(Long productionReceivingSeq,
                                      Long productionWarehouseSeq, Long storeWarehouseSeq,
                                      String productionReceivingName, Integer productionReceivingExtendedPrice,
                                      String productionReceivingNote, List<ProductionReceivingItemDTO> productionReceivingItemList) {
@@ -108,7 +108,7 @@ class ProductionReceivingServiceTest {
     @DisplayName("생산입고 삭제")
     @ParameterizedTest()
     @MethodSource("deleteProductionReceivingParam")
-    void deleteProductionReceiving(Long productionReceivingSeq) {
+    void deleteProductionReceivingTest(Long productionReceivingSeq) {
 
         assertDoesNotThrow(() -> productionReceivingService.deleteProductionReceiving(productionReceivingSeq));
     }
@@ -124,7 +124,7 @@ class ProductionReceivingServiceTest {
     @DisplayName("생산입고 결재")
     @ParameterizedTest()
     @MethodSource("updateProductionReceivingApprovalParam")
-    void updateProductionReceivingApproval(Long productionReceivingSeq) {
+    void updateProductionReceivingApprovalTest(Long productionReceivingSeq) {
 
         assertDoesNotThrow(() -> productionReceivingService.updateProductionReceivingApproval(productionReceivingSeq));
     }
@@ -140,7 +140,7 @@ class ProductionReceivingServiceTest {
     @DisplayName("생산입고 완료")
     @ParameterizedTest()
     @MethodSource("updateProductionReceivingCompleteParam")
-    void updateProductionReceivingComplete(Long productionReceivingSeq) {
+    void updateProductionReceivingCompleteTest(Long productionReceivingSeq) {
 
         assertDoesNotThrow(() -> productionReceivingService.updateProductionReceivingApproval(productionReceivingSeq));
     }
