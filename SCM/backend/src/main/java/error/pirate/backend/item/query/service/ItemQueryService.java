@@ -59,7 +59,9 @@ public class ItemQueryService {
             childItemList.add(modelMapper.map(childItem, ItemResponse.class));
         }
 
-        List<ItemInventory> itemInventories = itemInventoryRepository.findAllByItem(item);
+        // 재고가 다 떨어진 재고는 조회하지 않는다.
+        List<ItemInventory> itemInventories = itemInventoryRepository
+                .findAllByItemAndItemInventoryRemainAmountGreaterThanOrderByItemInventoryExpirationDate(item, 0);
         for(ItemInventory itemInventory : itemInventories) {
             itemInventoryList.add(modelMapper.map(itemInventory, ItemInventoryDTO.class));
         }

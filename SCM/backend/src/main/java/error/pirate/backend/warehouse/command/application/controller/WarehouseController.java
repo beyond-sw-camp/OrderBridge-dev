@@ -3,16 +3,15 @@ package error.pirate.backend.warehouse.command.application.controller;
 import error.pirate.backend.warehouse.command.application.dto.WarehouseCreateRequest;
 import error.pirate.backend.warehouse.command.application.dto.WarehouseDTO;
 import error.pirate.backend.warehouse.command.application.dto.WarehouseResponse;
+import error.pirate.backend.warehouse.command.application.dto.WarehouseUpdateRequest;
 import error.pirate.backend.warehouse.command.application.service.WarehouseService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/warehouse")
@@ -26,6 +25,12 @@ public class WarehouseController {
     public ResponseEntity<WarehouseResponse> createWarehouse(@RequestBody WarehouseCreateRequest request) {
         WarehouseResponse response = warehouseService.createWarehouse(request);
         return ResponseEntity.ok(response);
+    }
+    @PutMapping("/{warehouseSeq}")
+    @Operation(summary = "창고 수정", description = "창고 정보를 수정합니다.")
+    public ResponseEntity<Void> updateWarehouse(@PathVariable Long warehouseSeq, @Valid @RequestBody WarehouseUpdateRequest request) {
+        warehouseService.updateWarehouse(warehouseSeq, request);
+        return ResponseEntity.ok().build();
     }
 }
 
