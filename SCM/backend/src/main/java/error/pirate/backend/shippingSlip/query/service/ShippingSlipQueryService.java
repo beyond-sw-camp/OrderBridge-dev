@@ -50,11 +50,21 @@ public class ShippingSlipQueryService {
     /* 출하전표 현황 조회 */
     @Transactional(readOnly = true)
     public ShippingSlipSituationResponse readShippingSlipSituation(ShippingSlipSituationRequest request) {
+        // 출하전표 현황 조회
         List<ShippingSlipSituationDTO> shippingSlipSituationList
                 = shippingSlipMapper.selectShippingSlipSituation(request);
 
+        // 출하전표 현황 월합계
+        List<ShippingSlipSituationMonthlyTotalDTO> monthlyTotalList
+                = shippingSlipMapper.selectMonthlyTotal(request);
+
+        // 출하전표 현황 총합계
+        int totalQuantity = shippingSlipMapper.selectTotal(request);
+
         return ShippingSlipSituationResponse.builder()
                 .shippingSlipSituationList(shippingSlipSituationList)
+                .monthlyTotalList(monthlyTotalList)
+                .totalQuantity(totalQuantity)
                 .build();
     }
 }

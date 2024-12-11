@@ -10,5 +10,7 @@ import java.util.List;
 @Builder
 @Schema(description = "출하전표 현황 응답")
 public class ShippingSlipSituationResponse {
-    private List<ShippingSlipSituationDTO> shippingSlipSituationList;
+    private List<ShippingSlipSituationDTO> shippingSlipSituationList;   // 현황 리스트
+    private List<ShippingSlipSituationMonthlyTotalDTO> monthlyTotalList;   // 월합계 리스트
+    private int totalQuantity;  // 총합계
 }

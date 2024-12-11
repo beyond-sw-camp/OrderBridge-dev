@@ -21,4 +21,10 @@ public interface ShippingSlipMapper {
 
     List<ShippingSlipSituationDTO> selectShippingSlipSituation(
             @Param("request") ShippingSlipSituationRequest request);
+
+    List<ShippingSlipSituationMonthlyTotalDTO> selectMonthlyTotal(
+            @Param("request") ShippingSlipSituationRequest request);
+
+    int selectTotal(
+            @Param("request") ShippingSlipSituationRequest request);
 }

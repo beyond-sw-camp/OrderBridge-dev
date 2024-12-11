@@ -51,11 +51,21 @@ public class ShippingInstructionQueryService {
     /* 출하지시서 현황 조회 */
     @Transactional(readOnly = true)
     public ShippingInstructionSituationResponse readShippingInstructionSituation(ShippingInstructionSituationRequest request) {
+        // 출하지시서 현황 조회
         List<ShippingInstructionSituationDTO> shippingInstructionSituationList
                 = shippingInstructionMapper.selectShippingInstructionSituation(request);
 
+        // 출하지시서 현황 월합계
+        List<ShippingInstructionSituationMonthlyTotalDTO> monthlyTotalList
+                = shippingInstructionMapper.selectMonthlyTotal(request);
+
+        // 출하전표 현황 총합계
+        int totalQuantity = shippingInstructionMapper.selectTotal(request);
+
         return ShippingInstructionSituationResponse.builder()
                 .shippingInstructionSituationList(shippingInstructionSituationList)
+                .monthlyTotalList(monthlyTotalList)
+                .totalQuantity(totalQuantity)
                 .build();
     }
 }
