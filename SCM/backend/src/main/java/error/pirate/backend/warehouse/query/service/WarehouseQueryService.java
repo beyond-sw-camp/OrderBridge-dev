@@ -15,7 +15,7 @@ public class WarehouseQueryService {
     private final WarehouseMapper warehouseMapper;
 
     public List<WarehouseResponse> readWarehouseList(WarehouseFilterRequest filterRequest) {
-        // MyBatis 쿼리에 맞게 필드 값 개별적으로 전달
+
         int offset = filterRequest.getPage() * filterRequest.getSize();
         return warehouseMapper.findWarehouseListByFilter(
                 filterRequest.getWarehouseName(),
