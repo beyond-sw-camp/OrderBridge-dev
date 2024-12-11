@@ -7,6 +7,9 @@ server:
 spring:
   application:
     name: login
+  config:
+    import:
+      optional:file:env.properties
   datasource:
     url: jdbc:log4jdbc:mariadb://localhost:3306/order_bridge_login?serverTimezone=Asia/Seoul
     username: login
@@ -23,15 +26,6 @@ spring:
         format_sql: true
       hibernate.dialect: org.hibernate.dialect.MariaDBDialect
 
-springdoc:
-  packages-to-scan: error.pirate.backend
-  default-consumes-media-type: application/json;charset=UTF-8
-  default-produces-media-type: application/json;charset=UTF-8
-  swagger-ui:
-    path: /swagger
-    operations-sorter: method
-    doc-expansion: none
-
 logging:
   level:
     root: info
@@ -43,5 +37,5 @@ logging:
     jdbc.connection: info
 
 token:
-  secret: jcbbmpPbq7gw8TC1n6vCcAAgNTCQtZVHhRkSOTSuM5iYi6RmW1g/8h9rYkL7OQq/MZZ08cambRHW5O6dQ1p0PQ==
+  secret: ${TOKEN}
   expiration_time: 43200000

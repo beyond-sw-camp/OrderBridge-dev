@@ -29,8 +29,8 @@ public class JwtFilter extends OncePerRequestFilter {
                 // 인증이 완료되면 이후 인증 필터는 건너 뛰게 된다.
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
-            // 위의 if문에 걸리지 않아 Authentication 객체가 설정되지 않으면 다음 필터가 실행된다.
-            filterChain.doFilter(request, response);
         }
+        // 위의 if문에 걸리지 않아 Authentication 객체가 설정되지 않으면 다음 필터가 실행된다.
+        filterChain.doFilter(request, response);
     }
 }

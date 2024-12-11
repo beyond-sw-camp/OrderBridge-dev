@@ -1,7 +1,6 @@
 package error.pirate.backend.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import error.pirate.backend.common.ExceptionResponse;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

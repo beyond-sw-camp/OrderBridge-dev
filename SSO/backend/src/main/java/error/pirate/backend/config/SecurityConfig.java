@@ -36,8 +36,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> {
                     authorize.requestMatchers(
-                                    new AntPathRequestMatcher("/login", "POST"),
-                                    new AntPathRequestMatcher("/swagger")).permitAll() // /users/ 하위의 모든 POST 요청은 모든 사용자가 접근할 수 있다.
+                                    new AntPathRequestMatcher("/login", "POST")).permitAll() // login 요청만이 모든 사용자가 요청할 수 있다..
                             .requestMatchers(new AntPathRequestMatcher("/**"))
                             .authenticated(); // 위의 요청 외에는 인증만 필요하다.
                 })
