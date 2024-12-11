@@ -1,13 +1,12 @@
 package error.pirate.backend.entity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "tb_user")
@@ -25,11 +24,11 @@ public class User {
     private String userName;
 
     @CreatedDate
-    private String regDate;
+    private LocalDateTime regDate;
 
     @LastModifiedDate
     @Column(insertable = false)
-    private String modDate;
+    private LocalDateTime modDate;
 
     @Builder
     protected User(String userId, String userPwd, String userEmail, String userName) {
@@ -37,9 +36,5 @@ public class User {
         this.userPwd = userPwd;
         this.userEmail = userEmail;
         this.userName = userName;
-    }
-
-    public void encryptPassword(String encodedPwd) {
-        this.userPwd = encodedPwd;
     }
 }
