@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class QuotationItem {
-    @Id @GeneratedValue(strategy = GenerationType.AUTO)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long quotationItemSeq;
 
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
@@ -27,4 +27,15 @@ public class QuotationItem {
     private int quotationItemPrice; // 견적서 품목 단가
 
     private String quotationItemNote; // 견적서 품목 비고
+
+    public QuotationItem(
+            Quotation quotation, Item item, int quotationItemQuantity,
+            int quotationItemPrice, String quotationItemNote) {
+
+        this.quotation = quotation;
+        this.item = item;
+        this.quotationItemQuantity = quotationItemQuantity;
+        this.quotationItemPrice = quotationItemPrice;
+        this.quotationItemNote = quotationItemNote;
+    }
 }

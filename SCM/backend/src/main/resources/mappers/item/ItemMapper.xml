@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="error.pirate.backend.item.query.mapper.ItemMapper">
+
+    <!-- 품목 조회 -->
+    <select id="findItemsByFilter" resultType="error.pirate.backend.item.query.dto.ItemResponse">
+        SELECT
+        item_seq,
+        item_name,
+        item_division,
+        item_expiration_hour,
+        item_image_url,
+        item_price,
+        item_reg_date,
+        item_mod_date
+        FROM
+        tb_item
+        WHERE
+        1=1
+        <!-- 조건: 품목명 -->
+        <if test="itemName != null and itemName != ''">
+            AND item_name LIKE CONCAT('%', #{itemName}, '%')
+        </if>
+        <!-- 조건: 품목 구분 -->
+        <if test="itemDivision != null and itemDivision != ''">
+            AND item_division = #{itemDivision}
+        </if>
+        <!-- 조건: 유통기한 -->
+        <if test="itemExpirationHour != null">
+            AND item_expiration_hour &lt;= #{itemExpirationHour}
+        </if>
+        ORDER BY
+        <choose>
+            <when test="sortBy != null and sortBy != ''">
+                ${sortBy}
+            </when>
+            <otherwise>
+                item_reg_date
+            </otherwise>
+        </choose>
+        <choose>
+            <when test="sortDirection == 'desc'">
+                DESC
+            </when>
+            <otherwise>
+                ASC
+            </otherwise>
+        </choose>
+        LIMIT #{offset}, #{size}
+    </select>
+
+</mapper>

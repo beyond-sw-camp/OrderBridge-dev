@@ -1,12 +1,17 @@
 package error.pirate.backend.productionReceiving.command.domain.aggregate.entity;
 
+import error.pirate.backend.common.NullCheck;
+import error.pirate.backend.productionReceiving.command.application.dto.ProductionReceivingCreateRequest;
+import error.pirate.backend.productionReceiving.command.application.dto.ProductionReceivingUpdateRequest;
 import error.pirate.backend.user.command.domain.aggregate.entity.User;
 import error.pirate.backend.warehouse.command.domain.aggregate.entity.Warehouse;
 import error.pirate.backend.workOrder.command.domain.aggregate.entity.WorkOrder;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.hibernate.annotations.SQLDelete;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
@@ -14,9 +19,11 @@ import java.time.LocalDateTime;
 @Table(name = "tb_production_receiving") // 생산 입고
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EntityListeners(AuditingEntityListener.class)
+@SQLDelete(sql = "UPDATE tb_production_receiving SET production_receiving_status = 'DELETE' WHERE production_receiving_seq = ? AND production_receiving_status = 'BEFORE'")
 public class ProductionReceiving {
 
-    @Id @GeneratedValue(strategy = GenerationType.AUTO)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long productionReceivingSeq;
 
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
@@ -32,16 +39,88 @@ public class ProductionReceiving {
     private User user; // 생산 입고 관리자
 
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
-    @JoinColumn(name = "workOrdereq")
+    @JoinColumn(name = "workOrderSeq")
     private WorkOrder workOrder; // 작업지시서
 
     private String productionReceivingName; // 생산 입고명
 
+    @CreatedDate
     private LocalDateTime productionReceivingRegDate; // 생산 입고 등록일
 
+    @LastModifiedDate
+    @Column(insertable = false)
     private LocalDateTime productionReceivingModDate; // 생산 입고 수정일
 
     private Integer productionReceivingExtendedPrice; // 생산 입고 총금액
 
     private String productionReceivingNote; // 생산 입고 비고
+
+    @Enumerated(value = EnumType.STRING)
+    private ProductionReceivingStatus productionReceivingStatus; // 생산 입고 상태
+
+    public static ProductionReceiving createProductionReceiving(Warehouse productionWarehouse, Warehouse storeWarehouse,
+                                                                User user, WorkOrder workOrder,
+                                                                ProductionReceivingCreateRequest request
+                                                                ) {
+        ProductionReceiving productionReceiving = new ProductionReceiving(request);
+        productionReceiving.specifyProductionWarehouse(productionWarehouse);
+        productionReceiving.specifyStoreWarehouse(storeWarehouse);
+        productionReceiving.specifyUser(user);
+        productionReceiving.specifyWorkOrder(workOrder);
+
+        return productionReceiving;
+    }
+
+    protected ProductionReceiving(ProductionReceivingCreateRequest request) {
+        this.productionReceivingName = request.getProductionReceivingName();
+        this.productionReceivingExtendedPrice = request.getProductionReceivingExtendedPrice();
+        this.productionReceivingStatus = ProductionReceivingStatus.BEFORE;
+        this.productionReceivingNote = request.getProductionReceivingNote();
+    }
+
+    private void specifyProductionWarehouse(Warehouse productionWarehouse) {
+        this.productionWarehouse = productionWarehouse;
+    }
+
+    private void specifyStoreWarehouse(Warehouse storeWarehouse) {
+        this.storeWarehouse = storeWarehouse;
+    }
+
+    private void specifyUser(User user) {
+        this.user = user;
+    }
+
+    private void specifyWorkOrder(WorkOrder workOrder) {
+        this.workOrder = workOrder;
+    }
+
+    public void updateProductionReceiving(
+            Warehouse productionWarehouse, Warehouse storeWarehouse,
+            ProductionReceivingUpdateRequest request) {
+        if(NullCheck.nullCheck(productionWarehouse)) {
+           this.productionWarehouse = productionWarehouse;
+        }
+        if(NullCheck.nullCheck(storeWarehouse)) {
+            this.storeWarehouse = storeWarehouse;
+        }
+        if(NullCheck.nullCheck(request.getProductionReceivingName())) {
+            this.productionReceivingName = request.getProductionReceivingName();
+        }
+        if(NullCheck.nullOrZeroCheck(request.getProductionReceivingExtendedPrice())) {
+            this.productionReceivingExtendedPrice = request.getProductionReceivingExtendedPrice();
+        }
+        if(NullCheck.nullCheck(request.getProductionReceivingNote())) {
+            this.productionReceivingNote = request.getProductionReceivingNote();
+        }
+    }
+
+    // 결재 시 결재 후로 상태 변경
+    public void updateProductionReceivingApproval() {
+        this.productionReceivingStatus = ProductionReceivingStatus.AFTER;
+    }
+
+    // 생산입고 완료 시 생산완료로 상태 변경
+    public void updateProductionReceivingComplete() {
+        this.productionReceivingStatus = ProductionReceivingStatus.COMPLETE;
+    }
 }

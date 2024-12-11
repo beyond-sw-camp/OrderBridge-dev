@@ -6,6 +6,9 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
@@ -13,8 +16,9 @@ import java.time.LocalDateTime;
 @Table(name = "tb_shipping_slip") // 출하전표
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EntityListeners(AuditingEntityListener.class)
 public class ShippingSlip {
-    @Id @GeneratedValue(strategy = GenerationType.AUTO)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long shippingSlipSeq;
 
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
@@ -29,8 +33,11 @@ public class ShippingSlip {
 
     private String shippingSlipAddress; // 출하전표 주소
 
+    @CreatedDate
     private LocalDateTime shippingSlipRegDate; // 출하전표 등록일
 
+    @LastModifiedDate
+    @Column(insertable = false)
     private LocalDateTime shippingSlipModDate; // 출하전표 수정일
 
     private LocalDateTime shippingSlipShippingDate; // 출하전표 출하일

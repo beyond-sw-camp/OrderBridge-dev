@@ -1,5 +1,6 @@
 package error.pirate.backend.item.command.domain.aggregate.entity;
 
+import error.pirate.backend.item.command.application.dto.ItemUpdateRequest;
 import error.pirate.backend.user.command.domain.aggregate.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -7,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
@@ -14,8 +16,9 @@ import java.time.LocalDateTime;
 @Table(name = "tb_item") // 품목
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EntityListeners(AuditingEntityListener.class)
 public class Item {
-    @Id @GeneratedValue(strategy = GenerationType.AUTO)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long itemSeq;
 
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
@@ -43,4 +46,38 @@ public class Item {
     private String itemImageUrl; // 품목 이미지 주소
 
     private Integer itemPrice; // 품목 단가
+
+    private String itemNote;
+
+    @Enumerated(EnumType.STRING)
+    private ItemStatus itemStatus = ItemStatus.ACTIVE;
+
+    public void updateItem(ItemUnit itemUnit, ItemUpdateRequest request) {
+        if(itemUnit != null) {
+            this.itemUnit = itemUnit;
+        }
+        if(request.getItemName() != null) {
+            this.itemName = request.getItemName();
+        }
+        if(request.getItemDivision() != null) {
+            this.itemDivision = request.getItemDivision();
+        }
+        if(request.getItemExpirationHour() != null) {
+            this.itemExpirationHour = request.getItemExpirationHour();
+        }
+        if(request.getItemImageUrl() != null) {
+            this.itemImageUrl = request.getItemImageUrl();
+        }
+        if(request.getItemPrice() != null) {
+            this.itemPrice = request.getItemPrice();
+        }
+        if(request.getItemNote() != null) {
+            this.itemNote = request.getItemNote();
+        }
+    }
+    // 품목 삭제 메서드
+    public void delete() {
+        this.itemStatus = ItemStatus.DELETED;
+    }
 }
+

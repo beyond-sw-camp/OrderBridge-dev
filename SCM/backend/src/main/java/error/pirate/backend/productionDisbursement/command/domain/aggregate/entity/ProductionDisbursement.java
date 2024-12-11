@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
@@ -16,9 +17,10 @@ import java.time.LocalDateTime;
 @Table(name = "tb_production_disbursement") // 생산 불출
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EntityListeners(AuditingEntityListener.class)
 public class ProductionDisbursement {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long productionDisbursementId;
 
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
@@ -38,7 +40,6 @@ public class ProductionDisbursement {
     private WorkOrder workOrder; // 작업지시서
 
     private String productionDisbursementName; // 생산불출명
-
 
     @CreatedDate
     private LocalDateTime productionDisbursementRegDate; // 생산불출 등록일

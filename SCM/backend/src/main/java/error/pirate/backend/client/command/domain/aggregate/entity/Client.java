@@ -1,5 +1,6 @@
 package error.pirate.backend.client.command.domain.aggregate.entity;
 
+import error.pirate.backend.client.command.application.dto.ClientUpdateRequest;
 import error.pirate.backend.user.command.domain.aggregate.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -7,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
@@ -14,8 +16,9 @@ import java.time.LocalDateTime;
 @Table(name = "tb_client") // 거래처
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EntityListeners(AuditingEntityListener.class)
 public class Client {
-    @Id @GeneratedValue(strategy = GenerationType.AUTO)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long clientSeq;
 
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
@@ -36,4 +39,26 @@ public class Client {
     @LastModifiedDate
     @Column(insertable = false)
     private LocalDateTime clientModDate; // 거래처 수정일
+
+    @Enumerated(EnumType.STRING)
+    private ClientStatus clientStatus = ClientStatus.ACTIVE;
+
+    public void updateClient(ClientUpdateRequest request) {
+        if (request.getClientName() != null) {
+            this.clientName = request.getClientName();
+        }
+        if (request.getClientPhoneNo() != null) {
+            this.clientPhoneNo = request.getClientPhoneNo();
+        }
+        if (request.getClientEmail() != null) {
+            this.clientEmail = request.getClientEmail();
+        }
+        if (request.getClientRegistrationNo() != null) {
+            this.clientRegistrationNo = request.getClientRegistrationNo();
+        }
+    }
+    public void delete() {
+        this.clientStatus = ClientStatus.DELETED;
+    }
 }
+

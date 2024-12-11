@@ -21,6 +21,7 @@ const toggleMenu2 = (menu) => {
 <template>
   <aside
       class="side-bar"
+      style="z-index: 5"
       :class="{ open: isSidebar }"
       @mouseover="isSidebar = true"
       @mouseleave="isSidebar = false"

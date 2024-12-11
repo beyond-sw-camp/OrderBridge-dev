@@ -47,3 +47,8 @@ logging:
     jdbc.sqlonly: info
     jdbc.resultsettable: info
     jdbc.connection: info
+
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+  mapper-locations: mappers/**/*.xml

@@ -11,6 +11,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
@@ -18,8 +19,9 @@ import java.time.LocalDateTime;
 @Table(name = "tb_work_order") // 작업지시서
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EntityListeners(AuditingEntityListener.class)
 public class WorkOrder {
-    @Id @GeneratedValue(strategy = GenerationType.AUTO)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long workOrderSeq;
     
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
@@ -58,8 +60,6 @@ public class WorkOrder {
     private LocalDateTime workOrderDueDate; // 작업지시서 납기일
 
     private Integer workOrderIndicatedQuantity; // 작업지시서 주문수량
-
-    private int workOrderProductionQuantity; // 작업지시서 생산수량
 
     private Integer workOrderWorkQuantity; // 작업지시서 작업완료수량
 
