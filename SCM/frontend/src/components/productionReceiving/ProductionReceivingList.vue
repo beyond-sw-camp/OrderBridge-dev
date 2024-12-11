@@ -101,7 +101,19 @@ function check(status) {
                 </div>
                 <div style="max-height: 600px; overflow-y: auto;">
                     <div v-for="productionReceiving in productionReceivingList" :key="productionReceiving.productionReceivingSeq" class="list-line row" @click="itemExtend">
-                        <div class="list-body col-4">{{ productionReceiving.productionReceivingName }}</div>
+                        <div class="list-body col-4 left">
+                          {{ productionReceiving.productionReceivingName }}
+                          <div v-if="productionReceiving.productionReceivingItemList.length > 0">
+                            <template v-for="(productionReceivingItem, index) in productionReceiving.productionReceivingItemList" :key="productionReceivingItem.productionReceivingItemSeq">
+                              <template v-if="index === productionReceiving.productionReceivingItemList.length - 1">
+                                {{productionReceivingItem.itemName}}
+                              </template>
+                              <template v-else>
+                                {{productionReceivingItem.itemName + ", "}}
+                              </template>
+                            </template>
+                          </div>
+                        </div>
                         <div class="list-body col-2">{{ productionReceiving.productionWarehouseName }}</div>
                         <div class="list-body col-2">{{ productionReceiving.storeWarehouseName }}</div>
                         <div class="list-body col-3">{{ productionReceiving.productReceivingRegDate }}</div>
@@ -168,6 +180,10 @@ div {
 .pagination {
     justify-content: center; /* 가로 중앙 정렬 */
     margin-top: 20px;
+}
+
+.left {
+  text-align: left;
 }
 
 </style>
