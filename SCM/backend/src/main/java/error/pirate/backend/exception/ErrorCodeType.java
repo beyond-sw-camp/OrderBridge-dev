@@ -56,6 +56,10 @@ public enum ErrorCodeType {
 
     // 물품 단위 오류
     ITEM_UNIT_NOT_FOUND(HttpStatus.NOT_FOUND, "ITEM_UNIT_ERROR_001", "물품 단위를 찾을 수 없습니다."),
+
+    // 엑셀 오류
+    EXCEL_DOWN_ERROR(HttpStatus.BAD_REQUEST, "EXCEL_DOWN_ERROR_001", "엑셀 다운로드에 실패 하였습니다."),
+
     ;
     private final HttpStatus httpStatus;
     private final String code;

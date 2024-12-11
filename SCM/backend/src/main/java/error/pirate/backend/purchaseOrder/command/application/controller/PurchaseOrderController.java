@@ -60,4 +60,10 @@ public class PurchaseOrderController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+    @GetMapping("/excelDown")
+    @Operation(summary = "발주서 엑셀다운")
+    public ResponseEntity<byte[]> purchaseOrderExcelDown() {
+        return purchaseOrderApplicationService.purchaseOrderExcelDown();
+    }
+
 }
