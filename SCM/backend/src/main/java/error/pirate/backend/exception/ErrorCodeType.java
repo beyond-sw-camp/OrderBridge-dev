@@ -50,6 +50,9 @@ public enum ErrorCodeType {
 
     // 물품 단위 오류
     ITEM_UNIT_NOT_FOUND(HttpStatus.NOT_FOUND, "ITEM_UNIT_ERROR_001", "물품 단위를 찾을 수 없습니다."),
+
+    // 거래처 오류
+    CLIENT_STATUS_ERROR(HttpStatus.BAD_REQUEST, "CLIENT_ERROR_001", "이미 삭제된 거래처입니다."),
     ;
     private final HttpStatus httpStatus;
     private final String code;
