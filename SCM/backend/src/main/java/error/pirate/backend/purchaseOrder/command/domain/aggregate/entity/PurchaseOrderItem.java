@@ -1,7 +1,6 @@
 package error.pirate.backend.purchaseOrder.command.domain.aggregate.entity;
 
 import error.pirate.backend.item.command.domain.aggregate.entity.Item;
-import error.pirate.backend.purchase.command.domain.aggregate.entity.Purchase;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -31,6 +30,16 @@ public class PurchaseOrderItem {
 
     public void insertPurchase(PurchaseOrder purchaseOrder) {
         this.purchaseOrder = purchaseOrder;
+    }
+
+    public void insertItem(Item item) {
+        this.item = item;
+    }
+
+    public void updateOrderInfo(int purchaseOrderItemQuantity, int purchaseOrderItemPrice, String purchaseOrderItemNote) {
+        this.purchaseOrderItemQuantity = purchaseOrderItemQuantity;
+        this.purchaseOrderItemPrice = purchaseOrderItemPrice;
+        this.purchaseOrderItemNote = purchaseOrderItemNote;
     }
 
 }

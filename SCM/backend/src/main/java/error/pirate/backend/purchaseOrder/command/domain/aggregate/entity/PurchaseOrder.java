@@ -56,6 +56,11 @@ public class PurchaseOrder {
 
     private String purchaseOrderNote; // 발주서 비고
 
+    @Builder
+    public PurchaseOrder(Long purchaseOrderSeq) {
+        this.purchaseOrderSeq = purchaseOrderSeq;
+    }
+
     public void changePurchaseOrderName(String name) {
         this.purchaseOrderName = name;
     }
