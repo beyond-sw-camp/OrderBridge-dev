@@ -36,6 +36,7 @@
         <if test="request.shippingInstructionStatus != '' and request.shippingInstructionStatus != null">
             AND si.shipping_instruction_status LIKE #{request.shippingInstructionStatus}
         </if>
+        ORDER BY si.shipping_instruction_reg_date DESC
         LIMIT #{request.size} OFFSET #{offset}
     </select>
 

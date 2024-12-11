@@ -33,6 +33,9 @@ public class ShippingSlip {
 
     private String shippingSlipAddress; // 출하전표 주소
 
+    @Enumerated(EnumType.STRING)
+    private ShippingSlipStatus shippingSlipStatus; // 출하전표 상태
+
     @CreatedDate
     private LocalDateTime shippingSlipRegDate; // 출하전표 등록일
 

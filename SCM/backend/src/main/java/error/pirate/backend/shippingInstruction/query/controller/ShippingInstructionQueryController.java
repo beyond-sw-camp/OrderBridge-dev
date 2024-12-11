@@ -13,8 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
-
 @Tag(name = "출하지시서")
 @RestController
 @RequiredArgsConstructor    // final 을 받은 필드의 생성자를 주입
