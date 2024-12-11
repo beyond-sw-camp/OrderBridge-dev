@@ -1,5 +1,7 @@
 package error.pirate.backend.shippingInstruction.command.mapper;
 
+import error.pirate.backend.exception.CustomException;
+import error.pirate.backend.exception.ErrorCodeType;
 import error.pirate.backend.item.command.domain.aggregate.entity.Item;
 import error.pirate.backend.shippingInstruction.command.application.dto.ShippingInstructionItemDTO;
 import error.pirate.backend.shippingInstruction.command.application.dto.ShippingInstructionRequest;
@@ -31,8 +33,8 @@ public class ShippingInstructionItemMapper {
             Item item = itemMap.get(itemDTO.getItemSeq()); // itemSeq으로 Item 매핑
 
             if (item == null) {
-                // 매핑되지 않은 Item이 있으면 예외 처리 (필요 시 Custom Exception 사용)
-                throw new IllegalArgumentException("Item not found: " + itemDTO.getItemSeq());
+                // 매핑되지 않은 Item이 있으면 예외 처리
+                throw new CustomException(ErrorCodeType.ITEM_NOT_FOUND);
             }
 
             // ShippingInstructionItem 생성 및 리스트에 추가
