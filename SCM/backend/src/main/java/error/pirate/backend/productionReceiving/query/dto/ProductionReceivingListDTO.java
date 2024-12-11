@@ -13,7 +13,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProductionReceivingListDTO {
-    private String productReceivingName;
+    private Long productionReceivingSeq;
+    private String productionReceivingName;
     private LocalDateTime productReceivingRegDate;
     private ProductionReceivingStatus productionReceivingStatus;
     private String productionWarehouseName;
