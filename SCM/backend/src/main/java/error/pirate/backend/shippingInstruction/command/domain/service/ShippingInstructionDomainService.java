@@ -49,7 +49,7 @@ public class ShippingInstructionDomainService {
 
     /* 주문서 상태가 생산완료인지 체크 */
     public void checkShippingInstructionSalesOrder(SalesOrder salesOrder) {
-        if (!salesOrder.getSalesOrderStatus().equals(SalesOrderStatus.PRODUCTIONCOMPLETION)) {
+        if (!salesOrder.getSalesOrderStatus().equals(SalesOrderStatus.PRODUCTION_COMPLETE)) {
             throw new CustomException(ErrorCodeType.SALES_ORDER_STATE_BAD_REQUEST);
         }
     }
