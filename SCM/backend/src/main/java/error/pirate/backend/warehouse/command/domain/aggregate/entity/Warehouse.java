@@ -23,7 +23,6 @@ public class Warehouse {
     private Long warehouseSeq;
 
     // User 설정 메서드
-    @Setter
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinColumn(name = "userSeq")
     private User user; // 창고 관리자 번호
@@ -42,4 +41,7 @@ public class Warehouse {
 
     private String warehouseNote; // 창고 비고
 
+    public void specifyUser(User user) {
+        this.user = user;
+    }
 }

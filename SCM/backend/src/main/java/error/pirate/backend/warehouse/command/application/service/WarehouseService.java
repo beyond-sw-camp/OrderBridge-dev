@@ -29,7 +29,7 @@ public class WarehouseService {
 
         // 요청을 Warehouse 엔티티로 매핑
         Warehouse warehouse = modelMapper.map(request, Warehouse.class);
-        warehouse.setUser(user);
+        warehouse.specifyUser(user);
 
         // 저장
         Warehouse savedWarehouse = warehouseRepository.save(warehouse);
