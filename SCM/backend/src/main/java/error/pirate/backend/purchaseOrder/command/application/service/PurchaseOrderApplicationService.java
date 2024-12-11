@@ -1,5 +1,7 @@
 package error.pirate.backend.purchaseOrder.command.application.service;
 
+import error.pirate.backend.exception.CustomException;
+import error.pirate.backend.exception.ErrorCodeType;
 import error.pirate.backend.purchaseOrder.command.application.dto.PurchaseOrderCreateRequest;
 import error.pirate.backend.purchaseOrder.command.application.dto.PurchaseOrderUpdateRequest;
 import error.pirate.backend.purchaseOrder.command.domain.service.PurchaseOrderDomainService;
@@ -22,10 +24,11 @@ public class PurchaseOrderApplicationService {
 
     @Transactional
     public void createPurchaseOrder(PurchaseOrderCreateRequest request) {
-        // 발주서명은 uuid 생성해서 넣어도 되는지?
         SalesOrder salesOrder = salesOrderDomainService.findById(request.getSalesOrderSeq());
-        if(salesOrder.getSalesOrderStatus() == SalesOrderStatus.BEFORE) {
+        if(salesOrder.getSalesOrderStatus() == SalesOrderStatus.AFTER) {
             purchaseOrderDomainService.createPurchaseOrder(request);
+        } else {
+            throw new CustomException(ErrorCodeType.SALES_ORDER_STATE_BAD_REQUEST);
         }
     }
 
@@ -35,6 +38,8 @@ public class PurchaseOrderApplicationService {
         // 생산 중이 아닐 때만 수정 가능
         if(salesOrder.getSalesOrderStatus() != SalesOrderStatus.PRODUCTION) {
             purchaseOrderDomainService.updatePurchaseOrder(request);
+        } else {
+            throw new CustomException(ErrorCodeType.SALES_ORDER_STATE_BAD_REQUEST);
         }
     }
 
@@ -44,6 +49,8 @@ public class PurchaseOrderApplicationService {
         // 생산 중이 아닐 때만 삭제 가능
         if(salesOrder.getSalesOrderStatus() != SalesOrderStatus.PRODUCTION) {
             purchaseOrderDomainService.deletePurchaseOrder(purchaseOrderSeq);
+        } else {
+            throw new CustomException(ErrorCodeType.SALES_ORDER_STATE_BAD_REQUEST);
         }
     }
 

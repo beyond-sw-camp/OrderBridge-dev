@@ -6,6 +6,7 @@ import error.pirate.backend.salesOrder.command.domain.aggregate.entity.SalesOrde
 import error.pirate.backend.user.command.domain.aggregate.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
@@ -55,11 +56,25 @@ public class PurchaseOrder {
 
     private String purchaseOrderNote; // 발주서 비고
 
+    public void changePurchaseOrderName(String name) {
+        this.purchaseOrderName = name;
+    }
+
     public void updatePurchaseOrder(PurchaseOrderUpdateRequest request) {
         this.purchaseOrderDueDate = request.getPurchaseOrderDueDate();
         this.purchaseOrderTargetDueDate = request.getPurchaseOrderTargetDueDate();
         this.purchaseOrderExtendedPrice = request.getPurchaseOrderExtendedPrice();
         this.purchaseOrderNote = request.getPurchaseOrderNote();
+    }
+
+    public void changePurchaseOrderStatus(PurchaseOrderStatus status) {
+        this.purchaseOrderStatus = status;
+    }
+
+    public void setSeqValue(User user, Client client, SalesOrder salesOrder) {
+        this.user = user;
+        this.client = client;
+        this.salesOrder = salesOrder;
     }
 
 }

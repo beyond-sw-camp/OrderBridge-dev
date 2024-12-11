@@ -3,6 +3,7 @@ package error.pirate.backend.client.command.domain.aggregate.entity;
 import error.pirate.backend.user.command.domain.aggregate.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
@@ -38,4 +39,10 @@ public class Client {
     @LastModifiedDate
     @Column(insertable = false)
     private LocalDateTime clientModDate; // 거래처 수정일
+
+    @Builder
+    public Client(Long clientSeq) {
+        this.clientSeq = clientSeq;
+    }
+
 }

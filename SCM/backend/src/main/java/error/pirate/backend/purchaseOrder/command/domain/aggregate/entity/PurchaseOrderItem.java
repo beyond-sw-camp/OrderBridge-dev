@@ -17,7 +17,7 @@ public class PurchaseOrderItem {
 
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinColumn(name = "purchaseOrderSeq")
-    private Purchase purchase; // 발주서
+    private PurchaseOrder purchaseOrder; // 발주서
 
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinColumn(name = "itemSeq")
@@ -28,4 +28,9 @@ public class PurchaseOrderItem {
     private int purchaseOrderItemPrice; // 발주서 품목 단가
 
     private String purchaseOrderItemNote; // 발주서 품목 비고
+
+    public void insertPurchase(PurchaseOrder purchaseOrder) {
+        this.purchaseOrder = purchaseOrder;
+    }
+
 }

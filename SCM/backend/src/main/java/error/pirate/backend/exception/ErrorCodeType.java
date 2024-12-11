@@ -46,6 +46,9 @@ public enum ErrorCodeType {
 
     // 회원 오류
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "USER_ERROR_001", "회원을 찾을 수 없습니다."),
+    
+    // 거래처 오류
+    CLIENT_NOT_FOUND(HttpStatus.NOT_FOUND, "CLIENT_ERROR_001", "거래처를 찾을 수 없습니다."),
 
     // 물품 오류
     ITEM_NOT_FOUND(HttpStatus.NOT_FOUND, "ITEM_ERROR_001", "물품을 찾을 수 없습니다."),

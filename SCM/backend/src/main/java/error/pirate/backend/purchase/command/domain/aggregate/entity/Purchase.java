@@ -50,4 +50,6 @@ public class Purchase {
     private Integer purchaseExtendedPrice; // 구매서 총금액
 
     private String purchaseNote; // 구매서 비고
+
+
 }
