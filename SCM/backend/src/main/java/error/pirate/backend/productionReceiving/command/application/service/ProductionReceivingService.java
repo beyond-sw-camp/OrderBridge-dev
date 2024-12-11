@@ -132,7 +132,7 @@ public class ProductionReceivingService {
 
         SalesOrder salesOrder = salesOrderRepository.findByProductionReceivingSeq(productionReceivingSeq);
 
-        salesOrder.updateSalesOrderStatus(SalesOrderStatus.PRODUCTIONCOMPLETION); // 주문서의 상태를 생산완료로 변경
+        salesOrder.updateSalesOrderStatus(SalesOrderStatus.PRODUCTION_COMPLETE); // 주문서의 상태를 생산완료로 변경
 
         /*
         * 품목 재고에 생산입고 수량만큼 추가
