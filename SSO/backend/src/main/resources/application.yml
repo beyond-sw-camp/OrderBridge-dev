@@ -39,3 +39,5 @@ logging:
 token:
   secret: ${TOKEN}
   expiration_time: 43200000
+
+frontend: http://localhost:5174

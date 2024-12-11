@@ -6,6 +6,7 @@ import error.pirate.backend.security.filter.JwtFilter;
 import error.pirate.backend.service.UserService;
 import jakarta.servlet.Filter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
@@ -20,10 +21,14 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
+@Slf4j
 public class SecurityConfig {
     private final BCryptPasswordEncoder passwordEncoder;
     private final UserService userService;
@@ -33,10 +38,12 @@ public class SecurityConfig {
     @Bean
     protected SecurityFilterChain configure(HttpSecurity http) throws Exception {
         http
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> {
                     authorize.requestMatchers(
-                                    new AntPathRequestMatcher("/login", "POST")).permitAll() // login 요청만이 모든 사용자가 요청할 수 있다..
+                                    new AntPathRequestMatcher("/login", "POST"),
+                                    new AntPathRequestMatcher("/api/v1/user", "POST")).permitAll() // login 요청만이 모든 사용자가 요청할 수 있다..
                             .requestMatchers(new AntPathRequestMatcher("/**"))
                             .authenticated(); // 위의 요청 외에는 인증만 필요하다.
                 })
@@ -72,5 +79,25 @@ public class SecurityConfig {
         provider.setUserDetailsService(userService);  // userService를 UserDeatilService로 지정
 
         return new ProviderManager(provider);
+    }
+
+    @Bean
+    public CorsFilter corsFilter() {
+        return new CorsFilter(corsConfigurationSource());
+    }
+
+    @Bean
+    public UrlBasedCorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowCredentials(true);
+        config.addAllowedOrigin(env.getProperty("frontend")); // 허용할 도메인
+        config.addAllowedHeader("*"); // 모든 헤더 허용
+        config.addAllowedMethod("*"); // 모든 HTTP 메소드 허용
+
+        config.addExposedHeader("token");
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
     }
 }
