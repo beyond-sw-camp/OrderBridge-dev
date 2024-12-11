@@ -6,6 +6,7 @@ import error.pirate.backend.user.command.domain.aggregate.entity.User;
 import error.pirate.backend.user.command.domain.repository.UserRepository;
 import error.pirate.backend.warehouse.command.application.dto.WarehouseCreateRequest;
 import error.pirate.backend.warehouse.command.application.dto.WarehouseResponse;
+import error.pirate.backend.warehouse.command.application.dto.WarehouseUpdateRequest;
 import error.pirate.backend.warehouse.command.domain.aggregate.entity.Warehouse;
 import error.pirate.backend.warehouse.command.domain.repository.WarehouseRepository;
 import lombok.RequiredArgsConstructor;
@@ -36,5 +37,12 @@ public class WarehouseService {
 
         // 엔티티를 응답 DTO로 매핑
         return modelMapper.map(savedWarehouse, WarehouseResponse.class);
+    }
+    @Transactional
+    public void updateWarehouse(Long warehouseSeq, WarehouseUpdateRequest request) {
+        Warehouse warehouse = warehouseRepository.findById(warehouseSeq)
+                .orElseThrow(() -> new CustomException(ErrorCodeType.WAREHOUSE_NOT_FOUND));
+
+        warehouse.updateWarehouse(request);
     }
 }

@@ -1,11 +1,11 @@
 package error.pirate.backend.warehouse.command.domain.aggregate.entity;
 
 import error.pirate.backend.user.command.domain.aggregate.entity.User;
+import error.pirate.backend.warehouse.command.application.dto.WarehouseUpdateRequest;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -44,4 +44,16 @@ public class Warehouse {
     public void specifyUser(User user) {
         this.user = user;
     }
+    public void updateWarehouse(WarehouseUpdateRequest request) {
+        if (request.getWarehouseName() != null) {
+            this.warehouseName = request.getWarehouseName();
+        }
+        if (request.getWarehouseType() != null) {
+            this.warehouseType = request.getWarehouseType();
+        }
+        if (request.getWarehouseNote() != null) {
+            this.warehouseNote = request.getWarehouseNote();
+        }
+    }
+
 }
