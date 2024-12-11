@@ -5,7 +5,7 @@ import error.pirate.backend.item.command.domain.aggregate.entity.Item;
 import error.pirate.backend.quotation.command.application.dto.CreateQuotationRequest;
 import error.pirate.backend.quotation.command.application.dto.QuotationItemDTO;
 import error.pirate.backend.quotation.command.application.dto.QuotationItemUpdateDTO;
-import error.pirate.backend.quotation.command.application.dto.UpdtaeQuotationRequost;
+import error.pirate.backend.quotation.command.application.dto.UpdateQuotationRequest;
 import error.pirate.backend.quotation.command.domain.aggregate.entity.QuotationItem;
 import error.pirate.backend.quotation.command.domain.repository.QuotationItemRepository;
 import error.pirate.backend.quotation.command.domain.repository.QuotationRepository;
@@ -69,7 +69,7 @@ public class QuotationCommandService {
 
     // 견적서 수정
     @Transactional
-    public void updateQuotation(Long quotationSeq, UpdtaeQuotationRequost request) {
+    public void updateQuotation(Long quotationSeq, UpdateQuotationRequest request) {
         Quotation quotation = quotationRepository.findById(quotationSeq).orElseThrow();
 
         // 엔티티 요구 변수 작성
@@ -110,7 +110,5 @@ public class QuotationCommandService {
         // 견적서 변경 사항 적용
         quotation.updateQuotation(request.getQuotationQuotationDate(), client, user, request.getQuotationNote());
         quotation.setCalculate(quotationExtendedPrice, quotationTotalQuantity);
-
-        quotationRepository.save(quotation);
     }
 }

@@ -1,7 +1,7 @@
 package error.pirate.backend.quotation.command.application.controller;
 
 import error.pirate.backend.quotation.command.application.dto.CreateQuotationRequest;
-import error.pirate.backend.quotation.command.application.dto.UpdtaeQuotationRequost;
+import error.pirate.backend.quotation.command.application.dto.UpdateQuotationRequest;
 import error.pirate.backend.quotation.command.application.service.QuotationCommandService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -31,7 +31,7 @@ public class QuotationCommandController {
     @Operation(summary = "견적서 수정")
     public ResponseEntity<Void> updateQuotation(
             @PathVariable Long quotationSeq,
-            @RequestBody UpdtaeQuotationRequost request) {
+            @RequestBody UpdateQuotationRequest request) {
 
         quotationCommandService.updateQuotation(quotationSeq, request);
 
