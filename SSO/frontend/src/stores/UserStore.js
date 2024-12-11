@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import axios from 'axios';
+import router from "@/router/index.js";
 
 // JWT 토큰 디코딩 함수
 function parseJwt(token) {
@@ -53,11 +54,12 @@ export const useUserStore = defineStore('user', {
       this.isAuthenticated = false;
       this.auth = null;
       localStorage.removeItem('authToken');
+
+      router.push("/");
     },
 
     // 새로고침 시 상태 복원
     initialize() {
-      console.log("@@");
       const token = localStorage.getItem('authToken');
       if (token) {
         try {
