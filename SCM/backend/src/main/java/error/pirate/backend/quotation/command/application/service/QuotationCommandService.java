@@ -108,7 +108,8 @@ public class QuotationCommandService {
         }
 
         // 견적서 변경 사항 적용
-        quotation.updateQuotation(request.getQuotationQuotationDate(), client, user, request.getQuotationNote());
-        quotation.setCalculate(quotationExtendedPrice, quotationTotalQuantity);
+        quotation.updateQuotation(
+                request.getQuotationQuotationDate(), client, user, request.getQuotationNote(),
+                quotationExtendedPrice, quotationTotalQuantity);
     }
 }

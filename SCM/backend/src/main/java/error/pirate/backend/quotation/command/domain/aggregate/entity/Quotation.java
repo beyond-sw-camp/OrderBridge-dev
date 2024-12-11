@@ -65,13 +65,9 @@ public class Quotation {
         this.quotationNote = quotationNote;
     }
 
-    public void setCalculate(Integer quotationExtendedPrice, Integer quotationTotalQuantity) {
-        this.quotationExtendedPrice = quotationExtendedPrice;
-        this.quotationTotalQuantity = quotationTotalQuantity;
-    }
-
     public void updateQuotation(
-            LocalDateTime quotationQuotationDate, Client client, User user, String quotationNote) {
+            LocalDateTime quotationQuotationDate, Client client, User user, String quotationNote,
+            Integer quotationExtendedPrice, Integer quotationTotalQuantity) {
         if (quotationQuotationDate != null) {
             this.quotationQuotationDate = quotationQuotationDate;
         }
@@ -84,5 +80,7 @@ public class Quotation {
         if (quotationNote != null) {
             this.quotationNote = quotationNote;
         }
+        this.quotationExtendedPrice = quotationExtendedPrice;
+        this.quotationTotalQuantity = quotationTotalQuantity;
     }
 }
