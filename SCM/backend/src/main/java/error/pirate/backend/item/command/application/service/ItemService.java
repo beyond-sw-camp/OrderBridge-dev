@@ -9,6 +9,7 @@ import error.pirate.backend.item.command.application.dto.ItemCreateRequest;
 import error.pirate.backend.item.command.application.dto.ItemUpdateRequest;
 import error.pirate.backend.item.command.domain.aggregate.entity.BomItem;
 import error.pirate.backend.item.command.domain.aggregate.entity.Item;
+import error.pirate.backend.item.command.domain.aggregate.entity.ItemStatus;
 import error.pirate.backend.item.command.domain.aggregate.entity.ItemUnit;
 import error.pirate.backend.item.command.domain.repository.BomItemRepository;
 import error.pirate.backend.item.command.domain.repository.ItemRepository;
@@ -69,7 +70,10 @@ public class ItemService {
 
         // 기존 품목 조회
         Item item = itemRepository.findById(itemSeq)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid itemSeq: " + itemSeq));
+                .orElseThrow(() -> new CustomException(ErrorCodeType.ITEM_NOT_FOUND));
+        if(!ItemStatus.ACTIVE.equals(item.getItemStatus())) {
+            throw new CustomException(ErrorCodeType.ITEM_STATUS_ERROR);
+        }
 
         ItemUnit itemUnit = itemUnitRepository.findById(request.getItemUnitSeq())
                 .orElseThrow(() -> new IllegalArgumentException("Invalid itemUnitSeq: " + request.getItemUnitSeq()));
@@ -93,9 +97,24 @@ public class ItemService {
         }
     }
 
+    @Transactional
+    public void deleteItem(Long itemSeq) {
+        // 품목 조회
+        Item item = itemRepository.findById(itemSeq)
+                .orElseThrow(() -> new CustomException(ErrorCodeType.ITEM_NOT_FOUND));
+        if(!ItemStatus.ACTIVE.equals(item.getItemStatus())) {
+            throw new CustomException(ErrorCodeType.ITEM_STATUS_ERROR);
+        }
+
+        // 품목 삭제 (상태값 변경)
+        item.delete();
+    }
+
     /* 물품 시퀀스들로 물품 리스트 불러오기 */
     @Transactional
     public List<Item> findAllById(List<Long> itemNameList) {
         return itemRepository.findAllById(itemNameList);
     }
 }
+
+

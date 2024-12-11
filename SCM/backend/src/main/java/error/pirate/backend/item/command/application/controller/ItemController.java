@@ -36,4 +36,11 @@ public class ItemController {
         itemService.updateItem(itemSeq, request);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
+
+    @DeleteMapping("/{itemSeq}")
+    @Operation(summary = "품목 삭제", description = "품목의 상태를 삭제로 변경합니다.")
+    public ResponseEntity<Void> deleteItem(@PathVariable Long itemSeq) {
+        itemService.deleteItem(itemSeq);
+        return ResponseEntity.noContent().build();
+    }
 }

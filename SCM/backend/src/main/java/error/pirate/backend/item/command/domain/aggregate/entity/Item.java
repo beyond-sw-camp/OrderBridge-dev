@@ -49,6 +49,9 @@ public class Item {
 
     private String itemNote;
 
+    @Enumerated(EnumType.STRING)
+    private ItemStatus itemStatus = ItemStatus.ACTIVE;
+
     public void updateItem(ItemUnit itemUnit, ItemUpdateRequest request) {
         if(itemUnit != null) {
             this.itemUnit = itemUnit;
@@ -72,4 +75,9 @@ public class Item {
             this.itemNote = request.getItemNote();
         }
     }
+    // 품목 삭제 메서드
+    public void delete() {
+        this.itemStatus = ItemStatus.DELETED;
+    }
 }
+

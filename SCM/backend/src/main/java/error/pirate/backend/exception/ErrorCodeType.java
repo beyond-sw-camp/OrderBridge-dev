@@ -46,6 +46,7 @@ public enum ErrorCodeType {
 
     // 물품 오류
     ITEM_NOT_FOUND(HttpStatus.NOT_FOUND, "ITEM_ERROR_001", "물품을 찾을 수 없습니다."),
+    ITEM_STATUS_ERROR(HttpStatus.BAD_REQUEST, "ITEM_ERROR_002", "이미 삭제된 상품입니다."),
 
     // 물품 단위 오류
     ITEM_UNIT_NOT_FOUND(HttpStatus.NOT_FOUND, "ITEM_UNIT_ERROR_001", "물품 단위를 찾을 수 없습니다."),
