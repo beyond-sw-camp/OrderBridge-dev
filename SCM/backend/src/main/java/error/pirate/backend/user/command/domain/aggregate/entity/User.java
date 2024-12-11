@@ -2,6 +2,7 @@ package error.pirate.backend.user.command.domain.aggregate.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -20,4 +21,10 @@ public class User {
     private String userPhoneNo; // 회원 핸드폰 번호
 
     private String userEmail; // 회원 이메일
+
+    @Builder
+    public User(Long userSeq) {
+        this.userSeq = userSeq;
+    }
+
 }

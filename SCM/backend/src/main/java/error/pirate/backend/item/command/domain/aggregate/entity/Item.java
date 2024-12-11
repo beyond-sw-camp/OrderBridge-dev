@@ -4,6 +4,7 @@ import error.pirate.backend.item.command.application.dto.ItemUpdateRequest;
 import error.pirate.backend.user.command.domain.aggregate.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
@@ -48,6 +49,11 @@ public class Item {
     private Integer itemPrice; // 품목 단가
 
     private String itemNote;
+
+    @Builder
+    public Item(Long itemSeq) {
+        this.itemSeq = itemSeq;
+    }
 
     public void updateItem(ItemUnit itemUnit, ItemUpdateRequest request) {
         if(itemUnit != null) {

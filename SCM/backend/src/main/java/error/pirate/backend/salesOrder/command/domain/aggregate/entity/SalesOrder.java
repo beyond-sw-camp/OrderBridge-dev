@@ -5,6 +5,7 @@ import error.pirate.backend.quotation.command.domain.aggregate.entity.Quotation;
 import error.pirate.backend.user.command.domain.aggregate.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
@@ -59,4 +60,10 @@ public class SalesOrder {
     public void updateSalesOrderStatus(SalesOrderStatus salesOrderStatus) {
         this.salesOrderStatus = salesOrderStatus;
     }
+
+    @Builder
+    public SalesOrder(Long salesOrderSeq) {
+        this.salesOrderSeq = salesOrderSeq;
+    }
+
 }
