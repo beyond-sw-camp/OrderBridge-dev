@@ -2,6 +2,7 @@ package error.pirate.backend.shippingSlip.command.application.service;
 
 import error.pirate.backend.item.command.application.service.ItemService;
 import error.pirate.backend.item.command.domain.aggregate.entity.Item;
+import error.pirate.backend.salesOrder.command.domain.service.SalesOrderDomainService;
 import error.pirate.backend.shippingInstruction.command.domain.aggregate.entity.ShippingInstruction;
 import error.pirate.backend.shippingInstruction.command.domain.service.ShippingInstructionDomainService;
 import error.pirate.backend.shippingSlip.command.application.dto.ShippingSlipItemDTO;
@@ -28,6 +29,7 @@ public class ShippingSlipApplicationService {
     private final ShippingSlipItemDomainService shippingSlipItemDomainService;
     private final ShippingInstructionDomainService shippingInstructionDomainService;
     private final ItemService itemService;
+    private final SalesOrderDomainService salesOrderDomainService;
 
     /* 출하전표 등록 */
     @Transactional
@@ -79,6 +81,9 @@ public class ShippingSlipApplicationService {
         /* saveAll 로직 실행 */
         List<ShippingSlipItem> shippingSlipItem
                 = shippingSlipItemDomainService.saveShippingSlipItem(newShippingSlipItemList);
+
+        /* 주문서 상태를 출하완료로 변경 */
+        salesOrderDomainService.updateSalesOrderStatus(shippingInstruction.getSalesOrder(), "SHIPMENT_COMPLETE");
     }
 
     /* 출하전표 수정 */
@@ -87,6 +92,9 @@ public class ShippingSlipApplicationService {
         /* 출하전표 찾기 */
         ShippingSlip shippingSlip
                 = shippingSlipDomainService.findByShippingSlipSeq(shippingSlipSeq);
+
+        /* 수정이 가능한 상태인지 체크 */
+        shippingSlipDomainService.checkShippingSlipDeleteStatus(shippingSlip.getShippingSlipStatus());
 
         /* 현재 출하지시서 저장 */
         ShippingInstruction shippingInstruction = shippingSlip.getShippingInstruction();
@@ -151,5 +159,8 @@ public class ShippingSlipApplicationService {
 
         /* 삭제 상태로 변경 */
         shippingSlipDomainService.deleteShippingSlip(shippingSlip);
+
+        /* 주문서 상태를 생산완료로 변경 */
+        salesOrderDomainService.updateSalesOrderStatus(shippingSlip.getShippingInstruction().getSalesOrder(), "PRODUCTION_COMPLETE");
     }
 }

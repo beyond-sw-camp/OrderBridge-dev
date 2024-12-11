@@ -7,6 +7,7 @@ import error.pirate.backend.shippingInstruction.command.domain.aggregate.entity.
 import error.pirate.backend.shippingSlip.command.application.dto.ShippingSlipItemDTO;
 import error.pirate.backend.shippingSlip.command.application.dto.ShippingSlipRequest;
 import error.pirate.backend.shippingSlip.command.domain.aggregate.entity.ShippingSlip;
+import error.pirate.backend.shippingSlip.command.domain.aggregate.entity.ShippingSlipStatus;
 import error.pirate.backend.shippingSlip.command.domain.repository.ShippingSlipRepository;
 import error.pirate.backend.shippingSlip.command.mapper.ShippingSlipMapper;
 import error.pirate.backend.user.command.domain.aggregate.entity.User;
@@ -122,6 +123,14 @@ public class ShippingSlipDomainService {
         return shippingSlip;
     }
 
+    /* 출하전표 수정이 가능한 상태인지 체크 */
+    public void checkShippingSlipDeleteStatus(ShippingSlipStatus shippingSlipStatus) {
+        /* 삭제 상태라면 변경 불가*/
+        if (shippingSlipStatus.equals(ShippingSlipStatus.DELETE)) {
+            throw new CustomException(ErrorCodeType.SHIPPING_SLIP_DELETE_STATE);
+        }
+    }
+
     /* 출하지시서가 변경되었는지 체크 */
     public boolean checkChangedShippingInstruction(ShippingInstruction shippingInstruction, ShippingInstruction newShippingInstruction) {
         return !Objects.equals(
@@ -133,4 +142,6 @@ public class ShippingSlipDomainService {
         /* 수정을 위해 엔터티 정보 변경 */
         shippingSlip.updateStatus("DELETE");
     }
+
+
 }

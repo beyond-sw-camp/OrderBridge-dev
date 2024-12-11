@@ -21,7 +21,6 @@ class ShippingInstructionApplicationServiceTest {
 
     @Autowired
     private ShippingInstructionApplicationService shippingInstructionApplicationService;
-    ;
 
     private static Stream<Arguments> createShippingInstructionArguments() {
         return Stream.of(
