@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
+import shippingInstructionRoutes from './shipping-instruction.js'
 
 const routes = [
     {
@@ -15,17 +16,14 @@ const routes = [
         component: () => import("@/views/quotation/QuotationListView.vue")
     },
     {
-        path: "/quotation/input",
-        component: () => import("@/views/quotation/InputView.vue")
-    },
-    {
         path: "/currentSituation",
         component: () => import("@/components/common/CurrentSituation.vue")
     },
     {
         path: "/productionReceiving",
         component: () => import("@/views/productionReceiving/ProductionReceivingListView.vue")
-    }
+    },
+    ...shippingInstructionRoutes
 ];
 
 const router = createRouter({
