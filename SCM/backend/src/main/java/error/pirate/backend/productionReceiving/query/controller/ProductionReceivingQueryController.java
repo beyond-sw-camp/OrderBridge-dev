@@ -1,5 +1,6 @@
 package error.pirate.backend.productionReceiving.query.controller;
 
+import error.pirate.backend.common.ExcelDown;
 import error.pirate.backend.productionReceiving.query.dto.ProductionReceivingListRequest;
 import error.pirate.backend.productionReceiving.query.dto.ProductionReceivingListResponse;
 import error.pirate.backend.productionReceiving.query.dto.ProductionReceivingResponse;
@@ -9,6 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,5 +34,15 @@ public class ProductionReceivingQueryController {
     @Operation(summary = "생산입고 상세 조회")
     public ResponseEntity<ProductionReceivingResponse> readProductionReceiving(@PathVariable Long productionReceivingSeq) {
         return ResponseEntity.ok(productionReceivingQueryService.readProductionReceiving(productionReceivingSeq));
+    }
+
+    @GetMapping("/excelDown")
+    @Operation(summary = "생산입고 엑셀다운")
+    public ResponseEntity<byte[]> productionReceivingExcelDown(@ModelAttribute ProductionReceivingListRequest request, Pageable pageable) {
+
+        return ResponseEntity.ok()
+                .headers(ExcelDown.excelDownHeader("생산입고"))
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(productionReceivingQueryService.productionReceivingExcelDown(request, pageable));
     }
 }

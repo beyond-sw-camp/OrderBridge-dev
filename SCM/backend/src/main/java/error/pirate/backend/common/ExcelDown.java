@@ -71,7 +71,7 @@ public class ExcelDown {
 
     public static HttpHeaders excelDownHeader(String name) {
         HttpHeaders headersResponse = new HttpHeaders();
-        String fileName = URLEncoder.encode(name + " (" + new SimpleDateFormat("yyyy/MM/dd_HH-mm").format(new Date()) + ").xlsx", StandardCharsets.UTF_8);
+        String fileName = URLEncoder.encode(name + "_" + new SimpleDateFormat("yyyyMMdd").format(new Date()) + ".xlsx", StandardCharsets.UTF_8);
         headersResponse.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileName);
 
         return headersResponse;
