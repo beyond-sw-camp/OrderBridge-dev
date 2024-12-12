@@ -55,5 +55,12 @@ public class Warehouse {
             this.warehouseNote = request.getWarehouseNote();
         }
     }
+    @Enumerated(EnumType.STRING)
+    private WarehouseStatus warehouseStatus = WarehouseStatus.ACTIVE;
+
+    // 상태 변경 메서드
+    public void delete() {
+        this.warehouseStatus = WarehouseStatus.DELETED;
+    }
 
 }
