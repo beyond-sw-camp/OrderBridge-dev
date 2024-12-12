@@ -36,9 +36,6 @@ public interface QuotationMapper {
     // 견적서 현황 조회
     List<QuotationSituationDTO> selectQuotationSituation(LocalDate startDate, LocalDate endDate, String clientName);
 
-    // 오늘 견적서 개수 조회
-    String makeQuotationName();
-
     QuotationCalculateSumDTO calculateSum(
             @Param("quotationSeq") Long quotationSeq);
 }

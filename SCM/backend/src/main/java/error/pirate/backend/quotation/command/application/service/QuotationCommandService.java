@@ -1,6 +1,7 @@
 package error.pirate.backend.quotation.command.application.service;
 
 import error.pirate.backend.client.command.domain.aggregate.entity.Client;
+import error.pirate.backend.common.NameGenerator;
 import error.pirate.backend.item.command.domain.aggregate.entity.Item;
 import error.pirate.backend.quotation.command.application.dto.CreateQuotationRequest;
 import error.pirate.backend.quotation.command.application.dto.QuotationItemDTO;
@@ -27,6 +28,7 @@ public class QuotationCommandService {
     private final QuotationRepository quotationRepository;
     private final QuotationItemRepository quotationItemRepository;
     private final EntityManager entityManager;
+    private final NameGenerator nameGenerator;
 
     // 견적서 등록
     @Transactional
@@ -35,7 +37,7 @@ public class QuotationCommandService {
         // 엔티티 요구 변수 작성
         Client client = entityManager.getReference(Client.class, request.getClientSeq());
         User user = entityManager.getReference(User.class, request.getUserSeq());
-        String quotationName = quotationQueryService.makeQuotationName();
+        String quotationName = nameGenerator.nameGenerator(Quotation.class);
 
         // 견적서 합계 계산
         int quotationExtendedPrice = 0;
