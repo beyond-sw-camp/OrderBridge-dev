@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="error.pirate.backend.shippingSlip.query.mapper.ShippingSlipMapper">
+
+    <!--    출하전표 리스트 조회  -->
+    <select id="selectShippingSlipList"
+            resultType="error.pirate.backend.shippingSlip.query.dto.ShippingSlipListDTO">
+        SELECT
+            s.shipping_slip_seq,
+            s.shipping_slip_name,
+            s.shipping_slip_shipping_date,
+            c.client_name,
+            (
+                SELECT
+                GROUP_CONCAT(i.item_name SEPARATOR ", ")
+                FROM tb_shipping_slip_item ssi
+                JOIN tb_item i ON i.item_seq = ssi.item_seq
+                WHERE s.shipping_slip_seq = ssi.shipping_slip_seq
+            ) AS item_name
+        FROM tb_shipping_slip s
+        JOIN tb_shipping_instruction si ON (s.shipping_instruction_seq = si.shipping_instruction_seq)
+        JOIN tb_sales_order so ON (si.sales_order_seq = so.sales_order_seq)
+        JOIN tb_client c ON (so.client_seq = c.client_seq)
+        WHERE s.shipping_slip_status NOT IN ('DELETE')
+        OR s.shipping_slip_status IS NULL
+        <if test="request.startDate != null"><![CDATA[
+            AND #{request.startDate} <= s.shipping_slip_shipping_date
+             ]]></if>
+        <if test="request.endDate != null"><![CDATA[
+            AND #{request.endDate} >= s.shipping_slip_shipping_date
+            ]]></if>
+        <if test="request.clientName != '' and request.clientName != null">
+            AND c.client_name LIKE CONCAT('%', #{request.clientName}, '%')
+        </if>
+        ORDER BY s.shipping_slip_reg_date DESC
+        LIMIT #{request.size} OFFSET #{offset}
+    </select>
+
+    <!--    출하전표 리스트 갯수  -->
+    <select id="countShippingSlip" resultType="long">
+        SELECT COUNT(*)
+        FROM tb_shipping_slip s
+        JOIN tb_shipping_instruction si ON (s.shipping_instruction_seq = si.shipping_instruction_seq)
+        JOIN tb_sales_order so ON (si.sales_order_seq = so.sales_order_seq)
+        JOIN tb_client c ON (so.client_seq = c.client_seq)
+        WHERE s.shipping_slip_status NOT IN ('DELETE')
+        OR s.shipping_slip_status IS NULL
+        <if test="request.startDate != null"><![CDATA[
+            AND #{request.startDate} <= s.shipping_slip_shipping_date
+             ]]></if>
+        <if test="request.endDate != null"><![CDATA[
+            AND #{request.endDate} >= s.shipping_slip_shipping_date
+            ]]></if>
+        <if test="request.clientName != '' and request.clientName != null">
+            AND c.client_name LIKE CONCAT('%', #{request.clientName}, '%')
+        </if>
+    </select>
+
+    <!--    출하전표 상세 조회  -->
+    <select id="selectShippingSlipByShippingSlipSeq"
+            resultType="error.pirate.backend.shippingSlip.query.dto.ShippingSlipDTO">
+        SELECT
+            s.shipping_slip_seq,
+            s.shipping_slip_name,
+            s.shipping_slip_shipping_date,
+            c.client_name,
+            s.shipping_slip_total_quantity,
+            s.shipping_slip_address,
+            u.user_name,
+            s.shipping_slip_note
+        FROM tb_shipping_slip s
+        JOIN tb_user u ON (s.user_seq = u.user_seq)
+        JOIN tb_shipping_instruction si ON (s.shipping_instruction_seq = si.shipping_instruction_seq)
+        JOIN tb_sales_order so ON (si.sales_order_seq = so.sales_order_seq)
+        JOIN tb_client c ON (so.client_seq = c.client_seq)
+        WHERE s.shipping_slip_seq = #{shippingSlipSeq}
+    </select>
+
+    <!--    출하전표 상세 품목 조회  -->
+    <select id="selectItemListByShippingSlipSeq"
+            resultType="error.pirate.backend.shippingSlip.query.dto.ShippingSlipItemDTO">
+        SELECT
+            ssi.shipping_slip_item_seq,
+            ssi.item_seq,
+            i.item_image_url,
+            i.item_name,
+            i.item_division,
+            i.item_price,
+            ssi.shipping_slip_item_quantity,
+            ssi.shipping_slip_item_note,
+            (i.item_price * ssi.shipping_slip_item_quantity) AS itemTotalAmount
+        FROM tb_shipping_slip_item ssi
+        JOIN tb_item i ON ssi.item_seq = i.item_seq
+        WHERE ssi.shipping_slip_seq = #{shippingSlipSeq}
+    </select>
+
+    <!--  출하전표 현황 조회  -->
+    <select id="selectShippingSlipSituation"
+            resultType="error.pirate.backend.shippingSlip.query.dto.ShippingSlipSituationDTO">
+        SELECT
+            s.shipping_slip_seq,
+            s.shipping_slip_shipping_date,
+            s.shipping_slip_name,
+            s.shipping_slip_total_quantity,
+            c.client_name,
+            s.shipping_slip_address,
+            s.shipping_slip_note
+        FROM tb_shipping_slip s
+        JOIN tb_shipping_instruction si ON (s.shipping_instruction_seq = si.shipping_instruction_seq)
+        JOIN tb_sales_order so ON (si.sales_order_seq = so.sales_order_seq)
+        JOIN tb_client c ON (so.client_seq = c.client_seq)
+        WHERE s.shipping_slip_status NOT IN ('DELETE')
+        OR s.shipping_slip_status IS NULL
+        <if test="request.startDate != null"><![CDATA[
+            AND #{request.startDate} <= s.shipping_slip_shipping_date
+             ]]></if>
+        <if test="request.endDate != null"><![CDATA[
+            AND #{request.endDate} >= s.shipping_slip_shipping_date
+            ]]></if>
+        <if test="request.clientName != '' and request.clientName != null">
+            AND c.client_name LIKE CONCAT('%', #{request.clientName}, '%')
+        </if>
+    </select>
+
+    <!--  출하전표 현황 월합계 조회  -->
+    <select id="selectMonthlyTotal"
+            resultType="error.pirate.backend.shippingSlip.query.dto.ShippingSlipSituationMonthlyTotalDTO">
+        SELECT
+            DATE_FORMAT(s.shipping_slip_shipping_date, '%Y-%m') AS month,
+            SUM(s.shipping_slip_total_quantity) AS monthly_total
+        FROM tb_shipping_slip s
+        JOIN tb_shipping_instruction si ON (s.shipping_instruction_seq = si.shipping_instruction_seq)
+        JOIN tb_sales_order so ON (si.sales_order_seq = so.sales_order_seq)
+        JOIN tb_client c ON (so.client_seq = c.client_seq)
+        WHERE s.shipping_slip_status NOT IN ('DELETE')
+        OR s.shipping_slip_status IS NULL
+        <if test="request.startDate != null"><![CDATA[
+            AND #{request.startDate} <= s.shipping_slip_shipping_date
+             ]]></if>
+        <if test="request.endDate != null"><![CDATA[
+            AND #{request.endDate} >= s.shipping_slip_shipping_date
+            ]]></if>
+        <if test="request.clientName != '' and request.clientName != null">
+            AND c.client_name LIKE CONCAT('%', #{request.clientName}, '%')
+        </if>
+        GROUP BY DATE_FORMAT(s.shipping_slip_shipping_date, '%Y-%m')
+    </select>
+
+    <!--  출하전표 현황 총합계 조회  -->
+    <select id="selectTotal" resultType="Integer">
+        SELECT
+            SUM(s.shipping_slip_total_quantity) AS total_quantity
+        FROM tb_shipping_slip s
+        JOIN tb_shipping_instruction si ON (s.shipping_instruction_seq = si.shipping_instruction_seq)
+        JOIN tb_sales_order so ON (si.sales_order_seq = so.sales_order_seq)
+        JOIN tb_client c ON (so.client_seq = c.client_seq)
+        WHERE s.shipping_slip_status NOT IN ('DELETE')
+        OR s.shipping_slip_status IS NULL
+        <if test="request.startDate != null"><![CDATA[
+            AND #{request.startDate} <= s.shipping_slip_shipping_date
+             ]]></if>
+        <if test="request.endDate != null"><![CDATA[
+            AND #{request.endDate} >= s.shipping_slip_shipping_date
+            ]]></if>
+        <if test="request.clientName != '' and request.clientName != null">
+            AND c.client_name LIKE CONCAT('%', #{request.clientName}, '%')
+        </if>
+    </select>
+</mapper>

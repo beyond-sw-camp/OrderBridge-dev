@@ -8,8 +8,8 @@ import error.pirate.backend.item.command.domain.aggregate.entity.ItemInventory;
 import error.pirate.backend.item.command.domain.repository.BomItemRepository;
 import error.pirate.backend.item.command.domain.repository.ItemInventoryRepository;
 import error.pirate.backend.item.command.domain.repository.ItemRepository;
-import error.pirate.backend.item.query.dto.ItemDTO;
 import error.pirate.backend.item.query.dto.ItemDetailResponse;
+import error.pirate.backend.item.query.dto.ItemResponse;
 import error.pirate.backend.item.query.dto.ItemFilterRequest;
 import error.pirate.backend.item.query.dto.ItemInventoryDTO;
 import error.pirate.backend.item.query.mapper.ItemMapper;
@@ -30,7 +30,7 @@ public class ItemQueryService {
     private final BomItemRepository bomItemRepository;
     private final ModelMapper modelMapper;
 
-    public List<ItemDTO> readItemList(ItemFilterRequest itemFilterRequest) {
+    public List<ItemResponse> readItemList(ItemFilterRequest itemFilterRequest) {
         int offset = itemFilterRequest.getSize() * (itemFilterRequest.getPage() - 1) ;
 
         return itemMapper.findItemListByFilter(
@@ -47,19 +47,21 @@ public class ItemQueryService {
     public ItemDetailResponse readItem(Long itemSeq) {
         Item item = itemRepository.findById(itemSeq).orElseThrow(() -> new CustomException(ErrorCodeType.ITEM_NOT_FOUND));
 
-        ItemDTO itemDTO = modelMapper.map(item, ItemDTO.class);
+        ItemResponse itemDTO = modelMapper.map(item, ItemResponse.class);
 
-        List<ItemDTO> childItemList = new ArrayList<>();
+        List<ItemResponse> childItemList = new ArrayList<>();
         List<ItemInventoryDTO> itemInventoryList = new ArrayList<>();
 
         List<BomItem> bomItems = bomItemRepository.findAllByParentItem(item);
         for(BomItem bomItem : bomItems) {
             Item childItem = itemRepository.findById(bomItem.getChildItem().getItemSeq()).orElseThrow(() -> new CustomException(ErrorCodeType.ITEM_NOT_FOUND));
 
-            childItemList.add(modelMapper.map(childItem, ItemDTO.class));
+            childItemList.add(modelMapper.map(childItem, ItemResponse.class));
         }
 
-        List<ItemInventory> itemInventories = itemInventoryRepository.findAllByItem(item);
+        // 재고가 다 떨어진 재고는 조회하지 않는다.
+        List<ItemInventory> itemInventories = itemInventoryRepository
+                .findAllByItemAndItemInventoryRemainAmountGreaterThanOrderByItemInventoryExpirationDate(item, 0);
         for(ItemInventory itemInventory : itemInventories) {
             itemInventoryList.add(modelMapper.map(itemInventory, ItemInventoryDTO.class));
         }

@@ -33,6 +33,9 @@ public class ShippingSlip {
 
     private String shippingSlipAddress; // 출하전표 주소
 
+    @Enumerated(EnumType.STRING)
+    private ShippingSlipStatus shippingSlipStatus; // 출하전표 상태
+
     @CreatedDate
     private LocalDateTime shippingSlipRegDate; // 출하전표 등록일
 
@@ -45,4 +48,33 @@ public class ShippingSlip {
     private Integer shippingSlipTotalQuantity; // 출하전표 총 수량
 
     private String shippingSlipNote; // 출하전표 비고
+
+    private ShippingSlip(ShippingInstruction shippingInstruction, User user, String shippingSlipName, String shippingInstructionAddress, LocalDateTime shippingSlipShippingDate, int itemTotalQuantity, String shippingSlipNote){
+        this.shippingInstruction = shippingInstruction;
+        this.user = user;
+        this.shippingSlipName = shippingSlipName;
+        this.shippingSlipAddress = shippingInstructionAddress;
+        this.shippingSlipShippingDate = shippingSlipShippingDate;
+        this.shippingSlipTotalQuantity = itemTotalQuantity;
+        this.shippingSlipNote = shippingSlipNote;
+    }
+
+    public static ShippingSlip create(ShippingInstruction shippingInstruction, User user, String shippingSlipName, String shippingSlipAddress, LocalDateTime shippingSlipShippingDate, int itemTotalQuantity, String shippingSlipNote) {
+        return new ShippingSlip(shippingInstruction, user, shippingSlipName, shippingSlipAddress, shippingSlipShippingDate, itemTotalQuantity, shippingSlipNote);
+    }
+
+    // 다른 필드를 변경하는 메소드
+    public void update(ShippingInstruction shippingInstruction, User user, String shippingInstructionAddress, LocalDateTime shippingSlipShippingDate, int itemTotalQuantity, String shippingSlipNote) {
+        this.shippingInstruction = shippingInstruction;
+        this.user = user;
+        this.shippingSlipAddress = shippingInstructionAddress;
+        this.shippingSlipShippingDate = shippingSlipShippingDate;
+        this.shippingSlipTotalQuantity = itemTotalQuantity;
+        this.shippingSlipNote = shippingSlipNote;
+    }
+
+    // 상태를 변경하는 메소드
+    public void updateStatus(String status) {
+        this.shippingSlipStatus = ShippingSlipStatus.valueOf(status);
+    }
 }

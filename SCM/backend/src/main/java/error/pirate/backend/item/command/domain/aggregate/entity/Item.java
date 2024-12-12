@@ -4,7 +4,6 @@ import error.pirate.backend.item.command.application.dto.ItemUpdateRequest;
 import error.pirate.backend.user.command.domain.aggregate.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
@@ -50,10 +49,8 @@ public class Item {
 
     private String itemNote;
 
-    @Builder
-    public Item(Long itemSeq) {
-        this.itemSeq = itemSeq;
-    }
+    @Enumerated(EnumType.STRING)
+    private ItemStatus itemStatus = ItemStatus.ACTIVE;
 
     public void updateItem(ItemUnit itemUnit, ItemUpdateRequest request) {
         if(itemUnit != null) {
@@ -78,4 +75,9 @@ public class Item {
             this.itemNote = request.getItemNote();
         }
     }
+    // 품목 삭제 메서드
+    public void delete() {
+        this.itemStatus = ItemStatus.DELETED;
+    }
 }
+

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="error.pirate.backend.warehouse.query.mapper.WarehouseMapper">
+    <select id="findWarehouseListByFilter" resultType="error.pirate.backend.warehouse.query.dto.WarehouseResponse">
+        <![CDATA[
+        SELECT
+            w.warehouse_seq AS warehouseSeq,
+            w.warehouse_name AS warehouseName,
+            w.warehouse_type AS warehouseType,
+            w.warehouse_note AS warehouseNote,
+            w.warehouse_reg_date AS warehouseRegDate,
+            w.warehouse_mod_date AS warehouseModDate,
+            u.user_seq AS userSeq,
+            u.user_name AS userName,
+            u.user_email AS userEmail
+        FROM tb_warehouse w
+        LEFT JOIN tb_user u ON w.user_seq = u.user_seq
+        WHERE 1=1
+        ]]>
+        <if test="warehouseName != null and warehouseName != ''">
+            <![CDATA[
+            AND w.warehouse_name LIKE CONCAT('%', #{warehouseName}, '%')
+            ]]>
+        </if>
+        <if test="warehouseType != null and warehouseType != ''">
+            <![CDATA[
+            AND w.warehouse_type = #{warehouseType}
+            ]]>
+        </if>
+        <![CDATA[
+        ORDER BY
+        ]]>
+        <choose>
+            <when test="sortBy != null and sortDirection != null">
+                <if test="sortBy == 'warehouseName'"> w.warehouse_name </if>
+                <if test="sortBy == 'warehouseType'"> w.warehouse_type </if>
+                <if test="sortBy == 'warehouseRegDate'"> w.warehouse_reg_date </if>
+                <![CDATA[
+                ${sortDirection}
+                ]]>
+            </when>
+            <otherwise>
+                w.warehouse_reg_date DESC
+            </otherwise>
+        </choose>
+        <![CDATA[
+        LIMIT #{size} OFFSET #{offset}
+        ]]>
+    </select>
+</mapper>

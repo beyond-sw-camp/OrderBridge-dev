@@ -1,5 +1,6 @@
 package error.pirate.backend.productionReceiving.command.application.service;
 
+import error.pirate.backend.common.NameGenerator;
 import error.pirate.backend.common.NullCheck;
 import error.pirate.backend.exception.CustomException;
 import error.pirate.backend.exception.ErrorCodeType;
@@ -43,6 +44,7 @@ public class ProductionReceivingService {
     private final ProductionReceivingItemRepository productionReceivingItemRepository;
     private final SalesOrderRepository salesOrderRepository;
     private final ItemInventoryRepository itemInventoryRepository;
+    private final NameGenerator nameGenerator;
 
     @Transactional
     public void createProductionReceiving(ProductionReceivingCreateRequest request) {
@@ -51,9 +53,10 @@ public class ProductionReceivingService {
         Warehouse storeWarehouse = warehouseRepository.findById(request.getStoreWarehouseSeq()).orElseThrow(() -> new CustomException(ErrorCodeType.WAREHOUSE_NOT_FOUND));
         User user = userRepository.findById(request.getUserSeq()).orElseThrow(() -> new CustomException(ErrorCodeType.USER_NOT_FOUND));
         WorkOrder workOrder = workOrderRepository.findById(request.getWorkOrderSeq()).orElseThrow(() -> new CustomException(ErrorCodeType.WORK_ORDER_NOT_FOUND));
-        if(!WorkOrderStatus.COMPLETION.equals(workOrder.getWorkOrderStatus())) {
+        if(!WorkOrderStatus.COMPLETE.equals(workOrder.getWorkOrderStatus())) {
             throw new CustomException(ErrorCodeType.WORK_ORDER_STATUS_ERROR);
         }
+        request.setProductionReceivingName(nameGenerator.nameGenerator(ProductionReceiving.class));
         ProductionReceiving productionReceiving = ProductionReceiving.createProductionReceiving(productionWarehouse, storeWarehouse, user, workOrder, request);
 
         productionReceivingRepository.save(productionReceiving);
@@ -132,7 +135,7 @@ public class ProductionReceivingService {
 
         SalesOrder salesOrder = salesOrderRepository.findByProductionReceivingSeq(productionReceivingSeq);
 
-        salesOrder.updateSalesOrderStatus(SalesOrderStatus.PRODUCTIONCOMPLETION); // 주문서의 상태를 생산완료로 변경
+        salesOrder.updateSalesOrderStatus(SalesOrderStatus.PRODUCTION_COMPLETE); // 주문서의 상태를 생산완료로 변경
 
         /*
         * 품목 재고에 생산입고 수량만큼 추가
