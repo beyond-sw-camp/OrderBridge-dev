@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ItemDTO {
+public class ItemResponse {
 
     private Long itemSeq;
     private String itemName;

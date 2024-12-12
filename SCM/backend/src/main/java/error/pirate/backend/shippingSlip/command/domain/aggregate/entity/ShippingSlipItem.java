@@ -24,5 +24,16 @@ public class ShippingSlipItem {
 
     private int shippingSlipItemQuantity; // 출하전표 품목 수량
 
-    private String shippingSlipItemNote; // 찰하전표 품목 비고
+    private String shippingSlipItemNote; // 출하전표 품목 비고
+
+    private ShippingSlipItem(ShippingSlip shippingSlip, Item item, int shippingSlipItemQuantity, String shippingSlipItemNote) {
+        this.shippingSlip = shippingSlip;
+        this.item = item;
+        this.shippingSlipItemQuantity = shippingSlipItemQuantity;
+        this.shippingSlipItemNote = shippingSlipItemNote;
+    }
+
+    public static ShippingSlipItem create(ShippingSlip shippingSlip, Item item, int shippingSlipItemQuantity, String shippingSlipItemNote) {
+        return new ShippingSlipItem(shippingSlip, item, shippingSlipItemQuantity, shippingSlipItemNote);
+    }
 }

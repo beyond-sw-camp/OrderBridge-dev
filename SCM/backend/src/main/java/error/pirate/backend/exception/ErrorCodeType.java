@@ -25,6 +25,10 @@ public enum ErrorCodeType {
     SHIPPING_INSTRUCTION_NOT_FOUND(HttpStatus.NOT_FOUND, "SHIPPING_INSTRUCTION_ERROR_001", "출하지시서를 찾을 수 없습니다."),
     SHIPPING_INSTRUCTION_STATE_BAD_REQUEST(HttpStatus.BAD_REQUEST, "SHIPPING_INSTRUCTION_ERROR_002", "출하지시서의 상태를 확인해주세요"),
 
+    // 출하전표 관련 오류
+    SHIPPING_SLIP_NOT_FOUND(HttpStatus.NOT_FOUND, "SHIPPING_SLIP_ERROR_001", "출하전표를 찾을 수 없습니다."),
+    SHIPPING_SLIP_DELETE_STATE(HttpStatus.BAD_REQUEST, "SHIPPING_SLIP_ERROR_002", "이미 삭제된 출하전표입니다."),
+
     // 공통 오류
     COMMON_ERROR(HttpStatus.BAD_REQUEST, "COMMON_ERROR", "오류가 발생하였습니다. 관리자에게 문의 바랍니다."),
     INVALID_DATE_RANGE(HttpStatus.BAD_REQUEST, "COMMON_ERROR_002", "유효하지 않은 날짜 범위입니다."),
@@ -46,9 +50,13 @@ public enum ErrorCodeType {
 
     // 물품 오류
     ITEM_NOT_FOUND(HttpStatus.NOT_FOUND, "ITEM_ERROR_001", "물품을 찾을 수 없습니다."),
+    ITEM_STATUS_ERROR(HttpStatus.BAD_REQUEST, "ITEM_ERROR_002", "이미 삭제된 상품입니다."),
 
     // 물품 단위 오류
     ITEM_UNIT_NOT_FOUND(HttpStatus.NOT_FOUND, "ITEM_UNIT_ERROR_001", "물품 단위를 찾을 수 없습니다."),
+
+    // 거래처 오류
+    CLIENT_STATUS_ERROR(HttpStatus.BAD_REQUEST, "CLIENT_ERROR_001", "이미 삭제된 거래처입니다."),
     ;
     private final HttpStatus httpStatus;
     private final String code;

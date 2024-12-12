@@ -12,7 +12,7 @@ const routes = [
     },
     {
         path: "/quotation",
-        component: () => import("@/views/quotation/QuotationList.vue")
+        component: () => import("@/views/quotation/QuotationListView.vue")
     },
     {
         path: "/quotation/input",
@@ -21,6 +21,10 @@ const routes = [
     {
         path: "/currentSituation",
         component: () => import("@/components/common/CurrentSituation.vue")
+    },
+    {
+        path: "/productionReceiving",
+        component: () => import("@/views/productionReceiving/ProductionReceivingListView.vue")
     }
 ];
 

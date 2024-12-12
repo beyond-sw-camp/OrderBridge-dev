@@ -10,7 +10,7 @@ import java.util.List;
 @Getter
 @Setter
 public class ItemDetailResponse {
-    ItemDTO itemDTO;
-    List<ItemDTO> childItemList;
+    ItemResponse itemDTO;
+    List<ItemResponse> childItemList;
     List<ItemInventoryDTO> itemInventoryList;
 }

@@ -17,5 +17,5 @@ public class ProductionReceivingListRequest {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate searchEndDate;
     private String searchName;
-    private ProductionReceivingStatus searchStatus;
+    private ProductionReceivingStatus[] searchStatus;
 }

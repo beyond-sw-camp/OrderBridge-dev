@@ -59,4 +59,9 @@ public class SalesOrder {
     public void updateSalesOrderStatus(SalesOrderStatus salesOrderStatus) {
         this.salesOrderStatus = salesOrderStatus;
     }
+
+    // 상태를 변경하는 메소드
+    public void updateStatus(String status) {
+        this.salesOrderStatus = SalesOrderStatus.valueOf(status);
+    }
 }
