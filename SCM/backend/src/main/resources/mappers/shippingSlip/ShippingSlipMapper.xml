@@ -23,7 +23,7 @@
         JOIN tb_shipping_instruction si ON (s.shipping_instruction_seq = si.shipping_instruction_seq)
         JOIN tb_sales_order so ON (si.sales_order_seq = so.sales_order_seq)
         JOIN tb_client c ON (so.client_seq = c.client_seq)
-        WHERE (s.shipping_slip_status IS NULL OR s.shipping_slip_status != 'DELETE')
+        WHERE s.shipping_slip_status IS NULL
         <if test="request.startDate != null"><![CDATA[
             AND #{request.startDate} <= s.shipping_slip_shipping_date
              ]]></if>
@@ -44,7 +44,7 @@
         JOIN tb_shipping_instruction si ON (s.shipping_instruction_seq = si.shipping_instruction_seq)
         JOIN tb_sales_order so ON (si.sales_order_seq = so.sales_order_seq)
         JOIN tb_client c ON (so.client_seq = c.client_seq)
-        WHERE (s.shipping_slip_status IS NULL OR s.shipping_slip_status != 'DELETE')
+        WHERE s.shipping_slip_status IS NULL
         <if test="request.startDate != null"><![CDATA[
             AND #{request.startDate} <= s.shipping_slip_shipping_date
              ]]></if>
@@ -109,7 +109,7 @@
         JOIN tb_shipping_instruction si ON (s.shipping_instruction_seq = si.shipping_instruction_seq)
         JOIN tb_sales_order so ON (si.sales_order_seq = so.sales_order_seq)
         JOIN tb_client c ON (so.client_seq = c.client_seq)
-        WHERE (s.shipping_slip_status IS NULL OR s.shipping_slip_status != 'DELETE')
+        WHERE s.shipping_slip_status IS NULL
         <if test="request.startDate != null"><![CDATA[
             AND #{request.startDate} <= s.shipping_slip_shipping_date
              ]]></if>
@@ -131,7 +131,7 @@
         JOIN tb_shipping_instruction si ON (s.shipping_instruction_seq = si.shipping_instruction_seq)
         JOIN tb_sales_order so ON (si.sales_order_seq = so.sales_order_seq)
         JOIN tb_client c ON (so.client_seq = c.client_seq)
-        WHERE (s.shipping_slip_status IS NULL OR s.shipping_slip_status != 'DELETE')
+        WHERE s.shipping_slip_status IS NULL
         <if test="request.startDate != null"><![CDATA[
             AND #{request.startDate} <= s.shipping_slip_shipping_date
              ]]></if>
@@ -152,7 +152,7 @@
         JOIN tb_shipping_instruction si ON (s.shipping_instruction_seq = si.shipping_instruction_seq)
         JOIN tb_sales_order so ON (si.sales_order_seq = so.sales_order_seq)
         JOIN tb_client c ON (so.client_seq = c.client_seq)
-        WHERE (s.shipping_slip_status IS NULL OR s.shipping_slip_status != 'DELETE')
+        WHERE s.shipping_slip_status IS NULL
         <if test="request.startDate != null"><![CDATA[
             AND #{request.startDate} <= s.shipping_slip_shipping_date
              ]]></if>
