@@ -22,9 +22,4 @@ public class User {
 
     private String userEmail; // 회원 이메일
 
-    @Builder
-    public User(Long userSeq) {
-        this.userSeq = userSeq;
-    }
-
 }

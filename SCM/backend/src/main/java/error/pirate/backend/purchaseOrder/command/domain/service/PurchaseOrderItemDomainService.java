@@ -23,62 +23,14 @@ public class PurchaseOrderItemDomainService {
 
     private final PurchaseOrderItemRepository purchaseOrderItemRepository;
 
-    private final ModelMapper modelMapper;
-
-    public void createPurchaseOrderItem(Long purchaseOrderSeq, PurchaseOrderCreateRequest request) {
-        List<PurchaseOrderItem> items = new ArrayList<>();
-
-        if(ObjectUtils.isNotEmpty(request.getPurchaseOrderItemDtoList())) {
-            for(PurchaseOrderItemDto purchaseOrderItemDto : request.getPurchaseOrderItemDtoList()) {
-                PurchaseOrderItem purchaseOrderItem = modelMapper.map(purchaseOrderItemDto, PurchaseOrderItem.class);
-
-                purchaseOrderItem.insertPurchase(
-                        PurchaseOrder.builder()
-                                .purchaseOrderSeq(purchaseOrderSeq)
-                                .build()
-                );
-
-                purchaseOrderItem.insertItem(
-                        Item.builder()
-                                .itemSeq(purchaseOrderItemDto.getItemSeq())
-                                .build()
-                );
-
-                items.add(purchaseOrderItem);
-            }
-            purchaseOrderItemRepository.saveAll(items);
-        }
+    public void createPurchaseOrderItem(List<PurchaseOrderItem> items) {
+        purchaseOrderItemRepository.saveAll(items);
     }
 
-    public void updatePurchaseOrderItem(PurchaseOrderUpdateRequest request) {
-        if(ObjectUtils.isNotEmpty(request)) {
-            for(PurchaseOrderItemDto purchaseOrderItem : request.getPurchaseOrderItemDtoList()) {
-
-                // 발주서는 주문서의 품목과 상관없이 발주할 수 있어야함. 그래서 주문서의 품목과는 상관없이 추가할 수 있고,
-                // 주문서에 있는 품목일 경우는 수량 등을 변경할 수 있다.
-                if(purchaseOrderItem.getPurchaseOrderItemSeq() != null) {
-                    PurchaseOrderItem purChaseOrderItemResponse = purchaseOrderItemRepository.findById(purchaseOrderItem.getPurchaseOrderItemSeq())
-                            .orElseThrow( () -> new CustomException(ErrorCodeType.PURCHASE_NOT_FOUND));
-                    purChaseOrderItemResponse.updateOrderInfo(purchaseOrderItem.getPurchaseOrderItemQuantity(), purchaseOrderItem.getPurchaseOrderItemPrice(), purchaseOrderItem.getPurchaseOrderItemNote());
-                } else {
-                    PurchaseOrderItem purchaseOrderItemRequest = modelMapper.map(purchaseOrderItem, PurchaseOrderItem.class);
-
-                    purchaseOrderItemRequest.insertPurchase(
-                            PurchaseOrder.builder()
-                                    .purchaseOrderSeq(request.getPurchaseOrderSeq())
-                                    .build()
-                    );
-
-                    purchaseOrderItemRequest.insertItem(
-                            Item.builder()
-                                    .itemSeq(purchaseOrderItem.getItemSeq())
-                                    .build()
-                    );
-
-                    purchaseOrderItemRepository.save(purchaseOrderItemRequest);
-                }
-            }
-        }
+    public void updatePurchaseOrderItem(PurchaseOrderItemDto purchaseOrderItem) {
+        PurchaseOrderItem purChaseOrderItemResponse = purchaseOrderItemRepository.findById(purchaseOrderItem.getPurchaseOrderItemSeq())
+                .orElseThrow( () -> new CustomException(ErrorCodeType.PURCHASE_NOT_FOUND));
+        purChaseOrderItemResponse.updateOrderInfo(purchaseOrderItem.getPurchaseOrderItemQuantity(), purchaseOrderItem.getPurchaseOrderItemPrice(), purchaseOrderItem.getPurchaseOrderItemNote());
     }
 
 }

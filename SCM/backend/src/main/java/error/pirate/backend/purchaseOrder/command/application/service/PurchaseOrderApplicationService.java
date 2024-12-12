@@ -1,32 +1,32 @@
 package error.pirate.backend.purchaseOrder.command.application.service;
 
+import error.pirate.backend.client.command.domain.aggregate.entity.Client;
+import error.pirate.backend.client.command.domain.aggregate.repository.ClientRepository;
 import error.pirate.backend.exception.CustomException;
 import error.pirate.backend.exception.ErrorCodeType;
+import error.pirate.backend.item.command.domain.aggregate.entity.Item;
+import error.pirate.backend.item.command.domain.repository.ItemRepository;
 import error.pirate.backend.purchaseOrder.command.application.dto.PurchaseOrderCreateRequest;
+import error.pirate.backend.purchaseOrder.command.application.dto.PurchaseOrderItemDto;
 import error.pirate.backend.purchaseOrder.command.application.dto.PurchaseOrderUpdateRequest;
 import error.pirate.backend.purchaseOrder.command.domain.aggregate.entity.PurchaseOrder;
+import error.pirate.backend.purchaseOrder.command.domain.aggregate.entity.PurchaseOrderItem;
 import error.pirate.backend.purchaseOrder.command.domain.aggregate.entity.PurchaseOrderStatus;
 import error.pirate.backend.purchaseOrder.command.domain.service.PurchaseOrderDomainService;
 import error.pirate.backend.purchaseOrder.command.domain.service.PurchaseOrderItemDomainService;
 import error.pirate.backend.salesOrder.command.domain.aggregate.entity.SalesOrder;
 import error.pirate.backend.salesOrder.command.domain.aggregate.entity.SalesOrderStatus;
 import error.pirate.backend.salesOrder.command.domain.service.SalesOrderDomainService;
+import error.pirate.backend.user.command.domain.aggregate.entity.User;
+import error.pirate.backend.user.command.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
-import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.ByteArrayOutputStream;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -40,12 +40,44 @@ public class PurchaseOrderApplicationService {
 
     private final SalesOrderDomainService salesOrderDomainService;
 
+    private final UserRepository userRepository;
+
+    private final ClientRepository clientRepository;
+
+    private final ModelMapper modelMapper;
+
+    private final ItemRepository itemRepository;
+
     @Transactional
     public void createPurchaseOrder(PurchaseOrderCreateRequest request) {
         SalesOrder salesOrder = salesOrderDomainService.findById(request.getSalesOrderSeq());
         if(salesOrder.getSalesOrderStatus() == SalesOrderStatus.AFTER) {
-            PurchaseOrder purchaseOrder = purchaseOrderDomainService.createPurchaseOrder(request);
-            purchaseOrderItemDomainService.createPurchaseOrderItem(purchaseOrder.getPurchaseOrderSeq(), request);
+            PurchaseOrder purchaseOrder = modelMapper.map(request, PurchaseOrder.class);
+
+            User user = userRepository.findById(request.getUserSeq())
+                    .orElseThrow(() -> new CustomException(ErrorCodeType.USER_NOT_FOUND));
+
+            Client client = clientRepository.findById(request.getClientSeq())
+                    .orElseThrow(() -> new CustomException(ErrorCodeType.CLIENT_NOT_FOUND));
+
+            purchaseOrder.objectInjection(user, client, salesOrder);
+            PurchaseOrder purchaseOrderResponse = purchaseOrderDomainService.createPurchaseOrder(purchaseOrder);
+
+            List<PurchaseOrderItem> items = new ArrayList<>();
+            if(ObjectUtils.isNotEmpty(request.getPurchaseOrderItemDtoList())) {
+                for(PurchaseOrderItemDto purchaseOrderItemDto : request.getPurchaseOrderItemDtoList()) {
+                    PurchaseOrderItem purchaseOrderItem = modelMapper.map(purchaseOrderItemDto, PurchaseOrderItem.class);
+
+                    purchaseOrderItem.insertPurchase(purchaseOrderResponse);
+
+                    Item item = itemRepository.findById(purchaseOrderItemDto.getItemSeq())
+                            .orElseThrow(() -> new CustomException(ErrorCodeType.ITEM_NOT_FOUND));
+                    purchaseOrderItem.insertItem(item);
+
+                    items.add(purchaseOrderItem);
+                }
+            }
+            purchaseOrderItemDomainService.createPurchaseOrderItem(items);
         } else {
             throw new CustomException(ErrorCodeType.SALES_ORDER_STATE_BAD_REQUEST);
         }
@@ -54,7 +86,32 @@ public class PurchaseOrderApplicationService {
     @Transactional
     public void updatePurchaseOrder(PurchaseOrderUpdateRequest request) {
         purchaseOrderDomainService.updatePurchaseOrder(request);
-        purchaseOrderItemDomainService.updatePurchaseOrderItem(request);
+
+        if(ObjectUtils.isNotEmpty(request.getPurchaseOrderItemDtoList())) {
+            List<PurchaseOrderItem> items = new ArrayList<>();
+
+            for(PurchaseOrderItemDto purchaseOrderItem : request.getPurchaseOrderItemDtoList()) {
+
+                // 있는 품목일 경우는 수량 등을 변경
+                if(purchaseOrderItem.getPurchaseOrderItemSeq() != null) {
+                    purchaseOrderItemDomainService.updatePurchaseOrderItem(purchaseOrderItem);
+                } else {
+                    // 없는 품목일 경우 추가
+                    PurchaseOrderItem purchaseOrderItemRequest = modelMapper.map(purchaseOrderItem, PurchaseOrderItem.class);
+
+                    PurchaseOrder purchaseOrder = purchaseOrderDomainService.findById(request.getPurchaseOrderSeq());
+                    purchaseOrderItemRequest.insertPurchase(purchaseOrder);
+
+                    Item item = itemRepository.findById(purchaseOrderItem.getItemSeq())
+                            .orElseThrow(() -> new CustomException(ErrorCodeType.ITEM_NOT_FOUND));
+                    purchaseOrderItemRequest.insertItem(item);
+
+                    items.add(purchaseOrderItemRequest);
+                }
+            }
+            purchaseOrderItemDomainService.createPurchaseOrderItem(items);
+        }
+
     }
 
     @Transactional
@@ -68,63 +125,14 @@ public class PurchaseOrderApplicationService {
         }
     }
 
+    @Transactional
     public void updatePurchaseOrderComplete(Long purchaseOrderSeq) {
         purchaseOrderDomainService.updatePurchaseStatus(purchaseOrderSeq, PurchaseOrderStatus.APPROVAL_AFTER);
     }
 
+    @Transactional
     public void updatePurchaseOrderRefusal(Long purchaseOrderSeq) {
         purchaseOrderDomainService.updatePurchaseStatus(purchaseOrderSeq, PurchaseOrderStatus.APPROVAL_REFUSAL);
-    }
-
-    public ResponseEntity<byte[]> purchaseOrderExcelDown() {
-        List<PurchaseOrder> purchaseOrderList = purchaseOrderDomainService.findAll();
-
-        try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-            Sheet sheet = workbook.createSheet("발주서.xlsx");
-
-            CellStyle headerStyle = workbook.createCellStyle();
-            Font headerFont = workbook.createFont();
-            headerFont.setBold(true);
-            headerStyle.setFont(headerFont);
-            headerStyle.setAlignment(HorizontalAlignment.CENTER);
-            headerStyle.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
-            headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-
-            // 헤더 행 생성
-            Row headerRow = sheet.createRow(0);
-            String[] headers = {"발주서명", "계약 납기일", "목표 납기일"}; // TODO 아영 - 추가하기
-            for (int i=0 ; i<headers.length ; i++) {
-                Cell cell = headerRow.createCell(i);
-                cell.setCellValue(headers[i]);
-                cell.setCellStyle(headerStyle);
-            }
-
-            if(ObjectUtils.isNotEmpty(purchaseOrderList)) {
-                int rowNum = 1;
-                for (PurchaseOrder order : purchaseOrderList) {
-                    Row row = sheet.createRow(rowNum++);
-                    for (int colNum=0 ; colNum<purchaseOrderList.size() ; colNum++) {
-                        row.createCell(colNum++).setCellValue(order.getPurchaseOrderName());
-                        row.createCell(colNum++).setCellValue(order.getPurchaseOrderDueDate());
-                        row.createCell(colNum++).setCellValue(order.getPurchaseOrderTargetDueDate());
-                    }
-                }
-            }
-
-            workbook.write(out);
-
-            HttpHeaders headersResponse = new HttpHeaders();
-            String fileName = URLEncoder.encode("발주서[" + new SimpleDateFormat("yyyy/MM/dd_HH-mm").format(new Date()) + "].xlsx", StandardCharsets.UTF_8);
-            headersResponse.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileName);
-
-            return ResponseEntity.ok()
-                    .headers(headersResponse)
-                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                    .body(out.toByteArray());
-
-        } catch (Exception e) {
-            throw new CustomException(ErrorCodeType.EXCEL_DOWN_ERROR);
-        }
     }
 
 }
