@@ -80,7 +80,7 @@ public class ShippingInstructionDomainService {
         // yyyy/MM/dd 형식으로 변환
         String formattedDate = today.format(DateTimeFormatter.ofPattern("yyyy/MM/dd"));
 
-        return formattedDate + "-" + (count + 1);
+        return formattedDate + " - " + (count + 1);
     }
 
     /* 총수량 계산 */
@@ -136,9 +136,9 @@ public class ShippingInstructionDomainService {
     }
 
     /* 상태를 수정하는 로직 */
-    public void updateShippingInstructionApprovalStatus(ShippingInstruction shippingInstruction) {
+    public void updateShippingInstructionStatus(ShippingInstruction shippingInstruction, String status) {
         /* 수정을 위해 엔터티 정보 변경 */
-        shippingInstruction.updateStatus("AFTER");
+        shippingInstruction.updateStatus(status);
     }
 
     /* 도메인 객체를 삭제 로직 */
