@@ -23,8 +23,7 @@
         JOIN tb_shipping_instruction si ON (s.shipping_instruction_seq = si.shipping_instruction_seq)
         JOIN tb_sales_order so ON (si.sales_order_seq = so.sales_order_seq)
         JOIN tb_client c ON (so.client_seq = c.client_seq)
-        WHERE s.shipping_slip_status NOT IN ('DELETE')
-        OR s.shipping_slip_status IS NULL
+        WHERE (s.shipping_slip_status IS NULL OR s.shipping_slip_status != 'DELETE')
         <if test="request.startDate != null"><![CDATA[
             AND #{request.startDate} <= s.shipping_slip_shipping_date
              ]]></if>
@@ -45,8 +44,7 @@
         JOIN tb_shipping_instruction si ON (s.shipping_instruction_seq = si.shipping_instruction_seq)
         JOIN tb_sales_order so ON (si.sales_order_seq = so.sales_order_seq)
         JOIN tb_client c ON (so.client_seq = c.client_seq)
-        WHERE s.shipping_slip_status NOT IN ('DELETE')
-        OR s.shipping_slip_status IS NULL
+        WHERE (s.shipping_slip_status IS NULL OR s.shipping_slip_status != 'DELETE')
         <if test="request.startDate != null"><![CDATA[
             AND #{request.startDate} <= s.shipping_slip_shipping_date
              ]]></if>
@@ -111,8 +109,7 @@
         JOIN tb_shipping_instruction si ON (s.shipping_instruction_seq = si.shipping_instruction_seq)
         JOIN tb_sales_order so ON (si.sales_order_seq = so.sales_order_seq)
         JOIN tb_client c ON (so.client_seq = c.client_seq)
-        WHERE s.shipping_slip_status NOT IN ('DELETE')
-        OR s.shipping_slip_status IS NULL
+        WHERE (s.shipping_slip_status IS NULL OR s.shipping_slip_status != 'DELETE')
         <if test="request.startDate != null"><![CDATA[
             AND #{request.startDate} <= s.shipping_slip_shipping_date
              ]]></if>
@@ -129,13 +126,12 @@
             resultType="error.pirate.backend.shippingSlip.query.dto.ShippingSlipSituationMonthlyTotalDTO">
         SELECT
             DATE_FORMAT(s.shipping_slip_shipping_date, '%Y-%m') AS month,
-            SUM(s.shipping_slip_total_quantity) AS monthly_total
+            NVL(SUM(s.shipping_slip_total_quantity),0) AS monthly_total
         FROM tb_shipping_slip s
         JOIN tb_shipping_instruction si ON (s.shipping_instruction_seq = si.shipping_instruction_seq)
         JOIN tb_sales_order so ON (si.sales_order_seq = so.sales_order_seq)
         JOIN tb_client c ON (so.client_seq = c.client_seq)
-        WHERE s.shipping_slip_status NOT IN ('DELETE')
-        OR s.shipping_slip_status IS NULL
+        WHERE (s.shipping_slip_status IS NULL OR s.shipping_slip_status != 'DELETE')
         <if test="request.startDate != null"><![CDATA[
             AND #{request.startDate} <= s.shipping_slip_shipping_date
              ]]></if>
@@ -151,13 +147,12 @@
     <!--  출하전표 현황 총합계 조회  -->
     <select id="selectTotal" resultType="Integer">
         SELECT
-            SUM(s.shipping_slip_total_quantity) AS total_quantity
+            NVL(SUM(s.shipping_slip_total_quantity),0) AS total_quantity
         FROM tb_shipping_slip s
         JOIN tb_shipping_instruction si ON (s.shipping_instruction_seq = si.shipping_instruction_seq)
         JOIN tb_sales_order so ON (si.sales_order_seq = so.sales_order_seq)
         JOIN tb_client c ON (so.client_seq = c.client_seq)
-        WHERE s.shipping_slip_status NOT IN ('DELETE')
-        OR s.shipping_slip_status IS NULL
+        WHERE (s.shipping_slip_status IS NULL OR s.shipping_slip_status != 'DELETE')
         <if test="request.startDate != null"><![CDATA[
             AND #{request.startDate} <= s.shipping_slip_shipping_date
              ]]></if>
