@@ -5,10 +5,12 @@ import error.pirate.backend.item.command.domain.aggregate.entity.Item;
 import error.pirate.backend.salesOrder.command.domain.aggregate.entity.SalesOrder;
 import error.pirate.backend.user.command.domain.aggregate.entity.User;
 import error.pirate.backend.warehouse.command.domain.aggregate.entity.Warehouse;
+import error.pirate.backend.workOrder.command.application.dto.CreateWorkOrderRequest;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -20,6 +22,7 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
+@SQLDelete(sql = "UPDATE tb_work_order SET work_order_status = 'DELETE' WHERE work_order_seq = ? AND work_order_status = 'BEFORE'")
 public class WorkOrder {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long workOrderSeq;
@@ -69,4 +72,8 @@ public class WorkOrder {
     private Integer workOrderPrice; // 작업지시서 총금액
 
     private String workOrderNote; // 작업지시서 비고
+
+    public static WorkOrder createWorkOrder(Warehouse productionWarehouse, User user, SalesOrder salesOrder, CreateWorkOrderRequest request) {
+        return null;
+    }
 }

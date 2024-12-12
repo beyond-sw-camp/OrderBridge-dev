@@ -20,4 +20,7 @@ public class SalesOrderDomainService {
         return salesOrderRepository.findById(salesOrderSeq)
                 .orElseThrow(() -> new CustomException(ErrorCodeType.SALES_ORDER_NOT_FOUND));
     }
+
+    public SalesOrder findBySalesOrderName(String salesOrderName) {
+    }
 }
