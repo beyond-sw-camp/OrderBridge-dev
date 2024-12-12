@@ -1,8 +1,11 @@
 package error.pirate.backend.workOrder.command.domain.aggregate.entity;
 
 import error.pirate.backend.client.command.domain.aggregate.entity.Client;
+import error.pirate.backend.exception.CustomException;
+import error.pirate.backend.exception.ErrorCodeType;
 import error.pirate.backend.item.command.domain.aggregate.entity.Item;
 import error.pirate.backend.salesOrder.command.domain.aggregate.entity.SalesOrder;
+import error.pirate.backend.salesOrder.command.domain.aggregate.entity.SalesOrderItem;
 import error.pirate.backend.user.command.domain.aggregate.entity.User;
 import error.pirate.backend.warehouse.command.domain.aggregate.entity.Warehouse;
 import error.pirate.backend.workOrder.command.application.dto.CreateWorkOrderRequest;
@@ -73,7 +76,34 @@ public class WorkOrder {
 
     private String workOrderNote; // 작업지시서 비고
 
-    public static WorkOrder createWorkOrder(Warehouse productionWarehouse, User user, SalesOrder salesOrder, CreateWorkOrderRequest request) {
-        return null;
+    public static WorkOrder createWorkOrder(CreateWorkOrderRequest request, SalesOrder salesOrder, SalesOrderItem salesOrderItem,
+                                            Warehouse warehouse, User user, String workOrderName,
+                                            LocalDateTime seoulIndicatedDate, LocalDateTime seoulDueDate) {
+        if (seoulDueDate.isBefore(seoulIndicatedDate)) {
+            throw new CustomException(ErrorCodeType.INVALID_DATE_RANGE);
+        }
+        WorkOrder workOrder = new WorkOrder();
+
+        // SalesOrder 기반 설정
+        workOrder.salesOrder = salesOrder;
+        workOrder.client = salesOrder.getClient(); // 클라이언트 설정
+        workOrder.workOrderIndicatedQuantity = salesOrder.getSalesOrderTotalQuantity(); // 지시 수량 설정
+        workOrder.workOrderPrice = salesOrder.getSalesOrderExtendedPrice(); // 금액 설정
+        workOrder.specifyItem(salesOrderItem.getItem()); // 품목 설정
+
+        workOrder.warehouse = warehouse;
+        workOrder.user = user;
+        workOrder.workOrderName = workOrderName;
+        workOrder.workOrderStatus = WorkOrderStatus.valueOf("BEFORE");
+        workOrder.workOrderWorkQuantity = 0;
+        workOrder.workOrderIndicatedDate = seoulIndicatedDate;
+        workOrder.workOrderDueDate = seoulDueDate;
+        workOrder.workOrderNote = request.getWorkOrderNote();
+        return workOrder;
     }
+
+    private void specifyItem(Item item) {
+        this.item = item;
+    }
+
 }
