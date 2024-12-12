@@ -1,5 +1,7 @@
 package error.pirate.backend.productionReceiving.query.service;
 
+import error.pirate.backend.common.ExcelDTO;
+import error.pirate.backend.common.ExcelDown;
 import error.pirate.backend.exception.CustomException;
 import error.pirate.backend.exception.ErrorCodeType;
 import error.pirate.backend.productionReceiving.command.domain.aggregate.entity.ProductionReceiving;
@@ -17,6 +19,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -58,5 +62,34 @@ public class ProductionReceivingQueryService {
                 modelMapper.map(productionWarehouse, WarehouseDTO.class),
                 modelMapper.map(storeWarehouse, WarehouseDTO.class)
         );
+    }
+
+    public byte[] productionReceivingExcelDown(ProductionReceivingListRequest request, Pageable pageable) {
+        Page<ProductionReceivingListDTO> productionReceivingList = productionReceivingRepository.findAllByFilter(request, pageable);
+
+        List<ExcelDTO> excelList = new ArrayList<>();
+        // 각 생산입고의 아이템을 조회
+        for(ProductionReceivingListDTO dto : productionReceivingList) {
+            dto.setProductionReceivingItemList(productionReceivingItemRepository.findAllByProductionReceivingSeq(dto.getProductionReceivingSeq()));
+
+            ExcelDTO excel = new ExcelDTO();
+            excel.setCell1(dto.getProductionReceivingName()); // 생산입고명
+            StringBuilder productionReceivingItemName = new StringBuilder();
+            for(ProductionReceivingItemQueryDTO productionReceivingItem : dto.getProductionReceivingItemList()) {
+                productionReceivingItemName.append(productionReceivingItem.getItemName());
+            }
+            excel.setCell2(productionReceivingItemName.toString()); // 생산입고명
+
+            excel.setCell3(dto.getProductionWarehouseName());
+            excel.setCell4(dto.getStoreWarehouseName());
+            excel.setCell5(dto.getProductReceivingRegDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+            excel.setCell6(String.valueOf(dto.getProductionReceivingStatus()));
+
+            excelList.add(excel);
+        }
+
+        String[] headers = {"생산입고명", "생산입고 품목", "생산공장명", "보관창고명", "입고일", "상태"};
+
+        return ExcelDown.excelDownBody(excelList, "생산입고", headers);
     }
 }
