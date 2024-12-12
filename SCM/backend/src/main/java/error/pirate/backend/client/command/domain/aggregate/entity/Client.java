@@ -1,9 +1,9 @@
 package error.pirate.backend.client.command.domain.aggregate.entity;
 
+import error.pirate.backend.client.command.application.dto.ClientUpdateRequest;
 import error.pirate.backend.user.command.domain.aggregate.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
@@ -40,4 +40,25 @@ public class Client {
     @Column(insertable = false)
     private LocalDateTime clientModDate; // 거래처 수정일
 
+    @Enumerated(EnumType.STRING)
+    private ClientStatus clientStatus = ClientStatus.ACTIVE;
+
+    public void updateClient(ClientUpdateRequest request) {
+        if (request.getClientName() != null) {
+            this.clientName = request.getClientName();
+        }
+        if (request.getClientPhoneNo() != null) {
+            this.clientPhoneNo = request.getClientPhoneNo();
+        }
+        if (request.getClientEmail() != null) {
+            this.clientEmail = request.getClientEmail();
+        }
+        if (request.getClientRegistrationNo() != null) {
+            this.clientRegistrationNo = request.getClientRegistrationNo();
+        }
+    }
+    public void delete() {
+        this.clientStatus = ClientStatus.DELETED;
+    }
 }
+

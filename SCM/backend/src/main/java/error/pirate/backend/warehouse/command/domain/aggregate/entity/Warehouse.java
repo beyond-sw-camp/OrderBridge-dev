@@ -1,6 +1,7 @@
 package error.pirate.backend.warehouse.command.domain.aggregate.entity;
 
 import error.pirate.backend.user.command.domain.aggregate.entity.User;
+import error.pirate.backend.warehouse.command.application.dto.WarehouseUpdateRequest;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -17,9 +18,11 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
 public class Warehouse {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long warehouseSeq;
 
+    // User 설정 메서드
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinColumn(name = "userSeq")
     private User user; // 창고 관리자 번호
@@ -37,4 +40,27 @@ public class Warehouse {
     private LocalDateTime warehouseModDate; // 창고 수정일
 
     private String warehouseNote; // 창고 비고
+
+    public void specifyUser(User user) {
+        this.user = user;
+    }
+    public void updateWarehouse(WarehouseUpdateRequest request) {
+        if (request.getWarehouseName() != null) {
+            this.warehouseName = request.getWarehouseName();
+        }
+        if (request.getWarehouseType() != null) {
+            this.warehouseType = request.getWarehouseType();
+        }
+        if (request.getWarehouseNote() != null) {
+            this.warehouseNote = request.getWarehouseNote();
+        }
+    }
+    @Enumerated(EnumType.STRING)
+    private WarehouseStatus warehouseStatus = WarehouseStatus.ACTIVE;
+
+    // 상태 변경 메서드
+    public void delete() {
+        this.warehouseStatus = WarehouseStatus.DELETED;
+    }
+
 }

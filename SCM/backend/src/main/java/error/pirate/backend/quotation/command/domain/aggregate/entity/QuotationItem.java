@@ -1,6 +1,7 @@
 package error.pirate.backend.quotation.command.domain.aggregate.entity;
 
 import error.pirate.backend.item.command.domain.aggregate.entity.Item;
+import error.pirate.backend.quotation.command.application.dto.QuotationItemUpdateDTO;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -37,5 +38,17 @@ public class QuotationItem {
         this.quotationItemQuantity = quotationItemQuantity;
         this.quotationItemPrice = quotationItemPrice;
         this.quotationItemNote = quotationItemNote;
+    }
+
+    public void updateQuotationItem(QuotationItemUpdateDTO requestQuotationItem) {
+        if (requestQuotationItem.getQuotationItemQuantity() != null) {
+            this.quotationItemQuantity = requestQuotationItem.getQuotationItemQuantity();
+        }
+        if (requestQuotationItem.getQuotationItemPrice() != null) {
+            this.quotationItemPrice = requestQuotationItem.getQuotationItemPrice();
+        }
+        if (requestQuotationItem.getQuotationItemNote() != null) {
+            this.quotationItemNote = requestQuotationItem.getQuotationItemNote();
+        }
     }
 }

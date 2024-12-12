@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,6 +25,7 @@ public class ProductionReceivingQueryController {
     @GetMapping
     @Operation(summary = "생산입고 리스트 조회")
     public ResponseEntity<ProductionReceivingListResponse> readProductionReceivingList(@ModelAttribute ProductionReceivingListRequest request, Pageable pageable) {
+        log.info("readProductionReceivingList request : {}, pageable : {}", request, pageable);
         return ResponseEntity.ok(productionReceivingQueryService.readProductionReceivingList(request, pageable));
     }
 
@@ -31,5 +33,19 @@ public class ProductionReceivingQueryController {
     @Operation(summary = "생산입고 상세 조회")
     public ResponseEntity<ProductionReceivingResponse> readProductionReceiving(@PathVariable Long productionReceivingSeq) {
         return ResponseEntity.ok(productionReceivingQueryService.readProductionReceiving(productionReceivingSeq));
+    }
+
+    @GetMapping("/excelDown")
+    @Operation(summary = "생산입고 엑셀다운")
+    public ResponseEntity<byte[]> productionReceivingExcelDown(@ModelAttribute ProductionReceivingListRequest request, Pageable pageable) {
+
+        byte[] excelData = productionReceivingQueryService.productionReceivingExcelDown(request, pageable);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentLength(excelData.length);
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(excelData);
     }
 }

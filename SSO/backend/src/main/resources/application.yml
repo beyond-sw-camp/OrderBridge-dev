@@ -1,5 +1,5 @@
 server:
-  port: 8070
+  port: 8089
   servlet:
     encoding:
       charset: UTF-8
@@ -7,6 +7,9 @@ server:
 spring:
   application:
     name: login
+  config:
+    import:
+      optional:file:env.properties
   datasource:
     url: jdbc:log4jdbc:mariadb://localhost:3306/order_bridge_login?serverTimezone=Asia/Seoul
     username: login
@@ -15,22 +18,13 @@ spring:
   jpa:
     show-sql: true
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
       naming:
         physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
     properties:
       hibernate:
         format_sql: true
       hibernate.dialect: org.hibernate.dialect.MariaDBDialect
-
-springdoc:
-  packages-to-scan: error.pirate.backend
-  default-consumes-media-type: application/json;charset=UTF-8
-  default-produces-media-type: application/json;charset=UTF-8
-  swagger-ui:
-    path: /swagger
-    operations-sorter: method
-    doc-expansion: none
 
 logging:
   level:
@@ -41,3 +35,9 @@ logging:
     jdbc.sqlonly: info
     jdbc.resultsettable: info
     jdbc.connection: info
+
+token:
+  secret: ${TOKEN}
+  expiration_time: 43200000
+
+frontend: http://localhost:5174

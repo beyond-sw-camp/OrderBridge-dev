@@ -7,5 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface ItemInventoryRepository extends JpaRepository<ItemInventory, Long> {
-    List<ItemInventory> findAllByItem(Item item);
+    List<ItemInventory> findAllByItemAndItemInventoryRemainAmountGreaterThanOrderByItemInventoryExpirationDate(Item item, Integer itemInventoryRemainAmount);
 }

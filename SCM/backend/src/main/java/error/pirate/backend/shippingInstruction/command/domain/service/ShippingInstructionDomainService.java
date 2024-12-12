@@ -48,8 +48,8 @@ public class ShippingInstructionDomainService {
     }
 
     /* 주문서 상태가 생산완료인지 체크 */
-    public void checkShippingInstructionSalesOrder(SalesOrder salesOrder) {
-        if (!salesOrder.getSalesOrderStatus().equals(SalesOrderStatus.PRODUCTIONCOMPLETION)) {
+    public void checkSalesOrderStatus(SalesOrder salesOrder) {
+        if (!salesOrder.getSalesOrderStatus().equals(SalesOrderStatus.PRODUCTION_COMPLETE)) {
             throw new CustomException(ErrorCodeType.SALES_ORDER_STATE_BAD_REQUEST);
         }
     }
@@ -77,8 +77,8 @@ public class ShippingInstructionDomainService {
         // 서울 기준 현재 날짜 가져오기
         LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
 
-        // yyyy-MM-dd 형식으로 변환
-        String formattedDate = today.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        // yyyy/MM/dd 형식으로 변환
+        String formattedDate = today.format(DateTimeFormatter.ofPattern("yyyy/MM/dd"));
 
         return formattedDate + " - " + (count + 1);
     }
@@ -100,7 +100,7 @@ public class ShippingInstructionDomainService {
     /* 출하지시서 번호로 출하지시서 찾기 */
     public ShippingInstruction findByShippingInstructionSeq(Long shippingInstructionSeq) {
         return shippingInstructionRepository.findById(shippingInstructionSeq)
-                .orElseThrow(() -> new CustomException(ErrorCodeType.SALES_ORDER_NOT_FOUND));
+                .orElseThrow(() -> new CustomException(ErrorCodeType.SHIPPING_INSTRUCTION_NOT_FOUND));
     }
 
     /* 도메인 객체를 수정하는 로직 */
@@ -136,9 +136,9 @@ public class ShippingInstructionDomainService {
     }
 
     /* 상태를 수정하는 로직 */
-    public void updateShippingInstructionApprovalStatus(ShippingInstruction shippingInstruction) {
+    public void updateShippingInstructionStatus(ShippingInstruction shippingInstruction, String status) {
         /* 수정을 위해 엔터티 정보 변경 */
-        shippingInstruction.updateStatus("AFTER");
+        shippingInstruction.updateStatus(status);
     }
 
     /* 도메인 객체를 삭제 로직 */

@@ -58,11 +58,6 @@ public class QuotationQueryService {
         return new QuotationSituationResponse(quotationMapper.selectQuotationSituation(startDate, endDate, clientName));
     }
 
-    // 오늘 견적서 개수 조회
-    public String makeQuotationName() {
-        return quotationMapper.makeQuotationName();
-    }
-
     // 견적서 합계 계산
     public QuotationCalculateSumDTO calculateSum(Long quotationSeq) {
         return quotationMapper.calculateSum(quotationSeq);
