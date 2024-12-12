@@ -68,12 +68,4 @@ public class ExcelDown {
             throw new CustomException(ErrorCodeType.EXCEL_DOWN_ERROR);
         }
     }
-
-    public static HttpHeaders excelDownHeader(String name) {
-        HttpHeaders headersResponse = new HttpHeaders();
-        String fileName = URLEncoder.encode(name + "_" + new SimpleDateFormat("yyyyMMdd").format(new Date()) + ".xlsx", StandardCharsets.UTF_8);
-        headersResponse.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileName);
-
-        return headersResponse;
-    }
 }

@@ -80,10 +80,10 @@ public class ProductionReceivingQueryService {
             }
             excel.setCell2(productionReceivingItemName.toString()); // 생산입고명
 
-            excel.setCell3(dto.getProductReceivingRegDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-            excel.setCell4(String.valueOf(dto.getProductionReceivingStatus()));
-            excel.setCell5(dto.getProductionWarehouseName());
-            excel.setCell6(dto.getStoreWarehouseName());
+            excel.setCell3(dto.getProductionWarehouseName());
+            excel.setCell4(dto.getStoreWarehouseName());
+            excel.setCell5(dto.getProductReceivingRegDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+            excel.setCell6(String.valueOf(dto.getProductionReceivingStatus()));
 
             excelList.add(excel);
         }

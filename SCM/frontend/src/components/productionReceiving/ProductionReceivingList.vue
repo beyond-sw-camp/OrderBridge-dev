@@ -67,6 +67,45 @@ function search() {
 
   fetchProductionReceivingList();
 }
+
+const excelDown = async () => {
+  const excelName = "생산입고_" + new Date().getFullYear() + (new Date().getMonth() + 1) + new Date().getDay();
+  try {
+    const response = await axios.get(`http://localhost:8090/api/v1/productionReceiving/excelDown`, {
+      params: {
+        searchStartDate: searchStartDate.value,
+        searchEndDate: searchEndDate.value,
+        searchName: searchName.value,
+        searchStatus: searchStatus.value.size === 0 ? null : Array.from(searchStatus.value),
+        page: pageNumber.value - 1, // Spring Pageable에서 0부터 시작
+        size: pageSize.value,
+        excelName: excelName
+      }, paramsSerializer: (params) => {
+        // null이나 undefined 값을 필터링
+        const filteredParams = Object.fromEntries(
+            Object.entries(params).filter(([_, value]) => value !== null && value !== undefined)
+        );
+        return new URLSearchParams(filteredParams).toString();
+      },
+      responseType: "blob", // 중요: blob 형식으로 설정
+    });
+
+    // Blob 객체 생성 및 다운로드 처리
+    const blob = new Blob([response.data], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = decodeURIComponent(excelName); // 파일명 디코딩
+    link.click();
+
+    // Blob URL 해제
+    URL.revokeObjectURL(link.href);
+
+  } catch (error) {
+    console.error("생산입고 엑셀다운로드 실패 :", error);
+  }
+}
 </script>
 
 <template>
@@ -100,7 +139,10 @@ function search() {
             <div>
               <div class="d-flex justify-content-between">
                   <div>검색결과: {{ totalCount }}개</div>
-                  <b-button variant="light" size="sm" class="button">생산입고 등록</b-button>
+                  <div class="d-flex justify-content-end mt-3">
+                    <b-button @click="excelDown" variant="light" size="sm" class="button">엑셀 다운로드</b-button>
+                    <b-button variant="light" size="sm" class="button ms-2">생산입고 등록</b-button>
+                  </div>
               </div>
               <div class="list-headline row">
                   <div class="list-head col-4">생산입고명</div>
@@ -131,6 +173,8 @@ function search() {
                     <div class="list-body col-1">{{ productionReceiving.productionReceivingStatus }}</div>
                   </div>
                 </div>
+
+
                 <div class="pagination">
                   <b-pagination
                       v-model="pageNumber"

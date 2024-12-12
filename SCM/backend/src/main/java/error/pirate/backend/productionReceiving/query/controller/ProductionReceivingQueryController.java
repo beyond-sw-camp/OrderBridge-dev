@@ -10,7 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.MediaType;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,11 +38,15 @@ public class ProductionReceivingQueryController {
 
     @GetMapping("/excelDown")
     @Operation(summary = "생산입고 엑셀다운")
-    public ResponseEntity<byte[]> productionReceivingExcelDown(@ModelAttribute ProductionReceivingListRequest request, Pageable pageable) {
+    public ResponseEntity<byte[]> productionReceivingExcelDown(@ModelAttribute ProductionReceivingListRequest request, Pageable pageable, @RequestParam String excelName) {
+
+        byte[] excelData = productionReceivingQueryService.productionReceivingExcelDown(request, pageable);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentLength(excelData.length);
 
         return ResponseEntity.ok()
-                .headers(ExcelDown.excelDownHeader("생산입고"))
-                .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                .body(productionReceivingQueryService.productionReceivingExcelDown(request, pageable));
+                .headers(headers)
+                .body(excelData);
     }
 }
