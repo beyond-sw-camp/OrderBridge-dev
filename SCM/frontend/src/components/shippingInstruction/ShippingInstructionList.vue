@@ -1,17 +1,17 @@
 <script setup>
-import {defineProps, ref, watch} from 'vue';
+import {computed, defineProps, ref, watch} from 'vue';
 
 const props = defineProps({
   searchStartDate: { type: String, required: false }, // 시작 날짜
   searchEndDate: { type: String, required: false },   // 종료 날짜
   searchName: { type: String, required: false },      // 검색 조건 이름
-  shippingInstructionList: { type: Array, required: true },       // 생산 입고 목록
+  shippingInstructionList: { type: Array, required: true },       // 출하지시서 목록
   totalCount: { type: Number, required: true },       // 검색 결과 총 개수
   pageNumber: { type: Number, required: true },       // 현재 페이지 번호
   pageSize: { type: Number, required: true },         // 페이지 사이즈
 });
 
-const emit = defineEmits(['pageEvent','searchEvent','checkStatusEvent','extendItemEvent']);
+const emit = defineEmits(['pageEvent','searchEvent','checkStatusEvent','extendItemEvent', 'registerEvent']);
 
 const startDate = ref(props.searchStartDate);
 const endDate = ref(props.searchEndDate);
@@ -40,6 +40,32 @@ const check = (status) => {
 
 const itemExtend = () => {
   emit('extendItemEvent');
+};
+
+const register = () => {
+  emit('registerEvent');
+}
+
+// 날짜 포맷 함수
+const formatDate = (dateString) => {
+  if (!dateString) return '';
+
+  const date = new Date(dateString);
+  const year = date.getFullYear();
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');
+  const day = date.getDate().toString().padStart(2, '0');
+
+  return `${year}/${month}/${day}`;
+};
+
+// 상태 포맷 함수
+const formatStatus = (status) => {
+  if (status === 'BEFORE') {
+    return '결제 전';
+  } else if (status === 'AFTER') {
+    return '결제 후';
+  }
+  return status; // 상태가 다른 경우 그대로 반환
 };
 </script>
 
@@ -73,7 +99,7 @@ const itemExtend = () => {
             <div>
               <div class="d-flex justify-content-between">
                   <div>검색결과: {{ totalCount }}개</div>
-                  <b-button variant="light" size="sm" class="button">출하지시서 등록</b-button>
+                  <b-button variant="light" size="sm" class="button" @click="register()">출하지시서 등록</b-button>
               </div>
               <div class="list-headline row">
                   <div class="list-head col-6">출하지시서명</div>
@@ -91,8 +117,8 @@ const itemExtend = () => {
                       <div v-else>{{ shippingInstruction.itemName }}</div>
                     </div>
                     <div class="list-body col-2">{{ shippingInstruction.clientName }}</div>
-                    <div class="list-body col-2">{{ shippingInstruction.shippingInstructionScheduledShipmentDate }}</div>
-                    <div class="list-body col-2">{{ shippingInstruction.shippingInstructionStatus }}</div>
+                    <div class="list-body col-2">{{ formatDate(shippingInstruction.shippingInstructionScheduledShipmentDate) }}</div>
+                    <div class="list-body col-2">{{ formatStatus(shippingInstruction.shippingInstructionStatus) }}</div>
                   </div>
                 </div>
                 <div class="pagination">

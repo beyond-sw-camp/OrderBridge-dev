@@ -2,6 +2,7 @@
 import ShippingInstructionList from "@/components/shippingInstruction/ShippingInstructionList.vue";
 import {onMounted, ref, watch} from "vue";
 import axios from "axios";
+import router from "@/router/index.js";
 
 const totalCount = ref(0);
 const pageSize = ref(10);
@@ -44,11 +45,13 @@ onMounted(() => {
   fetchShippingInstructionList();
 });
 
+// 페이지 이동
 const handlePage = (newPageNumber) => {
   pageNumber.value = Number(newPageNumber.value);
   fetchShippingInstructionList();
 };
 
+// 검색
 const handleSearch = (payload) => {
   searchStartDate.value = payload.startDate;
   searchEndDate.value = payload.endDate;
@@ -57,6 +60,7 @@ const handleSearch = (payload) => {
   search();
 };
 
+// 상태 검색
 const handleStatus = (payload) => {
   if (searchStatus.value.has(payload)) {
     searchStatus.value.delete(payload);
@@ -65,6 +69,11 @@ const handleStatus = (payload) => {
   }
 
   search();
+}
+
+// 등록 페이지 이동
+const handleRegister = () => {
+  router.push("/shipping-instruction/input");
 }
 
 function search() {
@@ -87,6 +96,7 @@ function search() {
                            @searchEvent="handleSearch"
                            @checkStatusEvent="handleStatus"
                            @extendItemEvent=""
+                           @registerEvent="handleRegister"
   />
 </template>
 
