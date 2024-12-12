@@ -67,11 +67,11 @@ public class ShippingSlipApplicationService {
                 shippingSlipDomainService.saveShippingSlip(newShippingSlip);
 
         /* 물품 불러오기 */
-        List<Long> itemNameList = shippingSlipRequest.getShippingSlipItems()
+        List<Long> itemSeqList = shippingSlipRequest.getShippingSlipItems()
                 .stream()
                 .map(ShippingSlipItemDTO::getItemSeq) // itemSeq 필드 추출
                 .toList(); // 추출한 값을 List로 변환
-        List<Item> itemList = itemService.findAllById(itemNameList);
+        List<Item> itemList = itemService.findAllById(itemSeqList);
 
         /* ShippingSlipItem 도메인 생성 로직 실행, entity 반환 */
         List<ShippingSlipItem> newShippingSlipItemList
@@ -131,11 +131,11 @@ public class ShippingSlipApplicationService {
         /* 출하지시서가 변경되었다면 출하전표 품목도 변경*/
         if (changeShippingInstruction){
             /* 물품 불러오기 */
-            List<Long> itemNameList = shippingSlipRequest.getShippingSlipItems()
+            List<Long> itemSeqList = shippingSlipRequest.getShippingSlipItems()
                     .stream()
                     .map(ShippingSlipItemDTO::getItemSeq) // itemSeq 필드 추출
                     .toList(); // 추출한 값을 List로 변환
-            List<Item> itemList = itemService.findAllById(itemNameList);
+            List<Item> itemList = itemService.findAllById(itemSeqList);
 
             /* 기존에 저장된 출하전표 품목 리스트 삭제 */
             shippingSlipItemDomainService.deleteByShippingSlip(newShippingSlip);

@@ -61,6 +61,9 @@ public enum ErrorCodeType {
 
     // 거래처 오류
     CLIENT_STATUS_ERROR(HttpStatus.BAD_REQUEST, "CLIENT_ERROR_001", "이미 삭제된 거래처입니다."),
+
+    // 엑셀 다운 오류
+    EXCEL_DOWN_ERROR(HttpStatus.BAD_REQUEST, "EXCEL_DOWN_ERROR_001", "엑셀 다운로드 도중 오류가 발생하였습니다."),
     ;
     private final HttpStatus httpStatus;
     private final String code;
