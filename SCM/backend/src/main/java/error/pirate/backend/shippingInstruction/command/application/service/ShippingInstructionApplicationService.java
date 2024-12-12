@@ -35,7 +35,7 @@ public class ShippingInstructionApplicationService {
         SalesOrder salesOrder = salesOrderDomainService.findById(shippingInstructionRequest.getSalesOrderSeq());
 
         // 주문서가 생산완료 상태인지 체크
-        shippingInstructionDomainService.checkShippingInstructionSalesOrder(salesOrder);
+        shippingInstructionDomainService.checkSalesOrderStatus(salesOrder);
 
         // 출하지시서 유저는 주문서 작성 유저
         User user = salesOrder.getUser();
@@ -95,7 +95,7 @@ public class ShippingInstructionApplicationService {
         SalesOrder newSalesOrder = salesOrderDomainService.findById(shippingInstructionRequest.getSalesOrderSeq());
 
         // 주문서가 생산완료 상태인지 체크
-        shippingInstructionDomainService.checkShippingInstructionSalesOrder(newSalesOrder);
+        shippingInstructionDomainService.checkSalesOrderStatus(newSalesOrder);
 
         // 출하지시서 유저는 주문서 작성 유저
         User user = newSalesOrder.getUser();
