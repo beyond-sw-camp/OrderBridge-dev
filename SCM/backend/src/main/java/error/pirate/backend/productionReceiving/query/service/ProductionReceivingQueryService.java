@@ -1,7 +1,6 @@
 package error.pirate.backend.productionReceiving.query.service;
 
-import error.pirate.backend.common.ExcelDTO;
-import error.pirate.backend.common.ExcelDown;
+import error.pirate.backend.common.ExcelDownLoad;
 import error.pirate.backend.exception.CustomException;
 import error.pirate.backend.exception.ErrorCodeType;
 import error.pirate.backend.productionReceiving.command.domain.aggregate.entity.ProductionReceiving;
@@ -23,6 +22,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +33,7 @@ public class ProductionReceivingQueryService {
     private final WarehouseRepository warehouseRepository;
     private final ProductionReceivingItemRepository productionReceivingItemRepository;
     private final ModelMapper modelMapper;
+    private final ExcelDownLoad excelDownBody;
 
     public ProductionReceivingListResponse readProductionReceivingList(ProductionReceivingListRequest request, Pageable pageable) {
         Page<ProductionReceivingListDTO> productionReceivingList = productionReceivingRepository.findAllByFilter(request, pageable);
@@ -67,29 +68,24 @@ public class ProductionReceivingQueryService {
     public byte[] productionReceivingExcelDown(ProductionReceivingListRequest request, Pageable pageable) {
         Page<ProductionReceivingListDTO> productionReceivingList = productionReceivingRepository.findAllByFilter(request, pageable);
 
-        List<ExcelDTO> excelList = new ArrayList<>();
-        // 각 생산입고의 아이템을 조회
-        for(ProductionReceivingListDTO dto : productionReceivingList) {
+        String[] headers = {"생산입고명", "생산입고 품목", "생산공장명", "보관창고명", "입고일", "상태"};
+        String[][] excel = new String[productionReceivingList.getSize()][headers.length];
+
+        for(int i = 0; i < productionReceivingList.getContent().size(); i++) {
+            ProductionReceivingListDTO dto = productionReceivingList.getContent().get(i);
             dto.setProductionReceivingItemList(productionReceivingItemRepository.findAllByProductionReceivingSeq(dto.getProductionReceivingSeq()));
 
-            ExcelDTO excel = new ExcelDTO();
-            excel.setCell1(dto.getProductionReceivingName()); // 생산입고명
-            StringBuilder productionReceivingItemName = new StringBuilder();
-            for(ProductionReceivingItemQueryDTO productionReceivingItem : dto.getProductionReceivingItemList()) {
-                productionReceivingItemName.append(productionReceivingItem.getItemName());
-            }
-            excel.setCell2(productionReceivingItemName.toString()); // 생산입고명
-
-            excel.setCell3(dto.getProductionWarehouseName());
-            excel.setCell4(dto.getStoreWarehouseName());
-            excel.setCell5(dto.getProductReceivingRegDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-            excel.setCell6(String.valueOf(dto.getProductionReceivingStatus()));
-
-            excelList.add(excel);
+            excel[i][0] = dto.getProductionReceivingName(); // 생산입고 명
+            excel[i][1] = dto.getProductionReceivingItemList()
+                    .stream()
+                    .map(ProductionReceivingItemQueryDTO::getItemName)
+                    .collect(Collectors.joining(", "));// 생산입고 품목
+            excel[i][2] = dto.getProductionWarehouseName();       // 생산창고
+            excel[i][3] = dto.getStoreWarehouseName();            // 보관창고
+            excel[i][4] = dto.getProductReceivingRegDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")); // 등록일
+            excel[i][5] = String.valueOf(dto.getProductionReceivingStatus());
         }
 
-        String[] headers = {"생산입고명", "생산입고 품목", "생산공장명", "보관창고명", "입고일", "상태"};
-
-        return ExcelDown.excelDownBody(excelList, "생산입고", headers);
+        return excelDownBody.excelDownBody(excel, headers, "생산입고");
     }
 }

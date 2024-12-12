@@ -1,6 +1,5 @@
 package error.pirate.backend.productionReceiving.query.controller;
 
-import error.pirate.backend.common.ExcelDown;
 import error.pirate.backend.productionReceiving.query.dto.ProductionReceivingListRequest;
 import error.pirate.backend.productionReceiving.query.dto.ProductionReceivingListResponse;
 import error.pirate.backend.productionReceiving.query.dto.ProductionReceivingResponse;
@@ -38,7 +37,7 @@ public class ProductionReceivingQueryController {
 
     @GetMapping("/excelDown")
     @Operation(summary = "생산입고 엑셀다운")
-    public ResponseEntity<byte[]> productionReceivingExcelDown(@ModelAttribute ProductionReceivingListRequest request, Pageable pageable, @RequestParam String excelName) {
+    public ResponseEntity<byte[]> productionReceivingExcelDown(@ModelAttribute ProductionReceivingListRequest request, Pageable pageable) {
 
         byte[] excelData = productionReceivingQueryService.productionReceivingExcelDown(request, pageable);
 
