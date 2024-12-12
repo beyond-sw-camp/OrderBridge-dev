@@ -78,8 +78,7 @@ const excelDown = async () => {
         searchName: searchName.value,
         searchStatus: searchStatus.value.size === 0 ? null : Array.from(searchStatus.value),
         page: pageNumber.value - 1, // Spring Pageable에서 0부터 시작
-        size: pageSize.value,
-        excelName: excelName
+        size: pageSize.value
       }, paramsSerializer: (params) => {
         // null이나 undefined 값을 필터링
         const filteredParams = Object.fromEntries(
