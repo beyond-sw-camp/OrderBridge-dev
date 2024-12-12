@@ -18,6 +18,21 @@ public class NameGenerator {
      * @return 제목
      */
     public String nameGenerator(Class domain) {
-        return commonMapper.nameGenerator(domain.getSimpleName().toLowerCase());
+        return commonMapper.nameGenerator(pascalToSnake(domain.getSimpleName()));
+    }
+
+    private String pascalToSnake(String input) {
+        StringBuilder output = new StringBuilder();
+        output.append(Character.toLowerCase(input.charAt(0)));
+
+        for (int i = 1; i < input.length(); i++) {
+            if (65 <= input.charAt(i) && input.charAt(i) <= 90) {
+                output.append('_').append(Character.toLowerCase(input.charAt(i)));
+            } else {
+                output.append(input.charAt(i));
+            }
+        }
+
+        return output.toString();
     }
 }
