@@ -25,29 +25,19 @@ public class PurchaseOrderDomainService {
 
     private final PurchaseOrderRepository purchaseOrderRepository;
 
-    private final ModelMapper modelMapper;
+    public PurchaseOrder findById(Long id) {
+        return purchaseOrderRepository.findById(id)
+                .orElseThrow(() -> new CustomException(ErrorCodeType.PURCHASE_NOT_FOUND));
+    }
 
-    private final EntityManager entityManager;
-
-    public PurchaseOrder createPurchaseOrder(PurchaseOrderCreateRequest request) {
-        PurchaseOrder purchaseOrder = modelMapper.map(request, PurchaseOrder.class);
-
-        User user = Optional.ofNullable(entityManager.find(User.class, request.getUserSeq()))
-                .orElseThrow(() -> new CustomException(ErrorCodeType.USER_NOT_FOUND));
-        Client client = Optional.ofNullable(entityManager.find(Client.class, request.getClientSeq()))
-                .orElseThrow(() -> new CustomException(ErrorCodeType.CLIENT_NOT_FOUND));
-        SalesOrder salesOrder = Optional.ofNullable(entityManager.find(SalesOrder.class, request.getSalesOrderSeq()))
-                .orElseThrow(() -> new CustomException(ErrorCodeType.SALES_ORDER_NOT_FOUND));
-
-        purchaseOrder.setSeqValue(user, client, salesOrder);
-
-        // 발주서 이름 생성
-        int purchaseOrderCount = (int) purchaseOrderRepository.count();
-        
+    public PurchaseOrder createPurchaseOrder(PurchaseOrder purchaseOrder) {
         LocalDate today = LocalDate.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
-        String purchaseOrderName = today.format(formatter) + " - "  + (purchaseOrderCount+1);
 
+        int purchaseOrderCount = (int) purchaseOrderRepository.count();
+
+        // 발주서 이름 생성
+        String purchaseOrderName = today.format(formatter) + " - "  + (purchaseOrderCount+1);
         purchaseOrder.changePurchaseOrderName(purchaseOrderName);
 
         return purchaseOrderRepository.save(purchaseOrder);

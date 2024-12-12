@@ -40,9 +40,4 @@ public class Client {
     @Column(insertable = false)
     private LocalDateTime clientModDate; // 거래처 수정일
 
-    @Builder
-    public Client(Long clientSeq) {
-        this.clientSeq = clientSeq;
-    }
-
 }

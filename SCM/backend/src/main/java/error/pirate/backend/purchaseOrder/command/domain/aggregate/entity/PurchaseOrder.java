@@ -56,11 +56,6 @@ public class PurchaseOrder {
 
     private String purchaseOrderNote; // 발주서 비고
 
-    @Builder
-    public PurchaseOrder(Long purchaseOrderSeq) {
-        this.purchaseOrderSeq = purchaseOrderSeq;
-    }
-
     public void changePurchaseOrderName(String name) {
         this.purchaseOrderName = name;
     }
@@ -76,7 +71,7 @@ public class PurchaseOrder {
         this.purchaseOrderStatus = status;
     }
 
-    public void setSeqValue(User user, Client client, SalesOrder salesOrder) {
+    public void objectInjection(User user, Client client, SalesOrder salesOrder) {
         this.user = user;
         this.client = client;
         this.salesOrder = salesOrder;

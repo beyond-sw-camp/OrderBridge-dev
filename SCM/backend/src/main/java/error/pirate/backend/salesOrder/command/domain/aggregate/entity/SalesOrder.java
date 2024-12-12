@@ -61,9 +61,4 @@ public class SalesOrder {
         this.salesOrderStatus = salesOrderStatus;
     }
 
-    @Builder
-    public SalesOrder(Long salesOrderSeq) {
-        this.salesOrderSeq = salesOrderSeq;
-    }
-
 }

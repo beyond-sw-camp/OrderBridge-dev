@@ -50,11 +50,6 @@ public class Item {
 
     private String itemNote;
 
-    @Builder
-    public Item(Long itemSeq) {
-        this.itemSeq = itemSeq;
-    }
-
     public void updateItem(ItemUnit itemUnit, ItemUpdateRequest request) {
         if(itemUnit != null) {
             this.itemUnit = itemUnit;
