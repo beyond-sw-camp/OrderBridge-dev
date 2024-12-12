@@ -1,5 +1,5 @@
 <script setup>
-import { defineProps } from 'vue';
+import {defineProps, ref, watch} from 'vue';
 
 const props = defineProps({
   searchStartDate: { type: String, required: false }, // 시작 날짜
@@ -11,13 +11,26 @@ const props = defineProps({
   pageSize: { type: Number, required: true },         // 페이지 사이즈
 });
 
-const emit = defineEmits([]);
+const emit = defineEmits(['pageEvent','searchEvent','checkStatusEvent','extendItemEvent']);
+
+const startDate = ref(props.searchStartDate);
+const endDate = ref(props.searchEndDate);
+const pageNumber = ref(props.pageNumber);
+const clientName = ref(props.searchName);
+
+watch([startDate, endDate], () => {
+  search();
+})
+
+watch(pageNumber, () => {
+  emit('pageEvent', pageNumber);
+})
 
 const search = () => {
   emit('searchEvent', {
-    startDate: props.searchStartDate,
-    endDate: props.searchEndDate,
-    name: props.searchName,
+    startDate: startDate.value,
+    endDate: endDate.value,
+    clientName: clientName.value,
   });
 };
 
@@ -36,14 +49,14 @@ const itemExtend = () => {
             <div class="side-box card">
                 <div class="card-body">
                     <p class="card-title">출하예정일</p>
-                    <input type="date" v-model="searchStartDate"/> ~ <input type="date" v-model="searchEndDate"/>
+                    <input type="date" v-model="startDate"/> ~ <input type="date" v-model="endDate"/>
                 </div>
             </div>
             <div class="side-box card">
                 <div class="card-body">
                     <p class="card-title">출하지시서명</p>
                     <b-input-group class="mt-3">
-                        <b-form-input v-model="searchName"></b-form-input>
+                        <b-form-input v-model="clientName"></b-form-input>
                         <b-button variant="light" class="button" @click="search()"><svg width="1em" id="Layer_1" version="1.1" viewBox="0 0 512 512" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><path d="M344.5,298c15-23.6,23.8-51.6,23.8-81.7c0-84.1-68.1-152.3-152.1-152.3C132.1,64,64,132.2,64,216.3  c0,84.1,68.1,152.3,152.1,152.3c30.5,0,58.9-9,82.7-24.4l6.9-4.8L414.3,448l33.7-34.3L339.5,305.1L344.5,298z M301.4,131.2  c22.7,22.7,35.2,52.9,35.2,85c0,32.1-12.5,62.3-35.2,85c-22.7,22.7-52.9,35.2-85,35.2c-32.1,0-62.3-12.5-85-35.2  c-22.7-22.7-35.2-52.9-35.2-85c0-32.1,12.5-62.3,35.2-85c22.7-22.7,52.9-35.2,85-35.2C248.5,96,278.7,108.5,301.4,131.2z"/></svg></b-button>
                     </b-input-group>
                 </div>
@@ -53,10 +66,6 @@ const itemExtend = () => {
                     <p class="card-title">출하지시서 상태</p>
                     <b-form-checkbox @click="check('BEFORE')">결재 전</b-form-checkbox>
                     <b-form-checkbox @click="check('AFTER')">결재 후</b-form-checkbox>
-<!--                    <template v-for="productionReceivingStatus in productionReceivingStatusList">-->
-<!--                      <b-form-checkbox @click="check(productionReceivingStatus.key)">{{productionReceivingStatus.value}}</b-form-checkbox>-->
-<!--                    </template>-->
-
                 </div>
             </div>
         </div>
@@ -67,29 +76,30 @@ const itemExtend = () => {
                   <b-button variant="light" size="sm" class="button">출하지시서 등록</b-button>
               </div>
               <div class="list-headline row">
-                  <div class="list-head col-7">출하지시서</div>
+                  <div class="list-head col-6">출하지시서명</div>
                   <div class="list-head col-2">거래처</div>
                   <div class="list-head col-2">출하예정일</div>
-                  <div class="list-head col-1">상태</div>
+                  <div class="list-head col-2">상태</div>
               </div>
               <template v-if="shippingInstructionList.length > 0">
                 <div style="max-height: 600px; overflow-y: auto;">
                   <div v-for="shippingInstruction in shippingInstructionList" :key="shippingInstruction.shippingInstructionSeq" class="list-line row" @click="itemExtend">
-                    <div class="list-body col-7 left">
+                    <div class="list-body col-6 left">
                       {{ shippingInstruction.shippingInstructionName }}
                       <br>
-                      {{ shippingInstruction.itemName }}
+                      <div v-if="!shippingInstruction.itemName"><br></div>
+                      <div v-else>{{ shippingInstruction.itemName }}</div>
                     </div>
                     <div class="list-body col-2">{{ shippingInstruction.clientName }}</div>
                     <div class="list-body col-2">{{ shippingInstruction.shippingInstructionScheduledShipmentDate }}</div>
-                    <div class="list-body col-1">{{ shippingInstruction.shippingInstructionStatus }}</div>
+                    <div class="list-body col-2">{{ shippingInstruction.shippingInstructionStatus }}</div>
                   </div>
                 </div>
                 <div class="pagination">
                   <b-pagination
                       v-model="pageNumber"
-                      :totalRows="totalCount"
-                      :perPage="pageSize">
+                      :totalRows="props.totalCount"
+                      :perPage="props.pageSize">
                   </b-pagination>
                 </div>
               </template>
@@ -97,7 +107,6 @@ const itemExtend = () => {
                 <b-card-text class="no-list-text">해당 검색조건에 부합한 출하지시서가 존재하지 않습니다.</b-card-text>
               </template>
             </div>
-
         </div>
     </div>
 </template>

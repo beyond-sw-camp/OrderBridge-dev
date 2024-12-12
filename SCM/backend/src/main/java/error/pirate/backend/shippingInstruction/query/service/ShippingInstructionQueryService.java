@@ -18,10 +18,12 @@ public class ShippingInstructionQueryService {
     @Transactional(readOnly = true)
     public ShippingInstructionListResponse readShippingInstructionList(ShippingInstructionListRequest request) {
         int offset = (request.getPage() - 1) * request.getSize();
-        List<ShippingInstructionListDTO> shippingInstructionList
-                = shippingInstructionMapper.selectShippingInstructionList(offset, request);
+        List<String> statusList = request.getShippingInstructionStatus();   // 상태 리스트
 
-        long totalItems = shippingInstructionMapper.countShippingInstruction(request);
+        List<ShippingInstructionListDTO> shippingInstructionList
+                = shippingInstructionMapper.selectShippingInstructionList(offset, request, statusList);
+
+        long totalItems = shippingInstructionMapper.countShippingInstruction(request, statusList);
 
         return ShippingInstructionListResponse.builder()
                 .shippingInstructionList(shippingInstructionList)

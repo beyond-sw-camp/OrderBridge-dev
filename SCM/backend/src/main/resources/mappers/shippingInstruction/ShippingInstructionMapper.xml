@@ -24,7 +24,6 @@
         JOIN tb_sales_order so ON (si.sales_order_seq = so.sales_order_seq)
         JOIN tb_client c ON (so.client_seq = c.client_seq)
         WHERE si.shipping_instruction_status NOT IN ('DELETE')
-        OR si.shipping_instruction_status IS NULL
         <if test="request.startDate != null"><![CDATA[
             AND #{request.startDate} <= si.shipping_instruction_scheduled_shipment_date
              ]]></if>
@@ -34,10 +33,11 @@
         <if test="request.clientName != '' and request.clientName != null">
             AND c.client_name LIKE CONCAT('%', #{request.clientName}, '%')
         </if>
-        <if test="request.shippingInstructionStatus != '' and request.shippingInstructionStatus != null">
+        <if test="statusList != null and !statusList.isEmpty()">
             AND si.shipping_instruction_status IN
-            <foreach item="status" collection="request.shippingInstructionStatus" open="(" separator="," close=")">
-            #{status} </foreach>
+            <foreach item="status" collection="statusList" open="(" separator="," close=")">
+                #{status}
+            </foreach>
         </if>
         ORDER BY si.shipping_instruction_reg_date DESC
         LIMIT #{request.size} OFFSET #{offset}
@@ -50,7 +50,6 @@
         JOIN tb_sales_order so ON (si.sales_order_seq = so.sales_order_seq)
         JOIN tb_client c ON (so.client_seq = c.client_seq)
         WHERE si.shipping_instruction_status NOT IN ('DELETE')
-        OR si.shipping_instruction_status IS NULL
         <if test="request.startDate != null"><![CDATA[
             AND #{request.startDate} <= si.shipping_instruction_scheduled_shipment_date
              ]]></if>
@@ -60,8 +59,11 @@
         <if test="request.clientName != '' and request.clientName != null">
             AND c.client_name LIKE CONCAT('%', #{request.clientName}, '%')
         </if>
-        <if test="request.shippingInstructionStatus != '' and request.shippingInstructionStatus != null">
-            AND si.shipping_instruction_status LIKE #{request.shippingInstructionStatus}
+        <if test="statusList != null and !statusList.isEmpty()">
+            AND si.shipping_instruction_status IN
+            <foreach item="status" collection="statusList" open="(" separator="," close=")">
+                #{status}
+            </foreach>
         </if>
     </select>
 
@@ -118,7 +120,6 @@
         JOIN tb_sales_order so ON (si.sales_order_seq = so.sales_order_seq)
         JOIN tb_client c ON (so.client_seq = c.client_seq)
         WHERE si.shipping_instruction_status NOT IN ('DELETE')
-        OR si.shipping_instruction_status IS NULL
         <if test="request.startDate != null"><![CDATA[
             AND #{request.startDate} <= si.shipping_instruction_scheduled_shipment_date
         ]]></if>
@@ -140,7 +141,6 @@
         JOIN tb_sales_order so ON (si.sales_order_seq = so.sales_order_seq)
         JOIN tb_client c ON (so.client_seq = c.client_seq)
         WHERE si.shipping_instruction_status NOT IN ('DELETE')
-        OR si.shipping_instruction_status IS NULL
         <if test="request.startDate != null"><![CDATA[
             AND #{request.startDate} <= si.shipping_instruction_scheduled_shipment_date
              ]]></if>
@@ -161,7 +161,6 @@
         JOIN tb_sales_order so ON (si.sales_order_seq = so.sales_order_seq)
         JOIN tb_client c ON (so.client_seq = c.client_seq)
         WHERE si.shipping_instruction_status NOT IN ('DELETE')
-        OR si.shipping_instruction_status IS NULL
         <if test="request.startDate != null"><![CDATA[
             AND #{request.startDate} <= si.shipping_instruction_scheduled_shipment_date
              ]]></if>

@@ -7,7 +7,6 @@ const totalCount = ref(0);
 const pageSize = ref(10);
 const pageNumber = ref(1);
 const shippingInstructionList = ref([]);
-const shippingInstructionStatusList = ref([]);
 const searchStartDate = ref(null);
 const searchEndDate = ref(null);
 const searchName = ref(null);
@@ -45,19 +44,24 @@ onMounted(() => {
   fetchShippingInstructionList();
 });
 
-watch([searchStartDate, searchEndDate], () => {
-  search();
-})
-
-watch(pageNumber, () => {
+const handlePage = (newPageNumber) => {
+  pageNumber.value = Number(newPageNumber.value);
   fetchShippingInstructionList();
-})
+};
 
-function check(status) {
-  if (searchStatus.value.has(status)) {
-    searchStatus.value.delete(status);
+const handleSearch = (payload) => {
+  searchStartDate.value = payload.startDate;
+  searchEndDate.value = payload.endDate;
+  searchName.value = payload.clientName;
+
+  search();
+};
+
+const handleStatus = (payload) => {
+  if (searchStatus.value.has(payload)) {
+    searchStatus.value.delete(payload);
   } else {
-    searchStatus.value.add(status);
+    searchStatus.value.add(payload);
   }
 
   search();
@@ -78,7 +82,12 @@ function search() {
                            :shippingInstructionList="shippingInstructionList"
                            :totalCount="totalCount"
                            :pageNumber="pageNumber"
-                           :pageSize="pageSize"/>
+                           :pageSize="pageSize"
+                           @pageEvent="handlePage"
+                           @searchEvent="handleSearch"
+                           @checkStatusEvent="handleStatus"
+                           @extendItemEvent=""
+  />
 </template>
 
 <style scoped>
