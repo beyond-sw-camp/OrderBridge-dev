@@ -84,7 +84,7 @@ public class ShippingInstructionQueryService {
         String[] headers = {"출하지시서명", "출하지시서 품목", "거래처명", "출하예정일", "상태"};
         String[][] excel = new String[shippingInstructionList.size()][headers.length];
 
-        for(int i=0 ; i<shippingInstructionList.size() ; i++) {
+        for (int i = 0; i < shippingInstructionList.size(); i++) {
             ShippingInstructionListDTO dto = shippingInstructionList.get(i);
 
             excel[i][0] = dto.getShippingInstructionName();
@@ -93,7 +93,8 @@ public class ShippingInstructionQueryService {
             excel[i][3] = dto.getShippingInstructionScheduledShipmentDate() != null
                     ? dto.getShippingInstructionScheduledShipmentDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
                     : null;
-            excel[i][4] = String.valueOf(dto.getShippingInstructionStatus());
+            excel[i][4] = ShippingInstructionStatus.statusValue(
+                    String.valueOf(dto.getShippingInstructionStatus()));
         }
 
         return excelDownBody.excelDownBody(excel, headers, "출하지시서");
