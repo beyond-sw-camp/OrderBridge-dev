@@ -4,7 +4,6 @@ import error.pirate.backend.item.command.application.dto.ItemUpdateRequest;
 import error.pirate.backend.user.command.domain.aggregate.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;

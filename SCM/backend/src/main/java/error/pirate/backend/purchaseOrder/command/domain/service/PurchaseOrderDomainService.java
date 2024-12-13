@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -58,6 +59,10 @@ public class PurchaseOrderDomainService {
         PurchaseOrder purchaseOrder = purchaseOrderRepository.findById(purchaseOrderSeq)
                 .orElseThrow(() -> new CustomException(ErrorCodeType.PURCHASE_NOT_FOUND));
         purchaseOrder.changePurchaseOrderStatus(purchaseOrderStatus);
+    }
+
+    public List<PurchaseOrder> findAll() {
+        return purchaseOrderRepository.findAll();
     }
 
 }
