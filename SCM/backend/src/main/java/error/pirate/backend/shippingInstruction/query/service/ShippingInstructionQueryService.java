@@ -80,8 +80,10 @@ public class ShippingInstructionQueryService {
     public byte[] shippingInstructionExcelDown(ShippingInstructionListRequest request) {
         int offset = (request.getPage() - 1) * request.getSize();
         request.setSize(null);
+        List<String> statusList = request.getShippingInstructionStatus();   // 상태 리스트
+
         List<ShippingInstructionListDTO> shippingInstructionList
-                = shippingInstructionMapper.selectShippingInstructionList(offset, request);
+                = shippingInstructionMapper.selectShippingInstructionList(offset, request, statusList);
 
         String[] headers = {"출하지시서명", "출하지시서 품목", "거래처명", "출하예정일", "상태"};
         String[][] excel = new String[shippingInstructionList.size()][headers.length];
