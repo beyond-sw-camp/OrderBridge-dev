@@ -28,7 +28,7 @@ import statisticsIcon from '@/assets/statisticsIcon.svg'
           <b-dropdown-item href="/quotation">견적 관리</b-dropdown-item>
           <b-dropdown-item href="#">주문서 관리</b-dropdown-item>
           <b-dropdown-item href="#">판매 관리</b-dropdown-item>
-          <b-dropdown-item href="/shipping-instruction">출하지시서 관리</b-dropdown-item>
+          <b-dropdown-item href="#"><RouterLink to="/shipping-instruction" active-class="active" replace>생산입고 관리</RouterLink>출하지시서 관리</b-dropdown-item>
           <b-dropdown-item href="#">출하 관리</b-dropdown-item>
         </b-nav-item-dropdown>
         <b-nav-item-dropdown>
