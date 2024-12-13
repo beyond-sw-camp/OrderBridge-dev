@@ -41,6 +41,23 @@ onMounted(() => {
 watch([searchStartDate, searchEndDate], () => {
   fetchProductionReceivingSituationList();
 })
+
+const printTable = () => {
+  const printContent = document.getElementById('print-area').innerHTML; // 특정 영역 가져오기
+  const originalContent = document.body.innerHTML; // 현재 페이지 내용 저장
+
+  // 페이지 내용을 특정 영역으로 교체
+  document.body.innerHTML = printContent;
+
+  // 인쇄
+  window.print();
+
+  // 원래 내용 복원
+  document.body.innerHTML = originalContent;
+
+  // SPA일 경우 Vue의 리렌더링 강제 호출
+  location.reload(); // 상태를 새로고침하여 업데이트
+}
 </script>
 
 <template>
@@ -64,9 +81,9 @@ watch([searchStartDate, searchEndDate], () => {
     </div>
     <div class="col-md-9">
       <div class="d-flex justify-content-end mt-3">
-        <b-button variant="light" size="sm" class="button ms-2 mb-3">인쇄</b-button>
+        <b-button @click="printTable()" variant="light" size="sm" class="button ms-2 mb-3">인쇄</b-button>
       </div>
-      <div class="content">
+      <div id="print-area" class="content">
         <div class="table-container">
           <!-- 테이블 -->
           <table>
@@ -213,4 +230,27 @@ div {
   height: 20px;
 }
 
+/* 인쇄 스타일 */
+@media print {
+  /* 인쇄할 영역만 표시 */
+  body * {
+    visibility: hidden; /* 전체 요소 숨기기 */
+  }
+
+  #print-area, #print-area * {
+    visibility: visible; /* 특정 영역만 표시 */
+  }
+
+  #print-area {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+  }
+
+  /* 버튼 숨기기 */
+  button {
+    display: none;
+  }
+}
 </style>
