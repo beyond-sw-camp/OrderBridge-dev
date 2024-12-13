@@ -6,6 +6,7 @@ import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -18,5 +19,5 @@ public class ShippingInstructionListRequest {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate endDate;
     private String clientName;
-    private String shippingInstructionStatus;
+    private List<ShippingInstructionStatus> shippingInstructionStatus;
 }
