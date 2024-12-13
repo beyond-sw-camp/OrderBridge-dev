@@ -24,7 +24,6 @@
         JOIN tb_sales_order so ON (si.sales_order_seq = so.sales_order_seq)
         JOIN tb_client c ON (so.client_seq = c.client_seq)
         WHERE si.shipping_instruction_status NOT IN ('DELETE')
-        OR si.shipping_instruction_status IS NULL
         <if test="request.startDate != null"><![CDATA[
             AND #{request.startDate} <= si.shipping_instruction_scheduled_shipment_date
              ]]></if>
@@ -48,7 +47,6 @@
         JOIN tb_sales_order so ON (si.sales_order_seq = so.sales_order_seq)
         JOIN tb_client c ON (so.client_seq = c.client_seq)
         WHERE si.shipping_instruction_status NOT IN ('DELETE')
-        OR si.shipping_instruction_status IS NULL
         <if test="request.startDate != null"><![CDATA[
             AND #{request.startDate} <= si.shipping_instruction_scheduled_shipment_date
              ]]></if>
@@ -116,7 +114,6 @@
         JOIN tb_sales_order so ON (si.sales_order_seq = so.sales_order_seq)
         JOIN tb_client c ON (so.client_seq = c.client_seq)
         WHERE si.shipping_instruction_status NOT IN ('DELETE')
-        OR si.shipping_instruction_status IS NULL
         <if test="request.startDate != null"><![CDATA[
             AND #{request.startDate} <= si.shipping_instruction_scheduled_shipment_date
         ]]></if>
@@ -133,12 +130,11 @@
             resultType="error.pirate.backend.shippingInstruction.query.dto.ShippingInstructionSituationMonthlyTotalDTO">
         SELECT
             DATE_FORMAT(si.shipping_instruction_scheduled_shipment_date, '%Y-%m') AS month,
-            SUM(si.shipping_instruction_total_quantity) AS monthly_total
+            NVL(SUM(si.shipping_instruction_total_quantity),0) AS monthly_total
         FROM tb_shipping_instruction si
         JOIN tb_sales_order so ON (si.sales_order_seq = so.sales_order_seq)
         JOIN tb_client c ON (so.client_seq = c.client_seq)
         WHERE si.shipping_instruction_status NOT IN ('DELETE')
-        OR si.shipping_instruction_status IS NULL
         <if test="request.startDate != null"><![CDATA[
             AND #{request.startDate} <= si.shipping_instruction_scheduled_shipment_date
              ]]></if>
@@ -154,12 +150,11 @@
     <!--  출하지시서 현황 총합계 조회  -->
     <select id="selectTotal" resultType="Integer">
         SELECT
-            SUM(si.shipping_instruction_total_quantity) AS total_quantity
+            NVL(SUM(si.shipping_instruction_total_quantity),0) AS total_quantity
         FROM tb_shipping_instruction si
         JOIN tb_sales_order so ON (si.sales_order_seq = so.sales_order_seq)
         JOIN tb_client c ON (so.client_seq = c.client_seq)
         WHERE si.shipping_instruction_status NOT IN ('DELETE')
-        OR si.shipping_instruction_status IS NULL
         <if test="request.startDate != null"><![CDATA[
             AND #{request.startDate} <= si.shipping_instruction_scheduled_shipment_date
              ]]></if>
