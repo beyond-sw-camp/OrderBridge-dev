@@ -19,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -113,5 +114,14 @@ public class QuotationCommandService {
         quotation.updateQuotation(
                 request.getQuotationQuotationDate(), client, user, request.getQuotationNote(),
                 quotationExtendedPrice, quotationTotalQuantity);
+    }
+
+    // 견적서 삭제
+    @Transactional
+    public void deleteQuotation(Long quotationSeq) {
+
+        Quotation quotation = quotationRepository.findById(quotationSeq).orElseThrow();
+
+        quotation.delete();
     }
 }
