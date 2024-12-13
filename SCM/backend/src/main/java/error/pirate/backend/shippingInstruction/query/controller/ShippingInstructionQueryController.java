@@ -1,5 +1,6 @@
 package error.pirate.backend.shippingInstruction.query.controller;
 
+import error.pirate.backend.purchaseOrder.query.dto.PurchaseOrderRequest;
 import error.pirate.backend.shippingInstruction.query.dto.ShippingInstructionListRequest;
 import error.pirate.backend.shippingInstruction.query.dto.ShippingInstructionListResponse;
 import error.pirate.backend.shippingInstruction.query.dto.ShippingInstructionResponse;
@@ -10,8 +11,15 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 @Tag(name = "출하지시서")
 @RestController
@@ -52,5 +60,18 @@ public class ShippingInstructionQueryController {
                 = shippingInstructionQueryService.readShippingInstructionSituation(request);
 
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/excelDown")
+    @Operation(summary = "출하지시서 엑셀 다운")
+    public ResponseEntity<byte[]> shippingInstructionExcelDown(ShippingInstructionListRequest shippingInstructionListRequest) {
+        HttpHeaders headersResponse = new HttpHeaders();
+        String fileName = URLEncoder.encode("출하지시서[" + new SimpleDateFormat("yyyyMMdd").format(new Date()) + "].xlsx", StandardCharsets.UTF_8);
+        headersResponse.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileName);
+
+        return ResponseEntity.ok()
+                .headers(headersResponse)
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(shippingInstructionQueryService.shippingInstructionExcelDown(shippingInstructionListRequest));
     }
 }

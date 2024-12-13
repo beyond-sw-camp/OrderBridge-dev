@@ -40,7 +40,9 @@
             </foreach>
         </if>
         ORDER BY si.shipping_instruction_reg_date DESC
-        LIMIT #{request.size} OFFSET #{offset}
+        <if test="request.size != null">
+            LIMIT #{request.size} OFFSET #{offset}
+        </if>
     </select>
 
     <!--    출하지시서 리스트 갯수  -->

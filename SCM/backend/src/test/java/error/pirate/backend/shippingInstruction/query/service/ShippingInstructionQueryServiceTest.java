@@ -44,6 +44,16 @@ class ShippingInstructionQueryServiceTest {
                 () -> shippingInstructionQueryService.readShippingInstructionList(request));
     }
 
+    @DisplayName("출하지시서 엑셀 다운")
+    @ParameterizedTest(autoCloseArguments = true)
+    @MethodSource("readShippingInstructionListArguments")
+    void shippingInstructionExcelDownTest(
+            ShippingInstructionListRequest request
+    ) {
+        assertDoesNotThrow(
+                () -> shippingInstructionQueryService.shippingInstructionExcelDown(request));
+    }
+
     private static Stream<Arguments> readShippingInstructionArguments() {
         return Stream.of(
                 arguments(1L),
