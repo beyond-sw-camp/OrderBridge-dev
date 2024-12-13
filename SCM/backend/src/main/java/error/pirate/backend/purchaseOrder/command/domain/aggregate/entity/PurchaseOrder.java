@@ -1,10 +1,12 @@
 package error.pirate.backend.purchaseOrder.command.domain.aggregate.entity;
 
 import error.pirate.backend.client.command.domain.aggregate.entity.Client;
+import error.pirate.backend.purchaseOrder.command.application.dto.PurchaseOrderUpdateRequest;
 import error.pirate.backend.salesOrder.command.domain.aggregate.entity.SalesOrder;
 import error.pirate.backend.user.command.domain.aggregate.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
@@ -34,7 +36,7 @@ public class PurchaseOrder {
     @JoinColumn(name = "salesOrderSeq")
     private SalesOrder salesOrder; // 주문서
 
-    private String purchaseOrderName; // 발주서 명
+    private String purchaseOrderName; // 발주서명
 
     @Enumerated(EnumType.STRING)
     private PurchaseOrderStatus purchaseOrderStatus; // 발주서 상태
@@ -53,4 +55,26 @@ public class PurchaseOrder {
     private Integer purchaseOrderExtendedPrice; // 발주서 총금액
 
     private String purchaseOrderNote; // 발주서 비고
+
+    public void changePurchaseOrderName(String name) {
+        this.purchaseOrderName = name;
+    }
+
+    public void updatePurchaseOrder(PurchaseOrderUpdateRequest request) {
+        this.purchaseOrderDueDate = request.getPurchaseOrderDueDate();
+        this.purchaseOrderTargetDueDate = request.getPurchaseOrderTargetDueDate();
+        this.purchaseOrderExtendedPrice = request.getPurchaseOrderExtendedPrice();
+        this.purchaseOrderNote = request.getPurchaseOrderNote();
+    }
+
+    public void changePurchaseOrderStatus(PurchaseOrderStatus status) {
+        this.purchaseOrderStatus = status;
+    }
+
+    public void objectInjection(User user, Client client, SalesOrder salesOrder) {
+        this.user = user;
+        this.client = client;
+        this.salesOrder = salesOrder;
+    }
+
 }

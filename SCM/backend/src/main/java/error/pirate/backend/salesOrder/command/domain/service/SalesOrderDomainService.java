@@ -15,12 +15,6 @@ public class SalesOrderDomainService {
     
     private final SalesOrderRepository salesOrderRepository;
 
-    /* 주문서 시퀀스로 주문서 불러오기 */
-    public SalesOrder findById(long salesOrderSeq) {
-        return salesOrderRepository.findById(salesOrderSeq)
-                .orElseThrow(() -> new CustomException(ErrorCodeType.SALES_ORDER_NOT_FOUND));
-    }
-
     /* 상태를 수정하는 로직 */
     public void updateSalesOrderStatus(SalesOrder salesOrder, String status) {
         /* 수정을 위해 엔터티 정보 변경 */

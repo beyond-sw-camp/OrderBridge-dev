@@ -1,9 +1,9 @@
 package error.pirate.backend.shippingInstruction.command.application.service;
 
+import error.pirate.backend.common.NameGenerator;
 import error.pirate.backend.item.command.application.service.ItemService;
 import error.pirate.backend.item.command.domain.aggregate.entity.Item;
 import error.pirate.backend.salesOrder.command.domain.aggregate.entity.SalesOrder;
-import error.pirate.backend.salesOrder.command.domain.service.SalesOrderDomainService;
 import error.pirate.backend.shippingInstruction.command.application.dto.ShippingInstructionItemDTO;
 import error.pirate.backend.shippingInstruction.command.application.dto.ShippingInstructionRequest;
 import error.pirate.backend.shippingInstruction.command.domain.aggregate.entity.ShippingInstruction;
@@ -11,6 +11,7 @@ import error.pirate.backend.shippingInstruction.command.domain.aggregate.entity.
 import error.pirate.backend.shippingInstruction.command.domain.service.ShippingInstructionDomainService;
 import error.pirate.backend.shippingInstruction.command.domain.service.ShippingInstructionItemDomainService;
 import error.pirate.backend.user.command.domain.aggregate.entity.User;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -26,13 +27,14 @@ public class ShippingInstructionApplicationService {
 
     private final ShippingInstructionDomainService shippingInstructionDomainService;
     private final ShippingInstructionItemDomainService shippingInstructionItemDomainService;
-    private final SalesOrderDomainService salesOrderDomainService;
     private final ItemService itemService;
+    private final EntityManager entityManager;
+    private final NameGenerator nameGenerator;
 
     /* 출하지시서 등록 */
     @Transactional
     public void createShippingInstruction(ShippingInstructionRequest shippingInstructionRequest) {
-        SalesOrder salesOrder = salesOrderDomainService.findById(shippingInstructionRequest.getSalesOrderSeq());
+        SalesOrder salesOrder = entityManager.getReference(SalesOrder.class, shippingInstructionRequest.getSalesOrderSeq());
 
         // 주문서가 생산완료 상태인지 체크
         shippingInstructionDomainService.checkSalesOrderStatus(salesOrder);
@@ -45,9 +47,8 @@ public class ShippingInstructionApplicationService {
                 shippingInstructionDomainService.setShippingInstructionScheduledShipmentDate(
                         shippingInstructionRequest.getShippingInstructionScheduledShipmentDate());
 
-        /* 등록일을 기반으로 ShippingInstruction 명 설정 */
-        long count = shippingInstructionDomainService.countTodayShippingInstruction();
-        String shippingInstructionName = shippingInstructionDomainService.setShippingInstructionName(count);
+        /* 등록일 설정 공통코드 */
+        String shippingInstructionName = nameGenerator.nameGenerator(ShippingInstruction.class);
 
         /* 총수량 연산 */
         int itemTotalQuantity = shippingInstructionDomainService.calculateTotalQuantity(shippingInstructionRequest);
@@ -92,7 +93,7 @@ public class ShippingInstructionApplicationService {
         SalesOrder salesOrder = shippingInstruction.getSalesOrder();
 
         // 등록과 동일
-        SalesOrder newSalesOrder = salesOrderDomainService.findById(shippingInstructionRequest.getSalesOrderSeq());
+        SalesOrder newSalesOrder = entityManager.getReference(SalesOrder.class, shippingInstructionRequest.getSalesOrderSeq());
 
         // 주문서가 생산완료 상태인지 체크
         shippingInstructionDomainService.checkSalesOrderStatus(newSalesOrder);

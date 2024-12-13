@@ -14,18 +14,10 @@
             tpo.purchase_order_extended_price,
             tpo.purchase_order_note,
             tu.user_name,
-            tc.client_name,
-            tpoi.item_seq,
-            tpoi.purchase_order_item_quantity,
-            tpoi.purchase_order_item_price,
-            tpoi.purchase_order_item_note,
-            ti.item_name,
-            ti.item_image_url
+            tc.client_name
         FROM tb_purchase_order tpo
         JOIN tb_user tu USING (user_seq)
         JOIN tb_client tc USING (client_seq)
-        LEFT JOIN tb_purchase_order_item tpoi ON (tpo.purchase_order_seq = tpoi.purchase_order_seq)
-        LEFT JOIN tb_item ti ON (tpoi.item_seq = ti.item_seq)
         <trim prefix="WHERE" prefixOverrides="AND">
             <if test="searchStartDate != null and searchStartDate != ''">
                 <![CDATA[
@@ -45,7 +37,23 @@
             </if>
         </trim>
         ORDER BY tpo.purchase_order_seq
-        LIMIT #{limit} OFFSET #{offset}
+        <if test="limit != null">
+            LIMIT #{limit} OFFSET #{offset}
+        </if>
+    </select>
+
+    <select id="readPurchaseOrderItemList" resultType="error.pirate.backend.purchaseOrder.query.dto.PurchaseOrderItemResponse">
+        SELECT
+            tpoi.item_seq,
+            tpoi.purchase_order_item_quantity,
+            tpoi.purchase_order_item_price,
+            tpoi.purchase_order_item_note,
+            ti.item_name,
+            ti.item_image_url
+        FROM tb_purchase_order_item tpoi
+        JOIN tb_item ti USING (item_seq)
+        WHERE tpoi.purchase_order_seq = #{purchaseOrderSeq}
+        ORDER BY tpoi.purchase_order_item_seq
     </select>
 
     <select id="readPurchaseOrderListCount" resultType="int">

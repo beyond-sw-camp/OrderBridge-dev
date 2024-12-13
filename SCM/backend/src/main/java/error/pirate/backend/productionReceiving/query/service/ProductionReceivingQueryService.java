@@ -1,5 +1,6 @@
 package error.pirate.backend.productionReceiving.query.service;
 
+import error.pirate.backend.common.ExcelDownLoad;
 import error.pirate.backend.exception.CustomException;
 import error.pirate.backend.exception.ErrorCodeType;
 import error.pirate.backend.productionReceiving.command.domain.aggregate.entity.ProductionReceiving;
@@ -17,8 +18,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +33,7 @@ public class ProductionReceivingQueryService {
     private final WarehouseRepository warehouseRepository;
     private final ProductionReceivingItemRepository productionReceivingItemRepository;
     private final ModelMapper modelMapper;
+    private final ExcelDownLoad excelDownBody;
 
     public ProductionReceivingListResponse readProductionReceivingList(ProductionReceivingListRequest request, Pageable pageable) {
         Page<ProductionReceivingListDTO> productionReceivingList = productionReceivingRepository.findAllByFilter(request, pageable);
@@ -58,5 +63,29 @@ public class ProductionReceivingQueryService {
                 modelMapper.map(productionWarehouse, WarehouseDTO.class),
                 modelMapper.map(storeWarehouse, WarehouseDTO.class)
         );
+    }
+
+    public byte[] productionReceivingExcelDown(ProductionReceivingListRequest request, Pageable pageable) {
+        Page<ProductionReceivingListDTO> productionReceivingList = productionReceivingRepository.findAllByFilter(request, pageable);
+
+        String[] headers = {"생산입고명", "생산입고 품목", "생산공장명", "보관창고명", "입고일", "상태"};
+        String[][] excel = new String[productionReceivingList.getSize()][headers.length];
+
+        for(int i = 0; i < productionReceivingList.getContent().size(); i++) {
+            ProductionReceivingListDTO dto = productionReceivingList.getContent().get(i);
+            dto.setProductionReceivingItemList(productionReceivingItemRepository.findAllByProductionReceivingSeq(dto.getProductionReceivingSeq()));
+
+            excel[i][0] = dto.getProductionReceivingName(); // 생산입고 명
+            excel[i][1] = dto.getProductionReceivingItemList()
+                    .stream()
+                    .map(ProductionReceivingItemQueryDTO::getItemName)
+                    .collect(Collectors.joining(", "));// 생산입고 품목
+            excel[i][2] = dto.getProductionWarehouseName();       // 생산창고
+            excel[i][3] = dto.getStoreWarehouseName();            // 보관창고
+            excel[i][4] = dto.getProductReceivingRegDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")); // 등록일
+            excel[i][5] = String.valueOf(dto.getProductionReceivingStatus());
+        }
+
+        return excelDownBody.excelDownBody(excel, headers, "생산입고");
     }
 }
