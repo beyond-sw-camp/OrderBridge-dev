@@ -33,8 +33,11 @@
         <if test="request.clientName != '' and request.clientName != null">
             AND c.client_name LIKE CONCAT('%', #{request.clientName}, '%')
         </if>
-        <if test="request.shippingInstructionStatus != '' and request.shippingInstructionStatus != null">
-            AND si.shipping_instruction_status LIKE #{request.shippingInstructionStatus}
+        <if test="statusList != null and !statusList.isEmpty()">
+            AND si.shipping_instruction_status IN
+            <foreach item="status" collection="statusList" open="(" separator="," close=")">
+                #{status}
+            </foreach>
         </if>
         ORDER BY si.shipping_instruction_reg_date DESC
         <if test="request.size != null">
@@ -58,8 +61,11 @@
         <if test="request.clientName != '' and request.clientName != null">
             AND c.client_name LIKE CONCAT('%', #{request.clientName}, '%')
         </if>
-        <if test="request.shippingInstructionStatus != '' and request.shippingInstructionStatus != null">
-            AND si.shipping_instruction_status LIKE #{request.shippingInstructionStatus}
+        <if test="statusList != null and !statusList.isEmpty()">
+            AND si.shipping_instruction_status IN
+            <foreach item="status" collection="statusList" open="(" separator="," close=")">
+                #{status}
+            </foreach>
         </if>
     </select>
 

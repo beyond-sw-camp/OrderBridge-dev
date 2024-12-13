@@ -10,10 +10,12 @@ import java.util.List;
 public interface ShippingInstructionMapper {
     List<ShippingInstructionListDTO> selectShippingInstructionList(
             @Param("offset") int offset,
-            @Param("request") ShippingInstructionListRequest request);
+            @Param("request") ShippingInstructionListRequest request,
+            @Param("statusList") List<ShippingInstructionStatus> statusList);
 
     long countShippingInstruction(
-            @Param("request") ShippingInstructionListRequest request);
+            @Param("request") ShippingInstructionListRequest request,
+            @Param("statusList") List<ShippingInstructionStatus> statusList);
 
     ShippingInstructionDTO selectShippingInstructionByShippingInstructionSeq(long shippingInstructionSeq);
 
