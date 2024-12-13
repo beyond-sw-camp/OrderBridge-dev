@@ -37,4 +37,14 @@ public class QuotationCommandController {
 
         return ResponseEntity.status(HttpStatus.OK).build();
     }
+
+    @DeleteMapping("/{quotationSeq}")
+    @Operation(summary = "견적서 삭제")
+    public ResponseEntity<Void> deleteQuotation(
+            @PathVariable Long quotationSeq) {
+
+        quotationCommandService.deleteQuotation(quotationSeq);
+
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
 }
