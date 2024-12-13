@@ -11,7 +11,8 @@ const props = defineProps({
   pageSize: { type: Number, required: true },         // 페이지 사이즈
 });
 
-const emit = defineEmits(['pageEvent','searchEvent','checkStatusEvent','extendItemEvent', 'registerEvent']);
+const emit = defineEmits(
+    ['pageEvent','searchEvent','checkStatusEvent','extendItemEvent', 'registerEvent','excelEvent']);
 
 const startDate = ref(props.searchStartDate);
 const endDate = ref(props.searchEndDate);
@@ -44,6 +45,10 @@ const itemExtend = () => {
 
 const register = () => {
   emit('registerEvent');
+}
+
+const excel = () => {
+  emit('excelEvent');
 }
 
 // 날짜 포맷 함수
@@ -99,7 +104,8 @@ const formatStatus = (status) => {
             <div>
               <div class="d-flex justify-content-between">
                   <div>검색결과: {{ totalCount }}개</div>
-                  <b-button variant="light" size="sm" class="button" @click="register()">출하지시서 등록</b-button>
+                  <b-button @click="excel()" variant="light" size="sm" class="button" >엑셀 다운로드</b-button>
+                  <b-button @click="register()" variant="light" size="sm" class="button">출하지시서 등록</b-button>
               </div>
               <div class="list-headline row">
                   <div class="list-head col-6">출하지시서명</div>
