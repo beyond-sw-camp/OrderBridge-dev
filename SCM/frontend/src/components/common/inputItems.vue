@@ -51,27 +51,30 @@ const deleteItem = () => {
 
 <template>
   <h5 class="px-4">물품 등록</h5>
-  <div class="mx-5 my-3 d-flex flex-row border border-secondary rounded" v-if="additionalItems">
-<!--    모달에서 물품 선택시 내용을 가져오도록 변경 필요 -->
-    <b-img class="p-2 col-md-2" src="https://picsum.photos/200/200" fluid alt="Responsive image"></b-img>
-    <div class="p-2 col-md-10">
-      <div class="mb-4 d-flex justify-content-between">
-        <span class="fw-bold" >{{ items[0].itemName }}</span>
-        <trashIcon class="icon" @click="deleteItem"/>
+  <div style="max-height: 250px; overflow-y: auto;" >
+    <div class="mx-5 my-3 d-flex flex-row border border-secondary rounded" v-if="additionalItems">
+      <!--    모달에서 물품 선택시 내용을 가져오도록 변경 필요 -->
+      <b-img class="p-2 col-md-2" src="https://picsum.photos/200/200" fluid alt="Responsive image"></b-img>
+      <div class="p-2 col-md-10">
+        <div class="mb-4 d-flex justify-content-between">
+          <span class="fw-bold" >{{ items[0].itemName }}</span>
+          <trashIcon class="icon" @click="deleteItem"/>
+        </div>
+        <ul>
+          <li class="mb-3 me-5 li-row">품목 : {{ items[0].itemDivision }}</li>
+          <li class="mb-3 ms-5">비고 : {{ items[0].itemNote }}</li>
+          <li class="mb-3">수량 : {{ items[0].itemQuantity }} 개</li>
+          <li class="mb-3">단가 : {{ items[0].itemPrice }} ₩</li>
+        </ul>
+        <p class="fw-bold float-end">총금액 {{ items[0].totalQuantity }} ₩</p>
       </div>
-      <ul>
-        <li class="mb-3 me-5 li-row">품목 : {{ items[0].itemDivision }}</li>
-        <li class="mb-3 ms-5">비고 : {{ items[0].itemNote }}</li>
-        <li class="mb-3">수량 : {{ items[0].itemQuantity }} 개</li>
-        <li class="mb-3">단가 : {{ items[0].itemPrice }} ₩</li>
-      </ul>
-      <p class="fw-bold float-end">총금액 {{ items[0].totalQuantity }} ₩</p>
+    </div>
+    <div class="mx-5 my-3">
+      <b-button class="w-100" size="lg" variant="outline-dark" data-bs-toggle="modal" data-bs-target="#itemModal">+
+      </b-button>
     </div>
   </div>
-  <div class="mx-5 my-3">
-    <b-button class="w-100" size="lg" variant="outline-dark" data-bs-toggle="modal" data-bs-target="#itemModal">+
-    </b-button>
-  </div>
+
   <div class="mx-5 my-3 d-flex justify-content-end">
     <b-button class="mx-3" pill variant="primary">확인</b-button>
     <b-button class="mx-3" pill>목록</b-button>
