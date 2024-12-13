@@ -77,7 +77,7 @@ public class WorkOrder {
     private String workOrderNote; // 작업지시서 비고
 
     public static WorkOrder createWorkOrder(CreateWorkOrderRequest request, SalesOrder salesOrder, SalesOrderItem salesOrderItem,
-                                            Warehouse warehouse, User user, String workOrderName,
+                                            Warehouse warehouse, User user,
                                             LocalDateTime seoulIndicatedDate, LocalDateTime seoulDueDate) {
         if (seoulDueDate.isBefore(seoulIndicatedDate)) {
             throw new CustomException(ErrorCodeType.INVALID_DATE_RANGE);
@@ -87,13 +87,14 @@ public class WorkOrder {
         // SalesOrder 기반 설정
         workOrder.salesOrder = salesOrder;
         workOrder.client = salesOrder.getClient(); // 클라이언트 설정
-        workOrder.workOrderIndicatedQuantity = salesOrder.getSalesOrderTotalQuantity(); // 지시 수량 설정
+//        workOrder.workOrderIndicatedQuantity = salesOrder.getSalesOrderTotalQuantity(); // 지시 수량 설정
+        workOrder.workOrderIndicatedQuantity = salesOrderItem.getSalesOrderItemQuantity(); // 지시 수량 설정
         workOrder.workOrderPrice = salesOrder.getSalesOrderExtendedPrice(); // 금액 설정
         workOrder.specifyItem(salesOrderItem.getItem()); // 품목 설정
 
         workOrder.warehouse = warehouse;
         workOrder.user = user;
-        workOrder.workOrderName = workOrderName;
+        workOrder.workOrderName = request.getWorkOrderName();
         workOrder.workOrderStatus = WorkOrderStatus.valueOf("BEFORE");
         workOrder.workOrderWorkQuantity = 0;
         workOrder.workOrderIndicatedDate = seoulIndicatedDate;

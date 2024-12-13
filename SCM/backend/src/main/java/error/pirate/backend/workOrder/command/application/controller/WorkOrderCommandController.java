@@ -10,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -21,11 +20,12 @@ public class WorkOrderCommandController {
 
     private final WorkOrderService workOrderService;
 
-    @PostMapping
-    @Operation(summary = "작업지시서 등록", description = "작업지시서를 등록한다.")
-    public ResponseEntity<Void> createWorkOrder(@Valid @RequestBody CreateWorkOrderRequest request) {
-        log.info("POST /api/v1/workOrder 작업지시서 등록 요청 - request:{}", request);
-        workOrderService.createWorkOrder(request);
+    @PostMapping("")
+    @Operation(summary = "작업지시서 등록", description = "주문서를 불러와 품목을 선택해 작업지시서를 등록한다.")
+    public ResponseEntity<Void> createWorkOrder(@Valid @RequestBody CreateWorkOrderRequest request
+    ) {
+        log.info("-------------- POST /api/v1/workOrder 작업지시서 등록 요청 - request:{} --------------", request);
+        workOrderService.createWorkOrderForItem(request);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }

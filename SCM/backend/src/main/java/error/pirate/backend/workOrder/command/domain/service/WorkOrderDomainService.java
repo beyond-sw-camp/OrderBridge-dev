@@ -11,11 +11,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 
 @Service
 @RequiredArgsConstructor
@@ -24,23 +22,10 @@ public class WorkOrderDomainService {
 
     private final WorkOrderRepository workOrderRepository;
 
-    // 등록일이 오늘인 개수 카운트
-    public long countTodayWorkOrders() {
-        LocalDate today = LocalDate.now();
-        return workOrderRepository.countByWorkOrderRegDateBetween(
-                today.atStartOfDay(), today.plusDays(1).atStartOfDay());
-    }
-
-    // 작업지시서명 설정(등록일과 카운트로 이름 설정)
-    public String generateWorkOrderName(long count) {
-        String date = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd"));
-        return date + "-" + (count + 1);
-    }
-
     // 작업지시서 생성
     public WorkOrder createWorkOrder(CreateWorkOrderRequest request, SalesOrder salesOrder, SalesOrderItem salesOrderItem, Warehouse warehouse, User user,
-                                     String workOrderName, LocalDateTime seoulDueDate, LocalDateTime seoulIndicatedDate) {
-        return WorkOrder.createWorkOrder(request, salesOrder, salesOrderItem, warehouse, user, workOrderName, seoulIndicatedDate, seoulDueDate);
+                                     LocalDateTime seoulDueDate, LocalDateTime seoulIndicatedDate) {
+        return WorkOrder.createWorkOrder(request, salesOrder, salesOrderItem, warehouse, user, seoulIndicatedDate, seoulDueDate);
     }
 
     // 작업지시서 저장
@@ -48,19 +33,23 @@ public class WorkOrderDomainService {
         workOrderRepository.save(workOrder);
     }
 
-    // 서울 시간 기준으로 변경
-    public LocalDateTime convertToSeoulTime(LocalDateTime localDateTime) {
-        ZoneId systemZone = ZoneId.systemDefault(); // 서버 기본 시간대
-        ZoneId seoulZone = ZoneId.of("Asia/Seoul"); // 서울 시간대
+    // 작업지시일 시간대 변경
+    public LocalDateTime setIndicatedDate(LocalDateTime workOrderIndicatedDate) {
 
-        ZonedDateTime systemZonedDateTime = localDateTime.atZone(systemZone); // 요청 시간을 시스템 시간대로 설정
-        ZonedDateTime seoulZonedDateTime = systemZonedDateTime.withZoneSameInstant(seoulZone); // 서울 시간대로 변환
-        log.info("Converted {} to Seoul Time: {}", localDateTime, seoulZonedDateTime.toLocalDateTime());
-
-        return seoulZonedDateTime.toLocalDateTime(); // LocalDateTime 반환
+        ZonedDateTime systemZonedDateTime = workOrderIndicatedDate.atZone(ZoneId.systemDefault());
+        ZonedDateTime seoulZonedDateTime = systemZonedDateTime.withZoneSameInstant(ZoneId.of("Asia/Seoul"));
+        return seoulZonedDateTime.toLocalDateTime();
     }
 
-    public boolean existsBySalesOrderItem(Long salesOrderItemSeq) {
-        return workOrderRepository.existsBySalesOrderItemSeq(salesOrderItemSeq);
+    // 만료일 시간대 변경
+    public LocalDateTime setDueDate(LocalDateTime workOrderDueDate) {
+        ZonedDateTime systemZonedDateTime = workOrderDueDate.atZone(ZoneId.systemDefault());
+        ZonedDateTime seoulZonedDateTime = systemZonedDateTime.withZoneSameInstant(ZoneId.of("Asia/Seoul"));
+        return seoulZonedDateTime.toLocalDateTime();
+    }
+
+    // 중복체크
+    public boolean existsBySalesOrderAndItem(Long salesOrderSeq, Long itemSeq) {
+        return workOrderRepository.existsBySalesOrderSeqAndItemSeq(salesOrderSeq, itemSeq);
     }
 }

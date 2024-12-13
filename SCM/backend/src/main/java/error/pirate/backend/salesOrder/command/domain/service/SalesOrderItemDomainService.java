@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -15,7 +15,7 @@ public class SalesOrderItemDomainService {
 
     private final SalesOrderItemRepository salesOrderItemRepository;
 
-    public List<SalesOrderItem> findAllBySalesOrderSeq(Long salesOrderSeq) {
-        return salesOrderItemRepository.findAllBySalesOrderSeq(salesOrderSeq);
+    public Optional<SalesOrderItem> findBySalesOrderItemSeq(Long salesOrderItemSeq) {
+        return salesOrderItemRepository.findBySalesOrderItemSeq(salesOrderItemSeq);
     }
 }

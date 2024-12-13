@@ -27,6 +27,9 @@ public class ItemInventoryDomainService {
             // 재고조회
             int availableQuantity = itemInventoryRepository.countByItemAndItemInventoryExpirationDateAfter(bomItem.getChildItem(), LocalDateTime.now());
 
+            log.debug("BOM Item: {}, Required Quantity: {}, Available Quantity: {}",
+                    bomItem.getChildItem().getItemSeq(), requiredQuantity, availableQuantity);
+
             // 재고 부족 시 예외 처리
             if (availableQuantity < requiredQuantity) {
                 throw new CustomException(ErrorCodeType.OUT_OF_STOCK_ERROR);
