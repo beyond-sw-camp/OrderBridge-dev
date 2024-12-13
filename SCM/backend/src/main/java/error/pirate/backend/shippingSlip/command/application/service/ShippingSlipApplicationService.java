@@ -1,10 +1,10 @@
 package error.pirate.backend.shippingSlip.command.application.service;
 
+import error.pirate.backend.common.NameGenerator;
 import error.pirate.backend.item.command.application.service.ItemService;
 import error.pirate.backend.item.command.domain.aggregate.entity.Item;
 import error.pirate.backend.salesOrder.command.domain.service.SalesOrderDomainService;
 import error.pirate.backend.shippingInstruction.command.domain.aggregate.entity.ShippingInstruction;
-import error.pirate.backend.shippingInstruction.command.domain.service.ShippingInstructionDomainService;
 import error.pirate.backend.shippingSlip.command.application.dto.ShippingSlipItemDTO;
 import error.pirate.backend.shippingSlip.command.application.dto.ShippingSlipRequest;
 import error.pirate.backend.shippingSlip.command.domain.aggregate.entity.ShippingSlip;
@@ -12,6 +12,7 @@ import error.pirate.backend.shippingSlip.command.domain.aggregate.entity.Shippin
 import error.pirate.backend.shippingSlip.command.domain.service.ShippingSlipDomainService;
 import error.pirate.backend.shippingSlip.command.domain.service.ShippingSlipItemDomainService;
 import error.pirate.backend.user.command.domain.aggregate.entity.User;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -27,15 +28,16 @@ public class ShippingSlipApplicationService {
 
     private final ShippingSlipDomainService shippingSlipDomainService;
     private final ShippingSlipItemDomainService shippingSlipItemDomainService;
-    private final ShippingInstructionDomainService shippingInstructionDomainService;
     private final ItemService itemService;
     private final SalesOrderDomainService salesOrderDomainService;
+    private final EntityManager entityManager;
+    private final NameGenerator nameGenerator;
 
     /* 출하전표 등록 */
     @Transactional
     public void createShippingSlip(ShippingSlipRequest shippingSlipRequest) {
         ShippingInstruction shippingInstruction
-                = shippingInstructionDomainService.findByShippingInstructionSeq(shippingSlipRequest.getShippingInstructionSeq());
+                = entityManager.getReference(ShippingInstruction.class, shippingSlipRequest.getShippingInstructionSeq());
 
         // 출하지시서가 결재후 상태인지 체크
         shippingSlipDomainService.checkShippingInstructionStatus(shippingInstruction);
@@ -48,9 +50,8 @@ public class ShippingSlipApplicationService {
                 shippingSlipDomainService.setShippingSlipShippingDate(
                         shippingSlipRequest.getShippingSlipShippingDate());
 
-        /* 등록일을 기반으로 ShippingSlip 명 설정 */
-        long count = shippingSlipDomainService.countTodayShippingSlip();
-        String shippingSlipName = shippingSlipDomainService.setShippingSlipName(count);
+        /* 등록일 설정 공통코드 */
+        String shippingSlipName = nameGenerator.nameGenerator(ShippingSlip.class);
 
         /* 총수량 연산 */
         int itemTotalQuantity = shippingSlipDomainService.calculateTotalQuantity(shippingSlipRequest);
@@ -101,7 +102,7 @@ public class ShippingSlipApplicationService {
 
         // 등록과 동일
         ShippingInstruction newShippingInstruction
-                = shippingInstructionDomainService.findByShippingInstructionSeq(shippingSlipRequest.getShippingInstructionSeq());
+                = entityManager.getReference(ShippingInstruction.class, shippingSlipRequest.getShippingInstructionSeq());
 
         // 출하지시서가 결재후 상태인지 체크
         shippingSlipDomainService.checkShippingInstructionStatus(newShippingInstruction);
