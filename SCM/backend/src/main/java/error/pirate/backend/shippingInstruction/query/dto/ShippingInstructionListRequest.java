@@ -19,5 +19,5 @@ public class ShippingInstructionListRequest {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate endDate;
     private String clientName;
-    private List<String> shippingInstructionStatus;
+    private List<ShippingInstructionStatus> shippingInstructionStatus;
 }

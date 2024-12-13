@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 public class ShippingInstructionListDTO {
     private long shippingInstructionSeq;    // 출하지시서 번호
     private String shippingInstructionName; // 출하지시서명
-    private String shippingInstructionStatus;   // 출하지시서 상태
+    private ShippingInstructionStatus shippingInstructionStatus;   // 출하지시서 상태
     private LocalDateTime shippingInstructionScheduledShipmentDate; // 출하예정일
     private String clientName;  // 거래처명
     private String itemName;    // 품목명

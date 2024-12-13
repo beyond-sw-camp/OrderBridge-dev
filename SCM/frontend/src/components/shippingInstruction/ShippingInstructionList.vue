@@ -1,11 +1,12 @@
 <script setup>
-import {computed, defineProps, ref, watch} from 'vue';
+import {defineProps, ref, watch} from 'vue';
 
 const props = defineProps({
   searchStartDate: {type: String, required: false}, // 시작 날짜
   searchEndDate: {type: String, required: false},   // 종료 날짜
   searchName: {type: String, required: false},      // 검색 조건 이름
   shippingInstructionList: {type: Array, required: true},       // 출하지시서 목록
+  shippingInstructionStatusList: {type: Array, required: true},       // 출하지시서 상태 목록
   totalCount: {type: Number, required: true},       // 검색 결과 총 개수
   pageNumber: {type: Number, required: true},       // 현재 페이지 번호
   pageSize: {type: Number, required: true},         // 페이지 사이즈
@@ -97,8 +98,9 @@ const formatStatus = (status) => {
       <div class="side-box card">
         <div class="card-body">
           <p class="card-title">출하지시서 상태</p>
-          <b-form-checkbox @click="check('BEFORE')">결재 전</b-form-checkbox>
-          <b-form-checkbox @click="check('AFTER')">결재 후</b-form-checkbox>
+          <template v-for="shippingInstructionStatus in props.shippingInstructionStatusList">
+            <b-form-checkbox v-if="shippingInstructionStatus.key !== 'DELETE'" @click="check(shippingInstructionStatus.key)">{{ shippingInstructionStatus.value }}</b-form-checkbox>
+          </template>
         </div>
       </div>
     </div>

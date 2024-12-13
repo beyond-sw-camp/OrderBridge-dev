@@ -1,7 +1,6 @@
 package error.pirate.backend.shippingInstruction.query.service;
 
 import error.pirate.backend.common.ExcelDownLoad;
-import error.pirate.backend.purchaseOrder.query.dto.PurchaseOrderResponse;
 import error.pirate.backend.shippingInstruction.query.dto.*;
 import error.pirate.backend.shippingInstruction.query.mapper.ShippingInstructionMapper;
 import lombok.RequiredArgsConstructor;
@@ -9,8 +8,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -23,15 +22,24 @@ public class ShippingInstructionQueryService {
     @Transactional(readOnly = true)
     public ShippingInstructionListResponse readShippingInstructionList(ShippingInstructionListRequest request) {
         int offset = (request.getPage() - 1) * request.getSize();
-        List<String> statusList = request.getShippingInstructionStatus();   // 상태 리스트
+        List<ShippingInstructionStatus> statusList = request.getShippingInstructionStatus();   // 상태 리스트
 
+        // 리스트 응답 및 상태를 value로 변경
         List<ShippingInstructionListDTO> shippingInstructionList
                 = shippingInstructionMapper.selectShippingInstructionList(offset, request, statusList);
+
+        // enum 상태 리스트 응답
+        List<ShippingInstructionStatus.ShippingInstructionStatusResponse> shippingInstructionStatusResponse
+                = Arrays.stream(ShippingInstructionStatus.class.getEnumConstants()).map(key ->
+                new ShippingInstructionStatus.ShippingInstructionStatusResponse(
+                        key.toString(), ShippingInstructionStatus.valueOf(key.toString())
+                )).toList();
 
         long totalItems = shippingInstructionMapper.countShippingInstruction(request, statusList);
 
         return ShippingInstructionListResponse.builder()
                 .shippingInstructionList(shippingInstructionList)
+                .shippingInstructionStatusList(shippingInstructionStatusResponse)
                 .currentPage(request.getPage())
                 .totalPages((int) Math.ceil((double) totalItems / request.getSize()))
                 .totalItems(totalItems)
@@ -80,7 +88,7 @@ public class ShippingInstructionQueryService {
     public byte[] shippingInstructionExcelDown(ShippingInstructionListRequest request) {
         int offset = (request.getPage() - 1) * request.getSize();
         request.setSize(null);
-        List<String> statusList = request.getShippingInstructionStatus();   // 상태 리스트
+        List<ShippingInstructionStatus> statusList = request.getShippingInstructionStatus();   // 상태 리스트
 
         List<ShippingInstructionListDTO> shippingInstructionList
                 = shippingInstructionMapper.selectShippingInstructionList(offset, request, statusList);
@@ -88,7 +96,7 @@ public class ShippingInstructionQueryService {
         String[] headers = {"출하지시서명", "출하지시서 품목", "거래처명", "출하예정일", "상태"};
         String[][] excel = new String[shippingInstructionList.size()][headers.length];
 
-        for(int i=0 ; i<shippingInstructionList.size() ; i++) {
+        for (int i = 0; i < shippingInstructionList.size(); i++) {
             ShippingInstructionListDTO dto = shippingInstructionList.get(i);
 
             excel[i][0] = dto.getShippingInstructionName();
@@ -97,7 +105,8 @@ public class ShippingInstructionQueryService {
             excel[i][3] = dto.getShippingInstructionScheduledShipmentDate() != null
                     ? dto.getShippingInstructionScheduledShipmentDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
                     : null;
-            excel[i][4] = String.valueOf(dto.getShippingInstructionStatus());
+            excel[i][4] = ShippingInstructionStatus.statusValue(
+                    String.valueOf(dto.getShippingInstructionStatus()));
         }
 
         return excelDownBody.excelDownBody(excel, headers, "출하지시서");

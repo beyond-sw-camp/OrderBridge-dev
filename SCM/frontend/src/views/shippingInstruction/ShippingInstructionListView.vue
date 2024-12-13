@@ -8,6 +8,7 @@ const totalCount = ref(0);
 const pageSize = ref(10);
 const pageNumber = ref(1);
 const shippingInstructionList = ref([]);
+const shippingInstructionStatusList = ref([]);
 const searchStartDate = ref(null);
 const searchEndDate = ref(null);
 const searchName = ref(null);
@@ -34,6 +35,7 @@ const fetchShippingInstructionList = async () => {
 
     console.log(response);
     shippingInstructionList.value = response.data.shippingInstructionList;
+    shippingInstructionStatusList.value = response.data.shippingInstructionStatusList;
     totalCount.value = response.data.totalItems;
 
   } catch (error) {
@@ -127,6 +129,7 @@ function search() {
                            :searchEndDate="searchEndDate"
                            :searchName="searchName"
                            :shippingInstructionList="shippingInstructionList"
+                           :shippingInstructionStatusList="shippingInstructionStatusList"
                            :totalCount="totalCount"
                            :pageNumber="pageNumber"
                            :pageSize="pageSize"
