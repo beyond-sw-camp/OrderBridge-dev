@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="error.pirate.backend.purchase.query.mapper.PurchaseMapper">
+
+    <select id="readPurchaseList" resultType="error.pirate.backend.purchase.query.dto.PurchaseResponse">
+        SELECT
+            tp.purchase_seq,
+            tp.purchase_name,
+            tp.purchase_status,
+            tp.purchase_contract_date,
+            tp.purchase_extended_price,
+            tp.purchase_note,
+            tu.user_name,
+            tc.client_name,
+            tw.warehouse_name
+        FROM tb_purchase tp
+        JOIN tb_user tu USING (user_seq)
+        JOIN tb_warehouse tw USING (warehouse_seq)
+        JOIN tb_client tc ON (tu.user_seq = tc.user_seq)
+        <trim prefix="WHERE" prefixOverrides="AND">
+            <if test="searchStartDate != null and searchStartDate != ''">
+                <![CDATA[
+                AND #{searchStartDate} <= tpo.purchase_order_target_due_date
+                ]]>
+            </if>
+            <if test="searchEndDate != null and searchEndDate != ''">
+                <![CDATA[
+                AND #{searchEndDate} >= tpo.purchase_order_target_due_date
+                ]]>
+            </if>
+            <if test="clientName != null">
+                AND tc.client_name LIKE CONCAT('%', #{clientName}, '%')
+            </if>
+            <if test="purchaseStatus != null">
+                AND tp.purchase_status = #{purchaseStatus}
+            </if>
+        </trim>
+        ORDER BY tp.purchase_seq
+        <if test="limit != null">
+            LIMIT #{limit} OFFSET #{offset}
+        </if>
+    </select>
+
+    <select id="readPurchaseItemList" resultType="error.pirate.backend.purchase.query.dto.PurchaseItemResponse">
+        SELECT
+            tpi.item_seq,
+            tpi.purchase_item_quantity,
+            tpi.purchase_item_price,
+            tpi.purchase_item_receipt_date,
+            tpi.purchase_item_status,
+            tpi.purchase_item_note,
+            ti.item_name,
+            ti.item_image_url
+        FROM tb_purchase_item tpi
+        JOIN tb_item ti USING (item_seq)
+        WHERE tpi.purchase_seq = #{purchaseSeq}
+        ORDER BY tpi.purchase_item_seq
+    </select>
+
+    <select id="readPurchaseListCount" resultType="int">
+        SELECT
+            COUNT(*)
+        FROM tb_purchase tp
+        JOIN tb_user tu USING (user_seq)
+        JOIN tb_warehouse tw USING (warehouse_seq)
+        JOIN tb_client tc ON (tu.user_seq = tc.user_seq)
+        <trim prefix="WHERE" prefixOverrides="AND">
+            <if test="searchStartDate != null and searchStartDate != ''">
+                <![CDATA[
+                AND #{searchStartDate} <= tpo.purchase_order_target_due_date
+                ]]>
+            </if>
+            <if test="searchEndDate != null and searchEndDate != ''">
+                <![CDATA[
+                AND #{searchEndDate} >= tpo.purchase_order_target_due_date
+                ]]>
+            </if>
+            <if test="clientName != null">
+                AND tc.client_name LIKE CONCAT('%', #{clientName}, '%')
+            </if>
+            <if test="purchaseStatus != null">
+                AND tp.purchase_status = #{purchaseStatus}
+            </if>
+        </trim>
+    </select>
+
+</mapper>

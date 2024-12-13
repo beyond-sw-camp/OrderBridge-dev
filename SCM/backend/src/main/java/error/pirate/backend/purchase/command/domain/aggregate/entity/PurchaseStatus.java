@@ -7,7 +7,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum PurchaseStatus {
     PROGRESS("정산중"),
-    COMPLETE("정산완료");
+    COMPLETE("정산완료"),
+    DELETE("삭제");
 
     private final String value;
 }
