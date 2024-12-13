@@ -42,6 +42,16 @@ class ShippingSlipQueryServiceTest {
                 () -> shippingSlipQueryService.readShippingSlipList(request));
     }
 
+    @DisplayName("출하전표 엑셀 다운")
+    @ParameterizedTest(autoCloseArguments = true)
+    @MethodSource("readShippingSlipListArguments")
+    void shippingSlipExcelDownTest(
+            ShippingSlipListRequest request
+    ) {
+        assertDoesNotThrow(
+                () -> shippingSlipQueryService.shippingSlipExcelDown(request));
+    }
+
     private static Stream<Arguments> readShippingSlipArguments() {
         return Stream.of(
                 arguments(1L),

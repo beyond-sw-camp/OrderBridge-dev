@@ -72,6 +72,7 @@ public class ShippingSlipQueryService {
                 .build();
     }
 
+    /* 출하전표 엑셀 다운 */
     public byte[] shippingSlipExcelDown(ShippingSlipListRequest request) {
         int offset = (request.getPage() - 1) * request.getSize();
         request.setSize(null);
