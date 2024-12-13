@@ -35,7 +35,7 @@ public class ExcelDownLoad {
             }
 
             for (int i = 0; i < excel.length; i++) {
-                Row row = sheet.createRow(i);
+                Row row = sheet.createRow(i+1);
 
                 for(int j = 0; j < excel[i].length; j++) {
                     row.createCell(j).setCellValue(excel[i][j]);

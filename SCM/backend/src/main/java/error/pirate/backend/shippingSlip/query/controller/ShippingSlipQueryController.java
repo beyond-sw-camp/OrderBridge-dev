@@ -1,13 +1,21 @@
 package error.pirate.backend.shippingSlip.query.controller;
 
+import error.pirate.backend.shippingInstruction.query.dto.ShippingInstructionListRequest;
 import error.pirate.backend.shippingSlip.query.dto.*;
 import error.pirate.backend.shippingSlip.query.service.ShippingSlipQueryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 @Tag(name = "출하전표")
 @RestController
@@ -48,5 +56,18 @@ public class ShippingSlipQueryController {
                 = shippingSlipQueryService.readShippingSlipSituation(request);
 
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/excelDown")
+    @Operation(summary = "출하전표 엑셀 다운")
+    public ResponseEntity<byte[]> shippingInstructionExcelDown(ShippingSlipListRequest request) {
+        HttpHeaders headersResponse = new HttpHeaders();
+        String fileName = URLEncoder.encode("출하전표[" + new SimpleDateFormat("yyyyMMdd").format(new Date()) + "].xlsx", StandardCharsets.UTF_8);
+        headersResponse.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileName);
+
+        return ResponseEntity.ok()
+                .headers(headersResponse)
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(shippingSlipQueryService.shippingSlipExcelDown(request));
     }
 }

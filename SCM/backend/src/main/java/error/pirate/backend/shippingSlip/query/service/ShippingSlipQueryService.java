@@ -1,11 +1,14 @@
 package error.pirate.backend.shippingSlip.query.service;
 
+import error.pirate.backend.common.ExcelDownLoad;
+import error.pirate.backend.shippingInstruction.query.dto.ShippingInstructionListDTO;
 import error.pirate.backend.shippingSlip.query.dto.*;
 import error.pirate.backend.shippingSlip.query.mapper.ShippingSlipMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
@@ -13,6 +16,7 @@ import java.util.List;
 public class ShippingSlipQueryService {
 
     private final ShippingSlipMapper shippingSlipMapper;
+    private final ExcelDownLoad excelDownBody;
 
     /* 출하전표 리스트 조회 */
     @Transactional(readOnly = true)
@@ -66,5 +70,28 @@ public class ShippingSlipQueryService {
                 .monthlyTotalList(monthlyTotalList)
                 .totalQuantity(totalQuantity)
                 .build();
+    }
+
+    public byte[] shippingSlipExcelDown(ShippingSlipListRequest request) {
+        int offset = (request.getPage() - 1) * request.getSize();
+        request.setSize(null);
+        List<ShippingSlipListDTO> shippingSlipList
+                = shippingSlipMapper.selectShippingSlipList(offset, request);
+
+        String[] headers = {"출하전표명", "출하전표 품목", "거래처명", "출하일"};
+        String[][] excel = new String[shippingSlipList.size()][headers.length];
+
+        for(int i = 0; i< shippingSlipList.size() ; i++) {
+            ShippingSlipListDTO dto = shippingSlipList.get(i);
+
+            excel[i][0] = dto.getShippingSlipName();
+            excel[i][1] = dto.getItemName();//  품목
+            excel[i][2] = dto.getClientName();
+            excel[i][3] = dto.getShippingSlipShippingDate() != null
+                    ? dto.getShippingSlipShippingDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                    : null;
+        }
+
+        return excelDownBody.excelDownBody(excel, headers, "출하지시서");
     }
 }
