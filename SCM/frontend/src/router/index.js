@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import shippingInstructionRoutes from './shipping-instruction.js'
+import productionReceivingRoutes from './production-receiving.js'
 
 const routes = [
     {
@@ -19,11 +20,9 @@ const routes = [
         path: "/currentSituation",
         component: () => import("@/components/common/CurrentSituation.vue")
     },
-    {
-        path: "/productionReceiving",
-        component: () => import("@/views/productionReceiving/ProductionReceivingListView.vue")
-    },
-    ...shippingInstructionRoutes
+
+    ...shippingInstructionRoutes,
+    ...productionReceivingRoutes,
 ];
 
 const router = createRouter({

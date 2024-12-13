@@ -47,6 +47,7 @@ import statisticsIcon from '@/assets/statisticsIcon.svg'
           <b-dropdown-item href="#">재고관리 현황</b-dropdown-item>
           <b-dropdown-item href="#">영업관리 현황</b-dropdown-item>
           <b-dropdown-item href="#">구매관리 현황</b-dropdown-item>
+          <b-dropdown-item href="#"><RouterLink to="/productionReceiving/situation" active-class="active" replace>생산입고 현황</RouterLink></b-dropdown-item>
           <b-dropdown-item href="#">기타 현황</b-dropdown-item>
         </b-nav-item-dropdown>
       </b-navbar-nav>
