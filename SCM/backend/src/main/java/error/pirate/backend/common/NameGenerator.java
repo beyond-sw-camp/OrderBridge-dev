@@ -1,6 +1,7 @@
 package error.pirate.backend.common;
 
 import error.pirate.backend.common.mapper.CommonMapper;
+import error.pirate.backend.productionReceiving.command.domain.aggregate.entity.QProductionReceiving;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

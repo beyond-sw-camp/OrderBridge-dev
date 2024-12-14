@@ -34,7 +34,9 @@
             AND c.client_name LIKE CONCAT('%', #{request.clientName}, '%')
         </if>
         ORDER BY s.shipping_slip_reg_date DESC
-        LIMIT #{request.size} OFFSET #{offset}
+        <if test="request.size != null">
+            LIMIT #{request.size} OFFSET #{offset}
+        </if>
     </select>
 
     <!--    출하전표 리스트 갯수  -->

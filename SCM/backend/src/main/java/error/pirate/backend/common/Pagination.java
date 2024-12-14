@@ -9,9 +9,9 @@ public class Pagination {
 
     private int pageNo;  // 현재 페이지 번호
 
-    private int limit = 10;  // 페이지당 데이터 수
+    private Integer limit = 10;  // 페이지당 데이터 수
 
-    private int offset; // 조회 시작숫자 -1 (limit=10일 경우 11부터 가져옴)
+    private Integer offset; // 조회 시작숫자 -1 (limit=10일 경우 11부터 가져옴)
 
     private String searchStartDate;
 

@@ -11,8 +11,8 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Schema(description = "출하전표 리스트 요청")
 public class ShippingSlipListRequest {
-    private int page = 1; // 기본값 설정
-    private int size = 10; // 기본값 설정
+    private Integer page = 1; // 기본값 설정
+    private Integer size = 10; // 기본값 설정
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) // LocalDate 매핑을 위해 필요
     private LocalDate startDate;
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)

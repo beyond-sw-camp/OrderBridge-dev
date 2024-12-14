@@ -2,8 +2,10 @@ package error.pirate.backend.purchaseOrder.query.dto;
 
 import error.pirate.backend.purchaseOrder.command.domain.aggregate.entity.PurchaseOrderStatus;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 public class PurchaseOrderResponse {
@@ -26,19 +28,7 @@ public class PurchaseOrderResponse {
 
     private String purchaseOrderNote; // 발주서 비고
 
-    // purchaseOrder item 관련
-    private Long purchaseOrderItemSeq;
-
-    private Long itemSeq; // 품목 번호
-
-    private String itemName;  // 품목 이름
-
-    private String itemImageUrl;  // 품목 사진 url
-
-    private int purchaseOrderItemQuantity; // 발주서 품목 수량
-
-    private int purchaseOrderItemPrice; // 발주서 품목 단가
-
-    private String purchaseOrderItemNote; // 발주서 품목 비고
+    @Setter
+    private List<PurchaseOrderItemResponse> purchaseOrderItemResponseList;
 
 }

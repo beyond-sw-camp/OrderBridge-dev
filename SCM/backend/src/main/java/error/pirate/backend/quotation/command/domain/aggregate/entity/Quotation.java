@@ -83,4 +83,8 @@ public class Quotation {
         this.quotationExtendedPrice = quotationExtendedPrice;
         this.quotationTotalQuantity = quotationTotalQuantity;
     }
+
+    public void delete() {
+        this.quotationStatus = QuotationStatus.DELETE;
+    }
 }

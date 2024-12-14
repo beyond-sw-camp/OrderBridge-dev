@@ -48,6 +48,10 @@ dependencies {
     // HikariCP
     implementation 'com.zaxxer:HikariCP:4.0.3'
 
+    // poi excel
+    implementation 'org.apache.poi:poi:5.2.3'
+    implementation 'org.apache.poi:poi-ooxml:5.2.3'
+
     // QueryDsl
     implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
     annotationProcessor "com.querydsl:querydsl-apt:5.0.0:jakarta"

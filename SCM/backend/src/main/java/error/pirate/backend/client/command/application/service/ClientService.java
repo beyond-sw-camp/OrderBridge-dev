@@ -4,7 +4,7 @@ import error.pirate.backend.client.command.application.dto.ClientCreateRequest;
 import error.pirate.backend.client.command.application.dto.ClientDTO;
 import error.pirate.backend.client.command.application.dto.ClientUpdateRequest;
 import error.pirate.backend.client.command.domain.aggregate.entity.Client;
-import error.pirate.backend.client.command.domain.repository.ClientRepository;
+import error.pirate.backend.client.command.domain.aggregate.repository.ClientRepository;
 import error.pirate.backend.exception.CustomException;
 import error.pirate.backend.exception.ErrorCodeType;
 import error.pirate.backend.user.command.domain.aggregate.entity.User;

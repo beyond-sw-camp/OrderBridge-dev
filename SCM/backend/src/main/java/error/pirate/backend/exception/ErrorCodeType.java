@@ -24,6 +24,10 @@ public enum ErrorCodeType {
     // 주문서 품목 관련 오류
     SALES_ORDER_ITEM_NOT_FOUND(HttpStatus.NOT_FOUND, "SALES_ORDER_ITEM_ERROR_001", "주문서 품목을 찾을 수 없습니다."),
 
+    //발주서 관련 오류
+    PURCHASE_NOT_FOUND(HttpStatus.NOT_FOUND, "PURCHASE_ERROR_001", "발주서를 찾을 수 없습니다."),
+    PURCHASE_UPDATE_ERROR(HttpStatus.BAD_REQUEST, "PURCHASE_ERROR_002", "이미 결재가 완료된 발주서 입니다."),
+
     // 출하지시서 관련 오류
     SHIPPING_INSTRUCTION_NOT_FOUND(HttpStatus.NOT_FOUND, "SHIPPING_INSTRUCTION_ERROR_001", "출하지시서를 찾을 수 없습니다."),
     SHIPPING_INSTRUCTION_STATE_BAD_REQUEST(HttpStatus.BAD_REQUEST, "SHIPPING_INSTRUCTION_ERROR_002", "출하지시서의 상태를 확인해주세요"),
@@ -52,6 +56,9 @@ public enum ErrorCodeType {
 
     // 회원 오류
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "USER_ERROR_001", "회원을 찾을 수 없습니다."),
+
+    // 거래처 오류
+    CLIENT_NOT_FOUND(HttpStatus.NOT_FOUND, "CLIENT_ERROR_001", "거래처를 찾을 수 없습니다."),
 
     // 물품 오류
     ITEM_NOT_FOUND(HttpStatus.NOT_FOUND, "ITEM_ERROR_001", "물품을 찾을 수 없습니다."),
