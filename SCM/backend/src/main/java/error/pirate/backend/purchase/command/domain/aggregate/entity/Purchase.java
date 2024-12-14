@@ -45,11 +45,21 @@ public class Purchase {
     @LastModifiedDate
     private LocalDateTime purchaseModDate; // 구매서 수정일
 
+    @Enumerated(EnumType.STRING)
     private PurchaseStatus purchaseStatus; // 구매 상태
 
     private Integer purchaseExtendedPrice; // 구매서 총금액
 
     private String purchaseNote; // 구매서 비고
 
+    public void changePurchaseName(String purchaseName) {
+        this.purchaseName = purchaseName;
+    }
+
+    public void objectInjection(User user, Warehouse warehouse, PurchaseOrder purchaseOrder) {
+        this.user = user;
+        this.warehouse = warehouse;
+        this.purchaseOrder = purchaseOrder;
+    }
 
 }
