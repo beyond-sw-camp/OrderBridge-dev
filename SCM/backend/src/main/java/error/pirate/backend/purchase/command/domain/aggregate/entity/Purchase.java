@@ -1,5 +1,6 @@
 package error.pirate.backend.purchase.command.domain.aggregate.entity;
 
+import error.pirate.backend.purchase.command.application.dto.PurchaseUpdateRequest;
 import error.pirate.backend.purchaseOrder.command.domain.aggregate.entity.PurchaseOrder;
 import error.pirate.backend.user.command.domain.aggregate.entity.User;
 import error.pirate.backend.warehouse.command.domain.aggregate.entity.Warehouse;
@@ -60,6 +61,13 @@ public class Purchase {
         this.user = user;
         this.warehouse = warehouse;
         this.purchaseOrder = purchaseOrder;
+    }
+
+    public void updatePurchase(PurchaseUpdateRequest request) {
+        this.purchaseContractDate = request.getPurchaseContractDate();
+        this.purchaseStatus = request.getPurchaseStatus();
+        this.purchaseExtendedPrice = request.getPurchaseExtendedPrice();
+        this.purchaseNote = request.getPurchaseNote();
     }
 
 }
