@@ -9,6 +9,7 @@ import error.pirate.backend.purchase.command.application.dto.PurchaseItemDto;
 import error.pirate.backend.purchase.command.application.dto.PurchaseUpdateRequest;
 import error.pirate.backend.purchase.command.domain.aggregate.entity.Purchase;
 import error.pirate.backend.purchase.command.domain.aggregate.entity.PurchaseItem;
+import error.pirate.backend.purchase.command.domain.aggregate.entity.PurchaseStatus;
 import error.pirate.backend.purchase.command.domain.service.PurchaseDomainService;
 import error.pirate.backend.purchase.command.domain.service.PurchaseItemDomainService;
 import error.pirate.backend.purchaseOrder.command.domain.aggregate.entity.PurchaseOrder;
@@ -108,6 +109,16 @@ public class PurchaseApplicationService {
             purchaseItemDomainService.createPurchaseItem(items);
         }
 
+    }
+
+    @Transactional
+    public void updatePurchaseComplete(Long purchaseSeq) {
+        purchaseDomainService.updatePurchaseStatus(purchaseSeq, PurchaseStatus.COMPLETE);
+    }
+
+    @Transactional
+    public void deletePurchase(Long purchaseSeq) {
+        purchaseDomainService.updatePurchaseStatus(purchaseSeq, PurchaseStatus.DELETE);
     }
 
 }

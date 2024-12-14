@@ -30,8 +30,24 @@ public class PurchaseController {
 
     @PutMapping
     @Operation(summary = "구매서 수정")
-    public ResponseEntity<Void> updatePurchaseOrder(@RequestBody PurchaseUpdateRequest request) {
+    public ResponseEntity<Void> updatePurchase(@RequestBody PurchaseUpdateRequest request) {
         purchaseApplicationService.updatePurchase(request);
+
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @PutMapping("/complete/{purchaseSeq}")
+    @Operation(summary = "구매서 정산완료")
+    public ResponseEntity<Void> updatePurchaseComplete(@PathVariable Long purchaseSeq) {
+        purchaseApplicationService.updatePurchaseComplete(purchaseSeq);
+
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @DeleteMapping("/{purchaseSeq}")
+    @Operation(summary = "구매서 삭제")
+    public ResponseEntity<Void> deletePurchase(@PathVariable Long purchaseSeq) {
+        purchaseApplicationService.deletePurchase(purchaseSeq);
 
         return ResponseEntity.status(HttpStatus.OK).build();
     }
