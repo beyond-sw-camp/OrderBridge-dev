@@ -20,11 +20,11 @@
         SELECT
             production_receiving_reg_date
             , DATE_FORMAT(production_receiving_reg_date, '%Y-%m') production_receiving_reg_month
-            , production_receiving_extended_price
+            , FORMAT(production_receiving_extended_price, 0) production_receiving_extended_price
             , production_receiving_name
             , c.client_name
             , production_receiving_note
-            , IFNULL(SUM(production_receiving_extended_price), 0) production_receiving_sum
+            , FORMAT(IFNULL(SUM(production_receiving_extended_price), 0), 0) production_receiving_sum
         FROM tb_production_receiving pr
         JOIN tb_work_order wo
             ON wo.work_order_seq = pr.work_order_seq

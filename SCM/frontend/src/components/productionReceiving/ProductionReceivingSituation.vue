@@ -58,6 +58,41 @@ const printTable = () => {
   // SPA일 경우 Vue의 리렌더링 강제 호출
   location.reload(); // 상태를 새로고침하여 업데이트
 }
+
+const excelDown = async () => {
+  const excelName = "생산입고현황_" + new Date().getFullYear() + (new Date().getMonth() + 1) + new Date().getDay();
+  try {
+    const response = await axios.get(`http://localhost:8090/api/v1/productionReceiving/situation/excelDown`, {
+      params: {
+        searchStartDate: searchStartDate.value,
+        searchEndDate: searchEndDate.value,
+        searchName: searchName.value
+      }, paramsSerializer: (params) => {
+        // null이나 undefined 값을 필터링
+        const filteredParams = Object.fromEntries(
+            Object.entries(params).filter(([_, value]) => value !== null && value !== undefined)
+        );
+        return new URLSearchParams(filteredParams).toString();
+      },
+      responseType: "blob", // 중요: blob 형식으로 설정
+    });
+
+    // Blob 객체 생성 및 다운로드 처리
+    const blob = new Blob([response.data], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = decodeURIComponent(excelName); // 파일명 디코딩
+    link.click();
+
+    // Blob URL 해제
+    URL.revokeObjectURL(link.href);
+
+  } catch (error) {
+    console.error("생산입고 엑셀다운로드 실패 :", error);
+  }
+}
 </script>
 
 <template>
@@ -81,6 +116,7 @@ const printTable = () => {
     </div>
     <div class="col-md-9">
       <div class="d-flex justify-content-end mt-3">
+        <b-button @click="excelDown()" variant="light" size="sm" class="button ms-2 mb-3">엑셀 다운로드</b-button>
         <b-button @click="printTable()" variant="light" size="sm" class="button ms-2 mb-3">인쇄</b-button>
       </div>
       <div id="print-area" class="content">
