@@ -54,4 +54,17 @@ public class ProductionReceivingQueryController {
     public ResponseEntity<List<ProductionReceivingSituationResponse>> readProductionReceivingSituation(@ModelAttribute ProductionReceivingSituationRequest request) {
         return ResponseEntity.ok(productionReceivingQueryService.readProductionReceivingSituation(request));
     }
+
+    @GetMapping("/situation/excelDown")
+    @Operation(summary = "생산입고 현황 엑셀 다운")
+    public ResponseEntity<byte[]> productionReceivingSituationExcelDown(@ModelAttribute ProductionReceivingSituationRequest request) {
+        byte[] excelData = productionReceivingQueryService.productionReceivingSituationExcelDown(request);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentLength(excelData.length);
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(excelData);
+    }
 }
