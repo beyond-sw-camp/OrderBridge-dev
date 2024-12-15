@@ -1,9 +1,6 @@
 package error.pirate.backend.invoice.query.mapper;
 
-import error.pirate.backend.invoice.query.dto.InvoiceDTO;
-import error.pirate.backend.invoice.query.dto.InvoiceItemDTO;
-import error.pirate.backend.invoice.query.dto.InvoiceListItemDTO;
-import error.pirate.backend.invoice.query.dto.InvoiceSituationDTO;
+import error.pirate.backend.invoice.query.dto.*;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -40,4 +37,8 @@ public interface InvoiceMapper {
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate,
             @Param("clientName") String clientName);
+
+    // 거래 명세서 품목 값 확인
+    List<InvoiceItemCheckDTO> sumInvoiceItemValue(
+            @Param("salesOrderSeq") Long salesOrderSeq);
 }

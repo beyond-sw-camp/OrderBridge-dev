@@ -25,6 +25,9 @@ public enum ErrorCodeType {
     // 주문서 품목 관련 오류
     SALES_ORDER_ITEM_NOT_FOUND(HttpStatus.NOT_FOUND, "SALES_ORDER_ITEM_ERROR_001", "주문서 품목을 찾을 수 없습니다."),
 
+    // 거래 명세서 관련 오류
+    INVOICE_ITEM_NOT_MATCH(HttpStatus.BAD_REQUEST, "INVOICE_ITEM_ERROR_001", "거래 명세서의 품목이 주문서와 다릅니다."),
+
     //발주서 관련 오류
     PURCHASE_NOT_FOUND(HttpStatus.NOT_FOUND, "PURCHASE_ERROR_001", "발주서를 찾을 수 없습니다."),
     PURCHASE_UPDATE_ERROR(HttpStatus.BAD_REQUEST, "PURCHASE_ERROR_002", "이미 결재가 완료된 주문입니다."),
