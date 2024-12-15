@@ -11,9 +11,9 @@ import java.time.LocalDateTime;
 public class ProductionReceivingSituationResponse {
     private LocalDateTime productionReceivingRegDate;
     private String productionReceivingRegMonth;
-    private Integer productionReceivingExtendedPrice;
+    private String productionReceivingExtendedPrice;
     private String productionReceivingName;
     private String clientName;
     private String productionReceivingNote;
-    private Integer productionReceivingSum;
+    private String productionReceivingSum;
 }
