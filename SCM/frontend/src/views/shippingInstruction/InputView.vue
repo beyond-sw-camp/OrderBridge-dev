@@ -1,7 +1,7 @@
 <script setup>
 
 import InputForm from "@/components/common/InputForm.vue";
-import InputItems from "@/components/common/inputItems.vue";
+import InputItems from "@/components/common/InputItems.vue";
 </script>
 
 <template>
