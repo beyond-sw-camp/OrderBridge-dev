@@ -57,6 +57,10 @@ public class Purchase {
         this.purchaseName = purchaseName;
     }
 
+    public void changePurchaseStatus(PurchaseStatus purchaseStatus) {
+        this.purchaseStatus = purchaseStatus;
+    }
+
     public void objectInjection(User user, Warehouse warehouse, PurchaseOrder purchaseOrder) {
         this.user = user;
         this.warehouse = warehouse;

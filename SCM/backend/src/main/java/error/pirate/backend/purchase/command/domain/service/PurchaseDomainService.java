@@ -48,4 +48,11 @@ public class PurchaseDomainService {
     }
 
 
+    public void updatePurchaseStatus(Long purchaseSeq, PurchaseStatus purchaseStatus) {
+        Purchase purchase = purchaseRepository.findById(purchaseSeq)
+                .orElseThrow(() -> new CustomException(ErrorCodeType.PURCHASE_NOT_FOUND));
+
+        purchase.changePurchaseStatus(purchaseStatus);
+    }
+
 }
