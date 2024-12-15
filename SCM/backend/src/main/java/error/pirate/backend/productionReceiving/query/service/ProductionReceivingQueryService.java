@@ -93,4 +93,36 @@ public class ProductionReceivingQueryService {
     public List<ProductionReceivingSituationResponse> readProductionReceivingSituation(ProductionReceivingSituationRequest request) {
         return productionReceivingMapper.findProductionReceivingSituationByFilter(request);
     }
+
+    public byte[] productionReceivingSituationExcelDown(ProductionReceivingSituationRequest request) {
+
+        List<ProductionReceivingSituationResponse> productionReceivingSituationList
+                = productionReceivingMapper.findProductionReceivingSituationByFilter(request);
+
+        String[] headers = {"번호", "생산입고일", "생산입고명", "총금액", "거래처명", "비고"};
+        String[][] excel = new String[productionReceivingSituationList.size()][headers.length];
+
+        for(int i = 0; i < productionReceivingSituationList.size(); i++) {
+            ProductionReceivingSituationResponse dto = productionReceivingSituationList.get(i);
+            if(dto.getProductionReceivingRegDate() == null) {
+                boolean isNull = (dto.getProductionReceivingRegMonth() == null);
+
+                excel[i][0] = isNull ? "" : String.valueOf(i+1); // 번호
+                excel[i][1] = isNull ? "" : dto.getProductionReceivingRegMonth(); // 생산입고월
+                excel[i][2] = isNull ? "총합" : "-";       // 생산입고명
+                excel[i][3] = dto.getProductionReceivingSum() + " ￦";            // 총금액
+                excel[i][4] = "-";
+                excel[i][5] = "-";
+            } else {
+                excel[i][0] = String.valueOf(i+1); // 번호
+                excel[i][1] = dto.getProductionReceivingRegDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")); // 생산입고일
+                excel[i][2] = dto.getProductionReceivingName();       // 생산입고명
+                excel[i][3] = dto.getProductionReceivingExtendedPrice() + " ￦";            // 총금액
+                excel[i][4] = dto.getClientName(); // 거래처명
+                excel[i][5] = dto.getProductionReceivingNote(); // 비고
+            }
+        }
+
+        return excelDownBody.excelDownBody(excel, headers, "생산입고 현황");
+    }
 }

@@ -2,6 +2,7 @@
 import {onMounted, ref, watch} from 'vue';
 import axios from "axios";
 import searchIcon from "@/assets/searchIcon.svg";
+import dayjs from "dayjs";
 
 const totalCount = ref(0);
 const pageSize = ref(10);
@@ -169,7 +170,7 @@ const excelDown = async () => {
                     </div>
                     <div class="list-body col-2">{{ productionReceiving.productionWarehouseName }}</div>
                     <div class="list-body col-2">{{ productionReceiving.storeWarehouseName }}</div>
-                    <div class="list-body col-3">{{ productionReceiving.productReceivingRegDate }}</div>
+                    <div class="list-body col-3">{{ dayjs(productionReceiving.productReceivingRegDate).format('YYYY-MM-DD HH:mm:ss') }}</div>
                     <div class="list-body col-1">{{ productionReceiving.productionReceivingStatus }}</div>
                   </div>
                 </div>
