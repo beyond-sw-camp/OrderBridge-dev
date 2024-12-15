@@ -64,4 +64,16 @@ public class SalesOrder {
     public void updateStatus(String status) {
         this.salesOrderStatus = SalesOrderStatus.valueOf(status);
     }
+
+    public SalesOrder(Quotation quotation, User user, Client client, String salesOrderName,
+                      LocalDateTime salesOrderOrderDate, LocalDateTime salesOrderDueDate, String salesOrderNote) {
+        this.quotation = quotation;
+        this.user = user;
+        this.client = client;
+        this.salesOrderName = salesOrderName;
+        this.salesOrderStatus = SalesOrderStatus.BEFORE;
+        this.salesOrderOrderDate = salesOrderOrderDate;
+        this.salesOrderDueDate = salesOrderDueDate;
+        this.salesOrderNote = salesOrderNote;
+    }
 }

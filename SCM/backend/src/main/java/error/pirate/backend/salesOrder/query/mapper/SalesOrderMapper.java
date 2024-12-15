@@ -1,9 +1,6 @@
 package error.pirate.backend.salesOrder.query.mapper;
 
-import error.pirate.backend.salesOrder.query.dto.SalesOrderDTO;
-import error.pirate.backend.salesOrder.query.dto.SalesOrderItemDTO;
-import error.pirate.backend.salesOrder.query.dto.SalesOrderListItemDTO;
-import error.pirate.backend.salesOrder.query.dto.SalesOrderSituationDTO;
+import error.pirate.backend.salesOrder.query.dto.*;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -41,4 +38,8 @@ public interface SalesOrderMapper {
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate,
             @Param("clientName") String clientName);
+
+    // 주문서 품목 값 확인
+    List<SalesOrderItemCheckDTO> sumSalesOrderItemValue(
+            @Param("quotationSeq") Long quotationSeq);
 }

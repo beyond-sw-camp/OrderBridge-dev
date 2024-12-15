@@ -12,5 +12,5 @@ public class CreateSalesOrderRequest {
     private Long quotationSeq;
     private Long clientSeq;
     private String salesOrderNote;
-    private List<CreateSalesOrderItemRequest> salesOrderItemList;
+    private List<SalesOrderItemRequest> salesOrderItemList;
 }

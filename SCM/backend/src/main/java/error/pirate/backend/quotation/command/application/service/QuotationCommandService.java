@@ -12,6 +12,8 @@ import error.pirate.backend.quotation.command.domain.repository.QuotationItemRep
 import error.pirate.backend.quotation.command.domain.repository.QuotationRepository;
 import error.pirate.backend.quotation.command.domain.aggregate.entity.Quotation;
 import error.pirate.backend.quotation.query.service.QuotationQueryService;
+import error.pirate.backend.salesOrder.command.domain.service.SalesOrderDomainService;
+import error.pirate.backend.salesOrder.query.service.SalesOrderQueryService;
 import error.pirate.backend.user.command.domain.aggregate.entity.User;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
@@ -28,6 +30,7 @@ public class QuotationCommandService {
     private final QuotationQueryService quotationQueryService;
     private final QuotationRepository quotationRepository;
     private final QuotationItemRepository quotationItemRepository;
+    private final SalesOrderDomainService salesOrderDomainService;
     private final EntityManager entityManager;
     private final NameGenerator nameGenerator;
 
@@ -114,6 +117,9 @@ public class QuotationCommandService {
         quotation.updateQuotation(
                 request.getQuotationQuotationDate(), client, user, request.getQuotationNote(),
                 quotationExtendedPrice, quotationTotalQuantity);
+
+        // 견적서와 주문서의 품목 수량 비교
+        salesOrderDomainService.validateItem(quotationSeq);
     }
 
     // 견적서 삭제

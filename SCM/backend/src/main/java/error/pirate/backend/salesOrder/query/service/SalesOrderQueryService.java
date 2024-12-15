@@ -1,9 +1,6 @@
 package error.pirate.backend.salesOrder.query.service;
 
-import error.pirate.backend.salesOrder.query.dto.SalesOrderListItemDTO;
-import error.pirate.backend.salesOrder.query.dto.SalesOrderListResponse;
-import error.pirate.backend.salesOrder.query.dto.SalesOrderResponse;
-import error.pirate.backend.salesOrder.query.dto.SalesOrderSituationResponse;
+import error.pirate.backend.salesOrder.query.dto.*;
 import error.pirate.backend.salesOrder.query.mapper.SalesOrderMapper;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -60,5 +57,10 @@ public class SalesOrderQueryService {
         // 주문서 현황 조회
         return new SalesOrderSituationResponse(salesOrderMapper.selectSalesOrderSituation(
                 startDate, endDate, clientName));
+    }
+
+    // 주문서 품목 값 확인
+    public List<SalesOrderItemCheckDTO> salesOrderItemCheck(Long quotationSeq) {
+        return salesOrderMapper.sumSalesOrderItemValue(quotationSeq);
     }
 }
