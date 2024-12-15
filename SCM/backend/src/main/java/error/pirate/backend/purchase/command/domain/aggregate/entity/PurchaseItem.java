@@ -34,4 +34,13 @@ public class PurchaseItem {
     private PurchaseItemStatus purchaseItemStatus; // 구매 품목 상태
 
     private String purchaseItemNote; // 구매 품목 비고
+
+    public void insertPurchase(Purchase purchaseResponse) {
+        this.purchase = purchaseResponse;
+    }
+
+    public void insertItem(Item item) {
+        this.item = item;
+    }
+
 }

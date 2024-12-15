@@ -6,8 +6,8 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum PurchaseItemStatus {
-    DELIVERY_BEFORE("정산중"),
-    DELIVERY_COMPLETE("정산완료")
+    PROGRESS("정산중"),
+    COMPLETE("정산완료")
     ;
 
     private final String value;
