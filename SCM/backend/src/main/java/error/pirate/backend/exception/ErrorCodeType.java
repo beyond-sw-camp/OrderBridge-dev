@@ -20,6 +20,7 @@ public enum ErrorCodeType {
     // 주문서 관련 오류
     SALES_ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, "SALES_ORDER_ERROR_001", "주문서를 찾을 수 없습니다."),
     SALES_ORDER_STATE_BAD_REQUEST(HttpStatus.BAD_REQUEST, "SALES_ORDER_ERROR_002", "주문서의 상태를 확인해주세요"),
+    SALES_ORDER_ITEM_NOT_MATCH(HttpStatus.BAD_REQUEST, "SALES_ORDER_ERROR_003", "주문서의 아이템이 견적서와 다릅니다."),
 
     // 주문서 품목 관련 오류
     SALES_ORDER_ITEM_NOT_FOUND(HttpStatus.NOT_FOUND, "SALES_ORDER_ITEM_ERROR_001", "주문서 품목을 찾을 수 없습니다."),
