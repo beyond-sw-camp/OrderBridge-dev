@@ -1,6 +1,7 @@
 package error.pirate.backend.salesOrder.command.application.controller;
 
 import error.pirate.backend.salesOrder.command.application.dto.CreateSalesOrderRequest;
+import error.pirate.backend.salesOrder.command.application.dto.UpdateSalesOrderRequest;
 import error.pirate.backend.salesOrder.command.application.service.SalesOrderCommandService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -26,10 +27,15 @@ public class SalesOrderCommandController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @PatchMapping("")
+    @PatchMapping("{salesOrderSeq}")
     @Operation(summary = "주문서 수정")
-    public ResponseEntity<Void> updateSalesOrder() {
-        return null;
+    public ResponseEntity<Void> updateSalesOrder(
+            @PathVariable Long salesOrderSeq,
+            @RequestBody UpdateSalesOrderRequest request) {
+
+        salesOrderCommandService.updateSalesOrder(salesOrderSeq, request);
+
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("")

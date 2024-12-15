@@ -10,6 +10,8 @@ import error.pirate.backend.quotation.command.domain.aggregate.entity.QuotationI
 import error.pirate.backend.quotation.command.domain.repository.QuotationItemRepository;
 import error.pirate.backend.salesOrder.command.application.dto.SalesOrderItemRequest;
 import error.pirate.backend.salesOrder.command.application.dto.CreateSalesOrderRequest;
+import error.pirate.backend.salesOrder.command.application.dto.UpdateSalesOrderItemReqest;
+import error.pirate.backend.salesOrder.command.application.dto.UpdateSalesOrderRequest;
 import error.pirate.backend.salesOrder.command.domain.aggregate.entity.SalesOrder;
 import error.pirate.backend.salesOrder.command.domain.aggregate.entity.SalesOrderItem;
 import error.pirate.backend.salesOrder.command.domain.repository.SalesOrderItemRepository;
@@ -91,5 +93,52 @@ public class SalesOrderCommandService {
                 || matchCount != salesOrderItemRequestList.size()) {
             throw new CustomException(ErrorCodeType.SALES_ORDER_ITEM_NOT_MATCH);
         }
+    }
+
+    // 주문서 수정
+    @Transactional
+    public void updateSalesOrder(Long salesOrderSeq, UpdateSalesOrderRequest request) {
+        SalesOrder salesOrder = salesOrderRepository.findById(salesOrderSeq)
+                .orElseThrow(() -> new CustomException(ErrorCodeType.SALES_ORDER_NOT_FOUND));
+
+        // 엔티티 요구 변수 작성
+        Client client = request.getClientSeq() != null ?
+                entityManager.getReference(Client.class, request.getClientSeq()) : null;
+        User user = entityManager.getReference(User.class, 1L);
+
+        // 기존 주문서 품목 삭제
+        ArrayList<SalesOrderItem> salesOrderItemList = salesOrderItemRepository.findBySalesOrderSalesOrderSeq(salesOrderSeq);
+
+        for (SalesOrderItem salesOrderItem : salesOrderItemList) {
+            salesOrderItemRepository.delete(salesOrderItem);
+        }
+
+        // 합계 계산용 변수
+        int salesOrderExtendedPrice = 0;
+        int salesOrderTotalQuantity = 0;
+
+        // 주문서 품목 등록
+        for (UpdateSalesOrderItemReqest updateSalesOrderItemReqest : request.getSalesOrderItemReqestList()) {
+            // 주문서 합계 계산
+            salesOrderExtendedPrice += updateSalesOrderItemReqest.getSalesOrderItemPrice()
+                    * updateSalesOrderItemReqest.getSalesOrderItemQuantity();
+            salesOrderTotalQuantity += updateSalesOrderItemReqest.getSalesOrderItemQuantity();
+
+            SalesOrderItem salesOrderItem = new SalesOrderItem(
+                    entityManager.getReference(SalesOrder.class, salesOrderSeq),
+                    entityManager.getReference(Item.class, updateSalesOrderItemReqest.getItemSeq()),
+                    updateSalesOrderItemReqest.getSalesOrderItemQuantity(),
+                    updateSalesOrderItemReqest.getSalesOrderItemPrice(),
+                    updateSalesOrderItemReqest.getSalesOrderItemNote());
+            salesOrderItemRepository.save(salesOrderItem);
+        }
+
+        // 주문서 변경 사항 적용
+        salesOrder.updateSalesOrder(
+                request.getSalesOrderOrderDate(), request.getSalesOrderDueDate(), client, user,
+                request.getSalesOrderNote(), salesOrderExtendedPrice, salesOrderTotalQuantity);
+
+        // 견적서와 주문서의 품목 수량 비교
+        salesOrderDomainService.validateItem(salesOrder.getQuotation().getQuotationSeq());
     }
 }

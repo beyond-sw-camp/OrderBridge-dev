@@ -76,4 +76,16 @@ public class SalesOrder {
         this.salesOrderDueDate = salesOrderDueDate;
         this.salesOrderNote = salesOrderNote;
     }
+
+    public void updateSalesOrder(LocalDateTime salesOrderOrderDate, LocalDateTime salesOrderDueDate,
+                                 Client client, User user, String salesOrderNote,
+                                 int salesOrderExtendedPrice, int salesOrderTotalQuantity) {
+        if (salesOrderOrderDate != null) { this.salesOrderOrderDate = salesOrderOrderDate; }
+        if (salesOrderDueDate != null) { this.salesOrderDueDate = salesOrderDueDate; }
+        if (client != null) { this.client = client; }
+        if (user != null) { this.user = user; }
+        if (salesOrderNote != null) { this.salesOrderNote = salesOrderNote; }
+        this.salesOrderExtendedPrice = salesOrderExtendedPrice;
+        this.salesOrderTotalQuantity = salesOrderTotalQuantity;
+    }
 }
