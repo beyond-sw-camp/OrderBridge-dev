@@ -6,6 +6,7 @@ import error.pirate.backend.item.command.domain.aggregate.entity.Item;
 import error.pirate.backend.item.command.domain.repository.ItemRepository;
 import error.pirate.backend.purchase.command.application.dto.PurchaseCreateRequest;
 import error.pirate.backend.purchase.command.application.dto.PurchaseItemDto;
+import error.pirate.backend.purchase.command.application.dto.PurchaseUpdateRequest;
 import error.pirate.backend.purchase.command.domain.aggregate.entity.Purchase;
 import error.pirate.backend.purchase.command.domain.aggregate.entity.PurchaseItem;
 import error.pirate.backend.purchase.command.domain.service.PurchaseDomainService;
@@ -36,9 +37,9 @@ public class PurchaseApplicationService {
 
     private final PurchaseDomainService purchaseDomainService;
 
-    private final WarehouseDomainService warehouseDomainService;
-
     private final PurchaseItemDomainService purchaseItemDomainService;
+
+    private final WarehouseDomainService warehouseDomainService;
 
     private final UserDomainService userDomainService;
 
@@ -78,5 +79,35 @@ public class PurchaseApplicationService {
         }
     }
 
+    @Transactional
+    public void updatePurchase(PurchaseUpdateRequest request) {
+        purchaseDomainService.updatePurchase(request);
+
+        if(ObjectUtils.isNotEmpty(request.getPurchaseItemDtoList())) {
+            List<PurchaseItem> items = new ArrayList<>();
+
+            for(PurchaseItemDto purchaseItem : request.getPurchaseItemDtoList()) {
+
+                // 있는 품목일 경우는 수량 등을 변경
+                if(purchaseItem.getPurchaseItemSeq() != null) {
+                    purchaseItemDomainService.updatePurchaseItem(purchaseItem);
+                } else {
+                    // 없는 품목일 경우 추가
+                    PurchaseItem purchaseItemRequest = modelMapper.map(purchaseItem, PurchaseItem.class);
+
+                    Purchase purchase = purchaseDomainService.findById(request.getPurchaseOrderSeq());
+                    purchaseItemRequest.insertPurchase(purchase);
+
+                    Item item = itemRepository.findById(purchaseItem.getItemSeq())
+                            .orElseThrow(() -> new CustomException(ErrorCodeType.ITEM_NOT_FOUND));
+                    purchaseItemRequest.insertItem(item);
+
+                    items.add(purchaseItemRequest);
+                }
+            }
+            purchaseItemDomainService.createPurchaseItem(items);
+        }
+
+    }
 
 }

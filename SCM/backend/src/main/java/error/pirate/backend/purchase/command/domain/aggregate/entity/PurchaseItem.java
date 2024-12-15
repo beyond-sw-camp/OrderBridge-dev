@@ -43,4 +43,11 @@ public class PurchaseItem {
         this.item = item;
     }
 
+    public void updateOrderInfo(int purchaseItemQuantity, int purchaseItemPrice, String purchaseItemNote, LocalDateTime purchaseItemReceiptDate) {
+        this.purchaseItemQuantity = purchaseItemQuantity;
+        this.purchaseItemPrice = purchaseItemPrice;
+        this.purchaseItemNote = purchaseItemNote;
+        this.purchaseItemReceiptDate = purchaseItemReceiptDate;
+    }
+
 }
