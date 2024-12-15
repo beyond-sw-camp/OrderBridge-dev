@@ -26,9 +26,9 @@ import statisticsIcon from '@/assets/statisticsIcon.svg'
         <b-nav-item-dropdown>
           <template #button-content><salesIcon class="icon" />영업관리</template>
           <b-dropdown-item href="/quotation">견적 관리</b-dropdown-item>
-          <b-dropdown-item href="/quotation/input">주문서 관리</b-dropdown-item>
+          <b-dropdown-item href="#">주문서 관리</b-dropdown-item>
           <b-dropdown-item href="#">판매 관리</b-dropdown-item>
-          <b-dropdown-item href="#">출하지시서 관리</b-dropdown-item>
+          <b-dropdown-item href="#"><RouterLink to="/shipping-instruction" active-class="active" replace>출하지시서 관리</RouterLink></b-dropdown-item>
           <b-dropdown-item href="#">출하 관리</b-dropdown-item>
         </b-nav-item-dropdown>
         <b-nav-item-dropdown>
@@ -47,6 +47,7 @@ import statisticsIcon from '@/assets/statisticsIcon.svg'
           <b-dropdown-item href="#">재고관리 현황</b-dropdown-item>
           <b-dropdown-item href="#">영업관리 현황</b-dropdown-item>
           <b-dropdown-item href="#">구매관리 현황</b-dropdown-item>
+          <b-dropdown-item href="#"><RouterLink to="/productionReceiving/situation" active-class="active" replace>생산입고 현황</RouterLink></b-dropdown-item>
           <b-dropdown-item href="#">기타 현황</b-dropdown-item>
         </b-nav-item-dropdown>
       </b-navbar-nav>

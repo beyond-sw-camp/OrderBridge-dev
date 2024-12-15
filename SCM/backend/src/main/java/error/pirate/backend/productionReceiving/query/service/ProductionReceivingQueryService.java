@@ -8,6 +8,7 @@ import error.pirate.backend.productionReceiving.command.domain.aggregate.entity.
 import error.pirate.backend.productionReceiving.command.domain.repository.ProductionReceivingItemRepository;
 import error.pirate.backend.productionReceiving.command.domain.repository.ProductionReceivingRepository;
 import error.pirate.backend.productionReceiving.query.dto.*;
+import error.pirate.backend.productionReceiving.query.mapper.ProductionReceivingMapper;
 import error.pirate.backend.warehouse.command.domain.aggregate.entity.Warehouse;
 import error.pirate.backend.warehouse.command.domain.repository.WarehouseRepository;
 import error.pirate.backend.warehouse.query.dto.WarehouseDTO;
@@ -19,7 +20,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,6 +34,7 @@ public class ProductionReceivingQueryService {
     private final ProductionReceivingItemRepository productionReceivingItemRepository;
     private final ModelMapper modelMapper;
     private final ExcelDownLoad excelDownBody;
+    private final ProductionReceivingMapper productionReceivingMapper;
 
     public ProductionReceivingListResponse readProductionReceivingList(ProductionReceivingListRequest request, Pageable pageable) {
         Page<ProductionReceivingListDTO> productionReceivingList = productionReceivingRepository.findAllByFilter(request, pageable);
@@ -87,5 +88,9 @@ public class ProductionReceivingQueryService {
         }
 
         return excelDownBody.excelDownBody(excel, headers, "생산입고");
+    }
+
+    public List<ProductionReceivingSituationResponse> readProductionReceivingSituation(ProductionReceivingSituationRequest request) {
+        return productionReceivingMapper.findProductionReceivingSituationByFilter(request);
     }
 }

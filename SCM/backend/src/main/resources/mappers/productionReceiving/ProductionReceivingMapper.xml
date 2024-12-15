@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="error.pirate.backend.productionReceiving.query.mapper.ProductionReceivingMapper">
+
+    <sql id="productionReceivingSituationFilter">
+        <if test="searchStartDate != null">
+            AND production_receiving_reg_date &gt;= #{searchStartDate}
+        </if>
+        <if test="searchEndDate != null">
+            AND production_receiving_reg_date &lt;= #{searchEndDate}
+        </if>
+        <if test="searchName != null">
+            AND c.client_name LIKE CONCAT('%', #{searchName}, '%')
+        </if>
+    </sql>
+
+    <select id="findProductionReceivingSituationByFilter" resultType="error.pirate.backend.productionReceiving.query.dto.ProductionReceivingSituationResponse">
+        SELECT
+            production_receiving_reg_date
+            , DATE_FORMAT(production_receiving_reg_date, '%Y-%m') production_receiving_reg_month
+            , production_receiving_extended_price
+            , production_receiving_name
+            , c.client_name
+            , production_receiving_note
+            , IFNULL(SUM(production_receiving_extended_price), 0) production_receiving_sum
+        FROM tb_production_receiving pr
+        JOIN tb_work_order wo
+            ON wo.work_order_seq = pr.work_order_seq
+        JOIN tb_client c
+            ON c.client_seq = wo.client_seq
+        WHERE 1=1
+        <include refid="productionReceivingSituationFilter"/>
+        GROUP BY
+            DATE_FORMAT(production_receiving_reg_date, '%Y-%m'),
+            production_receiving_reg_date WITH ROLLUP;
+    </select>
+
+</mapper>
