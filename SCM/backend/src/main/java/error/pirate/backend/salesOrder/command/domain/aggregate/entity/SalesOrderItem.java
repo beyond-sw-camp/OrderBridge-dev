@@ -27,4 +27,13 @@ public class SalesOrderItem {
     private int salesOrderItemPrice; // 주문서 품목 단가
 
     private String salesOrderItemNote; // 주문서 품목 비고
+
+    public SalesOrderItem(SalesOrder salesOrder, Item item,
+                          int salesOrderItemQuantity, int salesOrderItemPrice, String salesOrderItemNote) {
+        this.salesOrder = salesOrder;
+        this.item = item;
+        this.salesOrderItemQuantity = salesOrderItemQuantity;
+        this.salesOrderItemPrice = salesOrderItemPrice;
+        this.salesOrderItemNote = salesOrderItemNote;
+    }
 }
