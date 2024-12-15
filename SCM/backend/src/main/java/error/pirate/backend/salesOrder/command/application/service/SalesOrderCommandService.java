@@ -14,11 +14,9 @@ import error.pirate.backend.salesOrder.command.application.dto.UpdateSalesOrderI
 import error.pirate.backend.salesOrder.command.application.dto.UpdateSalesOrderRequest;
 import error.pirate.backend.salesOrder.command.domain.aggregate.entity.SalesOrder;
 import error.pirate.backend.salesOrder.command.domain.aggregate.entity.SalesOrderItem;
+import error.pirate.backend.salesOrder.command.domain.repository.SalesOrderCommandRepository;
 import error.pirate.backend.salesOrder.command.domain.repository.SalesOrderItemRepository;
-import error.pirate.backend.salesOrder.command.domain.repository.SalesOrderRepository;
 import error.pirate.backend.salesOrder.command.domain.service.SalesOrderDomainService;
-import error.pirate.backend.salesOrder.query.dto.SalesOrderItemCheckDTO;
-import error.pirate.backend.salesOrder.query.service.SalesOrderQueryService;
 import error.pirate.backend.user.command.domain.aggregate.entity.User;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
@@ -34,9 +32,8 @@ import java.util.*;
 public class SalesOrderCommandService {
 
     private final QuotationItemRepository quotationItemRepository;
-    private final SalesOrderRepository salesOrderRepository;
+    private final SalesOrderCommandRepository salesOrderCommandRepository;
     private final SalesOrderItemRepository salesOrderItemRepository;
-    private final SalesOrderQueryService salesOrderQueryService;
     private final SalesOrderDomainService salesOrderDomainService;
     private final EntityManager entityManager;
     private final NameGenerator nameGenerator;
@@ -59,7 +56,7 @@ public class SalesOrderCommandService {
                 createSalesOrderRequest.getSalesOrderDueDate(),
                 createSalesOrderRequest.getSalesOrderNote());
 
-        salesOrderRepository.save(salesOrder);
+        salesOrderCommandRepository.save(salesOrder);
 
         // 주문서 품목 등록
         for (SalesOrderItemRequest salesOrderItemRequest : createSalesOrderRequest.getSalesOrderItemList()) {
@@ -98,8 +95,7 @@ public class SalesOrderCommandService {
     // 주문서 수정
     @Transactional
     public void updateSalesOrder(Long salesOrderSeq, UpdateSalesOrderRequest request) {
-        SalesOrder salesOrder = salesOrderRepository.findById(salesOrderSeq)
-                .orElseThrow(() -> new CustomException(ErrorCodeType.SALES_ORDER_NOT_FOUND));
+        SalesOrder salesOrder = salesOrderCommandRepository.findById(salesOrderSeq).orElseThrow();
 
         // 엔티티 요구 변수 작성
         Client client = request.getClientSeq() != null ?
@@ -140,5 +136,14 @@ public class SalesOrderCommandService {
 
         // 견적서와 주문서의 품목 수량 비교
         salesOrderDomainService.validateItem(salesOrder.getQuotation().getQuotationSeq());
+    }
+
+    // 견적서 삭제
+    @Transactional
+    public void deleteSalesOrder(Long salesOrderSeq) {
+
+        SalesOrder salesOrder = salesOrderCommandRepository.findById(salesOrderSeq).orElseThrow();
+
+        salesOrder.delete();
     }
 }

@@ -125,6 +125,7 @@
                 JOIN tb_sales_order_item USING (sales_order_seq)
                 WHERE tb_sales_order.quotation_seq = tb_quotation.quotation_seq
                 AND tb_sales_order_item.item_seq = quotation_item_seq
+                AND tb_sales_order.sales_order_status NOT IN ("DELETE")
             ), 0) AS remaining_quantity
         FROM tb_quotation AS tb_quotation
         JOIN tb_quotation_item USING (quotation_seq)

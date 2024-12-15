@@ -5,5 +5,6 @@ public enum SalesOrderStatus {
     AFTER, // 결재후
     PRODUCTION, // 생산중
     PRODUCTION_COMPLETE,   // 생산완료
-    SHIPMENT_COMPLETE  // 출하완료
+    SHIPMENT_COMPLETE,
+    DELETE // 출하완료
 }

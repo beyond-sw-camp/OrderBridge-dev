@@ -88,4 +88,8 @@ public class SalesOrder {
         this.salesOrderExtendedPrice = salesOrderExtendedPrice;
         this.salesOrderTotalQuantity = salesOrderTotalQuantity;
     }
+
+    public void delete() {
+        this.salesOrderStatus = SalesOrderStatus.DELETE;
+    }
 }

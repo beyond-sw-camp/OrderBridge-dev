@@ -27,7 +27,7 @@ public class SalesOrderCommandController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @PatchMapping("{salesOrderSeq}")
+    @PatchMapping("/{salesOrderSeq}")
     @Operation(summary = "주문서 수정")
     public ResponseEntity<Void> updateSalesOrder(
             @PathVariable Long salesOrderSeq,
@@ -38,9 +38,13 @@ public class SalesOrderCommandController {
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("")
+    @DeleteMapping("/{salesOrderSeq}")
     @Operation(summary = "주문서 삭제")
-    public ResponseEntity<Void> deleteSalesOrder() {
-        return null;
+    public ResponseEntity<Void> deleteSalesOrder(
+            @PathVariable Long salesOrderSeq) {
+
+        salesOrderCommandService.deleteSalesOrder(salesOrderSeq);
+
+        return ResponseEntity.ok().build();
     }
 }
