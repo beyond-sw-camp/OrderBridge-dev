@@ -44,6 +44,8 @@ public class ProductionReceiving {
 
     private String productionReceivingName; // 생산 입고명
 
+    private LocalDateTime productionReceivingReceiptDate;
+
     @CreatedDate
     private LocalDateTime productionReceivingRegDate; // 생산 입고 등록일
 
