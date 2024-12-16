@@ -20,6 +20,10 @@ const routes = [
         path: "/currentSituation",
         component: () => import("@/components/common/CurrentSituation.vue")
     },
+    {
+        path: "/purchaseOrder",
+        component: () => import("@/views/purchaseOrder/PurchaseOrderListView.vue")
+    },
 
     ...shippingInstructionRoutes,
     ...productionReceivingRoutes,
