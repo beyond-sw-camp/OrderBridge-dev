@@ -55,7 +55,7 @@ public enum ErrorCodeType {
     WORK_ORDER_REQUIRED_INFORMATION(HttpStatus.BAD_REQUEST, "WORK_ORDER_ERROR_003", "필수 입력 항목입니다."),
     WORK_ORDER_DUPLICATE(HttpStatus.CONFLICT, "WORK_ORDER_ERROR_004", "이미 작업지시서가 생성된 주문서입니다."),
     WORK_ORDER_STATE_BAD_REQUEST(HttpStatus.BAD_REQUEST, "WORK_ORDER_ERROR_005", "작업지시서의 상태를 확인해주세요"),
-    WORK_ORDER_INVALID_QUANTITY(HttpStatus.BAD_REQUEST, "WORK_ORDER_ERROR_005", "수정된 지시수량은 이미 완료된 작업량보다 작을 수 없습니다."),
+    WORK_ORDER_INVALID_QUANTITY(HttpStatus.BAD_REQUEST, "WORK_ORDER_ERROR_006", "수정된 지시수량은 이미 완료된 작업량보다 작을 수 없습니다."),
 
     // 회원 오류
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "USER_ERROR_001", "회원을 찾을 수 없습니다."),
