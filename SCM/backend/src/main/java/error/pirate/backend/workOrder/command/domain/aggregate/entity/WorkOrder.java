@@ -18,6 +18,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -142,4 +143,18 @@ public class WorkOrder {
             this.workOrderNote = workOrderNote;
         }
     }
+
+    public void changeWorkOrderStatus(WorkOrderStatus workOrderStatus) {
+        this.workOrderStatus = workOrderStatus;
+    }
+
+    public static WorkOrder updateTestWorkOrder(WorkOrderStatus status) {
+        WorkOrder workOrder = new WorkOrder();
+        workOrder.workOrderIndicatedQuantity = 0;
+        workOrder.workOrderIndicatedDate = LocalDate.from(LocalDate.parse("2024-12-09")).atStartOfDay();
+        workOrder.workOrderDueDate = LocalDate.from(LocalDate.parse("2024-12-10")).atStartOfDay();
+        workOrder.changeWorkOrderStatus(status);
+        return workOrder;
+    }
+
 }
