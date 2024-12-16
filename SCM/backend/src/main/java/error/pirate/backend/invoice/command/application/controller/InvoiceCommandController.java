@@ -28,7 +28,12 @@ public class InvoiceCommandController {
 
     @PatchMapping("/{invoiceSeq}")
     @Operation(summary = "거래 명세서 수정")
-    public ResponseEntity<Void> updateInvoice() {
+    public ResponseEntity<Void> updateInvoice(
+            @PathVariable Long invoiceSeq,
+            @RequestBody UpdateInvoiceRequest request) {
+
+        invoiceCommandService.updateInvoice(invoiceSeq, request);
+
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 

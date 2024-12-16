@@ -4,6 +4,6 @@ import lombok.Getter;
 
 @Getter
 public class InvoiceItemCheckDTO {
-    private Long salesOrderItemSeq;
+    private Long item;
     private Integer remainingQuantity;
 }

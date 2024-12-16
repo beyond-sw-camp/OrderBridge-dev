@@ -113,13 +113,13 @@
     <!--  거래 명세서 품목 값 확인  -->
     <select id="sumInvoiceItemValue" resultType="error.pirate.backend.invoice.query.dto.InvoiceItemCheckDTO">
         SELECT
-            tb_sales_order_item.item_seq AS sales_order_item_seq,
+            tb_sales_order_item.item_seq AS item,
             tb_sales_order_item.sales_order_item_quantity - NVL((
                 SELECT SUM(tb_invoice_item.invoice_item_quantity)
                 FROM tb_invoice
                 JOIN tb_invoice_item USING (invoice_seq)
                 WHERE tb_invoice.sales_order_seq = tb_sales_order.sales_order_seq
-                AND tb_invoice_item.item_seq = sales_order_item_seq
+                AND tb_invoice_item.item_seq = item
             ), 0) AS remaining_quantity
         FROM tb_sales_order AS tb_sales_order
         JOIN tb_sales_order_item USING (sales_order_seq)

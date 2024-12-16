@@ -3,8 +3,10 @@ package error.pirate.backend.invoice.command.application.service;
 import error.pirate.backend.common.NameGenerator;
 import error.pirate.backend.exception.CustomException;
 import error.pirate.backend.exception.ErrorCodeType;
+import error.pirate.backend.invoice.command.application.controller.UpdateInvoiceRequest;
 import error.pirate.backend.invoice.command.application.dto.CreateInvoiceItemRequest;
 import error.pirate.backend.invoice.command.application.dto.CreateInvoiceRequest;
+import error.pirate.backend.invoice.command.application.dto.UpdateInvoiceItemRequest;
 import error.pirate.backend.invoice.command.domain.aggregate.entity.Invoice;
 import error.pirate.backend.invoice.command.domain.aggregate.entity.InvoiceItem;
 import error.pirate.backend.invoice.command.domain.repository.InvoiceItemRepository;
@@ -20,6 +22,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -89,5 +92,47 @@ public class InvoiceCommandService {
                 || matchCount != createInvoiceItemRequestList.size()) {
             throw new CustomException(ErrorCodeType.INVOICE_ITEM_NOT_MATCH);
         }
+    }
+
+    // 거래 명세서 수정
+    @Transactional
+    public void updateInvoice(Long invoiceSeq, UpdateInvoiceRequest request) {
+        Invoice invoice = invoiceRepository.findById(invoiceSeq).orElseThrow();
+
+        // 엔티티 요구 변수 작성
+        User user = entityManager.getReference(User.class, 1L);
+
+        // 기존 거래 명세서 품목 삭제
+        ArrayList<InvoiceItem> invoiceItemList = invoiceItemRepository.findByInvoiceInvoiceSeq(invoiceSeq);
+
+        for (InvoiceItem invoiceItem : invoiceItemList) {
+            invoiceItemRepository.delete(invoiceItem);
+        }
+
+        // 합계 계산용 변수
+        int invoiceExtendedPrice = 0;
+        int invoiceTotalQuantity = 0;
+
+        // 거래 명세서 품목 등록
+        for (UpdateInvoiceItemRequest updateInvoiceItemRequest : request.getUpdateInvoiceItemRequestList()) {
+            invoiceExtendedPrice += updateInvoiceItemRequest.getInvoiceItemPrice()
+                    * updateInvoiceItemRequest.getInvoiceItemQuantity();
+            invoiceTotalQuantity += updateInvoiceItemRequest.getInvoiceItemQuantity();
+
+            InvoiceItem invoiceItem = new InvoiceItem(
+                    entityManager.getReference(Invoice.class, invoiceSeq),
+                    entityManager.getReference(Item.class, updateInvoiceItemRequest.getItemSeq()),
+                    updateInvoiceItemRequest.getInvoiceItemQuantity(),
+                    updateInvoiceItemRequest.getInvoiceItemPrice(),
+                    updateInvoiceItemRequest.getInvoiceItemNote());
+            invoiceItemRepository.save(invoiceItem);
+        }
+
+        // 거래 명세서 변경 사항 적용
+        invoice.updateInvoice(
+                user, request.getInvoiceSaleDate(), request.getInvoiceNote(),
+                invoiceExtendedPrice, invoiceTotalQuantity);
+
+        invoiceDomainService.validateItem(invoice.getSalesOrder().getSalesOrderSeq());
     }
 }

@@ -56,4 +56,13 @@ public class Invoice {
         this.invoiceTotalQuantity = invoiceTotalQuantity;
         this.invoiceNote = invoiceNote;
     }
+
+    public void updateInvoice(User user, LocalDateTime invoiceSaleDate, String invoiceNote,
+                              int invoiceExtendedPrice, int invoiceTotalQuantity) {
+        if (user != null) this.user = user;
+        if (invoiceSaleDate != null) this.invoiceSaleDate = invoiceSaleDate;
+        if (invoiceNote != null) this.invoiceNote = invoiceNote;
+        this.invoiceExtendedPrice = invoiceExtendedPrice;
+        this.invoiceTotalQuantity = invoiceTotalQuantity;
+    }
 }
