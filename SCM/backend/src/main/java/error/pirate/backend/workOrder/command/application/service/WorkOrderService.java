@@ -6,16 +6,19 @@ import error.pirate.backend.exception.ErrorCodeType;
 import error.pirate.backend.item.command.domain.aggregate.entity.BomItem;
 import error.pirate.backend.item.command.domain.service.BomItemDomainService;
 import error.pirate.backend.item.command.domain.service.ItemInventoryDomainService;
+import error.pirate.backend.purchase.command.domain.aggregate.entity.PurchaseStatus;
 import error.pirate.backend.salesOrder.command.domain.aggregate.entity.SalesOrder;
 import error.pirate.backend.salesOrder.command.domain.aggregate.entity.SalesOrderItem;
 import error.pirate.backend.salesOrder.command.domain.aggregate.entity.SalesOrderStatus;
 import error.pirate.backend.salesOrder.command.domain.service.SalesOrderDomainService;
 import error.pirate.backend.salesOrder.command.domain.service.SalesOrderItemDomainService;
+import error.pirate.backend.shippingInstruction.command.domain.aggregate.entity.ShippingInstruction;
 import error.pirate.backend.user.command.domain.aggregate.entity.User;
 import error.pirate.backend.user.command.domain.service.UserDomainService;
 import error.pirate.backend.warehouse.command.domain.aggregate.entity.Warehouse;
 import error.pirate.backend.warehouse.command.domain.service.WarehouseDomainService;
 import error.pirate.backend.workOrder.command.application.dto.CreateWorkOrderRequest;
+import error.pirate.backend.workOrder.command.application.dto.UpdateWorkOrderRequest;
 import error.pirate.backend.workOrder.command.domain.aggregate.entity.WorkOrder;
 import error.pirate.backend.workOrder.command.domain.service.WorkOrderDomainService;
 import lombok.RequiredArgsConstructor;
@@ -42,6 +45,7 @@ public class WorkOrderService {
     private final WarehouseDomainService warehouseDomainService;
     private final NameGenerator nameGenerator;
 
+    /* 작업지시서 등록 */
     @Transactional
     public void createWorkOrderForItem(CreateWorkOrderRequest request) {
         log.info("-------------- 작업지시서 등록 서비스 진입 :등록요청 조건 - request: {} --------------", request);
@@ -114,6 +118,20 @@ public class WorkOrderService {
 
         // 10. 작업지시서 저장
         workOrderDomainService.saveWorkOrder(workOrder);
+    }
+
+    @Transactional
+    public void deleteWorkOrder(Long workOrderSeq) {
+        log.info("-------------- 작업지시서 삭제 서비스 진입 - {}번  --------------", workOrderSeq);
+
+        // 작업지시서 찾기
+        WorkOrder workOrder = workOrderDomainService.findByWorkOrderSeq(workOrderSeq);
+
+        // 결재상태 체크
+        workOrderDomainService.checkWorkOrderStatus(workOrder.getWorkOrderStatus());
+
+        // 삭제로 상태 변경
+        workOrderDomainService.deleteWorkOrder(workOrder);
     }
 
 }

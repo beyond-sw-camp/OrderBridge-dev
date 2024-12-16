@@ -20,7 +20,8 @@ public class WorkOrderCommandController {
 
     private final WorkOrderService workOrderService;
 
-    @PostMapping("")
+    /* 작업지시서 등록 */
+    @PostMapping
     @Operation(summary = "작업지시서 등록", description = "주문서를 불러와 품목을 선택해 작업지시서를 등록한다.")
     public ResponseEntity<Void> createWorkOrder(@Valid @RequestBody CreateWorkOrderRequest request
     ) {
@@ -28,6 +29,19 @@ public class WorkOrderCommandController {
         workOrderService.createWorkOrderForItem(request);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    /* 작업지시서 상태변경 */
+
+
+    /* 작업지시서 삭제 */
+    @DeleteMapping("/{workOrderSeq}")
+    @Operation(summary = "작업지시서 삭제", description = "선택한 작업지시서를 삭제한다.")
+    public ResponseEntity<Void> deleteSalesOrder(@PathVariable Long workOrderSeq) {
+        log.info("-------------- DELETE /api/v1/workOrder/{} 작업지시서 삭제 요청 -  --------------", workOrderSeq);
+        workOrderService.deleteWorkOrder(workOrderSeq);
+
+        return ResponseEntity.ok().build();
     }
 
 }
