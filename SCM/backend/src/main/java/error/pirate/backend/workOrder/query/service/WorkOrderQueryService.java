@@ -27,17 +27,11 @@ public class WorkOrderQueryService {
     public WorkOrderListResponse readWorkOrderList(WorkOrderFilterDTO filter) {
         log.info("-------------- 작업지시서 목록조회 서비스 진입 :목록조회 필터링 조건 - filter: {} --------------", filter);
 
-        // 시작일이 종료일보다 나중인 경우 에러처리
-        if (filter.getStartDate().isAfter(filter.getEndDate())) {
-            throw new CustomException(ErrorCodeType.INVALID_DATE_RANGE);
-        }
-
-        // 기본 날짜 값 설정
-        if (filter.getStartDate() == null) {
-            filter.setStartDate(LocalDate.of(2023, 1, 1));
-        }
-        if (filter.getEndDate() == null) {
-            filter.setEndDate(LocalDate.now());
+        // null 체크 및 날짜 유효성 검증
+        if (filter.getStartDate() != null && filter.getEndDate() != null) {
+            if (filter.getStartDate().isAfter(filter.getEndDate())) {
+                throw new CustomException(ErrorCodeType.INVALID_DATE_RANGE);
+            }
         }
 
         // 페이지 설정
