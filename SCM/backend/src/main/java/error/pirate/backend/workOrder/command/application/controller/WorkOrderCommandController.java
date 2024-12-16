@@ -3,6 +3,7 @@ package error.pirate.backend.workOrder.command.application.controller;
 import error.pirate.backend.workOrder.command.application.dto.CreateWorkOrderRequest;
 import error.pirate.backend.workOrder.command.application.dto.UpdateWorkOrderRequest;
 import error.pirate.backend.workOrder.command.application.service.WorkOrderService;
+import error.pirate.backend.workOrder.command.domain.aggregate.entity.WorkOrderStatus;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -35,7 +36,7 @@ public class WorkOrderCommandController {
     /* 작업지시서 수정 */
     @PutMapping("/{workOrderSeq}")
     @Operation(summary = "작업지시서 수정", description = "선택한 작업지시서를 수정한다.")
-    public ResponseEntity<Void> updateSalesOrder(@PathVariable Long workOrderSeq,
+    public ResponseEntity<Void> updateWorkOrder(@PathVariable Long workOrderSeq,
                                                  @Valid @RequestBody UpdateWorkOrderRequest request) {
         log.info("-------------- PUT /api/v1/workOrder/{} 작업지시서 수정 요청 - request:{} --------------", workOrderSeq, request);
         workOrderService.updateWorkOrder(workOrderSeq, request);
@@ -43,8 +44,45 @@ public class WorkOrderCommandController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    /* 작업지시서 상태변경 */
+    /* 작업지시서 상태변경(결재) */
+    @PutMapping("/approval/{workOrderSeq}")
+    @Operation(summary = "작업지시서 결재상태변경", description = "선택한 작업지시서의 상태를 변경한다. 결재 전 > 결재 후")
+    public ResponseEntity<Void> updateWorkOrderApproval(@PathVariable Long workOrderSeq) {
+        log.info("-------------- PUT /api/v1/workOrder/approval/{} 작업지시서 결재 상태 변경 요청 --------------", workOrderSeq);
+        workOrderService.updateWorkOrderStatus(workOrderSeq, WorkOrderStatus.AFTER);
 
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    /* 작업지시서 상태변경(진행중) */
+    @PutMapping("/ongoing/{workOrderSeq}")
+    @Operation(summary = "작업지시서 진행상태변경", description = "선택한 작업지시서의 상태를 변경한다. > 진행중")
+    public ResponseEntity<Void> updateWorkOrderOngoing(@PathVariable Long workOrderSeq) {
+        log.info("-------------- PUT /api/v1/workOrder/ongoing/{} 작업지시서 진행 상태 변경 요청 --------------", workOrderSeq);
+        workOrderService.updateWorkOrderStatus(workOrderSeq, WorkOrderStatus.ONGOING);
+
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    /* 작업지시서 상태변경(중단) */
+    @PutMapping("/stop/{workOrderSeq}")
+    @Operation(summary = "작업지시서 진행상태변경", description = "선택한 작업지시서의 상태를 변경한다. 진행중 > 중단")
+    public ResponseEntity<Void> updateWorkOrderStop(@PathVariable Long workOrderSeq) {
+        log.info("-------------- PUT /api/v1/workOrder/stop/{} 작업지시서 진행 상태 변경 요청 --------------", workOrderSeq);
+        workOrderService.updateWorkOrderStatus(workOrderSeq, WorkOrderStatus.STOP);
+
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    /* 작업지시서 상태변경(완료) */
+    @PutMapping("/complete/{workOrderSeq}")
+    @Operation(summary = "작업지시서 진행상태변경", description = "선택한 작업지시서의 상태를 변경한다. 진행중 > 완료")
+    public ResponseEntity<Void> updateWorkOrderComplete(@PathVariable Long workOrderSeq) {
+        log.info("-------------- PUT /api/v1/workOrder/complete/{} 작업지시서 진행 상태 완료로 변경 요청 --------------", workOrderSeq);
+        workOrderService.updateWorkOrderStatus(workOrderSeq, WorkOrderStatus.COMPLETE);
+
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
 
     /* 작업지시서 삭제 */
     @DeleteMapping("/{workOrderSeq}")

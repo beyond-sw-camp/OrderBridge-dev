@@ -1,14 +1,15 @@
 package error.pirate.backend.workOrder.command.application.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.*;
 
 import java.time.LocalDate;
 
 @Getter
+@Setter
 @ToString
+@NoArgsConstructor
+@AllArgsConstructor
 @Schema(description = "작업지시서 수정요청 데이터")
 public class UpdateWorkOrderRequest {
 

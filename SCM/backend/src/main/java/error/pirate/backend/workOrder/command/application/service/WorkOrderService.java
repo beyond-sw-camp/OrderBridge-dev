@@ -4,7 +4,6 @@ import error.pirate.backend.common.NameGenerator;
 import error.pirate.backend.common.NullCheck;
 import error.pirate.backend.exception.CustomException;
 import error.pirate.backend.exception.ErrorCodeType;
-import error.pirate.backend.item.command.domain.aggregate.entity.BomItem;
 import error.pirate.backend.item.command.domain.service.BomItemDomainService;
 import error.pirate.backend.item.command.domain.service.ItemInventoryDomainService;
 import error.pirate.backend.salesOrder.command.domain.aggregate.entity.SalesOrder;
@@ -18,6 +17,7 @@ import error.pirate.backend.warehouse.command.domain.service.WarehouseDomainServ
 import error.pirate.backend.workOrder.command.application.dto.CreateWorkOrderRequest;
 import error.pirate.backend.workOrder.command.application.dto.UpdateWorkOrderRequest;
 import error.pirate.backend.workOrder.command.domain.aggregate.entity.WorkOrder;
+import error.pirate.backend.workOrder.command.domain.aggregate.entity.WorkOrderStatus;
 import error.pirate.backend.workOrder.command.domain.service.WorkOrderDomainService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -69,7 +68,7 @@ public class WorkOrderService {
         request.setWorkOrderName(nameGenerator.nameGenerator(WorkOrder.class));
 
         // 주문서번호와 품목번호로(같은 주문서에서는 같은 품목 주문이 여러 개 들어오지 않는다는 가정) 중복체크 및 BOM 재고 검증
-        validateAndCheckForDuplicates(salesOrder, salesOrderItem, request.getWorkOrderIndicatedQuantity());
+        workOrderDomainService.validateAndCheckForDuplicates(salesOrder, salesOrderItem, request.getWorkOrderIndicatedQuantity());
 
         // 작업지시일 시간대 변경
         LocalDate indicatedDate = request.getWorkOrderIndicatedDate();
@@ -111,10 +110,6 @@ public class WorkOrderService {
         // 작업지시서 찾기
         WorkOrder workOrder = workOrderDomainService.findByWorkOrderSeq(workOrderSeq);
         log.info("작업지시서 조회 완료 - 작업지시서 번호: {}", workOrderSeq);
-
-        // 작업지시서 결재상태 체크
-//        workOrderDomainService.checkWorkOrderStatus(workOrder.getWorkOrderStatus());
-//        log.info("작업지시서 상태 확인 완료 - 상태: {}", workOrder.getWorkOrderStatus());
 
         // 작업지시서 상태에 따른 수정 로직
         switch (workOrder.getWorkOrderStatus()) {
@@ -197,7 +192,7 @@ public class WorkOrderService {
 
                 // 품목 변경된 경우 중복 및 BOM 재고 검증
                 if (!salesOrderItem.getItem().getItemSeq().equals(workOrder.getItem().getItemSeq())) {
-                    validateAndCheckForDuplicates(salesOrder, salesOrderItem, request.getWorkOrderIndicatedQuantity());
+                    workOrderDomainService.validateAndCheckForDuplicates(salesOrder, salesOrderItem, request.getWorkOrderIndicatedQuantity());
                 }
             }
 
@@ -253,19 +248,6 @@ public class WorkOrderService {
         );
     }
 
-    // 중복 및 BOM 검증 로직
-    private void validateAndCheckForDuplicates(SalesOrder salesOrder, SalesOrderItem salesOrderItem, Integer workOrderIndicatedQuantity) {
-        if (workOrderDomainService.existsBySalesOrderAndItem(salesOrder.getSalesOrderSeq(), salesOrderItem.getItem().getItemSeq())) {
-            throw new CustomException(ErrorCodeType.WORK_ORDER_DUPLICATE);
-        }
-        log.info("중복 작업지시서 확인 완료 - 주문서 번호: {}, 품목 번호: {}", salesOrder.getSalesOrderSeq(), salesOrderItem.getItem().getItemSeq());
-
-        // BOM 품목 및 재고 검증
-        List<BomItem> bomItems = bomItemDomainService.findAllByParentItem(salesOrderItem.getItem());
-        itemInventoryDomainService.checkInventoryForBomItems(bomItems, workOrderIndicatedQuantity);
-        log.info("BOM 및 재고 검증 완료 - 품목 번호: {}", salesOrderItem.getItem().getItemSeq());
-    }
-
     /* 작업지시서 삭제 */
     @Transactional
     public void deleteWorkOrder(Long workOrderSeq) {
@@ -274,11 +256,57 @@ public class WorkOrderService {
         // 작업지시서 찾기
         WorkOrder workOrder = workOrderDomainService.findByWorkOrderSeq(workOrderSeq);
 
-        // 결재상태 체크
-        workOrderDomainService.checkWorkOrderStatus(workOrder.getWorkOrderStatus());
+        // 삭제가능한 상태인지 체크
+        workOrderDomainService.checkWorkOrderStatusDeletePossible(workOrder.getWorkOrderStatus());
 
         // 삭제로 상태 변경
         workOrderDomainService.deleteWorkOrder(workOrder);
+    }
+
+    /* 상태 변경 */
+    @Transactional
+    public void updateWorkOrderStatus(Long workOrderSeq, WorkOrderStatus newStatus) {
+        log.info("-------------- 작업지시서 상태 변경 서비스 진입 - {}번 변경 --------------", workOrderSeq);
+        // 작업지시서 찾기
+        WorkOrder workOrder = workOrderDomainService.findByWorkOrderSeq(workOrderSeq);
+        WorkOrderStatus currentStatus  = workOrder.getWorkOrderStatus();
+
+        switch (newStatus) {
+            case AFTER:
+                log.info("-------------- 작업지시서 결재상태 변경 서비스 진입 - {}번 결재 전>후 변경, 현재상태 : {} --------------", workOrderSeq, currentStatus);
+                if (!currentStatus.equals(WorkOrderStatus.BEFORE)) {
+                    throw new CustomException(ErrorCodeType.WORK_ORDER_STATE_BAD_REQUEST); // 주석: 명확한 조건 검사 추가
+                }
+                break;
+
+            case STOP:
+                log.info("-------------- 작업지시서 진행상태 변경 서비스 진입 - {}번 중단으로 변경, 현재상태 : {}  --------------", workOrderSeq, currentStatus);
+                if (!currentStatus.equals(WorkOrderStatus.ONGOING)) {
+                    throw new CustomException(ErrorCodeType.WORK_ORDER_STATE_BAD_REQUEST);
+                }
+                break;
+
+            case ONGOING:
+                log.info("-------------- 작업지시서 진행상태 변경 서비스 진입 - {}번 진행중으로 변경, 현재상태 : {}  --------------", workOrderSeq, currentStatus);
+                if (!(currentStatus.equals(WorkOrderStatus.STOP) || currentStatus.equals(WorkOrderStatus.AFTER))) {
+                    throw new CustomException(ErrorCodeType.WORK_ORDER_STATE_BAD_REQUEST);
+                }
+                break;
+
+            case COMPLETE:
+                log.info("-------------- 작업지시서 진행상태 변경 서비스 진입 - {}번 완료로 변경, 현재상태 : {}  --------------", workOrderSeq, currentStatus);
+                if (!currentStatus.equals(WorkOrderStatus.ONGOING)) {
+                    throw new CustomException(ErrorCodeType.WORK_ORDER_STATE_BAD_REQUEST);
+                }
+                break;
+
+            default:
+                throw new CustomException(ErrorCodeType.WORK_ORDER_STATE_BAD_REQUEST);
+        }
+
+        // 상태 변경
+        workOrderDomainService.updateWorkOrderStatus(workOrder, newStatus);
+        log.info("-------------- 작업지시서 상태 변경 완료 - {}번, 새로운 상태: {} --------------", workOrderSeq, newStatus);
     }
 
 }
