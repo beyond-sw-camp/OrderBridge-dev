@@ -11,6 +11,7 @@ const props = defineProps({
   totalCount: {type: Number, required: true},       // 검색 결과 총 개수
   pageNumber: {type: Number, required: true},       // 현재 페이지 번호
   pageSize: {type: Number, required: true},         // 페이지 사이즈
+  expandShippingInstruction: {type: Object, required: true},
 });
 
 const emit = defineEmits(
@@ -41,8 +42,9 @@ const check = (status) => {
   emit('checkStatusEvent', status);
 };
 
-const itemExtend = () => {
-  emit('extendItemEvent');
+// 선택한 Item 확장 | 축소
+const itemExtend = async (seq) => {
+    emit('extendItemEvent', seq);
 };
 
 const register = () => {
@@ -125,12 +127,14 @@ const formatStatus = (status) => {
         <template v-if="shippingInstructionList.length > 0">
           <div style="max-height: 600px; overflow-y: auto;">
             <div v-for="shippingInstruction in shippingInstructionList"
-                 :key="shippingInstruction.shippingInstructionSeq" class="list-line row" @click="itemExtend">
+                 :key="shippingInstruction.shippingInstructionSeq" class="list-line row"
+                 @click="itemExtend(shippingInstruction.shippingInstructionSeq)">
               <div class="list-body col-6 left">
                 {{ shippingInstruction.shippingInstructionName }}
-                <br>
-                <div v-if="!shippingInstruction.itemName"><br></div>
-                <div v-else>{{ shippingInstruction.itemName }}</div>
+                <div v-if="!expandShippingInstruction[shippingInstruction.shippingInstructionSeq]">
+                  <div v-if="!shippingInstruction.itemName"><br></div>
+                  <div v-else>{{ shippingInstruction.itemName }}</div>
+                </div>
               </div>
               <div class="list-body col-2">{{ shippingInstruction.clientName }}</div>
               <div class="list-body col-2">{{
@@ -138,6 +142,18 @@ const formatStatus = (status) => {
                 }}
               </div>
               <div class="list-body col-2">{{ formatStatus(shippingInstruction.shippingInstructionStatus) }}</div>
+
+              <!-- 확장된 상세 정보 표시 -->
+              <div v-if="expandShippingInstruction[shippingInstruction.shippingInstructionSeq]"
+                   class="col-12">
+                <p>총수량: {{ expandShippingInstruction[shippingInstruction.shippingInstructionSeq].shippingInstructionDTO.shippingInstructionTotalQuantity }}</p>
+                <p>출하 주소: {{ expandShippingInstruction[shippingInstruction.shippingInstructionSeq].shippingInstructionDTO.shippingInstructionAddress }}</p>
+                <p>담당자: {{ expandShippingInstruction[shippingInstruction.shippingInstructionSeq].shippingInstructionDTO.userName }}</p>
+                <p>출하예정일시: {{ expandShippingInstruction[shippingInstruction.shippingInstructionSeq].shippingInstructionDTO.shippingInstructionScheduledShipmentDate }}</p>
+                <p v-if="expandShippingInstruction[shippingInstruction.shippingInstructionSeq].shippingInstructionDTO.shippingInstructionNote">
+                  출하지시서 비고: {{ expandShippingInstruction[shippingInstruction.shippingInstructionSeq].shippingInstructionDTO.shippingInstructionNote }}
+                </p>
+              </div>
             </div>
           </div>
           <div class="pagination">

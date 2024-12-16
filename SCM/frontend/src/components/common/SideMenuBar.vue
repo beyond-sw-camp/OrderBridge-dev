@@ -68,8 +68,8 @@ const toggleMenu2 = (menu) => {
         <span @click="toggleMenu('sales')">영업관리</span>
         <ul v-if="activeMenu === 'sales'">
           <li>
-            <span @click="toggleMenu2('item')">견적서</span>
-            <ul v-if="activeMenu2 === 'item'">
+            <span @click="toggleMenu2('quotation')">견적서</span>
+            <ul v-if="activeMenu2 === 'quotation'">
               <li>
                 <RouterLink class="content-item" to="">견적서 조회</RouterLink>
                 <RouterLink class="content-item" to="">견적서 등록</RouterLink>
@@ -78,8 +78,8 @@ const toggleMenu2 = (menu) => {
             </ul>
           </li>
           <li>
-            <span @click="toggleMenu2('order')">주문서</span>
-            <ul v-if="activeMenu2 === 'order'">
+            <span @click="toggleMenu2('salesOrder')">주문서</span>
+            <ul v-if="activeMenu2 === 'salesOrder'">
               <li>
                 <RouterLink class="content-item" to="">주문서 조회</RouterLink>
                 <RouterLink class="content-item" to="">주문서 등록</RouterLink>
@@ -88,8 +88,8 @@ const toggleMenu2 = (menu) => {
             </ul>
           </li>
           <li>
-            <span @click="toggleMenu2('warehouse')">판매</span>
-            <ul v-if="activeMenu2 === 'warehouse'">
+            <span @click="toggleMenu2('invoice')">판매</span>
+            <ul v-if="activeMenu2 === 'invoice'">
               <li>
                 <RouterLink class="content-item" to="">거래명세서 조회</RouterLink>
                 <RouterLink class="content-item" to="">거래명세서 등록</RouterLink>
@@ -98,18 +98,18 @@ const toggleMenu2 = (menu) => {
             </ul>
           </li>
           <li>
-            <span @click="toggleMenu2('warehouse')">출하지시서</span>
-            <ul v-if="activeMenu2 === 'warehouse'">
+            <span @click="toggleMenu2('shippingInstruction')">출하지시서</span>
+            <ul v-if="activeMenu2 === 'shippingInstruction'">
               <li>
-                <RouterLink class="content-item" to="">출하지시서 조회</RouterLink>
-                <RouterLink class="content-item" to="">출하지시서 등록</RouterLink>
-                <RouterLink class="content-item" to="">출하지시서 현황</RouterLink>
+                <RouterLink class="content-item" to="/shipping-instruction" active-class="active" replace>출하지시서 조회</RouterLink>
+                <RouterLink class="content-item" to="/shipping-instruction/input" active-class="active" replace>출하지시서 등록</RouterLink>
+                <RouterLink class="content-item" to="/shipping-instruction/situation" active-class="active" replace>출하지시서 현황</RouterLink>
               </li>
             </ul>
           </li>
           <li>
-            <span @click="toggleMenu2('warehouse')">출하</span>
-            <ul v-if="activeMenu2 === 'warehouse'">
+            <span @click="toggleMenu2('shippingSlip')">출하</span>
+            <ul v-if="activeMenu2 === 'shippingSlip'">
               <li>
                 <RouterLink class="content-item" to="">출하전표 조회</RouterLink>
                 <RouterLink class="content-item" to="">출하전표 등록</RouterLink>

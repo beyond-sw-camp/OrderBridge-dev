@@ -1,6 +1,6 @@
 <script setup>
 import ShippingInstructionList from "@/components/shippingInstruction/ShippingInstructionList.vue";
-import {onMounted, ref, watch} from "vue";
+import {onMounted, reactive, ref, watch} from "vue";
 import axios from "axios";
 import router from "@/router/index.js";
 
@@ -13,6 +13,7 @@ const searchStartDate = ref(null);
 const searchEndDate = ref(null);
 const searchName = ref(null);
 const searchStatus = ref(new Set([]));
+const expandShippingInstruction = ref({});
 
 const fetchShippingInstructionList = async () => {
   try {
@@ -33,13 +34,32 @@ const fetchShippingInstructionList = async () => {
       }
     });
 
-    console.log(response);
     shippingInstructionList.value = response.data.shippingInstructionList;
     shippingInstructionStatusList.value = response.data.shippingInstructionStatusList;
     totalCount.value = response.data.totalItems;
 
   } catch (error) {
     console.error("출하지시서 불러오기 실패 :", error);
+  }
+};
+
+const fetchShippingInstruction = async (seq) => {
+  try {
+    const response = await axios.get(`http://localhost:8090/api/v1/shipping-instruction/${seq}`, {
+      paramsSerializer: (params) => {
+        // null이나 undefined 값을 필터링
+        const filteredParams = Object.fromEntries(
+            Object.entries(params).filter(([_, value]) => value !== null && value !== undefined)
+        );
+        return new URLSearchParams(filteredParams).toString();
+      }
+    });
+
+    expandShippingInstruction.value[seq] = response.data; // ref 값에 추가
+    console.log('상세 데이터:', expandShippingInstruction.value);
+
+  } catch (error) {
+    console.error("상세 출하지시서 불러오기 실패 :", error);
   }
 };
 
@@ -121,6 +141,18 @@ function search() {
 
   fetchShippingInstructionList();
 }
+
+// 상세 정보 확장
+const handleExtendItem = (seq) => {
+  if (expandShippingInstruction.value[seq]) {
+    // 이미 확장된 상태면 축소
+    delete expandShippingInstruction.value[seq];
+  } else {
+    // API로 데이터를 가져와서 저장
+    fetchShippingInstruction(seq);
+  }
+}
+
 </script>
 
 <template>
@@ -133,10 +165,11 @@ function search() {
                            :totalCount="totalCount"
                            :pageNumber="pageNumber"
                            :pageSize="pageSize"
+                           :expandShippingInstruction="expandShippingInstruction"
                            @pageEvent="handlePage"
                            @searchEvent="handleSearch"
                            @checkStatusEvent="handleStatus"
-                           @extendItemEvent=""
+                           @extendItemEvent="handleExtendItem"
                            @registerEvent="handleRegister"
                            @excelEvent="excelDown"
   />
