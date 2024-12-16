@@ -3,6 +3,7 @@ import {onMounted, ref, watch} from 'vue';
 import axios from "axios";
 import searchIcon from "@/assets/searchIcon.svg";
 import dayjs from "dayjs";
+import router from "@/router/index.js";
 
 const totalCount = ref(0);
 const pageSize = ref(10);
@@ -107,6 +108,11 @@ const excelDown = async () => {
     console.error("생산입고 엑셀다운로드 실패 :", error);
   }
 }
+
+// 등록 페이지 이동
+const handleRegister = () => {
+  router.push("/productionReceiving/register");
+}
 </script>
 
 <template>
@@ -142,7 +148,7 @@ const excelDown = async () => {
                   <div>검색결과: {{ totalCount }}개</div>
                   <div class="d-flex justify-content-end mt-3">
                     <b-button @click="excelDown" variant="light" size="sm" class="button">엑셀 다운로드</b-button>
-                    <b-button variant="light" size="sm" class="button ms-2">생산입고 등록</b-button>
+                    <b-button @click="handleRegister" variant="light" size="sm" class="button ms-2">생산입고 등록</b-button>
                   </div>
               </div>
               <div class="list-headline row">
@@ -153,7 +159,7 @@ const excelDown = async () => {
                   <div class="list-head col-1">상태</div>
               </div>
               <template v-if="productionReceivingList.length > 0">
-                <div style="max-height: 600px; overflow-y: auto;">
+                <div style="max-height: 500px; overflow-y: auto;">
                   <div v-for="productionReceiving in productionReceivingList" :key="productionReceiving.productionReceivingSeq" class="list-line row" @click="itemExtend">
                     <div class="list-body col-4 left">
                       {{ productionReceiving.productionReceivingName }}
