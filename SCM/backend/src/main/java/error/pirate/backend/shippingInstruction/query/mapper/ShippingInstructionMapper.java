@@ -21,11 +21,6 @@ public interface ShippingInstructionMapper {
 
     List<ShippingInstructionItemDTO> selectItemListByShippingInstructionSeq(long shippingInstructionSeq);
 
-    List<ShippingInstructionSituationDTO> selectShippingInstructionSituation(
+    List<ShippingInstructionSituationResponse> selectShippingInstructionSituation(
             @Param("request") ShippingInstructionSituationRequest request);
-
-    List<ShippingInstructionSituationMonthlyTotalDTO> selectMonthlyTotal(
-            @Param("request") ShippingInstructionSituationRequest request);
-
-    int selectTotal(@Param("request") ShippingInstructionSituationRequest request);
 }
