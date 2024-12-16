@@ -1,6 +1,7 @@
 package error.pirate.backend.workOrder.command.application.controller;
 
 import error.pirate.backend.workOrder.command.application.dto.CreateWorkOrderRequest;
+import error.pirate.backend.workOrder.command.application.dto.UpdateWorkOrderRequest;
 import error.pirate.backend.workOrder.command.application.service.WorkOrderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -29,6 +30,17 @@ public class WorkOrderCommandController {
         workOrderService.createWorkOrderForItem(request);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    /* 작업지시서 수정 */
+    @PutMapping("/{workOrderSeq}")
+    @Operation(summary = "작업지시서 수정", description = "선택한 작업지시서를 수정한다.")
+    public ResponseEntity<Void> updateSalesOrder(@PathVariable Long workOrderSeq,
+                                                 @Valid @RequestBody UpdateWorkOrderRequest request) {
+        log.info("-------------- PUT /api/v1/workOrder/{} 작업지시서 수정 요청 - request:{} --------------", workOrderSeq, request);
+        workOrderService.updateWorkOrder(workOrderSeq, request);
+
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     /* 작업지시서 상태변경 */

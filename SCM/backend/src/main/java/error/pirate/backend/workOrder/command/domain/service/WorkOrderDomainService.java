@@ -14,9 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.*;
 
 @Service
 @RequiredArgsConstructor
@@ -70,10 +68,44 @@ public class WorkOrderDomainService {
         }
     }
 
+    // 작업지시일 시간 처리
+    public LocalDateTime convertIndicatedDate(LocalDate indicatedDate) {
+        LocalDateTime regDate = LocalDateTime.now();
+
+        if (indicatedDate.isEqual(regDate.toLocalDate())) {
+            // 등록일과 같으면 등록 시간 + 1시간
+            return regDate.plusHours(1);
+        } else {
+            // 등록일과 다르면 오전 9시로 설정
+            return indicatedDate.atTime(LocalTime.of(9, 0));
+        }
+    }
+
+    // 납기일 시간 처리
+    public LocalDateTime convertDueDate(LocalDate dueDate) {
+        return dueDate.atTime(LocalTime.of(23, 59, 59));
+    }
+
+    // 작업지시서 수정
+    public void updateWorkOrder(WorkOrder workOrder, SalesOrder salesOrder, SalesOrderItem salesOrderItem, Warehouse warehouse,
+                                LocalDateTime workOrderIndicatedDate, LocalDateTime workOrderDueDate,
+                                int workOrderIndicatedQuantity, String workOrderNote) {
+        workOrder.updateWorkOrder(
+                salesOrder,
+                salesOrderItem,
+                warehouse,
+                workOrderIndicatedDate,
+                workOrderDueDate,
+                workOrderIndicatedQuantity,
+                workOrderNote
+        );
+    }
+
     // 작업지시서 삭제(상태로 변경)
     public void deleteWorkOrder(WorkOrder workOrder) {
 
-        /* 수정을 위해 엔터티 정보 변경 */
+        // 상태 수정을 위해 엔터티 변경
         workOrder.deleteWorkOrder();
     }
+
 }
