@@ -113,7 +113,7 @@
         SELECT
             si.shipping_instruction_seq,
             si.shipping_instruction_scheduled_shipment_date,
-            DATE_FORMAT(si.shipping_instruction_scheduled_shipment_date, '%Y-%m')
+            DATE_FORMAT(si.shipping_instruction_scheduled_shipment_date, '%Y/%m')
                 shipping_instruction_scheduled_shipment_month_date,
             si.shipping_instruction_name,
             FORMAT(si.shipping_instruction_total_quantity, 0) shipping_instruction_total_quantity,
@@ -135,7 +135,7 @@
             AND c.client_name LIKE CONCAT('%', #{request.clientName}, '%')
         </if>
         GROUP BY
-            DATE_FORMAT(si.shipping_instruction_scheduled_shipment_date, '%Y-%m'),
+            DATE_FORMAT(si.shipping_instruction_scheduled_shipment_date, '%Y/%m'),
             si.shipping_instruction_scheduled_shipment_date WITH ROLLUP;
     </select>
 </mapper>

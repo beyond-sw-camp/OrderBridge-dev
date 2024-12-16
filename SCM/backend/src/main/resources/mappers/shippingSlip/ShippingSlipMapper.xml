@@ -102,7 +102,7 @@
         SELECT
             s.shipping_slip_seq,
             s.shipping_slip_shipping_date,
-            DATE_FORMAT(s.shipping_slip_shipping_date, '%Y-%m') shipping_slip_shipping_month_date,
+            DATE_FORMAT(s.shipping_slip_shipping_date, '%Y/%m') shipping_slip_shipping_month_date,
             s.shipping_slip_name,
             FORMAT(s.shipping_slip_total_quantity, 0) shipping_slip_total_quantity,
             c.client_name,
@@ -124,7 +124,7 @@
             AND c.client_name LIKE CONCAT('%', #{request.clientName}, '%')
         </if>
         GROUP BY
-            DATE_FORMAT(s.shipping_slip_shipping_date, '%Y-%m'),
+            DATE_FORMAT(s.shipping_slip_shipping_date, '%Y/%m'),
             s.shipping_slip_shipping_date WITH ROLLUP;
     </select>
 </mapper>
