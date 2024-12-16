@@ -111,4 +111,33 @@ public class WorkOrder {
         this.workOrderStatus = WorkOrderStatus.DELETE;
     }
 
+    public void updateWorkOrder(SalesOrder salesOrder, SalesOrderItem salesOrderItem, Warehouse warehouse,
+                                LocalDateTime workOrderIndicatedDate, LocalDateTime workOrderDueDate,
+                                int workOrderIndicatedQuantity, String workOrderNote) {
+        if (salesOrder != null) {
+            this.salesOrder = salesOrder;
+        }
+
+        if (salesOrderItem != null) {
+            this.item = salesOrderItem.getItem();
+        }
+
+        if (warehouse != null) {
+            this.warehouse = warehouse;
+        }
+
+        if (workOrderIndicatedDate != null) {
+            this.workOrderIndicatedDate = workOrderIndicatedDate;
+        }
+
+        if (workOrderDueDate != null) {
+            this.workOrderDueDate = workOrderDueDate;
+        }
+
+        if (workOrderNote != null) {
+            this.workOrderNote = workOrderNote;
+        }
+
+        this.workOrderIndicatedQuantity = workOrderIndicatedQuantity;
+    }
 }
