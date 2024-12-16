@@ -109,15 +109,18 @@
 
     <!--  출하지시서 현황 조회  -->
     <select id="selectShippingInstructionSituation"
-            resultType="error.pirate.backend.shippingInstruction.query.dto.ShippingInstructionSituationDTO">
+            resultType="error.pirate.backend.shippingInstruction.query.dto.ShippingInstructionSituationResponse">
         SELECT
             si.shipping_instruction_seq,
             si.shipping_instruction_scheduled_shipment_date,
+            DATE_FORMAT(si.shipping_instruction_scheduled_shipment_date, '%Y-%m')
+                shipping_instruction_scheduled_shipment_month_date,
             si.shipping_instruction_name,
-            si.shipping_instruction_total_quantity,
+            FORMAT(si.shipping_instruction_total_quantity, 0) shipping_instruction_total_quantity,
             c.client_name,
             si.shipping_instruction_address,
-            si.shipping_instruction_note
+            si.shipping_instruction_note,
+            FORMAT(IFNULL(SUM(si.shipping_instruction_total_quantity), 0), 0) shipping_instruction_total_quantity_sum
         FROM tb_shipping_instruction si
         JOIN tb_sales_order so ON (si.sales_order_seq = so.sales_order_seq)
         JOIN tb_client c ON (so.client_seq = c.client_seq)
@@ -131,46 +134,8 @@
         <if test="request.clientName != '' and request.clientName != null">
             AND c.client_name LIKE CONCAT('%', #{request.clientName}, '%')
         </if>
-    </select>
-
-    <!--  출하지시서 현황 월합계 조회  -->
-    <select id="selectMonthlyTotal"
-            resultType="error.pirate.backend.shippingInstruction.query.dto.ShippingInstructionSituationMonthlyTotalDTO">
-        SELECT
-            DATE_FORMAT(si.shipping_instruction_scheduled_shipment_date, '%Y-%m') AS month,
-            NVL(SUM(si.shipping_instruction_total_quantity),0) AS monthly_total
-        FROM tb_shipping_instruction si
-        JOIN tb_sales_order so ON (si.sales_order_seq = so.sales_order_seq)
-        JOIN tb_client c ON (so.client_seq = c.client_seq)
-        WHERE si.shipping_instruction_status NOT IN ('DELETE')
-        <if test="request.startDate != null"><![CDATA[
-            AND #{request.startDate} <= si.shipping_instruction_scheduled_shipment_date
-             ]]></if>
-        <if test="request.endDate != null"><![CDATA[
-            AND #{request.endDate} >= si.shipping_instruction_scheduled_shipment_date
-            ]]></if>
-        <if test="request.clientName != '' and request.clientName != null">
-            AND c.client_name LIKE CONCAT('%', #{request.clientName}, '%')
-        </if>
-        GROUP BY DATE_FORMAT(si.shipping_instruction_scheduled_shipment_date, '%Y-%m')
-    </select>
-
-    <!--  출하지시서 현황 총합계 조회  -->
-    <select id="selectTotal" resultType="Integer">
-        SELECT
-            NVL(SUM(si.shipping_instruction_total_quantity),0) AS total_quantity
-        FROM tb_shipping_instruction si
-        JOIN tb_sales_order so ON (si.sales_order_seq = so.sales_order_seq)
-        JOIN tb_client c ON (so.client_seq = c.client_seq)
-        WHERE si.shipping_instruction_status NOT IN ('DELETE')
-        <if test="request.startDate != null"><![CDATA[
-            AND #{request.startDate} <= si.shipping_instruction_scheduled_shipment_date
-             ]]></if>
-        <if test="request.endDate != null"><![CDATA[
-            AND #{request.endDate} >= si.shipping_instruction_scheduled_shipment_date
-            ]]></if>
-        <if test="request.clientName != '' and request.clientName != null">
-            AND c.client_name LIKE CONCAT('%', #{request.clientName}, '%')
-        </if>
+        GROUP BY
+            DATE_FORMAT(si.shipping_instruction_scheduled_shipment_date, '%Y-%m'),
+            si.shipping_instruction_scheduled_shipment_date WITH ROLLUP;
     </select>
 </mapper>

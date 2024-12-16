@@ -19,12 +19,6 @@ public interface ShippingSlipMapper {
 
     List<ShippingSlipItemDTO> selectItemListByShippingSlipSeq(long shippingSlipSeq);
 
-    List<ShippingSlipSituationDTO> selectShippingSlipSituation(
-            @Param("request") ShippingSlipSituationRequest request);
-
-    List<ShippingSlipSituationMonthlyTotalDTO> selectMonthlyTotal(
-            @Param("request") ShippingSlipSituationRequest request);
-
-    int selectTotal(
+    List<ShippingSlipSituationResponse> selectShippingSlipSituation(
             @Param("request") ShippingSlipSituationRequest request);
 }
