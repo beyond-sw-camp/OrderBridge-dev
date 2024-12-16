@@ -1,6 +1,5 @@
 package error.pirate.backend.shippingInstruction.query.controller;
 
-import error.pirate.backend.purchaseOrder.query.dto.PurchaseOrderRequest;
 import error.pirate.backend.shippingInstruction.query.dto.ShippingInstructionListRequest;
 import error.pirate.backend.shippingInstruction.query.dto.ShippingInstructionListResponse;
 import error.pirate.backend.shippingInstruction.query.dto.ShippingInstructionResponse;
@@ -12,14 +11,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.List;
 
 @Tag(name = "출하지시서")
 @RestController
@@ -51,27 +46,44 @@ public class ShippingInstructionQueryController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/excelDown")
+    @Operation(summary = "출하지시서 엑셀 다운")
+    public ResponseEntity<byte[]> shippingInstructionExcelDown(
+            @ModelAttribute ShippingInstructionListRequest request) {
+
+        byte[] excelData = shippingInstructionQueryService.shippingInstructionExcelDown(request);
+
+        HttpHeaders headersResponse = new HttpHeaders();
+        headersResponse.setContentLength(excelData.length);
+
+        return ResponseEntity.ok()
+                .headers(headersResponse)
+                .body(excelData);
+    }
+
     @Operation(summary = "출하지시서 현황 조회", description = "출하지시서 현황 조회")
     @GetMapping("/situation")
-    public ResponseEntity<ShippingInstructionSituationResponse> readShippingInstructionSituation(
+    public ResponseEntity<List<ShippingInstructionSituationResponse>> readShippingInstructionSituation(
             @ModelAttribute ShippingInstructionSituationRequest request
     ) {
-        ShippingInstructionSituationResponse response
+        List<ShippingInstructionSituationResponse> response
                 = shippingInstructionQueryService.readShippingInstructionSituation(request);
 
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/excelDown")
-    @Operation(summary = "출하지시서 엑셀 다운")
-    public ResponseEntity<byte[]> shippingInstructionExcelDown(ShippingInstructionListRequest shippingInstructionListRequest) {
+    @GetMapping("/situation/excelDown")
+    @Operation(summary = "출하지시서 현황 엑셀 다운")
+    public ResponseEntity<byte[]> shippingInstructionSituationExcelDown(
+            @ModelAttribute ShippingInstructionSituationRequest request) {
+
+        byte[] excelData = shippingInstructionQueryService.shippingInstructionSituationExcelDown(request);
+
         HttpHeaders headersResponse = new HttpHeaders();
-        String fileName = URLEncoder.encode("출하지시서[" + new SimpleDateFormat("yyyyMMdd").format(new Date()) + "].xlsx", StandardCharsets.UTF_8);
-        headersResponse.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileName);
+        headersResponse.setContentLength(excelData.length);
 
         return ResponseEntity.ok()
                 .headers(headersResponse)
-                .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                .body(shippingInstructionQueryService.shippingInstructionExcelDown(shippingInstructionListRequest));
+                .body(excelData);
     }
 }

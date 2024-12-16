@@ -1,6 +1,7 @@
 package error.pirate.backend.shippingInstruction.query.service;
 
 import error.pirate.backend.common.ExcelDownLoad;
+import error.pirate.backend.productionReceiving.query.dto.ProductionReceivingSituationResponse;
 import error.pirate.backend.shippingInstruction.query.dto.*;
 import error.pirate.backend.shippingInstruction.query.mapper.ShippingInstructionMapper;
 import lombok.RequiredArgsConstructor;
@@ -63,27 +64,6 @@ public class ShippingInstructionQueryService {
                 .build();
     }
 
-    /* 출하지시서 현황 조회 */
-    @Transactional(readOnly = true)
-    public ShippingInstructionSituationResponse readShippingInstructionSituation(ShippingInstructionSituationRequest request) {
-        // 출하지시서 현황 조회
-        List<ShippingInstructionSituationDTO> shippingInstructionSituationList
-                = shippingInstructionMapper.selectShippingInstructionSituation(request);
-
-        // 출하지시서 현황 월합계
-        List<ShippingInstructionSituationMonthlyTotalDTO> monthlyTotalList
-                = shippingInstructionMapper.selectMonthlyTotal(request);
-
-        // 출하전표 현황 총합계
-        int totalQuantity = shippingInstructionMapper.selectTotal(request);
-
-        return ShippingInstructionSituationResponse.builder()
-                .shippingInstructionSituationList(shippingInstructionSituationList)
-                .monthlyTotalList(monthlyTotalList)
-                .totalQuantity(totalQuantity)
-                .build();
-    }
-
     /* 출하지시서 엑셀 다운 */
     public byte[] shippingInstructionExcelDown(ShippingInstructionListRequest request) {
         int offset = (request.getPage() - 1) * request.getSize();
@@ -103,12 +83,53 @@ public class ShippingInstructionQueryService {
             excel[i][1] = dto.getItemName();//  품목
             excel[i][2] = dto.getClientName();
             excel[i][3] = dto.getShippingInstructionScheduledShipmentDate() != null
-                    ? dto.getShippingInstructionScheduledShipmentDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                    ? dto.getShippingInstructionScheduledShipmentDate().format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss"))
                     : null;
             excel[i][4] = ShippingInstructionStatus.statusValue(
                     String.valueOf(dto.getShippingInstructionStatus()));
         }
 
         return excelDownBody.excelDownBody(excel, headers, "출하지시서");
+    }
+
+    /* 출하지시서 현황 조회 */
+    @Transactional(readOnly = true)
+    public List<ShippingInstructionSituationResponse> readShippingInstructionSituation(ShippingInstructionSituationRequest request) {
+        return shippingInstructionMapper.selectShippingInstructionSituation(request);
+    }
+
+    /* 출하지시서 현황 엑셀 다운 */
+    public byte[] shippingInstructionSituationExcelDown(ShippingInstructionSituationRequest request) {
+
+        List<ShippingInstructionSituationResponse> shippingInstructionSituationList
+                = shippingInstructionMapper.selectShippingInstructionSituation(request);
+
+        String[] headers = {"번호", "출하예정일", "출하지시서명", "총수량", "거래처명", "출하주소", "출하지시서 비고"};
+        String[][] excel = new String[shippingInstructionSituationList.size()][headers.length];
+
+        for(int i = 0; i < shippingInstructionSituationList.size(); i++) {
+            ShippingInstructionSituationResponse dto = shippingInstructionSituationList.get(i);
+            if(dto.getShippingInstructionScheduledShipmentDate() == null) {
+                boolean isNull = (dto.getShippingInstructionScheduledShipmentMonthDate() == null);
+
+                excel[i][0] = "-";
+                excel[i][1] = isNull ? "" : dto.getShippingInstructionScheduledShipmentMonthDate(); // 출하예정월
+                excel[i][2] = isNull ? "총합" : "-";
+                excel[i][3] = dto.getShippingInstructionTotalQuantitySum() + " 개";  // 총수량
+                excel[i][4] = "-";
+                excel[i][5] = "-";
+                excel[i][6] = "-";
+            } else {
+                excel[i][0] = String.valueOf(i+1); // 번호
+                excel[i][1] = dto.getShippingInstructionScheduledShipmentDate().format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss")); // 출하예정일
+                excel[i][2] = dto.getShippingInstructionName();       // 출하지시서명
+                excel[i][3] = dto.getShippingInstructionTotalQuantity() + " 개";  // 총수량
+                excel[i][4] = dto.getClientName(); // 거래처명
+                excel[i][5] = dto.getShippingInstructionAddress(); // 주소
+                excel[i][6] = dto.getShippingInstructionNote(); // 비고
+            }
+        }
+
+        return excelDownBody.excelDownBody(excel, headers, "출하지시서 현황");
     }
 }

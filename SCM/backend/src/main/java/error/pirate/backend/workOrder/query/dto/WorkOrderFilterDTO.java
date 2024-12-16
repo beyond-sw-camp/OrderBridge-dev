@@ -1,6 +1,7 @@
 package error.pirate.backend.workOrder.query.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import error.pirate.backend.workOrder.command.domain.aggregate.entity.WorkOrderStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,7 +20,7 @@ import java.time.LocalDateTime;
 public class WorkOrderFilterDTO {
 
     private String warehouseName;          // 생산창고 이름
-    private String workOrderStatus;        // 작업지시 상태
+    private WorkOrderStatus workOrderStatus;        // 작업지시 상태
 
     @DateTimeFormat(pattern = "yyyy/MM/dd")
     private LocalDate startDate;       // 검색 시작일

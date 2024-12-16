@@ -1,6 +1,7 @@
 package error.pirate.backend.shippingSlip.query.controller;
 
 import error.pirate.backend.shippingInstruction.query.dto.ShippingInstructionListRequest;
+import error.pirate.backend.shippingInstruction.query.dto.ShippingInstructionSituationRequest;
 import error.pirate.backend.shippingSlip.query.dto.*;
 import error.pirate.backend.shippingSlip.query.service.ShippingSlipQueryService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -16,6 +17,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 @Tag(name = "출하전표")
 @RestController
@@ -47,27 +49,42 @@ public class ShippingSlipQueryController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/excelDown")
+    @Operation(summary = "출하전표 엑셀 다운")
+    public ResponseEntity<byte[]> shippingInstructionExcelDown(ShippingSlipListRequest request) {
+        byte[] excelData = shippingSlipQueryService.shippingSlipExcelDown(request);
+
+        HttpHeaders headersResponse = new HttpHeaders();
+        headersResponse.setContentLength(excelData.length);
+
+        return ResponseEntity.ok()
+                .headers(headersResponse)
+                .body(excelData);
+    }
+
     @Operation(summary = "출하전표 현황 조회", description = "출하전표 현황 조회")
     @GetMapping("/situation")
-    public ResponseEntity<ShippingSlipSituationResponse> readShippingSlipSituation(
+    public ResponseEntity<List<ShippingSlipSituationResponse>> readShippingSlipSituation(
             @ModelAttribute ShippingSlipSituationRequest request
     ) {
-        ShippingSlipSituationResponse response
+        List<ShippingSlipSituationResponse> response
                 = shippingSlipQueryService.readShippingSlipSituation(request);
 
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/excelDown")
-    @Operation(summary = "출하전표 엑셀 다운")
-    public ResponseEntity<byte[]> shippingInstructionExcelDown(ShippingSlipListRequest request) {
+    @GetMapping("/situation/excelDown")
+    @Operation(summary = "출하전표 현황 엑셀 다운")
+    public ResponseEntity<byte[]> shippingSlipSituationExcelDown(
+            @ModelAttribute ShippingSlipSituationRequest request) {
+
+        byte[] excelData = shippingSlipQueryService.shippingSlipSituationExcelDown(request);
+
         HttpHeaders headersResponse = new HttpHeaders();
-        String fileName = URLEncoder.encode("출하전표[" + new SimpleDateFormat("yyyyMMdd").format(new Date()) + "].xlsx", StandardCharsets.UTF_8);
-        headersResponse.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileName);
+        headersResponse.setContentLength(excelData.length);
 
         return ResponseEntity.ok()
                 .headers(headersResponse)
-                .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                .body(shippingSlipQueryService.shippingSlipExcelDown(request));
+                .body(excelData);
     }
 }
