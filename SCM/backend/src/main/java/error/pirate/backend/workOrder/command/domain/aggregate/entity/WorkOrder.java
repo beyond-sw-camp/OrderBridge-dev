@@ -113,7 +113,7 @@ public class WorkOrder {
 
     public void updateWorkOrder(SalesOrder salesOrder, SalesOrderItem salesOrderItem, Warehouse warehouse,
                                 LocalDateTime workOrderIndicatedDate, LocalDateTime workOrderDueDate,
-                                int workOrderIndicatedQuantity, String workOrderNote) {
+                                Integer workOrderIndicatedQuantity, String workOrderNote) {
         if (salesOrder != null) {
             this.salesOrder = salesOrder;
         }
@@ -134,10 +134,12 @@ public class WorkOrder {
             this.workOrderDueDate = workOrderDueDate;
         }
 
+        if (workOrderIndicatedQuantity != null) {
+            this.workOrderIndicatedQuantity = workOrderIndicatedQuantity;
+        }
+
         if (workOrderNote != null) {
             this.workOrderNote = workOrderNote;
         }
-
-        this.workOrderIndicatedQuantity = workOrderIndicatedQuantity;
     }
 }
