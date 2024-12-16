@@ -31,6 +31,9 @@ public class Invoice {
 
     private String invoiceName;
 
+    @Enumerated(EnumType.STRING)
+    private InvoiceStatus invoiceStatus;
+
     @CreatedDate
     private LocalDateTime invoiceRegDate; // 거래 명세서 등록일
 
@@ -64,5 +67,9 @@ public class Invoice {
         if (invoiceNote != null) this.invoiceNote = invoiceNote;
         this.invoiceExtendedPrice = invoiceExtendedPrice;
         this.invoiceTotalQuantity = invoiceTotalQuantity;
+    }
+
+    public void delete() {
+        this.invoiceStatus = InvoiceStatus.DELETE;
     }
 }

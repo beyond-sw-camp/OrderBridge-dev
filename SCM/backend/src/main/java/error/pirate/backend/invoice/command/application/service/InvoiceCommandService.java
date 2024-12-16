@@ -135,4 +135,13 @@ public class InvoiceCommandService {
 
         invoiceDomainService.validateItem(invoice.getSalesOrder().getSalesOrderSeq());
     }
+
+    // 거래 명세서 삭제
+    @Transactional
+    public void deleteInvoice(Long invoiceSeq) {
+
+        Invoice invoice = invoiceRepository.findById(invoiceSeq).orElseThrow();
+
+        invoice.delete();
+    }
 }

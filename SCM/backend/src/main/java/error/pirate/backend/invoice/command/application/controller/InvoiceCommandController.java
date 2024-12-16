@@ -39,7 +39,11 @@ public class InvoiceCommandController {
 
     @DeleteMapping("/{invoiceSeq}")
     @Operation(summary = "거래 명세서 삭제")
-    public ResponseEntity<Void> deleteInvoice() {
+    public ResponseEntity<Void> deleteInvoice(
+            @PathVariable Long invoiceSeq) {
+
+        invoiceCommandService.deleteInvoice(invoiceSeq);
+
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 }
