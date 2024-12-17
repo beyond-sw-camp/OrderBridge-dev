@@ -157,4 +157,10 @@ public class WorkOrder {
         return workOrder;
     }
 
+    public void updateWorkOrderWorkAutoComplete(Integer indicatedQuantity) {
+        this.workOrderWorkQuantity = indicatedQuantity;
+        this.workOrderEndDate = LocalDateTime.now();
+    }
+
+
 }
