@@ -28,6 +28,8 @@ public class PurchaseOrderResponse {
 
     private String purchaseOrderNote; // 발주서 비고
 
+    private Integer purchaseOrderTotalItemQuantity;  // 총 수량
+
     @Setter
     private List<PurchaseOrderItemResponse> purchaseOrderItemResponseList;
 

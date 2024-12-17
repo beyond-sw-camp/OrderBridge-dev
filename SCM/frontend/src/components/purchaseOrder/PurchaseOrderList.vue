@@ -2,6 +2,9 @@
 import {onMounted, ref, watch} from 'vue';
 import axios from "axios";
 import searchIcon from "@/assets/searchIcon.svg";
+import trashIcon from "@/assets/trashIcon.svg";
+import editIcon from "@/assets/editIcon.svg";
+import printIcon from "@/assets/printIcon.svg";
 import dayjs from "dayjs";
 import router from "@/router/index.js";
 
@@ -12,6 +15,11 @@ const searchStartDate = ref('');
 const searchEndDate = ref('');
 const searchName = ref('');
 const searchStatus = ref([]);
+const expandedIndex = ref(null);
+
+const toggleDetails = (index) => {
+  expandedIndex.value = expandedIndex.value === index ? null : index;
+};
 
 const fetchPurchaseOrderList = async () => {
   try {
@@ -52,7 +60,7 @@ const excelDown = async () => {
       searchStartDate: searchStartDate.value,
       searchEndDate: searchEndDate.value,
       searchName: searchName.value,
-      searchStatus:  searchStatus.value.toString(),
+      searchStatus: searchStatus.value.toString(),
       pageNo: pageNumber.value,
     };
 
@@ -62,7 +70,7 @@ const excelDown = async () => {
 
     const response = await axios.get(`http://localhost:8090/api/v1/purchaseOrder/excelDown`, {
       params: filteredParams
-      ,  paramsSerializer: (params) => {
+      , paramsSerializer: (params) => {
         return new URLSearchParams(params).toString();
       },
       responseType: "blob", // 중요: blob 형식으로 설정
@@ -85,7 +93,7 @@ const excelDown = async () => {
   }
 }
 
-onMounted( () => {
+onMounted(() => {
   fetchPurchaseOrderList();
 })
 
@@ -196,13 +204,13 @@ function register() {
         <template v-if="purchaseOrderList?.length > 0">
           <div style="max-height: 600px; overflow-y: auto;">
             <div v-for="(purchaseOrder, index) in purchaseOrderList" :key="purchaseOrder.purchaseOrderSeq || index"
-                 class="list-line row" @click="itemExtend">
+                 class="list-line row" @click="toggleDetails(index)">
               <div class="list-body col-5 left">
                 {{ purchaseOrder.purchaseOrderName }}
                 <div v-if="purchaseOrder.purchaseOrderItemResponseList?.length > 0">
                   <template v-for="(purchaseOrderItem, idx) in purchaseOrder.purchaseOrderItemResponseList"
                             :key="purchaseOrderItem.purchaseOrderItemSeq || idx">
-                    <span>
+                    <span v-if="expandedIndex !== index">
                       {{ purchaseOrderItem.itemName }}
                       <span v-if="idx < purchaseOrder.purchaseOrderItemResponseList.length - 1">, </span>
                     </span>
@@ -214,9 +222,54 @@ function register() {
                 {{ dayjs(purchaseOrder.purchaseOrderTargetDueDate).format('YYYY-MM-DD HH:mm:ss') }}
               </div>
               <div class="list-body col-2">{{ purchaseOrder.purchaseOrderStatus }}</div>
+
+              <!-- 확장된 상세 내용 -->
+              <div class="d-flex justify-content-center">
+                <div v-if="expandedIndex === index" class="col-md-11 mt-3">
+                    <p>총수량 : {{
+                        purchaseOrder.purchaseOrderTotalItemQuantity
+                      }} 개</p>
+                    <p>총금액 : {{
+                        purchaseOrder.purchaseOrderExtendedPrice.toLocaleString()
+                      }} 원</p>
+                    <p>담당자 : {{
+                        purchaseOrder.userName
+                      }}</p>
+                    <p>계약 납기일 : {{
+                        dayjs(purchaseOrder.purchaseOrderDueDate).format('YYYY/MM/DD HH:mm:ss')
+                      }}</p>
+                    <p>목표 납기일 : {{
+                        dayjs(purchaseOrder.purchaseOrderTargetDueDate).format('YYYY/MM/DD HH:mm:ss')
+                      }}</p>
+                    <p>
+                      출하지시서 비고 :
+                      {{ purchaseOrder.purchaseOrderNote }}
+                    </p>
+                  <div v-for="(purchaseOrderItem, idx) in purchaseOrder.purchaseOrderItemResponseList"
+                       :key="purchaseOrderItem.purchaseOrderItemSeq || idx"
+                       class="mb-3 d-flex flex-row">
+                    <div style="max-height: 250px;" class="me-5 col-md-3 d-flex flex-column border border-secondary rounded">
+                      <b-img
+                          style="max-height: 100px;"
+                          :src="purchaseOrderItem.itemImageUrl != null ? purchaseOrderItem.itemImageUrl : 'https://picsum.photos/200/200'"
+                          fluid
+                          alt="Responsive image">
+                      </b-img>
+                      <p class="ms-3"> 상품명: {{ purchaseOrderItem.itemName }}</p>
+                      <p class="ms-3"> 수량: {{ purchaseOrderItem.purchaseOrderItemQuantity }}</p>
+                      <p class="ms-3"> 가격: {{ purchaseOrderItem.purchaseOrderItemPrice }}</p>
+                      <p class="ms-3"> 비고: {{ purchaseOrderItem.purchaseOrderItemNote }}</p>
+                    </div>
+                  </div>
+                  <div class="d-flex justify-content-end align-items-center">
+                    <printIcon class="me-3 icon" @click.stop="printItem(index)"/>
+                    <editIcon class="me-3 icon" @click.stop=""/>
+                    <trashIcon class="icon" @click.stop="itemDelete(shippingInstruction.shippingInstructionSeq)"/>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-
 
           <div class="pagination">
             <b-pagination
