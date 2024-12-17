@@ -1,12 +1,13 @@
 <script setup>
 import {defineProps, ref, watch} from "vue";
+import trashIcon from '@/assets/trashIcon.svg'
 
 const props = defineProps({
   itemList: {type: Array, required: true},       // 주문서 품목 리스트
   selectedSalesOrder: {type: Boolean },       // 주문서 선택 여부
 });
 
-const emit = defineEmits(['registerEvent']);
+const emit = defineEmits(['registerEvent', 'updateItemListEvent']);
 
 // itemList의 각 아이템에 대해 itemData 초기화
 const itemData = ref(props.itemList.map(item => ({
@@ -27,6 +28,23 @@ watch(() => props.itemList, (newItemList) => {
   }));
 });
 
+// 특정 아이템 삭제
+const deleteItem = (index) => {
+  // 아이템이 하나만 남아 있으면 삭제 불가능
+  if (itemData.value.length <= 1) {
+    alert("최소 하나의 품목은 등록해야 합니다."); // 사용자 알림
+    return;
+  }
+
+  // itemData에서 해당 index 삭제
+  itemData.value.splice(index, 1);
+
+  // props.itemList를 업데이트하기 위해 부모 컴포넌트로 emit
+  const updatedItemList = [...props.itemList];
+  updatedItemList.splice(index, 1);
+  emit('updateItemListEvent', updatedItemList); // 부모 컴포넌트에서 itemList 갱신
+};
+
 // // 가격과 수량을 변경할 때마다 총금액 계산하기 위한 watch
 // watch(itemData, (newItemData) => {
 //   newItemData.forEach((data, index) => {
@@ -42,7 +60,7 @@ const addShippingInstruction = () => {
 // 품목 포맷 함수
 const formatDivision = (divisionString) => {
   if (divisionString === 'FINISHED') {
-    return '생산완료';
+    return '완제품';
   }else if(divisionString === 'RAW'){
     return '구성품';
   }else if(divisionString === 'PART'){
@@ -65,6 +83,7 @@ const formatDivision = (divisionString) => {
           <div class="p-2 col-md-8">
             <div class="mb-4 d-flex justify-content-between">
               <span class="fw-bold">{{ item.itemName }}</span>
+              <trashIcon class="icon" @click="deleteItem(index)"/>
             </div>
             <div class="d-flex">
               <ul class="col-md-4">
@@ -102,5 +121,10 @@ li {
 .button {
   background-color: #FFF8E7;
   border: 1px solid;
+}
+
+.icon {
+  width: 20px;
+  height: 20px;
 }
 </style>

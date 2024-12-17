@@ -108,6 +108,11 @@ const handleSalesOrder = (formData) => {
   selectedSalesOrder.value = true;
 }
 
+// 품목 리스트 갱신
+const handleUpdateItemList = (updatedList) => {
+  itemList.value = updatedList; // 자식에서 전달된 새 itemList로 갱신
+};
+
 // 등록 핸들러
 const handleRegister = async (itemList) => {
   if (childRef.value) {
@@ -138,7 +143,7 @@ const handleRegister = async (itemList) => {
     });
 
     if (invalidItem) {
-      alert(`품목 수량을 확인해 주세요.`);
+      alert(`품목 수량을 확인해 주세요. 0이하거나 원래 수량보다 많습니다.`);
       return;
     }
 
@@ -172,7 +177,8 @@ const handleRegister = async (itemList) => {
   <div class="d-flex justify-content-center">
     <ShippingInstructionInputItems :itemList="itemList"
                                    :selectedSalesOrder="selectedSalesOrder"
-                                   @registerEvent="handleRegister"/>
+                                   @registerEvent="handleRegister"
+                                   @updateItemListEvent="handleUpdateItemList"/>
   </div>
 </template>
 

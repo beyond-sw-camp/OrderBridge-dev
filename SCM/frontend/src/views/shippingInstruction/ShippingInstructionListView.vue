@@ -50,8 +50,6 @@ const fetchShippingInstruction = async (seq) => {
 
     expandShippingInstruction.value[seq] = response.data.shippingInstructionDTO; // ref 값에 추가
     expandItemList.value[seq] = response.data.itemList;
-    console.log('상세 데이터:', expandShippingInstruction.value);
-    console.log('품목 데이터:', expandItemList.value);
 
   } catch (error) {
     console.error("상세 출하지시서 불러오기 실패 :", error);
@@ -63,7 +61,6 @@ const deleteShippingInstruction = async (seq) => {
   try {
     const response = await axios.delete(`http://localhost:8090/api/v1/shipping-instruction/${seq}`, {});
 
-    console.log(response);
     alert("출하지시서가 삭제되었습니다.");
 
   } catch (error) {
