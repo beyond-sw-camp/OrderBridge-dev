@@ -1,7 +1,6 @@
 package error.pirate.backend.purchaseOrder.query.dto;
 
 import error.pirate.backend.common.Pagination;
-import error.pirate.backend.purchaseOrder.command.domain.aggregate.entity.PurchaseOrderStatus;
 
 import java.time.LocalDateTime;
 
@@ -11,6 +10,6 @@ public class PurchaseOrderRequest extends Pagination {
 
     private LocalDateTime purchaseOrderTargetDueDate;   // 발주서 목표 납기일
 
-    private PurchaseOrderStatus purchaseOrderStatus;
+    private String purchaseOrderStatus;
 
 }

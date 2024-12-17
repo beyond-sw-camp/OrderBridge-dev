@@ -3,30 +3,39 @@ import {onMounted, ref, watch} from 'vue';
 import axios from "axios";
 import searchIcon from "@/assets/searchIcon.svg";
 import dayjs from "dayjs";
+import router from "@/router/index.js";
 
 const totalCount = ref(0);
-const purchaseOrderResponseList = ref([]);
-const searchStartDate = ref(null);
-const searchEndDate = ref(null);
-const searchName = ref(null);
-const purchaseOrderStatus = ref("APPROVAL_BEFORE");
 const pageNumber = ref(1);
-const pageSize = ref(10);
+const purchaseOrderList = ref([]);
+const searchStartDate = ref('');
+const searchEndDate = ref('');
+const searchName = ref('');
+const searchStatus = ref([]);
 
 const fetchPurchaseOrderList = async () => {
   try {
+    const params = {
+      searchStartDate: searchStartDate.value,
+      searchEndDate: searchEndDate.value,
+      clientName: searchName.value,
+      purchaseOrderStatus: searchStatus.value.toString(),
+      pageNo: pageNumber.value,
+    };
+
+    const filteredParams = Object.fromEntries(
+        Object.entries(params).filter(([_, value]) => value !== null && value !== undefined && value !== '')
+    );
+
     const response = await axios.get(`http://localhost:8090/api/v1/purchaseOrder`, {
-      params: {
-        searchStartDate: searchStartDate.value ? dayjs(searchStartDate.value).toISOString() : null,
-        searchEndDate: searchEndDate.value ? dayjs(searchEndDate.value).toISOString() : null,
-        clientName: searchName.value,
-        purchaseOrderStatus: purchaseOrderStatus.value || null,
-        pageNo: pageNumber.value-1,
+      params: filteredParams,
+      paramsSerializer: (params) => {
+        return new URLSearchParams(params).toString();
       }
     });
 
     console.log(response.data);
-    purchaseOrderResponseList.value = response.data.purchaseOrderResponseList.content;
+    purchaseOrderList.value = response.data.purchaseOrderResponseList; // 발주서 목록
     totalCount.value = response.data.pagination.totalCount;
 
   } catch (error) {
@@ -34,13 +43,69 @@ const fetchPurchaseOrderList = async () => {
   }
 };
 
-onMounted(() => {
-  fetchPurchaseOrderList();
-});
 
-watch([searchStartDate, searchEndDate], () => {
-  search();
+const excelDown = async () => {
+  const excelName = "발주서_" + new Date().getFullYear() + (new Date().getMonth() + 1) + new Date().getDay();
+  try {
+    const params = {
+      searchStartDate: searchStartDate.value,
+      searchEndDate: searchEndDate.value,
+      clientName: searchName.value,
+      purchaseOrderStatus:  searchStatus.value.toString(),
+      pageNo: pageNumber.value,
+    };
+
+    const filteredParams = Object.fromEntries(
+        Object.entries(params).filter(([_, value]) => value !== null && value !== undefined && value !== '')
+    );
+
+    const response = await axios.get(`http://localhost:8090/api/v1/purchaseOrder/excelDown`, {
+      params: filteredParams
+      ,  paramsSerializer: (params) => {
+        return new URLSearchParams(params).toString();
+      },
+      responseType: "blob", // 중요: blob 형식으로 설정
+    });
+
+    // Blob 객체 생성 및 다운로드 처리
+    const blob = new Blob([response.data], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = decodeURIComponent(excelName); // 파일명 디코딩
+    link.click();
+
+    // Blob URL 해제
+    URL.revokeObjectURL(link.href);
+
+  } catch (error) {
+    console.error("발주서 엑셀다운로드 실패 :", error);
+  }
+}
+
+onMounted( () => {
+  fetchPurchaseOrderList();
 })
+
+watch(
+    [searchStartDate, searchEndDate],
+    () => {
+      search();
+    }
+);
+
+function check(status) {
+  const index = searchStatus.value.indexOf(status);
+  if (index > -1) {
+    searchStatus.value.splice(index, 1);
+  } else {
+    searchStatus.value.push(status);
+  }
+
+  console.log("현재 searchStatus 상태:", searchStatus.value.toString());
+  search();
+}
 
 watch(pageNumber, () => {
   fetchPurchaseOrderList();
@@ -48,25 +113,13 @@ watch(pageNumber, () => {
 
 function search() {
   pageNumber.value = 1;
-
   fetchPurchaseOrderList();
 }
 
-const excelDown = async () => {
-  try {
-    const response = await axios.get(`http://localhost:8090/api/v1/purchaseOrder/excelDown`, {
-      params: {
-        searchStartDate: searchStartDate.value ? dayjs(searchStartDate.value).toISOString() : null,
-        searchEndDate: searchEndDate.value ? dayjs(searchEndDate.value).toISOString() : null,
-        clientName: searchName.value,
-        purchaseOrderStatus: purchaseOrderStatus.value || null,
-      }
-    });
-
-  } catch (error) {
-    console.error("발주서 엑셀다운로드 실패 :", error);
-  }
+function register() {
+  router.push("/purchaseOrder/input");
 }
+
 </script>
 
 <template>
@@ -83,18 +136,44 @@ const excelDown = async () => {
           <p class="card-title">거래처명</p>
           <b-input-group class="mt-3">
             <b-form-input v-model="searchName"></b-form-input>
-            <b-button variant="light" class="button" @click="search()"><searchIcon class="icon"/></b-button>
+            <b-button variant="light" class="button" @click="search()">
+              <searchIcon class="icon"/>
+            </b-button>
           </b-input-group>
         </div>
       </div>
       <div class="side-box card">
         <div class="card-body">
           <p class="card-title">발주서 상태</p>
-            <b-form-checkbox v-model="purchaseOrderStatus" value="APPROVAL_BEFORE">서명전</b-form-checkbox>
-            <b-form-checkbox v-model="purchaseOrderStatus" value="APPROVAL_AFTER">서명후</b-form-checkbox>
-            <b-form-checkbox v-model="purchaseOrderStatus" value="APPROVAL_REFUSAL">반려</b-form-checkbox>
-            <b-form-checkbox v-model="purchaseOrderStatus" value="APPROVAL_COMPLETE">구매완료</b-form-checkbox>
-            <b-form-checkbox v-model="purchaseOrderStatus" value="DELETE">삭제</b-form-checkbox>
+          <b-form-checkbox
+              :checked="searchStatus.includes('APPROVAL_BEFORE')"
+              @change="check('APPROVAL_BEFORE')">
+            서명전
+          </b-form-checkbox>
+
+          <b-form-checkbox
+              :checked="searchStatus.includes('APPROVAL_AFTER')"
+              @change="check('APPROVAL_AFTER')">
+            서명후
+          </b-form-checkbox>
+
+          <b-form-checkbox
+              :checked="searchStatus.includes('APPROVAL_REFUSAL')"
+              @change="check('APPROVAL_REFUSAL')">
+            반려
+          </b-form-checkbox>
+
+          <b-form-checkbox
+              :checked="searchStatus.includes('APPROVAL_COMPLETE')"
+              @change="check('APPROVAL_COMPLETE')">
+            구매완료
+          </b-form-checkbox>
+
+          <b-form-checkbox
+              :checked="searchStatus.includes('DELETE')"
+              @change="check('DELETE')">
+            삭제
+          </b-form-checkbox>
         </div>
       </div>
     </div>
@@ -103,35 +182,37 @@ const excelDown = async () => {
         <div class="d-flex justify-content-between">
           <div>검색결과: {{ totalCount }}개</div>
           <div class="d-flex justify-content-end mt-3">
-            <b-button @click="excelDown" variant="light" size="sm" class="button">엑셀 다운로드</b-button>
-            <b-button variant="light" size="sm" class="button ms-2">생산입고 등록</b-button>
+            <b-button @click="excelDown()" variant="light" size="sm" class="button">엑셀 다운로드</b-button>
+            <b-button @click="register()" variant="light" size="sm" class="button ms-2">발주서 등록</b-button>
           </div>
         </div>
         <div class="list-headline row">
-          <div class="list-head col-7">발주서명</div>
-          <div class="list-head col-1">거래처명</div>
+          <div class="list-head col-5">발주서명</div>
+          <div class="list-head col-2">거래처명</div>
           <div class="list-head col-3">목표 납기일</div>
-          <div class="list-head col-1">상태</div>
+          <div class="list-head col-2">상태</div>
         </div>
-        <template v-if="purchaseOrderResponseList.length > 0">
+        <template v-if="purchaseOrderList?.length > 0">
           <div style="max-height: 600px; overflow-y: auto;">
-            <div v-for="purchaseOrder in purchaseOrderResponseList" :key="purchaseOrder.purchaseOrderSeq" class="list-line row" @click="itemExtend">
-              <div class="list-body col-4 left">
+            <div v-for="(purchaseOrder, index) in purchaseOrderList" :key="purchaseOrder.purchaseOrderSeq || index"
+                 class="list-line row" @click="itemExtend">
+              <div class="list-body col-5 left">
                 {{ purchaseOrder.purchaseOrderName }}
-                <div v-if="purchaseOrder.purchaseOrderItemResponseList.length > 0">
-                  <template v-for="(purchaseOrderItem, index) in purchaseOrder.purchaseOrderItemResponseList" :key="purchaseOrderItem.purchaseOrderItemSeq">
-                    <template v-if="index === purchaseOrder.purchaseOrderItemResponseList - 1">
-                      {{purchaseOrderItem.itemName}}
-                    </template>
-                    <template v-else>
-                      {{purchaseOrderItem.itemName + ", "}}
-                    </template>
+                <div v-if="purchaseOrder.purchaseOrderItemResponseList?.length > 0">
+                  <template v-for="(purchaseOrderItem, idx) in purchaseOrder.purchaseOrderItemResponseList"
+                            :key="purchaseOrderItem.purchaseOrderItemSeq || idx">
+                    <span>
+                      {{ purchaseOrderItem.itemName }}
+                      <span v-if="idx < purchaseOrder.purchaseOrderItemResponseList.length - 1">, </span>
+                    </span>
                   </template>
                 </div>
               </div>
               <div class="list-body col-2">{{ purchaseOrder.clientName }}</div>
-              <div class="list-body col-3">{{ dayjs(purchaseOrder.purchaseOrderTargetDueDate).format('YYYY-MM-DD HH:mm:ss') }}</div>
-              <div class="list-body col-1">{{ purchaseOrder.purchaseOrderStatus }}</div>
+              <div class="list-body col-3">
+                {{ dayjs(purchaseOrder.purchaseOrderTargetDueDate).format('YYYY-MM-DD HH:mm:ss') }}
+              </div>
+              <div class="list-body col-2">{{ purchaseOrder.purchaseOrderStatus }}</div>
             </div>
           </div>
 
@@ -140,7 +221,8 @@ const excelDown = async () => {
             <b-pagination
                 v-model="pageNumber"
                 :totalRows="totalCount"
-                :perPage="pageSize">
+                :perPage="10"
+                @input="fetchPurchaseOrderList">
             </b-pagination>
           </div>
         </template>
@@ -188,7 +270,7 @@ div {
   width: 99%;
   border: 1px solid Silver;
   border-radius: 8px;
-  margin-left:1px;
+  margin-left: 1px;
   margin-top: 20px;
   padding: 10px 5px 10px 5px;
 }
