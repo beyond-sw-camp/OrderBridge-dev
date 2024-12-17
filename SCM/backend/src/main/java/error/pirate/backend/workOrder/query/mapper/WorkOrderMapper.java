@@ -1,6 +1,7 @@
 package error.pirate.backend.workOrder.query.mapper;
 
 
+import error.pirate.backend.workOrder.command.domain.aggregate.entity.WorkOrderStatus;
 import error.pirate.backend.workOrder.query.dto.*;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -13,10 +14,12 @@ public interface WorkOrderMapper {
 
     /* 작업지시서 목록 조회 */
     List<WorkOrderListDTO> readWorkOrderList(@Param("filter") WorkOrderFilterDTO filter,
+                                             @Param("statusList") List<WorkOrderStatus> statusList,
                                              @Param("offset") int offset);
 
     /* 작업지시서 목록 개수 조회 */
-    long readWorkOrderListCount(@Param("filter") WorkOrderFilterDTO filter);
+    long readWorkOrderListCount(@Param("filter") WorkOrderFilterDTO filter,
+                                @Param("statusList") List<WorkOrderStatus> statusList);
 
     /* 작업지시서 상세 조회 */
     WorkOrderDetailDTO readWorkOrder(@Param("workOrderSeq") Long workOrderSeq);

@@ -10,7 +10,7 @@ import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -20,7 +20,7 @@ import java.time.LocalDateTime;
 public class WorkOrderFilterDTO {
 
     private String warehouseName;          // 생산창고 이름
-    private WorkOrderStatus workOrderStatus;        // 작업지시 상태
+    private List<WorkOrderStatus> workOrderStatus;        // 작업지시 상태
 
     @DateTimeFormat(pattern = "yyyy/MM/dd")
     private LocalDate startDate;       // 검색 시작일
