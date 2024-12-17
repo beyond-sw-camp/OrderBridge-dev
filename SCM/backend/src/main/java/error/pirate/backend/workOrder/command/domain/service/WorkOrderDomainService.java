@@ -139,4 +139,8 @@ public class WorkOrderDomainService {
         workOrder.changeWorkOrderStatus(newStatus);
     }
 
+    // 완료 상태시 업데이트
+    public void updateWorkOrderWorkAutoComplete(WorkOrder workOrder, Integer indicatedQuantity) {
+        workOrder.updateWorkOrderWorkAutoComplete(indicatedQuantity);
+    }
 }

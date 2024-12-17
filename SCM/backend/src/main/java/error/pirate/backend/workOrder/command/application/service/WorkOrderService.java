@@ -298,6 +298,10 @@ public class WorkOrderService {
                 if (!currentStatus.equals(WorkOrderStatus.ONGOING)) {
                     throw new CustomException(ErrorCodeType.WORK_ORDER_STATE_BAD_REQUEST);
                 }
+
+                Integer workOrderIndicatedQuantity = workOrder.getWorkOrderIndicatedQuantity();
+                workOrderDomainService.updateWorkOrderWorkAutoComplete(workOrder, workOrderIndicatedQuantity);
+
                 break;
 
             default:
