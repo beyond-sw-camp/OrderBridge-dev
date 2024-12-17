@@ -29,4 +29,13 @@ public class InvoiceItem {
     private int invoiceItemPrice; // 거래 명세서 단가
 
     private String invoiceItemNote; // 거래 명세서 품목 비고
+
+    public InvoiceItem(Invoice invoice, Item item,
+                       int invoiceItemQuantity, int invoiceItemPrice, String invoiceItemNote) {
+        this.invoice = invoice;
+        this.item = item;
+        this.invoiceItemQuantity = invoiceItemQuantity;
+        this.invoiceItemPrice = invoiceItemPrice;
+        this.invoiceItemNote = invoiceItemNote;
+    }
 }
