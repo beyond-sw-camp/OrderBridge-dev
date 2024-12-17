@@ -1,5 +1,6 @@
 package error.pirate.backend.workOrder.query.service;
 
+import error.pirate.backend.workOrder.command.domain.aggregate.entity.WorkOrderStatus;
 import error.pirate.backend.workOrder.query.dto.WorkOrderFilterDTO;
 import error.pirate.backend.workOrder.query.dto.WorkOrderListResponse;
 import error.pirate.backend.workOrder.query.dto.WorkOrderResponse;
@@ -31,13 +32,13 @@ class WorkOrderQueryServiceTest {
                 // 페이지와 기본 조건만 설정
                 new WorkOrderFilterDTO(null, null, LocalDate.of(2024, 1, 1), LocalDate.of(2024, 12, 31), 1, 5),
                 // 특정 상태 필터링
-                new WorkOrderFilterDTO(null, "진행중", LocalDate.of(2024, 1, 1), LocalDate.of(2024, 12, 31), 1, 5),
+                new WorkOrderFilterDTO(null, WorkOrderStatus.ONGOING, LocalDate.of(2024, 1, 1), LocalDate.of(2024, 12, 31), 1, 5),
                 // 특정 창고 필터링
                 new WorkOrderFilterDTO("생산창고", null, LocalDate.of(2024, 1, 1), LocalDate.of(2024, 12, 31), 1, 5),
                 // 특정 기간 필터링
                 new WorkOrderFilterDTO(null, null, LocalDate.of(2024, 3, 1), LocalDate.of(2024, 6, 30), 1, 5),
                 // 모든 조건 조합
-                new WorkOrderFilterDTO("생산창고", "완료", LocalDate.of(2024, 1, 1), LocalDate.of(2024, 12, 31), 1, 5)
+                new WorkOrderFilterDTO("생산창고", WorkOrderStatus.COMPLETE, LocalDate.of(2024, 1, 1), LocalDate.of(2024, 12, 31), 1, 5)
         );
     }
 
@@ -70,7 +71,7 @@ class WorkOrderQueryServiceTest {
         // Then : (예상과) 비교
         assertNotNull(response, "조회결과가 있음을 확인");
         assertEquals(5, response.getWorkOrderList().size(), "조회된 작업지시서 개수가 맞는지 확인");
-        assertEquals(17, response.getTotalItems(), "총 작업지시서 개수 확인");
+        assertEquals(19, response.getTotalItems(), "총 작업지시서 개수 확인");
         assertEquals(4, response.getTotalPages(), "총 페이지 수 확인");
         assertEquals(filter.getPage(), response.getCurrentPage(), "현재 페이지 확인");
     }

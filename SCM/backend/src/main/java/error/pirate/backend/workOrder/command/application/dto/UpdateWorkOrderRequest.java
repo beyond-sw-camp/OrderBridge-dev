@@ -1,25 +1,21 @@
 package error.pirate.backend.workOrder.command.application.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDate;
 
 @Getter
 @Setter
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(description = "작업지시서 작성요청 데이터")
-public class CreateWorkOrderRequest {
+@Schema(description = "작업지시서 수정요청 데이터")
+public class UpdateWorkOrderRequest {
 
     private Long salesOrderSeq; // 주문서 번호
     private Long salesOrderItemSeq; // 주문서 품목 번호
-    private Long userSeq;   // 담당자
     private Long warehouseSeq;  // 생산공장
-    private String workOrderName;   // 작업지시서명
     private LocalDate workOrderIndicatedDate;   // 작업지시서 지시일
     private LocalDate workOrderDueDate; // 작업지시서 납기일
     private Integer workOrderIndicatedQuantity; // 작업지시서 지시수량

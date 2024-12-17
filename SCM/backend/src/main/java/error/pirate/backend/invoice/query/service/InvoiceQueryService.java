@@ -1,9 +1,6 @@
 package error.pirate.backend.invoice.query.service;
 
-import error.pirate.backend.invoice.query.dto.InvoiceListItemDTO;
-import error.pirate.backend.invoice.query.dto.InvoiceListResponse;
-import error.pirate.backend.invoice.query.dto.InvoiceResponse;
-import error.pirate.backend.invoice.query.dto.InvoiceSituationResponse;
+import error.pirate.backend.invoice.query.dto.*;
 import error.pirate.backend.invoice.query.mapper.InvoiceMapper;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -50,5 +47,10 @@ public class InvoiceQueryService {
 
         // 거래 명세서 현황 조회
         return new InvoiceSituationResponse(invoiceMapper.selectInvoiceSituation(startDate, endDate, clientName));
+    }
+
+    // 거래 명세서 값 확인
+    public List<InvoiceItemCheckDTO> invoiceItemCheck(Long salesOrderSeq) {
+        return invoiceMapper.sumInvoiceItemValue(salesOrderSeq);
     }
 }
