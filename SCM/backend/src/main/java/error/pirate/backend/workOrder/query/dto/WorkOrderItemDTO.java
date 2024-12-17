@@ -14,5 +14,7 @@ public class WorkOrderItemDTO {
     private String itemImageUrl;
     private String itemPrice;
     private String itemUnitTitle;
+    private String itemDivision;
+    private String itemNote;
 
 }
