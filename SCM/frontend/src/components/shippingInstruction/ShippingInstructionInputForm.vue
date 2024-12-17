@@ -1,6 +1,7 @@
 <script setup>
 import {defineProps, ref, watch} from "vue";
 import searchIcon from '@/assets/searchIcon.svg'
+import dayjs from "dayjs";
 
 const props = defineProps({
   salesOrderList: {type: Array, required: true},       // 출하지시서 목록
@@ -38,18 +39,6 @@ const getData  = () => {
   return formData;
 };
 defineExpose({ getData });
-
-// 날짜 포맷 함수
-const formatDate = (dateString) => {
-  if (!dateString) return '';
-
-  const date = new Date(dateString);
-  const year = date.getFullYear();
-  const month = (date.getMonth() + 1).toString().padStart(2, '0');
-  const day = date.getDate().toString().padStart(2, '0');
-
-  return `${year}/${month}/${day}`;
-};
 
 // 상태 포맷 함수
 const formatStatus = (status) => {
@@ -151,7 +140,7 @@ const formatStatus = (status) => {
                 </div>
                 <div class="list-body col-2">{{ salesOrder.clientName }}</div>
                 <div class="list-body col-2">{{
-                    formatDate(salesOrder.salesOrderOrderDate)
+                    dayjs(salesOrder.salesOrderOrderDate).format('YYYY/MM/DD')
                   }}
                 </div>
                 <div class="list-body col-2">{{ formatStatus(salesOrder.salesOrderStatus) }}</div>

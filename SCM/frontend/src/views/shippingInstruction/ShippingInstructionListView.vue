@@ -147,11 +147,6 @@ const handleStatus = (payload) => {
   search();
 };
 
-// 등록 페이지 이동
-const handleRegister = () => {
-  router.push("/shipping-instruction/input");
-};
-
 // 삭제 수행
 const handleDelete = async (seq) => {
   if (seq != null) {
@@ -195,7 +190,7 @@ const handleExtendItem = (seq) => {
                            @searchEvent="handleSearch"
                            @checkStatusEvent="handleStatus"
                            @extendItemEvent="handleExtendItem"
-                           @registerEvent="handleRegister"
+                           @registerEvent="router.push('/shipping-instruction/input')"
                            @itemDeleteEvent="handleDelete"
                            @excelEvent="excelDown"
   />

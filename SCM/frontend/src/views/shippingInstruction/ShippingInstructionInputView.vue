@@ -153,6 +153,9 @@ const handleRegister = async (itemList) => {
 
 <template>
   <h4 class="title">영업관리 > 출하지시서 등록</h4>
+  <div class="d-flex justify-content-end mt-3">
+    <b-button @click="router.push('/shipping-instruction')" variant="light" size="sm" class="button ms-2">목록</b-button>
+  </div>
   <div class="d-flex justify-content-center">
     <ShippingInstructionInputForm ref="childRef"
                                   :salesOrderList="salesOrderList"
@@ -176,5 +179,10 @@ const handleRegister = async (itemList) => {
 <style scoped>
 .title {
   padding-bottom: 20px;
+}
+
+.button {
+  background-color: #FFF8E7;
+  border: 1px solid;
 }
 </style>

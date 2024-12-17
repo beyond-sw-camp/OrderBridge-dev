@@ -69,7 +69,7 @@ const formatDivision = (divisionString) => {
             <div class="d-flex">
               <ul class="col-md-4">
                 <li class="mb-3">
-                  · 품목 : {{ formatDivision(item.itemDivision) }}
+                  · 품목 구분 : {{ formatDivision(item.itemDivision) }}
                 </li>
                 <li class="mb-3 d-flex flex-row">
                   · 수량 :
@@ -88,8 +88,7 @@ const formatDivision = (divisionString) => {
         </div>
       </div>
       <div class="mx-5 my-3 d-flex justify-content-end">
-        <b-button class="mx-3" pill variant="primary" @click="addShippingInstruction">확인</b-button>
-        <b-button class="mx-3" pill>목록</b-button>
+        <b-button class="button mx-3" variant="light" size="sm" @click="addShippingInstruction">확인</b-button>
       </div>
     </div>
   </template>
@@ -98,5 +97,10 @@ const formatDivision = (divisionString) => {
 <style scoped>
 li {
   list-style: none;
+}
+
+.button {
+  background-color: #FFF8E7;
+  border: 1px solid;
 }
 </style>
