@@ -18,6 +18,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -106,5 +107,60 @@ public class WorkOrder {
     private void specifyItem(Item item) {
         this.item = item;
     }
+
+    public void deleteWorkOrder() {
+        this.workOrderStatus = WorkOrderStatus.DELETE;
+    }
+
+    public void updateWorkOrder(SalesOrder salesOrder, SalesOrderItem salesOrderItem, Warehouse warehouse,
+                                LocalDateTime workOrderIndicatedDate, LocalDateTime workOrderDueDate,
+                                Integer workOrderIndicatedQuantity, String workOrderNote) {
+        if (salesOrder != null) {
+            this.salesOrder = salesOrder;
+        }
+
+        if (salesOrderItem != null) {
+            this.item = salesOrderItem.getItem();
+        }
+
+        if (warehouse != null) {
+            this.warehouse = warehouse;
+        }
+
+        if (workOrderIndicatedDate != null) {
+            this.workOrderIndicatedDate = workOrderIndicatedDate;
+        }
+
+        if (workOrderDueDate != null) {
+            this.workOrderDueDate = workOrderDueDate;
+        }
+
+        if (workOrderIndicatedQuantity != null) {
+            this.workOrderIndicatedQuantity = workOrderIndicatedQuantity;
+        }
+
+        if (workOrderNote != null) {
+            this.workOrderNote = workOrderNote;
+        }
+    }
+
+    public void changeWorkOrderStatus(WorkOrderStatus workOrderStatus) {
+        this.workOrderStatus = workOrderStatus;
+    }
+
+    public static WorkOrder updateTestWorkOrder(WorkOrderStatus status) {
+        WorkOrder workOrder = new WorkOrder();
+        workOrder.workOrderIndicatedQuantity = 0;
+        workOrder.workOrderIndicatedDate = LocalDate.from(LocalDate.parse("2024-12-09")).atStartOfDay();
+        workOrder.workOrderDueDate = LocalDate.from(LocalDate.parse("2024-12-10")).atStartOfDay();
+        workOrder.changeWorkOrderStatus(status);
+        return workOrder;
+    }
+
+    public void updateWorkOrderWorkAutoComplete(Integer indicatedQuantity) {
+        this.workOrderWorkQuantity = indicatedQuantity;
+        this.workOrderEndDate = LocalDateTime.now();
+    }
+
 
 }
