@@ -14,15 +14,18 @@
              , wo.work_order_indicated_date
              , wo.work_order_status
              , (SELECT GROUP_CONCAT(i.item_name SEPARATOR ', ')
-                FROM tb_item i
-                WHERE i.item_seq = wo.item_seq
+                  FROM tb_item i
+                 WHERE i.item_seq = wo.item_seq
                 )   AS item_name
           FROM tb_work_order wo
           LEFT JOIN tb_warehouse w ON wo.warehouse_seq = w.warehouse_seq
          WHERE wo.work_order_status NOT IN ('DELETE')
         <!--작업상태 필터링-->
-        <if test="filter.workOrderStatus != null">
-            work_order_status = #{filter.workOrderStatus}
+        <if test="statusList != null and !statusList.isEmpty()">
+            AND wo.work_order_status IN
+            <foreach item="status" collection="statusList" open="(" separator="," close=")">
+                #{status}
+            </foreach>
         </if>
         <!--생산창고 이름 필터링 -->
         <if test="filter.warehouseName != null">
@@ -50,8 +53,11 @@
           FROM tb_work_order wo
           LEFT JOIN tb_warehouse w ON wo.warehouse_seq = w.warehouse_seq
          WHERE wo.work_order_status NOT IN ('DELETE')
-        <if test="filter.workOrderStatus != null">
-            work_order_status = #{filter.workOrderStatus}
+        <if test="statusList != null and !statusList.isEmpty()">
+            AND wo.work_order_status IN
+            <foreach item="status" collection="statusList" open="(" separator="," close=")">
+                #{status}
+            </foreach>
         </if>
         <if test="filter.warehouseName != null">
             AND warehouse_name like concat('%', #{filter.warehouseName}, '%')
@@ -101,6 +107,8 @@
              , i.item_image_url
              , i.item_price
              , iu.item_unit_title
+             , i.item_division
+             , i.item_note
           FROM tb_work_order wo
           JOIN tb_item i ON wo.item_seq = i.item_seq
           JOIN tb_item_unit iu ON i.item_unit_seq = iu.item_unit_seq
