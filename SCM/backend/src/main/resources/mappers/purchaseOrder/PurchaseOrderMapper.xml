@@ -29,13 +29,13 @@
                 AND #{searchEndDate} >= tpo.purchase_order_target_due_date
                 ]]>
             </if>
-            <if test="clientName != null">
-                AND tc.client_name LIKE CONCAT('%', #{clientName}, '%')
+            <if test="searchName != null">
+                AND tc.client_name LIKE CONCAT('%', #{searchName}, '%')
             </if>
-            <if test="purchaseOrderStatus != null and purchaseOrderStatus != ''">
+            <if test="searchStatus != null and searchStatus != ''">
                 AND tpo.purchase_order_status IN
                 <trim prefix="(" suffix=")" suffixOverrides=",">
-                    <foreach collection="purchaseOrderStatus.split(',')" item="status" separator=",">
+                    <foreach collection="searchStatus.split(',')" item="status" separator=",">
                         #{status}
                     </foreach>
                 </trim>
@@ -78,13 +78,13 @@
                 AND #{searchEndDate} >= tpo.purchase_order_target_due_date
                 ]]>
             </if>
-            <if test="clientName != null">
-                AND tc.client_name LIKE CONCAT('%', #{clientName}, '%')
+            <if test="searchName != null">
+                AND tc.client_name LIKE CONCAT('%', #{searchName}, '%')
             </if>
-            <if test="purchaseOrderStatus != null and !purchaseOrderStatus.isEmpty()">
+            <if test="searchStatus != null and !searchStatus.isEmpty()">
                 AND tpo.purchase_order_status IN
                 <trim prefix="(" suffix=")" suffixOverrides=",">
-                    <foreach collection="purchaseOrderStatus.split(',')" item="status" separator=",">
+                    <foreach collection="searchStatus.split(',')" item="status" separator=",">
                         #{status}
                     </foreach>
                 </trim>

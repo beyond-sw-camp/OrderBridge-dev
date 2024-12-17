@@ -18,8 +18,8 @@ const fetchPurchaseOrderList = async () => {
     const params = {
       searchStartDate: searchStartDate.value,
       searchEndDate: searchEndDate.value,
-      clientName: searchName.value,
-      purchaseOrderStatus: searchStatus.value.toString(),
+      searchName: searchName.value,
+      searchStatus: searchStatus.value.toString(),
       pageNo: pageNumber.value,
     };
 
@@ -34,6 +34,7 @@ const fetchPurchaseOrderList = async () => {
       }
     });
 
+    console.log(filteredParams);
     console.log(response.data);
     purchaseOrderList.value = response.data.purchaseOrderResponseList; // 발주서 목록
     totalCount.value = response.data.pagination.totalCount;
@@ -50,8 +51,8 @@ const excelDown = async () => {
     const params = {
       searchStartDate: searchStartDate.value,
       searchEndDate: searchEndDate.value,
-      clientName: searchName.value,
-      purchaseOrderStatus:  searchStatus.value.toString(),
+      searchName: searchName.value,
+      searchStatus:  searchStatus.value.toString(),
       pageNo: pageNumber.value,
     };
 
