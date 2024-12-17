@@ -20,6 +20,7 @@ public class WorkOrderListDTO {
     private String workOrderName;
     private String workOrderStatus;
     private LocalDateTime workOrderIndicatedDate;
+    private Long warehouseSeq;
     private String warehouseName;
     private String itemName;
 

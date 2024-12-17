@@ -14,6 +14,7 @@ public class WorkOrderDetailDTO {
 
     private Long workOrderSeq;
     private String workOrderName;
+    private Long warehouseSeq;
     private String warehouseName;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDateTime workOrderIndicatedDate;

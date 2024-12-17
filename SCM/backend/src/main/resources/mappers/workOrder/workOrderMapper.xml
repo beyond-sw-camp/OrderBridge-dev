@@ -72,6 +72,7 @@
     <select id="readWorkOrder" resultType="error.pirate.backend.workOrder.query.dto.WorkOrderDetailDTO">
         SELECT wo.work_order_seq
         , wo.work_order_name
+        , w.warehouse_seq
         , w.warehouse_name
         , wo.work_order_indicated_date
         , wo.work_order_status
