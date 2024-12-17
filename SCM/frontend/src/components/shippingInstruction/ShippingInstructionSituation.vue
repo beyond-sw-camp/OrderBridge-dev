@@ -1,6 +1,5 @@
 <script setup>
-import {defineProps, onMounted, ref, watch} from 'vue';
-import axios from "axios";
+import {defineProps, ref, watch} from 'vue';
 import dayjs from "dayjs";
 import searchIcon from "@/assets/searchIcon.svg";
 

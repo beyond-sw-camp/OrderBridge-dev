@@ -1,6 +1,5 @@
 <script setup>
 import {defineProps, ref, watch} from "vue";
-import trashIcon from '@/assets/trashIcon.svg'
 
 const props = defineProps({
   itemList: {type: Array, required: true},       // 주문서 품목 리스트
@@ -52,7 +51,7 @@ const formatDivision = (divisionString) => {
     return '원재료';
   }
   return divisionString; // 품목가 다른 경우 그대로 반환
-};
+}
 </script>
 
 <template>
