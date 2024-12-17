@@ -83,8 +83,10 @@ public class WorkOrderQueryService {
                 , startDate, endDate, clientName, warehouseName);
 
         // 시작일이 종료일보다 나중인 경우 에러처리
-        if (startDate.isAfter(endDate)) {
-            throw new CustomException(ErrorCodeType.INVALID_DATE_RANGE);
+        if(startDate != null && endDate != null) {
+            if (startDate.isAfter(endDate)) {
+                throw new CustomException(ErrorCodeType.INVALID_DATE_RANGE);
+            }
         }
 
         // 데이터 조회
