@@ -71,9 +71,9 @@ const itemDelete = (seq) => {
 // 상태 포맷 함수
 const formatStatus = (status) => {
   if (status === 'BEFORE') {
-    return '결제 전';
+    return '결재 전';
   } else if (status === 'AFTER') {
-    return '결제 후';
+    return '결재 후';
   }
   return status; // 상태가 다른 경우 그대로 반환
 };
