@@ -87,7 +87,7 @@ const formatStatus = (status) => {
       </div>
       <div class="side-box card">
         <div class="card-body">
-          <p class="card-title">출하지시서명</p>
+          <p class="card-title">거래처명</p>
           <b-input-group class="mt-3">
             <b-form-input v-model="clientName"></b-form-input>
             <b-button variant="light" class="button" @click="search()">

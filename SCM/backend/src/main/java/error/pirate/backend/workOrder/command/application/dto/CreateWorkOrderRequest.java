@@ -12,7 +12,7 @@ import java.time.LocalDate;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(description = "작업지시서 요청 데이터")
+@Schema(description = "작업지시서 작성요청 데이터")
 public class CreateWorkOrderRequest {
 
     private Long salesOrderSeq; // 주문서 번호
