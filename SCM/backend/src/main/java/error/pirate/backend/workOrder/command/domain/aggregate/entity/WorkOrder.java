@@ -107,4 +107,8 @@ public class WorkOrder {
         this.item = item;
     }
 
+    public void deleteWorkOrder() {
+        this.workOrderStatus = WorkOrderStatus.DELETE;
+    }
+
 }

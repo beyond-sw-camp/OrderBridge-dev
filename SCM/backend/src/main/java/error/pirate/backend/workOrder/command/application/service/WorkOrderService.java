@@ -42,6 +42,7 @@ public class WorkOrderService {
     private final WarehouseDomainService warehouseDomainService;
     private final NameGenerator nameGenerator;
 
+    /* 작업지시서 등록 */
     @Transactional
     public void createWorkOrderForItem(CreateWorkOrderRequest request) {
         log.info("-------------- 작업지시서 등록 서비스 진입 :등록요청 조건 - request: {} --------------", request);
@@ -114,6 +115,20 @@ public class WorkOrderService {
 
         // 10. 작업지시서 저장
         workOrderDomainService.saveWorkOrder(workOrder);
+    }
+
+    @Transactional
+    public void deleteWorkOrder(Long workOrderSeq) {
+        log.info("-------------- 작업지시서 삭제 서비스 진입 - {}번  --------------", workOrderSeq);
+
+        // 작업지시서 찾기
+        WorkOrder workOrder = workOrderDomainService.findByWorkOrderSeq(workOrderSeq);
+
+        // 결재상태 체크
+        workOrderDomainService.checkWorkOrderStatus(workOrder.getWorkOrderStatus());
+
+        // 삭제로 상태 변경
+        workOrderDomainService.deleteWorkOrder(workOrder);
     }
 
 }
