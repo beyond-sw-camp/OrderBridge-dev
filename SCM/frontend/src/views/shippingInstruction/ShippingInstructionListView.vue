@@ -1,6 +1,6 @@
 <script setup>
 import ShippingInstructionList from "@/components/shippingInstruction/ShippingInstructionList.vue";
-import {onMounted, ref, watch} from "vue";
+import {onMounted, reactive, ref, watch} from "vue";
 import axios from "axios";
 import router from "@/router/index.js";
 
@@ -13,6 +13,8 @@ const searchStartDate = ref(null);
 const searchEndDate = ref(null);
 const searchName = ref(null);
 const searchStatus = ref(new Set([]));
+const expandShippingInstruction = ref({});
+const expandItemList = ref({});
 
 const fetchShippingInstructionList = async () => {
   try {
@@ -33,13 +35,47 @@ const fetchShippingInstructionList = async () => {
       }
     });
 
-    console.log(response);
     shippingInstructionList.value = response.data.shippingInstructionList;
     shippingInstructionStatusList.value = response.data.shippingInstructionStatusList;
     totalCount.value = response.data.totalItems;
 
   } catch (error) {
     console.error("출하지시서 불러오기 실패 :", error);
+  }
+};
+
+const fetchShippingInstruction = async (seq) => {
+  try {
+    const response = await axios.get(`http://localhost:8090/api/v1/shipping-instruction/${seq}`, {});
+
+    expandShippingInstruction.value[seq] = response.data.shippingInstructionDTO; // ref 값에 추가
+    expandItemList.value[seq] = response.data.itemList;
+    console.log('상세 데이터:', expandShippingInstruction.value);
+    console.log('품목 데이터:', expandItemList.value);
+
+  } catch (error) {
+    console.error("상세 출하지시서 불러오기 실패 :", error);
+  }
+};
+
+const deleteShippingInstruction = async (seq) => {
+  console.log(seq);
+  try {
+    const response = await axios.delete(`http://localhost:8090/api/v1/shipping-instruction/${seq}`, {});
+
+    console.log(response);
+    alert("출하지시서가 삭제되었습니다.");
+
+  } catch (error) {
+    if (error.response) {
+      // 서버에서 반환된 상태 코드에 따른 처리
+      if (error.response.status === 400) {
+        console.error("상세 출하지시서 삭제 실패 : 결재후");
+        alert("이미 결재 후이므로 삭제하실 수 없습니다.");
+      } else {
+        console.error(`상세 출하지시서 삭제 실패 : 상태 코드 ${error.response.status}`);
+      }
+    }
   }
 };
 
@@ -109,17 +145,37 @@ const handleStatus = (payload) => {
   }
 
   search();
-}
+};
 
 // 등록 페이지 이동
 const handleRegister = () => {
   router.push("/shipping-instruction/input");
-}
+};
+
+// 삭제 수행
+const handleDelete = async (seq) => {
+  if (seq != null) {
+    await deleteShippingInstruction(seq);
+  }
+  await fetchShippingInstructionList();
+};
 
 function search() {
   pageNumber.value = 1;
 
   fetchShippingInstructionList();
+}
+
+// 상세 정보 확장
+const handleExtendItem = (seq) => {
+  if (expandShippingInstruction.value[seq] && expandItemList.value[seq]) {
+    // 이미 확장된 상태면 축소
+    delete expandShippingInstruction.value[seq];
+    delete expandItemList.value[seq];
+  } else {
+    // API로 데이터를 가져와서 저장
+    fetchShippingInstruction(seq);
+  }
 }
 </script>
 
@@ -133,11 +189,14 @@ function search() {
                            :totalCount="totalCount"
                            :pageNumber="pageNumber"
                            :pageSize="pageSize"
+                           :expandShippingInstruction="expandShippingInstruction"
+                           :expandItemList="expandItemList"
                            @pageEvent="handlePage"
                            @searchEvent="handleSearch"
                            @checkStatusEvent="handleStatus"
-                           @extendItemEvent=""
+                           @extendItemEvent="handleExtendItem"
                            @registerEvent="handleRegister"
+                           @itemDeleteEvent="handleDelete"
                            @excelEvent="excelDown"
   />
 </template>

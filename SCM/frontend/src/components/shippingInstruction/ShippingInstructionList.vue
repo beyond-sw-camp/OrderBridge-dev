@@ -1,6 +1,10 @@
 <script setup>
 import {defineProps, ref, watch} from 'vue';
 import searchIcon from "@/assets/searchIcon.svg";
+import trashIcon from "@/assets/trashIcon.svg";
+import editIcon from "@/assets/editIcon.svg";
+import printIcon from "@/assets/printIcon.svg";
+import dayjs from "dayjs";
 
 const props = defineProps({
   searchStartDate: {type: String, required: false}, // 시작 날짜
@@ -11,10 +15,13 @@ const props = defineProps({
   totalCount: {type: Number, required: true},       // 검색 결과 총 개수
   pageNumber: {type: Number, required: true},       // 현재 페이지 번호
   pageSize: {type: Number, required: true},         // 페이지 사이즈
+  expandShippingInstruction: {type: Object, required: true},
+  expandItemList: {type: Object, required: true},
 });
 
 const emit = defineEmits(
-    ['pageEvent', 'searchEvent', 'checkStatusEvent', 'extendItemEvent', 'registerEvent', 'excelEvent']);
+    ['pageEvent', 'searchEvent', 'checkStatusEvent', 'extendItemEvent',
+      'itemDeleteEvent', 'registerEvent', 'excelEvent']);
 
 const startDate = ref(props.searchStartDate);
 const endDate = ref(props.searchEndDate);
@@ -41,8 +48,9 @@ const check = (status) => {
   emit('checkStatusEvent', status);
 };
 
-const itemExtend = () => {
-  emit('extendItemEvent');
+// 선택한 Item 확장 | 축소
+const itemExtend = (seq) => {
+  emit('extendItemEvent', seq);
 };
 
 const register = () => {
@@ -53,26 +61,62 @@ const excel = () => {
   emit('excelEvent');
 }
 
-// 날짜 포맷 함수
-const formatDate = (dateString) => {
-  if (!dateString) return '';
-
-  const date = new Date(dateString);
-  const year = date.getFullYear();
-  const month = (date.getMonth() + 1).toString().padStart(2, '0');
-  const day = date.getDate().toString().padStart(2, '0');
-
-  return `${year}/${month}/${day}`;
-};
+const itemDelete = (seq) => {
+  const result = confirm("정말 삭제하시겠습니까?");
+  if (result) {
+    emit('itemDeleteEvent', seq);
+  }
+}
 
 // 상태 포맷 함수
 const formatStatus = (status) => {
   if (status === 'BEFORE') {
-    return '결제 전';
+    return '결재 전';
   } else if (status === 'AFTER') {
-    return '결제 후';
+    return '결재 후';
   }
   return status; // 상태가 다른 경우 그대로 반환
+};
+
+// 품목 포맷 함수
+const formatDivision = (divisionString) => {
+  if (divisionString === 'FINISHED') {
+    return '생산완료';
+  } else if (divisionString === 'RAW') {
+    return '구성품';
+  } else if (divisionString === 'PART') {
+    return '부재료';
+  } else if (divisionString === 'SUB') {
+    return '원재료';
+  }
+  return divisionString; // 품목가 다른 경우 그대로 반환
+}
+
+// 3개 단위로 나눈 데이터를 반환하는 함수
+const getChunkedItems = (seq) => {
+  const items = props.expandItemList[seq] || [];
+  const chunkedItems = [];
+  for (let i = 0; i < items.length; i += 3) {
+    chunkedItems.push(items.slice(i, i + 3));
+  }
+  return chunkedItems;
+};
+
+// 인쇄 함수
+const printItem = (index) => {
+  const printContent = document.getElementById(`print-area-${index}`).innerHTML;
+  const originalContent = document.body.innerHTML;
+
+  // 선택된 영역만 표시
+  document.body.innerHTML = printContent;
+
+  window.print();
+
+  // 원래 내용 복원
+  document.body.innerHTML = originalContent;
+
+  // Vue 리렌더링 방지
+  location.reload();
 };
 </script>
 
@@ -117,27 +161,75 @@ const formatStatus = (status) => {
           </div>
         </div>
         <div class="list-headline row">
-          <div class="list-head col-6">출하지시서명</div>
-          <div class="list-head col-2">거래처</div>
-          <div class="list-head col-2">출하예정일</div>
-          <div class="list-head col-2">상태</div>
+          <div class="list-head col-md-6">출하지시서명</div>
+          <div class="list-head col-md-2">거래처</div>
+          <div class="list-head col-md-2">출하예정일</div>
+          <div class="list-head col-md-2">상태</div>
         </div>
         <template v-if="shippingInstructionList.length > 0">
           <div style="max-height: 600px; overflow-y: auto;">
-            <div v-for="shippingInstruction in shippingInstructionList"
-                 :key="shippingInstruction.shippingInstructionSeq" class="list-line row" @click="itemExtend">
-              <div class="list-body col-6 left">
-                {{ shippingInstruction.shippingInstructionName }}
-                <br>
-                <div v-if="!shippingInstruction.itemName"><br></div>
-                <div v-else>{{ shippingInstruction.itemName }}</div>
+            <div v-for="(shippingInstruction, index) in shippingInstructionList"
+                 :key="shippingInstruction.shippingInstructionSeq"
+                 @click="itemExtend(shippingInstruction.shippingInstructionSeq)">
+              <div class="list-line row" :id="'print-area-' + index">
+                <div class="list-body col-md-6 left">
+                  {{ shippingInstruction.shippingInstructionName }}
+                  <div v-if="!expandShippingInstruction[shippingInstruction.shippingInstructionSeq]">
+                    <div v-if="!shippingInstruction.itemName"><br></div>
+                    <div v-else>{{ shippingInstruction.itemName }}</div>
+                  </div>
+                </div>
+                <div class="list-body col-md-2">{{ shippingInstruction.clientName }}</div>
+                <div class="list-body col-md-2">{{
+                    dayjs(shippingInstruction.shippingInstructionScheduledShipmentDate).format('YYYY/MM/DD')
+                  }}
+                </div>
+                <div class="list-body col-md-2">{{ formatStatus(shippingInstruction.shippingInstructionStatus) }}</div>
+
+                <!-- 확장된 상세 정보 표시 -->
+                <div class="d-flex justify-content-center">
+                  <div v-if="expandShippingInstruction[shippingInstruction.shippingInstructionSeq]"
+                       class="col-md-11 mt-3">
+                    <p>총수량 : {{
+                        expandShippingInstruction[shippingInstruction.shippingInstructionSeq].shippingInstructionTotalQuantity
+                      }} 개</p>
+                    <p>출하 주소 : {{
+                        expandShippingInstruction[shippingInstruction.shippingInstructionSeq].shippingInstructionAddress
+                      }}</p>
+                    <p>담당자 : {{ expandShippingInstruction[shippingInstruction.shippingInstructionSeq].userName }}</p>
+                    <p>출하예정일시 : {{
+                        dayjs(expandShippingInstruction[shippingInstruction.shippingInstructionSeq].shippingInstructionScheduledShipmentDate).format('YYYY/MM/DD HH:mm:ss')
+                      }}</p>
+                    <p v-if="expandShippingInstruction[shippingInstruction.shippingInstructionSeq].shippingInstructionNote">
+                      출하지시서 비고 :
+                      {{ expandShippingInstruction[shippingInstruction.shippingInstructionSeq].shippingInstructionNote }}
+                    </p>
+                    <!-- 확장된 상세 품목 정보 표시-->
+                    <div v-for="(row, rowIndex) in getChunkedItems(shippingInstruction.shippingInstructionSeq)"
+                         :key="rowIndex"
+                         class="mb-3 d-flex flex-row">
+                      <div style="max-height: 250px;"
+                           v-for="(expandItem, index) in row"
+                           :key="index"
+                           class="me-5 col-md-3 d-flex flex-column border border-secondary rounded">
+                        <b-img style="max-height: 100px;" src="https://picsum.photos/200/200" fluid
+                               alt="Responsive image"></b-img>
+                        <p class="ms-3">· 구분 : {{ formatDivision(expandItem.itemDivision) }}</p>
+                        <p class="ms-3">· 품목 : {{ expandItem.itemName }}</p>
+                        <p class="ms-3">· 수량 : {{ expandItem.shippingInstructionItemQuantity }} 개</p>
+                        <p v-if="expandItem.shippingInstructionItemNote" class="ms-3">· 비고 :
+                          {{ expandItem.shippingInstructionItemNote }}</p>
+                        <p v-else class="ms-3">· 비고 : 없음</p>
+                      </div>
+                    </div>
+                    <div class="d-flex justify-content-end align-items-center">
+                      <printIcon class="me-3 icon" @click.stop="printItem(index)"/>
+                      <editIcon class="me-3 icon" @click.stop=""/>
+                      <trashIcon class="icon" @click.stop="itemDelete(shippingInstruction.shippingInstructionSeq)"/>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div class="list-body col-2">{{ shippingInstruction.clientName }}</div>
-              <div class="list-body col-2">{{
-                  formatDate(shippingInstruction.shippingInstructionScheduledShipmentDate)
-                }}
-              </div>
-              <div class="list-body col-2">{{ formatStatus(shippingInstruction.shippingInstructionStatus) }}</div>
             </div>
           </div>
           <div class="pagination">
@@ -219,5 +311,4 @@ div {
   width: 20px;
   height: 20px;
 }
-
 </style>
