@@ -57,11 +57,43 @@ const fetchSalesOrder = async (salesOrderSeq) => {
       }
     });
 
+    const quantityResponse = await axios.get(`http://localhost:8090/api/v1/shipping-instruction/quantity/${salesOrderSeq}`, {
+      paramsSerializer: (salesOrderSeq) => {
+        // null이나 undefined 값을 필터링
+        const filteredParams = Object.fromEntries(
+            Object.entries(salesOrderSeq).filter(([_, value]) => value !== null && value !== undefined)
+        );
+        return new URLSearchParams(filteredParams).toString();
+      }
+    });
+
     console.log(response.data.salesOrderItem);
-    itemList.value = response.data.salesOrderItem;
+
+    if (Array.isArray(quantityResponse.data) && response.data.salesOrderItem.length === quantityResponse.data.length) {
+      // 수량 업데이트 및 필터링
+      const updatedItems = response.data.salesOrderItem
+          .map((item, index) => {
+            item.salesOrderItemQuantity = quantityResponse.data[index]; // 각 아이템의 quantity를 업데이트
+            return item; // 업데이트된 아이템 반환
+          })
+          .filter(item => item.salesOrderItemQuantity > 0); // 수량이 0인 항목은 제외
+
+      console.log(updatedItems);
+      itemList.value = updatedItems; // 필터링된 리스트를 itemList에 저장
+    } else {
+      console.warn("수량 데이터와 아이템 수가 일치하지 않습니다.");
+    }
 
   } catch (error) {
-    console.error("주문서 상세 품목 불러오기 실패 :", error);
+    if (error.response) {
+      // 서버에서 반환된 상태 코드에 따른 처리
+      if (error.response.status === 400) {
+        console.error(`주문서 상세 품목 불러오기 실패 : ${error.response.data.message}`);
+        alert(`${error.response.data.message}`);
+      } else {
+        console.error(`주문서 상세 품목 불러오기 : 상태 코드 ${error.response.status}`);
+      }
+    }
   }
 };
 
@@ -78,8 +110,7 @@ const createShippingInstruction = async (formData, itemData) => {
             shippingInstructionItemQuantity: item.quantity,
             shippingInstructionItemNote: item.note,
           })),
-        }, {
-    });
+        }, {});
 
     console.log(response);
     alert('출하지시서가 등록되었습니다!');
@@ -87,8 +118,15 @@ const createShippingInstruction = async (formData, itemData) => {
     await router.push("/shipping-instruction");
 
   } catch (error) {
-    console.error('평가 작성 실패', error);
-    throw error;
+    if (error.response) {
+      // 서버에서 반환된 상태 코드에 따른 처리
+      if (error.response.status === 400) {
+        console.error(`출하지시서 등록 실패 : ${error.response.data.message}`);
+        alert(`${error.response.data.message}`);
+      } else {
+        console.error(`출하지시서 등록 실패 : 상태 코드 ${error.response.status}`);
+      }
+    }
   }
 };
 

@@ -10,16 +10,17 @@ import error.pirate.backend.shippingInstruction.command.domain.aggregate.entity.
 import error.pirate.backend.shippingInstruction.command.domain.aggregate.entity.ShippingInstructionStatus;
 import error.pirate.backend.shippingInstruction.command.domain.repository.ShippingInstructionRepository;
 import error.pirate.backend.shippingInstruction.command.mapper.ShippingInstructionMapper;
+import error.pirate.backend.shippingInstruction.query.dto.ShippingInstructionItemCheckDTO;
+import error.pirate.backend.shippingInstruction.query.service.ShippingInstructionQueryService;
 import error.pirate.backend.user.command.domain.aggregate.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Objects;
 
 @Slf4j
@@ -28,6 +29,7 @@ import java.util.Objects;
 public class ShippingInstructionDomainService {
 
     private final ShippingInstructionRepository shippingInstructionRepository;
+    private final ShippingInstructionQueryService shippingInstructionQueryService;
 
     /* 도메인 객체를 생성하는 로직 */
     public ShippingInstruction createShippingInstruction(
@@ -61,28 +63,6 @@ public class ShippingInstructionDomainService {
         return seoulZonedDateTime.toLocalDateTime();
     }
 
-    /* 오늘날짜의 등록된 출하지지서 갯수 찾기 */
-    public long countTodayShippingInstruction() {
-        // 서울 시간대(Asia/Seoul)를 지정하여 시작과 끝 시간 생성
-        ZoneId seoulZoneId = ZoneId.of("Asia/Seoul");
-
-        // 서울 시간대 기준으로 오늘의 시작과 끝 시간을 계산
-        LocalDateTime startOfDay = LocalDate.now(seoulZoneId).atStartOfDay();
-        LocalDateTime endOfDay = startOfDay.plusDays(1).minusNanos(1);
-        return shippingInstructionRepository.countByShippingInstructionRegDateBetween(startOfDay, endOfDay);
-    }
-
-    /* 출하지시서 이름 설정 */
-    public String setShippingInstructionName(long count) {
-        // 서울 기준 현재 날짜 가져오기
-        LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
-
-        // yyyy/MM/dd 형식으로 변환
-        String formattedDate = today.format(DateTimeFormatter.ofPattern("yyyy/MM/dd"));
-
-        return formattedDate + " - " + (count + 1);
-    }
-
     /* 총수량 계산 */
     public int calculateTotalQuantity(ShippingInstructionRequest request) {
         // Null 검사를 수행하여 NPE 방지
@@ -101,6 +81,11 @@ public class ShippingInstructionDomainService {
     public ShippingInstruction findByShippingInstructionSeq(Long shippingInstructionSeq) {
         return shippingInstructionRepository.findById(shippingInstructionSeq)
                 .orElseThrow(() -> new CustomException(ErrorCodeType.SHIPPING_INSTRUCTION_NOT_FOUND));
+    }
+
+    /* 주문서 번호로 출하지시서 리스트 찾기 */
+    public List<ShippingInstruction> findBySalesOrder(SalesOrder salesOrder) {
+        return shippingInstructionRepository.findBySalesOrder(salesOrder);
     }
 
     /* 도메인 객체를 수정하는 로직 */
@@ -145,5 +130,25 @@ public class ShippingInstructionDomainService {
     public void deleteShippingInstruction(ShippingInstruction shippingInstruction) {
         /* 수정을 위해 엔터티 정보 변경 */
         shippingInstruction.updateStatus("DELETE");
+    }
+
+    // 주문서와 출하지시서의 품목 수량 비교
+    public boolean validateItem(long salesOrderSeq) {
+        List<ShippingInstructionItemCheckDTO> shippingInstructionItemCheckList =
+                shippingInstructionQueryService.shippingInstructionItemCheck(salesOrderSeq);
+
+        /* 체크 후 잔여 수량이 마이너스면 에러 발생 */
+        /* 체크 후 잔여 수량이 모두 0이면 true 반환 */
+        boolean allRemainingQuantitiesZero = true;
+        for (ShippingInstructionItemCheckDTO shippingInstructionItemCheck : shippingInstructionItemCheckList) {
+            if (shippingInstructionItemCheck.getRemainingQuantity() < 0) {
+                throw new CustomException(ErrorCodeType.SHIPPING_INSTRUCTION_ITEM_NOT_MATCH);
+            }
+            if (shippingInstructionItemCheck.getRemainingQuantity() > 0) {
+                allRemainingQuantitiesZero = false; // 잔여 수량이 0보다 크면 false로 설정
+            }
+        }
+
+        return allRemainingQuantitiesZero;
     }
 }
