@@ -30,6 +30,10 @@ const routes = [
         component: () => import("@/views/purchaseOrder/PurchaseOrderInputView.vue")
     },
     {
+        path: "/purchaseOrder/situation",
+        component: () => import("@/views/purchaseOrder/PurchaseOrderSituationView.vue")
+    },
+    {
         path: "/purchase",
         component: () => import("@/views/purchase/PurchaseListView.vue")
     },

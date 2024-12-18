@@ -47,4 +47,28 @@ public class PurchaseOrderQueryController {
                 .body(purchaseOrderService.purchaseOrderExcelDown(purchaseOrderRequest));
     }
 
+    @GetMapping("/situation")
+    @Operation(summary = "발주서 현황")
+    public void purchaseOrderSituation() {
+        
+    }
+
+    @GetMapping("/situation/excelDown")
+    @Operation(summary = "발주서 현황 엑셀다운")
+    public void purchaseOrderSituationExcel() {
+
+    }
+
+    @GetMapping("/stock/situation")
+    @Operation(summary = "미입고 현황")
+    public void notInStockSituation() {
+
+    }
+
+    @GetMapping("/stock/situation/excelDown")
+    @Operation(summary = "미입고 현황 엑셀다운")
+    public void notInStockSituationExcel() {
+
+    }
+
 }
