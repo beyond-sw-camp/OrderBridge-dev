@@ -3,9 +3,11 @@ package error.pirate.backend.salesOrder.command.domain.service;
 import error.pirate.backend.exception.CustomException;
 import error.pirate.backend.exception.ErrorCodeType;
 import error.pirate.backend.salesOrder.command.domain.aggregate.entity.SalesOrder;
+import error.pirate.backend.salesOrder.command.domain.aggregate.entity.SalesOrderStatus;
 import error.pirate.backend.salesOrder.command.domain.repository.SalesOrderRepository;
 import error.pirate.backend.salesOrder.query.dto.SalesOrderItemCheckDTO;
 import error.pirate.backend.salesOrder.query.service.SalesOrderQueryService;
+import error.pirate.backend.workOrder.command.domain.aggregate.entity.WorkOrderStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -41,6 +43,14 @@ public class SalesOrderDomainService {
             if (salesOrderItemCheck.getRemainingQuantity() < 0) {
                 throw new CustomException(ErrorCodeType.SALES_ORDER_ITEM_NOT_MATCH);
             }
+        }
+    }
+
+    // 주문서 상태 확인
+    public void checkSalesOrderStatus(SalesOrderStatus salesOrderStatus) {
+        /* 결재후가 아니라면 불가*/
+        if (!salesOrderStatus.equals(SalesOrderStatus.AFTER)) {
+            throw new CustomException(ErrorCodeType.SALES_ORDER_STATE_BAD_REQUEST);
         }
     }
 }

@@ -1,5 +1,6 @@
 package error.pirate.backend.quotation.query.controller;
 
+import error.pirate.backend.quotation.command.domain.aggregate.entity.QuotationStatus;
 import error.pirate.backend.quotation.query.dto.QuotationListResponse;
 import error.pirate.backend.quotation.query.dto.QuotationResponse;
 import error.pirate.backend.quotation.query.dto.QuotationSituationResponse;
@@ -8,6 +9,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,7 +32,7 @@ public class QuotationQueryController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
             @RequestParam(required = false) String clientName,
-            @RequestParam(required = false) String quotationStatus) {
+            @RequestParam(required = false) List<String> quotationStatus) {
 
         return ResponseEntity.ok(quotationQueryService.readQuotationList(
                 page, size, startDate, endDate, clientName, quotationStatus));
@@ -53,5 +55,11 @@ public class QuotationQueryController {
 
         return ResponseEntity.ok(quotationQueryService.readQuotationSituation(
                 startDate, endDate, clientName));
+    }
+
+    @GetMapping("/status")
+    @Operation(summary = "견적서 상태 분류 조회")
+    public ResponseEntity<List<QuotationStatus.QuotationStatusResponse>> readQuotationStatus() {
+        return ResponseEntity.ok(QuotationStatus.readQuotationStatusList());
     }
 }

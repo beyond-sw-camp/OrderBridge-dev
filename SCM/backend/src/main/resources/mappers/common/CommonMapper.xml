@@ -6,9 +6,25 @@
     <!--  이름 생성기  -->
     <select id="nameGenerator" resultType="String">
         SELECT
-            CONCAT(DATE_FORMAT(CURDATE(), '%Y/%m/%d'), ' - ', (COUNT(*) + 1)) AS ${domainName}_name
+        CONCAT(DATE_FORMAT(CURDATE(), '%Y/%m/%d'), ' - ', (COUNT(*) + 1)) AS ${domainName}_name
         FROM tb_${domainName}
         WHERE DATE(${domainName}_reg_date) = CURDATE()
     </select>
 
+    <!--  품목 조회 시 남은 수량 계산 후 조회  -->
+    <select id="remainingQuantity" resultType="Integer">
+        SELECT
+        tb_${selectDomainName}_item.${selectDomainName}_item_quantity - NVL((
+                SELECT
+                    SUM(tb_${joinDomainName}_item.${joinDomainName}_item_quantity)
+                FROM tb_${joinDomainName}
+                JOIN tb_${joinDomainName}_item USING (${joinDomainName}_seq)
+                WHERE tb_${joinDomainName}.${selectDomainName}_seq = tb_${selectDomainName}.${selectDomainName}_seq
+                AND tb_${joinDomainName}_item.item_seq = tb_${selectDomainName}_item.item_seq
+                AND tb_${joinDomainName}.${joinDomainName}_status NOT IN ("DELETE")
+                ), 0) AS remaining_quantity
+        FROM tb_${selectDomainName}
+        JOIN tb_${selectDomainName}_item USING (${selectDomainName}_seq)
+        WHERE tb_${selectDomainName}.${selectDomainName}_seq = #{seq}
+    </select>
 </mapper>

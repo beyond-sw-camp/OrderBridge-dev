@@ -23,4 +23,6 @@ public interface ShippingInstructionMapper {
 
     List<ShippingInstructionSituationResponse> selectShippingInstructionSituation(
             @Param("request") ShippingInstructionSituationRequest request);
+
+    List<ShippingInstructionItemCheckDTO> sumShippingInstructionItemValue(long salesOrderSeq);
 }

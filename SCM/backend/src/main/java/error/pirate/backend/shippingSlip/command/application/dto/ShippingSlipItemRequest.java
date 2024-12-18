@@ -7,7 +7,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 @Schema(description = "출하전표 품목 DTO")
-public class ShippingSlipItemDTO {
+public class ShippingSlipItemRequest {
     private long itemSeq;    // 품목 시퀀스
     private int shippingSlipItemQuantity;    // 물품 수량
     private String shippingSlipItemNote;     // 물품 비고

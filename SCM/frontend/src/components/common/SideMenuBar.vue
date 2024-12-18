@@ -1,11 +1,6 @@
 <script setup>
 import { ref } from 'vue';
 import { RouterLink } from 'vue-router';
-import basicIcon from '@/assets/basicIcon.svg';
-import salesIcon from '@/assets/salesIcon.svg';
-import productionIcon from '@/assets/productionIcon.svg';
-import orderIcon from '@/assets/orderIcon.svg';
-import statisticsIcon from '@/assets/statisticsIcon.svg'
 
 // 사이드바 열림/닫힘 상태
 const isSidebar = ref(false);
@@ -75,8 +70,8 @@ const toggleSubMenu = (subMenu) => {
         <span @click="toggleMenu('sales')">영업관리</span>
         <ul v-if="activeMenu === 'sales'">
           <li>
-            <span @click="toggleSubMenu('item')">견적서</span>
-            <ul v-if="activeSubMenu === 'item'">
+            <span @click="toggleSubMenu('quotation')">견적서</span>
+            <ul v-if="activeSubMenu === 'quotation'">
               <li>
                 <RouterLink class="content-item" to="">견적서 조회</RouterLink>
                 <RouterLink class="content-item" to="">견적서 등록</RouterLink>
@@ -85,8 +80,8 @@ const toggleSubMenu = (subMenu) => {
             </ul>
           </li>
           <li>
-            <span @click="toggleSubMenu('order')">주문서</span>
-            <ul v-if="activeSubMenu === 'order'">
+            <span @click="toggleSubMenu('salesOrder')">주문서</span>
+            <ul v-if="activeSubMenu === 'salesOrder'">
               <li>
                 <RouterLink class="content-item" to="">주문서 조회</RouterLink>
                 <RouterLink class="content-item" to="">주문서 등록</RouterLink>
@@ -95,8 +90,8 @@ const toggleSubMenu = (subMenu) => {
             </ul>
           </li>
           <li>
-            <span @click="toggleSubMenu('warehouse')">판매</span>
-            <ul v-if="activeSubMenu === 'warehouse'">
+            <span @click="toggleSubMenu('invoice')">판매</span>
+            <ul v-if="activeSubMenu === 'invoice'">
               <li>
                 <RouterLink class="content-item" to="">거래명세서 조회</RouterLink>
                 <RouterLink class="content-item" to="">거래명세서 등록</RouterLink>
@@ -105,18 +100,18 @@ const toggleSubMenu = (subMenu) => {
             </ul>
           </li>
           <li>
-            <span @click="toggleSubMenu('warehouse')">출하지시서</span>
-            <ul v-if="activeSubMenu === 'warehouse'">
+            <span @click="toggleSubMenu('shippingInstruction')">출하지시서</span>
+            <ul v-if="activeSubMenu === 'shippingInstruction'">
               <li>
-                <RouterLink class="content-item" to="">출하지시서 조회</RouterLink>
-                <RouterLink class="content-item" to="">출하지시서 등록</RouterLink>
-                <RouterLink class="content-item" to="">출하지시서 현황</RouterLink>
+                <RouterLink class="content-item" to="/shipping-instruction" active-class="active" replace>출하지시서 조회</RouterLink>
+                <RouterLink class="content-item" to="/shipping-instruction/input" active-class="active" replace>출하지시서 등록</RouterLink>
+                <RouterLink class="content-item" to="/shipping-instruction/situation" active-class="active" replace>출하지시서 현황</RouterLink>
               </li>
             </ul>
           </li>
           <li>
-            <span @click="toggleSubMenu('warehouse')">출하</span>
-            <ul v-if="activeSubMenu === 'warehouse'">
+            <span @click="toggleSubMenu('shippingSlip')">출하</span>
+            <ul v-if="activeSubMenu === 'shippingSlip'">
               <li>
                 <RouterLink class="content-item" to="">출하전표 조회</RouterLink>
                 <RouterLink class="content-item" to="">출하전표 등록</RouterLink>
@@ -179,8 +174,8 @@ const toggleSubMenu = (subMenu) => {
             </ul>
           </li>
           <li>
-            <span @click="toggleSubMenu('warehouse')">생산입고</span>
-            <ul v-if="activeSubMenu === 'warehouse'">
+            <span @click="toggleMenu2('warehouse')">생산입고</span>
+            <ul v-if="activeMenu2 === 'warehouse'">
               <li>
                 <RouterLink class="content-item" to="">생산입고 조회</RouterLink>
                 <RouterLink class="content-item" to="">생산입고 입력</RouterLink>

@@ -16,14 +16,14 @@ public interface QuotationMapper {
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate,
             @Param("clientName") String clientName,
-            @Param("quotationStatus") String quotationStatus);
+            @Param("quotationStatus") List<String> quotationStatus);
 
     // 견적서 개수 목록 조회
     int countQuotationList(
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate,
             @Param("clientName") String clientName,
-            @Param("quotationStatus") String quotationStatus);
+            @Param("quotationStatus") List<String> quotationStatus);
 
     // 견적서 상세 조회
     QuotationDTO selectQuotation(

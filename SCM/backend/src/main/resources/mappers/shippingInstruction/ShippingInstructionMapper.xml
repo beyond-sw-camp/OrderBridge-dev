@@ -74,18 +74,13 @@
             resultType="error.pirate.backend.shippingInstruction.query.dto.ShippingInstructionDTO">
         SELECT
             si.shipping_instruction_seq,
-            si.shipping_instruction_name,
-            si.shipping_instruction_status,
             si.shipping_instruction_scheduled_shipment_date,
-            c.client_name,
             si.shipping_instruction_total_quantity,
             si.shipping_instruction_address,
             u.user_name,
             si.shipping_instruction_note
         FROM tb_shipping_instruction si
         JOIN tb_user u ON (si.user_seq = u.user_seq)
-        JOIN tb_sales_order so ON (si.sales_order_seq = so.sales_order_seq)
-        JOIN tb_client c ON (so.client_seq = c.client_seq)
         WHERE si.shipping_instruction_seq = #{shippingInstructionSeq}
     </select>
 
@@ -98,10 +93,8 @@
             i.item_image_url,
             i.item_name,
             i.item_division,
-            i.item_price,
             sii.shipping_instruction_item_quantity,
-            sii.shipping_instruction_item_note,
-            (i.item_price * sii.shipping_instruction_item_quantity) AS itemTotalAmount
+            sii.shipping_instruction_item_note
         FROM tb_shipping_instruction_item sii
         JOIN tb_item i ON sii.item_seq = i.item_seq
         WHERE sii.shipping_instruction_seq = #{shippingInstructionSeq}
@@ -137,5 +130,24 @@
         GROUP BY
             DATE_FORMAT(si.shipping_instruction_scheduled_shipment_date, '%Y/%m'),
             si.shipping_instruction_scheduled_shipment_date WITH ROLLUP;
+    </select>
+
+    <!--  출하지시서 품목 값 확인  -->
+    <select id="sumShippingInstructionItemValue"
+            resultType="error.pirate.backend.shippingInstruction.query.dto.ShippingInstructionItemCheckDTO">
+        SELECT
+            soi.item_seq AS item,
+            soi.sales_order_item_quantity - NVL((
+                SELECT
+                    SUM(sii.shipping_instruction_item_quantity)
+                FROM tb_shipping_instruction si
+                JOIN tb_shipping_instruction_item sii ON (si.shipping_instruction_seq = sii.shipping_instruction_seq)
+                WHERE si.sales_order_seq = so.sales_order_seq
+                AND sii.item_seq = item
+                AND si.shipping_instruction_status NOT IN ("DELETE")
+                ), 0) AS remaining_quantity
+        FROM tb_sales_order so
+        JOIN tb_sales_order_item soi ON (so.sales_order_seq = soi.sales_order_seq)
+        WHERE so.sales_order_seq = #{salesOrderSeq}
     </select>
 </mapper>

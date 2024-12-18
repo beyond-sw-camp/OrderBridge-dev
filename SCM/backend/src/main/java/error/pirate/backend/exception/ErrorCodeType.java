@@ -25,6 +25,9 @@ public enum ErrorCodeType {
     // 주문서 품목 관련 오류
     SALES_ORDER_ITEM_NOT_FOUND(HttpStatus.NOT_FOUND, "SALES_ORDER_ITEM_ERROR_001", "주문서 품목을 찾을 수 없습니다."),
 
+    // 거래 명세서 관련 오류
+    INVOICE_ITEM_NOT_MATCH(HttpStatus.BAD_REQUEST, "INVOICE_ITEM_ERROR_001", "거래 명세서의 품목이 주문서와 다릅니다."),
+
     //발주서 관련 오류
     PURCHASE_NOT_FOUND(HttpStatus.NOT_FOUND, "PURCHASE_ERROR_001", "발주서를 찾을 수 없습니다."),
     PURCHASE_UPDATE_ERROR(HttpStatus.BAD_REQUEST, "PURCHASE_ERROR_002", "이미 결재가 완료된 주문입니다."),
@@ -32,6 +35,7 @@ public enum ErrorCodeType {
     // 출하지시서 관련 오류
     SHIPPING_INSTRUCTION_NOT_FOUND(HttpStatus.NOT_FOUND, "SHIPPING_INSTRUCTION_ERROR_001", "출하지시서를 찾을 수 없습니다."),
     SHIPPING_INSTRUCTION_STATE_BAD_REQUEST(HttpStatus.BAD_REQUEST, "SHIPPING_INSTRUCTION_ERROR_002", "출하지시서의 상태를 확인해주세요"),
+    SHIPPING_INSTRUCTION_ITEM_NOT_MATCH(HttpStatus.BAD_REQUEST, "SHIPPING_INSTRUCTION_ERROR_003", "출하지시서의 아이템이 주문서와 다릅니다."),
 
     // 출하전표 관련 오류
     SHIPPING_SLIP_NOT_FOUND(HttpStatus.NOT_FOUND, "SHIPPING_SLIP_ERROR_001", "출하전표를 찾을 수 없습니다."),
@@ -54,13 +58,15 @@ public enum ErrorCodeType {
     WORK_ORDER_STATUS_ERROR(HttpStatus.BAD_REQUEST, "WORK_ORDER_ERROR_002", "작업지시가 완료된 경우만 생산 입고를 작성할 수 있습니다."),
     WORK_ORDER_REQUIRED_INFORMATION(HttpStatus.BAD_REQUEST, "WORK_ORDER_ERROR_003", "필수 입력 항목입니다."),
     WORK_ORDER_DUPLICATE(HttpStatus.CONFLICT, "WORK_ORDER_ERROR_004", "이미 작업지시서가 생성된 주문서입니다."),
-    WORK_ORDER_STATE_BAD_REQUEST(HttpStatus.BAD_REQUEST, "WORK_ORDER_ERROR_005", "출하지시서의 상태를 확인해주세요"),
+    WORK_ORDER_STATE_BAD_REQUEST(HttpStatus.BAD_REQUEST, "WORK_ORDER_ERROR_005", "작업지시서의 상태를 확인해주세요"),
+    WORK_ORDER_INVALID_QUANTITY(HttpStatus.BAD_REQUEST, "WORK_ORDER_ERROR_006", "수정된 지시수량은 이미 완료된 작업량보다 작을 수 없습니다."),
 
     // 회원 오류
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "USER_ERROR_001", "회원을 찾을 수 없습니다."),
 
     // 거래처 오류
     CLIENT_NOT_FOUND(HttpStatus.NOT_FOUND, "CLIENT_ERROR_001", "거래처를 찾을 수 없습니다."),
+    CLIENT_STATUS_ERROR(HttpStatus.BAD_REQUEST, "CLIENT_ERROR_002", "이미 삭제된 거래처입니다."),
 
     // 물품 오류
     ITEM_NOT_FOUND(HttpStatus.NOT_FOUND, "ITEM_ERROR_001", "물품을 찾을 수 없습니다."),
@@ -71,9 +77,6 @@ public enum ErrorCodeType {
 
     // 물품 단위 오류
     ITEM_UNIT_NOT_FOUND(HttpStatus.NOT_FOUND, "ITEM_UNIT_ERROR_001", "물품 단위를 찾을 수 없습니다."),
-
-    // 거래처 오류
-    CLIENT_STATUS_ERROR(HttpStatus.BAD_REQUEST, "CLIENT_ERROR_001", "이미 삭제된 거래처입니다."),
 
     // 엑셀 다운 오류
     EXCEL_DOWN_ERROR(HttpStatus.BAD_REQUEST, "EXCEL_DOWN_ERROR_001", "엑셀 다운로드 도중 오류가 발생하였습니다."),

@@ -14,11 +14,28 @@ const routes = [
     },
     {
         path: "/quotation",
+        name: "Quotation",
         component: () => import("@/views/quotation/QuotationListView.vue")
     },
     {
         path: "/currentSituation",
         component: () => import("@/components/common/CurrentSituation.vue")
+    },
+    {
+        path: "/purchaseOrder",
+        component: () => import("@/views/purchaseOrder/PurchaseOrderListView.vue")
+    },
+    {
+        path: "/purchaseOrder/input",
+        component: () => import("@/views/purchaseOrder/PurchaseOrderInputView.vue")
+    },
+    {
+        path: "/purchase",
+        component: () => import("@/views/purchase/PurchaseListView.vue")
+    },
+    {
+        path: "/purchase/input",
+        component: () => import("@/views/purchase/PurchaseInputView.vue")
     },
 
     ...shippingInstructionRoutes,

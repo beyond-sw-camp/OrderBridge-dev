@@ -25,7 +25,9 @@ import statisticsIcon from '@/assets/statisticsIcon.svg'
         </b-nav-item-dropdown>
         <b-nav-item-dropdown>
           <template #button-content><salesIcon class="icon" />영업관리</template>
-          <b-dropdown-item href="/quotation">견적 관리</b-dropdown-item>
+          <RouterLink to="/quotation" style="text-decoration-line: none;">
+            <b-dropdown-item>견적 관리</b-dropdown-item>
+          </RouterLink>
           <b-dropdown-item href="#">주문서 관리</b-dropdown-item>
           <b-dropdown-item href="#">판매 관리</b-dropdown-item>
           <b-dropdown-item href="#"><RouterLink to="/shipping-instruction" active-class="active" replace>출하지시서 관리</RouterLink></b-dropdown-item>
@@ -33,8 +35,8 @@ import statisticsIcon from '@/assets/statisticsIcon.svg'
         </b-nav-item-dropdown>
         <b-nav-item-dropdown>
           <template #button-content><orderIcon class="icon" />주문관리</template>
-          <b-dropdown-item href="#">발주서 관리</b-dropdown-item>
-          <b-dropdown-item href="#">구매서 관리</b-dropdown-item>
+          <b-dropdown-item href="#"><RouterLink to="/purchaseOrder" active-class="active none-decoration" replace>발주서 관리</RouterLink></b-dropdown-item>
+          <b-dropdown-item href="#"><RouterLink to="/purchase" active-class="active none-decoration" replace>구매서 관리</RouterLink></b-dropdown-item>
         </b-nav-item-dropdown>
         <b-nav-item-dropdown>
           <template #button-content><productionIcon class="icon" />생산관리</template>
@@ -81,5 +83,9 @@ import statisticsIcon from '@/assets/statisticsIcon.svg'
 
 .header {
   background-color: #FFF9EA;
+}
+
+.none-decoration {
+  text-decoration: none;
 }
 </style>

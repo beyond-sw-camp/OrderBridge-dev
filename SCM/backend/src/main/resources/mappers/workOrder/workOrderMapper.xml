@@ -1,7 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
-
 <mapper namespace="error.pirate.backend.workOrder.query.mapper.WorkOrderMapper">
 
     <!-- 작업지시서 목록
@@ -17,63 +17,68 @@
                   FROM tb_item i
                  WHERE i.item_seq = wo.item_seq
                 )   AS item_name
-        FROM tb_work_order wo
-        LEFT JOIN tb_warehouse w ON wo.warehouse_seq = w.warehouse_seq
-        <where>
-             <!--작업상태 필터링-->
-            <if test="filter.workOrderStatus != null">
-                work_order_status = #{filter.workOrderStatus}
-            </if>
-            <!--생산창고 이름 필터링 -->
-            <if test="filter.warehouseName != null">
-                AND warehouse_name like concat('%', #{filter.warehouseName}, '%')
-            </if>
-            <!-- 작업지시일 검색 필터링 -->
-            <if test="filter.startDate != null">
-                <![CDATA[
+          FROM tb_work_order wo
+          LEFT JOIN tb_warehouse w ON wo.warehouse_seq = w.warehouse_seq
+         WHERE wo.work_order_status NOT IN ('DELETE')
+        <!--작업상태 필터링-->
+        <if test="statusList != null and !statusList.isEmpty()">
+            AND wo.work_order_status IN
+            <foreach item="status" collection="statusList" open="(" separator="," close=")">
+                #{status}
+            </foreach>
+        </if>
+        <!--생산창고 이름 필터링 -->
+        <if test="filter.warehouseName != null">
+            AND warehouse_name like concat('%', #{filter.warehouseName}, '%')
+        </if>
+        <!-- 작업지시일 검색 필터링 -->
+        <if test="filter.startDate != null">
+            <![CDATA[
                 AND work_order_indicated_date >= #{filter.startDate}
                 ]]>
-            </if>
-            <if test="filter.endDate != null">
-                <![CDATA[
+        </if>
+        <if test="filter.endDate != null">
+            <![CDATA[
                 AND work_order_indicated_date <= #{filter.endDate}
                 ]]>
-            </if>
-        </where>
-       ORDER BY wo.work_order_indicated_date DESC
-              , wo.work_order_name
+        </if>
+        ORDER BY wo.work_order_indicated_date DESC
+               , wo.work_order_name
         LIMIT #{filter.size} OFFSET #{offset}
     </select>
 
     <!--  작업지시서 목록 개수  -->
     <select id="readWorkOrderListCount" resultType="long">
         SELECT COUNT(*)
-        FROM tb_work_order wo
-        LEFT JOIN tb_warehouse w ON wo.warehouse_seq = w.warehouse_seq
-        <where>
-            <if test="filter.workOrderStatus != null">
-                work_order_status = #{filter.workOrderStatus}
-            </if>
-            <if test="filter.warehouseName != null">
-                AND warehouse_name like concat('%', #{filter.warehouseName}, '%')
-            </if>
-            <if test="filter.startDate != null">
-                <![CDATA[
+          FROM tb_work_order wo
+          LEFT JOIN tb_warehouse w ON wo.warehouse_seq = w.warehouse_seq
+         WHERE wo.work_order_status NOT IN ('DELETE')
+        <if test="statusList != null and !statusList.isEmpty()">
+            AND wo.work_order_status IN
+            <foreach item="status" collection="statusList" open="(" separator="," close=")">
+                #{status}
+            </foreach>
+        </if>
+        <if test="filter.warehouseName != null">
+            AND warehouse_name like concat('%', #{filter.warehouseName}, '%')
+        </if>
+        <if test="filter.startDate != null">
+            <![CDATA[
                 AND work_order_indicated_date >= #{filter.startDate}
                 ]]>
-            </if>
-            <if test="filter.endDate != null">
-                <![CDATA[
+        </if>
+        <if test="filter.endDate != null">
+            <![CDATA[
                 AND work_order_indicated_date <= #{filter.endDate}
                 ]]>
-            </if>
-        </where>
+        </if>
     </select>
 
     <!-- 작업지시서 상세조회 -->
     <select id="readWorkOrder" resultType="error.pirate.backend.workOrder.query.dto.WorkOrderDetailDTO">
         SELECT wo.work_order_seq
              , wo.work_order_name
+             , w.warehouse_seq
              , w.warehouse_name
              , wo.work_order_indicated_date
              , wo.work_order_status
@@ -87,25 +92,27 @@
              , wo.work_order_due_date
              , wo.work_order_work_quantity
              , wo.work_order_note
-        FROM tb_work_order wo
-        JOIN tb_warehouse w ON wo.warehouse_seq = w.warehouse_seq
-        JOIN tb_client c ON wo.client_seq = c.client_seq
-        JOIN tb_user u ON wo.user_seq = u.user_seq
-        JOIN tb_sales_order so ON wo.sales_order_seq = so.sales_order_seq
-       WHERE wo.work_order_seq = #{workOrderSeq}
+          FROM tb_work_order wo
+          JOIN tb_warehouse w ON wo.warehouse_seq = w.warehouse_seq
+          JOIN tb_client c ON wo.client_seq = c.client_seq
+          JOIN tb_user u ON wo.user_seq = u.user_seq
+          JOIN tb_sales_order so ON wo.sales_order_seq = so.sales_order_seq
+         WHERE wo.work_order_seq = #{workOrderSeq}
     </select>
 
     <!-- 작업지시서 상세 품목조회 -->
     <select id="readItemByWorkOrderSeq" resultType="error.pirate.backend.workOrder.query.dto.WorkOrderItemDTO">
-        SELECT  i.item_seq
-              , i.item_name
-              , i.item_image_url
-              , i.item_price
-              , iu.item_unit_title
-         FROM tb_work_order wo
-         JOIN tb_item i ON wo.item_seq = i.item_seq
-         JOIN tb_item_unit iu ON i.item_unit_seq = iu.item_unit_seq
-        WHERE wo.work_order_seq = #{workOrderSeq}
+        SELECT i.item_seq
+             , i.item_name
+             , i.item_image_url
+             , i.item_price
+             , iu.item_unit_title
+             , i.item_division
+             , i.item_note
+          FROM tb_work_order wo
+          JOIN tb_item i ON wo.item_seq = i.item_seq
+          JOIN tb_item_unit iu ON i.item_unit_seq = iu.item_unit_seq
+         WHERE wo.work_order_seq = #{workOrderSeq}
     </select>
 
     <!-- 작업지시서 현황조회 -->
@@ -122,30 +129,30 @@
           LEFT JOIN tb_item i ON wo.item_seq = i.item_seq
           LEFT JOIN tb_client c ON wo.client_seq = c.client_seq
           LEFT JOIN tb_warehouse w ON w.warehouse_seq = wo.warehouse_seq
-        <where>
-            <!-- 작업지시일 검색 필터링 -->
-            <if test="startDate != null">
-                <![CDATA[
+         WHERE wo.work_order_status NOT IN ('DELETE')
+        <!-- 작업지시일 검색 필터링 -->
+        <if test="startDate != null">
+            <![CDATA[
                 AND wo.work_order_indicated_date >= #{startDate}
                 ]]>
-            </if>
-            <if test="endDate != null">
-                <![CDATA[
+        </if>
+        <if test="endDate != null">
+            <![CDATA[
                 AND wo.work_order_indicated_date <= #{endDate}
                 ]]>
-            </if>
-            <!-- 거래처명 필터링 -->
-            <if test="clientName != null">
-                AND c.client_name LIKE CONCAT('%', #{clientName}, '%')
-            </if>
-            <!-- 생산창고 필터링 -->
-            <if test="warehouseName != null">
-                AND w.warehouse_name LIKE CONCAT('%', #{warehouseName}, '%')
-            </if>
-        </where>
-         ORDER BY wo.work_order_indicated_date
+        </if>
+        <!-- 거래처명 필터링 -->
+        <if test="clientName != null">
+            AND c.client_name LIKE CONCAT('%', #{clientName}, '%')
+        </if>
+        <!-- 생산창고 필터링 -->
+        <if test="warehouseName != null">
+            AND w.warehouse_name LIKE CONCAT('%', #{warehouseName}, '%')
+        </if>
+        ORDER BY wo.work_order_indicated_date
     </select>
 
+    <!-- 전표 조회 -->
     <select id="readWorkOrderSlip" resultType="error.pirate.backend.workOrder.query.dto.WorkOrderSlipDTO">
         SELECT wo.work_order_seq
              , wo.work_order_name
@@ -166,6 +173,7 @@
          WHERE wo.work_order_seq = #{workOrderSeq}
     </select>
 
+    <!-- 전표 품목조회 -->
     <select id="readWorkOrderSlipItemByWorkOrderSeq" resultType="error.pirate.backend.workOrder.query.dto.WorkOrderSlipItemDTO">
         SELECT wo.item_seq
              , iu.item_unit_title

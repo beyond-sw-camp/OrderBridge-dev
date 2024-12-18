@@ -4,7 +4,7 @@ import error.pirate.backend.exception.CustomException;
 import error.pirate.backend.exception.ErrorCodeType;
 import error.pirate.backend.shippingInstruction.command.domain.aggregate.entity.ShippingInstruction;
 import error.pirate.backend.shippingInstruction.command.domain.aggregate.entity.ShippingInstructionStatus;
-import error.pirate.backend.shippingSlip.command.application.dto.ShippingSlipItemDTO;
+import error.pirate.backend.shippingSlip.command.application.dto.ShippingSlipItemRequest;
 import error.pirate.backend.shippingSlip.command.application.dto.ShippingSlipRequest;
 import error.pirate.backend.shippingSlip.command.domain.aggregate.entity.ShippingSlip;
 import error.pirate.backend.shippingSlip.command.domain.aggregate.entity.ShippingSlipStatus;
@@ -94,7 +94,7 @@ public class ShippingSlipDomainService {
         // stream을 사용해 shippingSlipItemQuantity 필드 합산
         return request.getShippingSlipItems()
                 .stream()
-                .mapToInt(ShippingSlipItemDTO::getShippingSlipItemQuantity)
+                .mapToInt(ShippingSlipItemRequest::getShippingSlipItemQuantity)
                 .sum();
     }
 

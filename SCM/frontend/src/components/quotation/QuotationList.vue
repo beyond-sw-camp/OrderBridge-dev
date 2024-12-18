@@ -1,22 +1,53 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted, watch } from 'vue';
+import searchIcon from "@/assets/searchIcon.svg"
+import axios from "@/axios"
 
-// 임시 데이터 셋
-const rows = ref(123);
-const perPage = ref(10);
+const quotationList = ref([]);
+const quotationStatusList = ref([]);
 const currentPage = ref(1);
-const items = ref([
-{ id: '2024/12/03 - 2', item: '김치볶음밥, 치즈볶음밥, 그냥볶음밥', client: '대한항공', quotation_date: '2024/1/1', status: '주문 전' },
-{ id: '2024/12/03 - 1', item: '김치볶음밥, 치즈볶음밥, 그냥볶음밥', client: '아시아나항공', quotation_date: '2024/1/1', status: '주문 후' },
-{ id: '2024/12/03 - 1', item: null, client: '아시아나항공', quotation_date: '2024/1/1', status: '주문 후' },
-{ id: '2024/12/03 - 1', item: null, client: '아시아나항공', quotation_date: '2024/1/1', status: '주문 후' },
-{ id: '위에', client: '거래처', quotation_date: '2024/1/1', status: '반려' },
-{ id: '위에', client: '거래처', quotation_date: '2024/1/1', status: '반려' },
-{ id: '위에', client: '거래처', quotation_date: '2024/1/1', status: '반려' },
-{ id: '위에', client: '거래처', quotation_date: '2024/1/1', status: '반려' },
-{ id: '위에', client: '거래처', quotation_date: '2024/1/1', status: '반려' },
-{ id: '위에', client: '거래처', quotation_date: '2024/1/1', status: '반려' }
-]);
+const totalPage = ref(1);
+const totalQuotation = ref(0);
+const searchPage = ref(1);
+const searchSize = ref(10);
+const searchStartDate = ref(null);
+const searchEndDate = ref(null);
+const searchClient = ref(null);
+const searchStatus = ref(new Set());
+
+// 견적서 목록 요청
+const fetchQuotationList = async () => {
+    try {
+        const response = await axios.get(`quotation`, {
+            params: {
+                page: searchPage.value,
+                size: searchSize.value,
+                startDate: searchStartDate.value,
+                endDate: searchEndDate.value,
+                clientName: searchClient.value,
+                quotationStatus: searchStatus.value.size === 0 ? null : Array.from(searchStatus.value).join(",")
+            }
+        });
+
+        quotationList.value = response.data.quotation;
+        currentPage.value = response.data.currentPage;
+        totalPage.value = response.data.totalPages;
+        totalQuotation.value = response.data.totalQuotation;
+    } catch (error) {
+        console.log(`견적서 목록 요청 실패`, error);
+    }
+}
+
+// 견적서 상태 분류 목록 요청
+const fetchQuotationStatus = async () => {
+    try { 
+        const response = await axios.get(`quotation/status`);
+        
+        quotationStatusList.value = response.data;
+    } catch (error) {
+        console.log(`견적서 상태 분류 목록 요청 실패`, error);
+    }
+}
 
 // 선택한 Item 확장 | 축소
 function itemExtend(event) {
@@ -41,6 +72,31 @@ function addItemCard() {
 
 }
 
+onMounted(() => {
+    fetchQuotationList();
+    fetchQuotationStatus();
+});
+
+watch([searchStartDate, searchEndDate, searchStatus.value], () => {
+    search();
+});
+
+watch(searchPage, () => {
+
+    fetchQuotationList();
+});
+
+function statusCheck(status) {
+    searchStatus.value.has(status) ? searchStatus.value.delete(status)
+                                   : searchStatus.value.add(status);
+}
+
+function search() {
+    searchPage.value = 1;
+
+    fetchQuotationList();
+}
+
 </script>
 
 <template>
@@ -49,31 +105,31 @@ function addItemCard() {
             <div class="side-box card">
                 <div class="card-body">
                     <p class="card-title">견적일</p>
-                    <input type="date" style="max-width: 40%;"/> ~ <input type="date" style="max-width: 40%;"/>
+                    <input type="date" v-model="searchStartDate" style="max-width: 40%;"/> ~ <input type="date" v-model="searchEndDate" style="max-width: 40%;"/>
                 </div>
             </div>
             <div class="side-box card">
                 <div class="card-body">
                     <p class="card-title">거래처명</p>
                     <b-input-group class="mt-3">
-                        <b-form-input></b-form-input>
-                        <b-input-group-text><svg width="1em" id="Layer_1" style="enable-background:new 0 0 512 512;" version="1.1" viewBox="0 0 512 512" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><path d="M344.5,298c15-23.6,23.8-51.6,23.8-81.7c0-84.1-68.1-152.3-152.1-152.3C132.1,64,64,132.2,64,216.3  c0,84.1,68.1,152.3,152.1,152.3c30.5,0,58.9-9,82.7-24.4l6.9-4.8L414.3,448l33.7-34.3L339.5,305.1L344.5,298z M301.4,131.2  c22.7,22.7,35.2,52.9,35.2,85c0,32.1-12.5,62.3-35.2,85c-22.7,22.7-52.9,35.2-85,35.2c-32.1,0-62.3-12.5-85-35.2  c-22.7-22.7-35.2-52.9-35.2-85c0-32.1,12.5-62.3,35.2-85c22.7-22.7,52.9-35.2,85-35.2C248.5,96,278.7,108.5,301.4,131.2z"/></svg></b-input-group-text>
+                        <b-form-input v-model="searchClient"></b-form-input>
+                        <b-button variant="light" class="button" @click="search()"><searchIcon class="icon"/></b-button>
                     </b-input-group>
                 </div>
             </div>
             <div class="side-box card">
                 <div class="card-body">
                     <p class="card-title">견적서 상태</p>
-                    <b-form-checkbox>주문 전</b-form-checkbox>
-                    <b-form-checkbox>주문 후</b-form-checkbox>
-                    <b-form-checkbox>반려</b-form-checkbox>
+                    <template v-for="quotationStatus in quotationStatusList">
+                        <b-form-checkbox @click="statusCheck(quotationStatus.key)">{{ quotationStatus.value }}</b-form-checkbox>
+                    </template>
                 </div>
             </div>
         </div>
         <div class="col-md-9">
             <div style="width: 90%;">
                 <div class="d-flex justify-content-between">
-                    <div>검색결과: {{ rows }}개</div>
+                    <div>검색결과: {{ totalQuotation }}개</div>
                     <b-button variant="light" size="sm" class="button">견적서 등록</b-button>
                 </div>
                 <div class="list-headline row">
@@ -82,22 +138,27 @@ function addItemCard() {
                     <div class="list-headvalue col-2">견적일</div>
                     <div class="list-headvalue col-2">상태</div>
                 </div>
+                <template v-if="quotationList.length > 0">
                 <div style="max-height: 600px; overflow-y: auto;">
-                    <div v-for="item in items" :key="item.id" class="list-line row" @click="itemExtend">
-                        <div class="col-6">{{ item.id }}<br>
-                            <div v-if="!item.item"><br></div>
-                            <div v-else>{{ item.item }}</div></div>
-                        <div class="list-value col-2">{{ item.client }}</div>
-                        <div class="list-value col-2">{{ item.quotation_date }}</div>
-                        <div class="list-value col-2">{{ item.status }}</div>
+                    <div v-for="quotation in quotationList" :key="quotation.quotationSeq" class="list-line row" @click="itemExtend">
+                        <div class="col-6">{{ quotation.quotationName }}<br>
+                            <div v-if="!quotation.itemName"><br></div>
+                            <div v-else>{{ quotation.itemName }}</div></div>
+                        <div class="list-value col-2">{{ quotation.clientName }}</div>
+                        <div class="list-value col-2">{{ quotation.quotationQuotationDate }}</div>
+                        <div class="list-value col-2">{{ quotation.quotationStatus }}</div>
                     </div>
                 </div>
+                </template>
+                <template v-else>
+                    <b-card-text class="no-list-text">해당 검색 조건에 부합하는 견적서가 존재하지 않습니다.</b-card-text>
+                </template>
             </div>
             <div class="pagenation">
                 <b-pagination
-                    v-model="currentPage"
-                    :total-rows="rows"
-                    :per-page="perPage">
+                    v-model="searchPage"
+                    :total-rows="totalQuotation"
+                    :per-page="searchSize">
                 </b-pagination>
             </div>
         </div>
@@ -152,6 +213,16 @@ div {
 .pagenation {
     justify-items: center;
     margin-top: 20px;
+}
+
+.no-list-text {
+    text-align: center;
+    margin-top: 100px;
+}
+
+.icon {
+  width: 20px;
+  height: 20px;
 }
 
 </style>
