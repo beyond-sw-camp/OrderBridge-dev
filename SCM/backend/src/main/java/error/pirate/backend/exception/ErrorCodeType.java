@@ -35,6 +35,7 @@ public enum ErrorCodeType {
     // 출하지시서 관련 오류
     SHIPPING_INSTRUCTION_NOT_FOUND(HttpStatus.NOT_FOUND, "SHIPPING_INSTRUCTION_ERROR_001", "출하지시서를 찾을 수 없습니다."),
     SHIPPING_INSTRUCTION_STATE_BAD_REQUEST(HttpStatus.BAD_REQUEST, "SHIPPING_INSTRUCTION_ERROR_002", "출하지시서의 상태를 확인해주세요"),
+    SHIPPING_INSTRUCTION_ITEM_NOT_MATCH(HttpStatus.BAD_REQUEST, "SHIPPING_INSTRUCTION_ERROR_003", "출하지시서의 아이템이 주문서와 다릅니다."),
 
     // 출하전표 관련 오류
     SHIPPING_SLIP_NOT_FOUND(HttpStatus.NOT_FOUND, "SHIPPING_SLIP_ERROR_001", "출하전표를 찾을 수 없습니다."),

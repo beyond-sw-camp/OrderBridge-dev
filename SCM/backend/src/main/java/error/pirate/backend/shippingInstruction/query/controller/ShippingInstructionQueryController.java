@@ -86,4 +86,15 @@ public class ShippingInstructionQueryController {
                 .headers(headersResponse)
                 .body(excelData);
     }
+
+    @Operation(summary = "출하지시서 등록 시 남아있는 주문서 품목 수량 조회", description = "출하지시서 등록 시 남아있는 주문서 품목 수량 조회")
+    @GetMapping("/quantity/{salesOrderSeq}")
+    public ResponseEntity<List<Integer>> readRemainingQuantity(
+            @PathVariable long salesOrderSeq
+    ) {
+        List<Integer> response
+                = shippingInstructionQueryService.readRemainingQuantity(salesOrderSeq);
+
+        return ResponseEntity.ok(response);
+    }
 }

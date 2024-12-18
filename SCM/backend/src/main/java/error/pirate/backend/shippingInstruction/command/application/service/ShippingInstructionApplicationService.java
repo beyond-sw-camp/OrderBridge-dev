@@ -4,6 +4,7 @@ import error.pirate.backend.common.NameGenerator;
 import error.pirate.backend.item.command.application.service.ItemService;
 import error.pirate.backend.item.command.domain.aggregate.entity.Item;
 import error.pirate.backend.salesOrder.command.domain.aggregate.entity.SalesOrder;
+import error.pirate.backend.salesOrder.command.domain.service.SalesOrderDomainService;
 import error.pirate.backend.shippingInstruction.command.application.dto.ShippingInstructionItemRequest;
 import error.pirate.backend.shippingInstruction.command.application.dto.ShippingInstructionRequest;
 import error.pirate.backend.shippingInstruction.command.domain.aggregate.entity.ShippingInstruction;
@@ -27,6 +28,7 @@ public class ShippingInstructionApplicationService {
 
     private final ShippingInstructionDomainService shippingInstructionDomainService;
     private final ShippingInstructionItemDomainService shippingInstructionItemDomainService;
+    private final SalesOrderDomainService salesOrderDomainService;
     private final ItemService itemService;
     private final EntityManager entityManager;
     private final NameGenerator nameGenerator;
@@ -34,21 +36,23 @@ public class ShippingInstructionApplicationService {
     /* 출하지시서 등록 */
     @Transactional
     public void createShippingInstruction(ShippingInstructionRequest shippingInstructionRequest) {
-        SalesOrder salesOrder = entityManager.getReference(SalesOrder.class, shippingInstructionRequest.getSalesOrderSeq());
 
+        // 불러온 주문서가 있으면 주문서 확인 절차
+        shippingInstructionItemDomainService.validateItem(
+                shippingInstructionRequest.getSalesOrderSeq(), shippingInstructionRequest.getShippingInstructionItems());
+
+        SalesOrder salesOrder = entityManager.getReference(SalesOrder.class, shippingInstructionRequest.getSalesOrderSeq());
         // 주문서가 생산완료 상태인지 체크
         shippingInstructionDomainService.checkSalesOrderStatus(salesOrder);
-
         // 출하지시서 유저는 주문서 작성 유저
         User user = salesOrder.getUser();
+        /* 등록일 설정 공통코드 */
+        String shippingInstructionName = nameGenerator.nameGenerator(ShippingInstruction.class);
 
         /* 출하예정일을 서울 시간으로 변경 */
         LocalDateTime shippingInstructionScheduledShipmentDate =
                 shippingInstructionDomainService.setShippingInstructionScheduledShipmentDate(
                         shippingInstructionRequest.getShippingInstructionScheduledShipmentDate());
-
-        /* 등록일 설정 공통코드 */
-        String shippingInstructionName = nameGenerator.nameGenerator(ShippingInstruction.class);
 
         /* 총수량 연산 */
         int itemTotalQuantity = shippingInstructionDomainService.calculateTotalQuantity(shippingInstructionRequest);
@@ -78,6 +82,20 @@ public class ShippingInstructionApplicationService {
         /* saveAll 로직 실행 */
         List<ShippingInstructionItem> shippingInstructionItem
                 = shippingInstructionItemDomainService.saveShippingInstructionItem(newShippingInstructionItemList);
+
+        // 주문서와 출하지시서의 품목 수량 비교와 모든 품목이 출하되었는지 체크
+        boolean allRemainingQuantitiesZero = shippingInstructionDomainService.validateItem(shippingInstructionRequest.getSalesOrderSeq());
+
+        // 모든 품목이 출하되었다면 주문서를 출하완료 상태로 변경하고 만약 결재전인 출하지시서가 있다면 모두 결재후로 변경
+        if(allRemainingQuantitiesZero) {
+            // 만약 결재전인 출하지시서가 있다면 모두 결재후로 변경
+            List<ShippingInstruction> shippingInstructionList = shippingInstructionDomainService.findBySalesOrder(salesOrder);
+            for(ShippingInstruction si : shippingInstructionList) {
+                shippingInstructionDomainService.updateShippingInstructionStatus(si, "AFTER");
+            }
+            shippingInstructionDomainService.updateShippingInstructionStatus(shippingInstruction, "AFTER");
+            salesOrderDomainService.updateSalesOrderStatus(salesOrder, "SHIPMENT_COMPLETE");
+        }
     }
 
     /* 출하지시서 수정 */
@@ -166,5 +184,8 @@ public class ShippingInstructionApplicationService {
 
         /* 삭제 상태로 변경 */
         shippingInstructionDomainService.deleteShippingInstruction(shippingInstruction);
+
+        /* 남은 물품 계산을 위해 출하지시서 물품은 하드 삭제 */
+        shippingInstructionItemDomainService.deleteByShippingInstruction(shippingInstruction);
     }
 }

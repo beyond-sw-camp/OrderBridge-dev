@@ -1,7 +1,10 @@
 package error.pirate.backend.shippingInstruction.query.service;
 
 import error.pirate.backend.common.ExcelDownLoad;
+import error.pirate.backend.common.RemainingQuantity;
 import error.pirate.backend.productionReceiving.query.dto.ProductionReceivingSituationResponse;
+import error.pirate.backend.salesOrder.command.domain.aggregate.entity.SalesOrder;
+import error.pirate.backend.shippingInstruction.command.domain.aggregate.entity.ShippingInstruction;
 import error.pirate.backend.shippingInstruction.query.dto.*;
 import error.pirate.backend.shippingInstruction.query.mapper.ShippingInstructionMapper;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +21,7 @@ public class ShippingInstructionQueryService {
 
     private final ShippingInstructionMapper shippingInstructionMapper;
     private final ExcelDownLoad excelDownBody;
+    private final RemainingQuantity remainingQuantity;
 
     /* 출하지시서 리스트 조회 */
     @Transactional(readOnly = true)
@@ -131,5 +135,15 @@ public class ShippingInstructionQueryService {
         }
 
         return excelDownBody.excelDownBody(excel, headers, "출하지시서 현황");
+    }
+
+    // 출하지시서 품목 값 확인
+    public List<ShippingInstructionItemCheckDTO> shippingInstructionItemCheck(long salesOrderSeq) {
+        return shippingInstructionMapper.sumShippingInstructionItemValue(salesOrderSeq);
+    }
+
+    // 출하지시서 등록 시 남아있는 주문서 품목 값 리턴
+    public List<Integer> readRemainingQuantity(long salesOrderSeq) {
+        return remainingQuantity.remainingQuantity(SalesOrder.class, ShippingInstruction.class, salesOrderSeq);
     }
 }
