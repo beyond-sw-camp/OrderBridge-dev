@@ -21,6 +21,14 @@ const routes = [
         path: "/currentSituation",
         component: () => import("@/components/common/CurrentSituation.vue")
     },
+    {
+        path: "/purchaseOrder",
+        component: () => import("@/views/purchaseOrder/PurchaseOrderListView.vue")
+    },
+    {
+        path: "/purchaseOrder/input",
+        component: () => import("@/views/purchaseOrder/PurchaseOrderInputView.vue")
+    },
 
     ...shippingInstructionRoutes,
     ...productionReceivingRoutes,

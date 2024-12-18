@@ -17,6 +17,10 @@ public class Pagination {
 
     private String searchEndDate;
 
+    private String searchStatus;
+
+    private String searchName;
+
     private int totalCount;
 
     private int totalPageNo;

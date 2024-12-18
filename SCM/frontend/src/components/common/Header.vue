@@ -35,7 +35,7 @@ import statisticsIcon from '@/assets/statisticsIcon.svg'
         </b-nav-item-dropdown>
         <b-nav-item-dropdown>
           <template #button-content><orderIcon class="icon" />주문관리</template>
-          <b-dropdown-item href="#">발주서 관리</b-dropdown-item>
+          <b-dropdown-item href="#"><RouterLink to="/purchaseOrder" active-class="active none-decoration" replace>발주서 관리</RouterLink></b-dropdown-item>
           <b-dropdown-item href="#">구매서 관리</b-dropdown-item>
         </b-nav-item-dropdown>
         <b-nav-item-dropdown>
@@ -83,5 +83,9 @@ import statisticsIcon from '@/assets/statisticsIcon.svg'
 
 .header {
   background-color: #FFF9EA;
+}
+
+.none-decoration {
+  text-decoration: none;
 }
 </style>
