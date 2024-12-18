@@ -18,8 +18,6 @@ public class PurchaseResponse {
 
     private String clientName; // 거래처 이름
 
-    private String warehouseName;  // 입고창고명
-
     private String purchaseName; // 구매처명
 
     private PurchaseStatus purchaseStatus; // 상태

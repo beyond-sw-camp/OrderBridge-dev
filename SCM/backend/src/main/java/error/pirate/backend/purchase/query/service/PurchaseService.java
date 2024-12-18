@@ -48,7 +48,7 @@ public class PurchaseService {
         request.setOffset(null);
         List<PurchaseResponse> purchaseResponseList = purchaseMapper.readPurchaseList(request);
 
-        String[] headers = {"구매서명", "구매서 품목", "거래처명", "입고 창고명", "계약일", "상태"};
+        String[] headers = {"구매서명", "구매서 품목", "거래처명", "계약일", "상태"};
         String[][] excel = new String[purchaseResponseList.size()][headers.length];
 
         for(int i=0 ; i<purchaseResponseList.size() ; i++) {
@@ -61,11 +61,10 @@ public class PurchaseService {
                     .map(PurchaseItemResponse::getItemName)
                     .collect(Collectors.joining(", "));//  품목
             excel[i][2] = dto.getClientName();
-            excel[i][3] = dto.getWarehouseName();
-            excel[i][4] = dto.getPurchaseContractDate() != null
+            excel[i][3] = dto.getPurchaseContractDate() != null
                     ? dto.getPurchaseContractDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
                     : null;
-            excel[i][5] = String.valueOf(dto.getPurchaseStatus());
+            excel[i][4] = String.valueOf(dto.getPurchaseStatus());
         }
 
         return excelDownBody.excelDownBody(excel, headers, "구매서");

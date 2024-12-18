@@ -12,6 +12,8 @@ public class PurchaseItemResponse {
 
     private Long itemSeq; // 품목 번호
 
+    private String warehouseName;  // 입고창고명
+
     private String itemName;  // 품목 이름
 
     private String itemImageUrl;  // 품목 사진 url
