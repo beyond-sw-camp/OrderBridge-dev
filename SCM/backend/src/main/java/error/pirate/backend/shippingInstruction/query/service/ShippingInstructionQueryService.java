@@ -4,6 +4,7 @@ import error.pirate.backend.common.ExcelDownLoad;
 import error.pirate.backend.common.RemainingQuantity;
 import error.pirate.backend.salesOrder.command.domain.aggregate.entity.SalesOrder;
 import error.pirate.backend.shippingInstruction.command.domain.aggregate.entity.ShippingInstruction;
+import error.pirate.backend.shippingInstruction.command.domain.aggregate.entity.ShippingInstructionStatus;
 import error.pirate.backend.shippingInstruction.query.dto.*;
 import error.pirate.backend.shippingInstruction.query.mapper.ShippingInstructionMapper;
 import lombok.RequiredArgsConstructor;
