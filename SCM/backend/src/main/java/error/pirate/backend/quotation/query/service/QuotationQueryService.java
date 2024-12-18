@@ -7,7 +7,11 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.Field;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -62,5 +66,29 @@ public class QuotationQueryService {
     // 견적서 합계 계산
     public QuotationCalculateSumDTO calculateSum(Long quotationSeq) {
         return quotationMapper.calculateSum(quotationSeq);
+    }
+
+    // 견적서 목록 엑셀 다운로드
+    public byte[] readQuotationExcel(
+            LocalDate startDate, LocalDate endDate, String clientName, List<QuotationStatus> quotationStatus) {
+
+        ArrayList<QuotationExcelDTO> quotationExcelList = quotationMapper.selectQuotationExcel(startDate, endDate, clientName, quotationStatus);
+
+        System.out.println("quotationExcelList = " + quotationExcelList);
+        String[] headers = {"등록", "수정", "이름", "상태", "견적일", "만료일", "총 수량", "총 가격", "비고"};
+        String[][] cells = new String[quotationExcelList.size()][headers.length];
+
+        for (int i = 0; i < quotationExcelList.size(); i++) {
+
+            for (int j = 0; j < headers.length; j++) {
+                Field[] field = quotationExcelList.get(i).getClass().getDeclaredFields();
+                switch (field[j].getType().getSimpleName()) {
+                    case "LocalDateTime":
+                        System.out.println("field = " + field[j].toString());
+                }
+            }
+        }
+
+        return null;
     }
 }

@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Mapper
@@ -39,4 +40,11 @@ public interface QuotationMapper {
 
     QuotationCalculateSumDTO calculateSum(
             @Param("quotationSeq") Long quotationSeq);
+
+    // 견적서 목록 엑셀 다운로드
+    ArrayList<QuotationExcelDTO> selectQuotationExcel(
+            LocalDate startDate,
+            LocalDate endDate,
+            String clientName,
+            List<QuotationStatus> quotationStatus);
 }
