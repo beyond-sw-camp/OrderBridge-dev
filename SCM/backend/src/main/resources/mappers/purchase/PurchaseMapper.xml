@@ -18,7 +18,7 @@
         JOIN tb_user tu USING (user_seq)
         JOIN tb_purchase_order tpo USING (purchase_order_seq)
         JOIN tb_client tc ON (tpo.client_seq = tc.client_seq)
-        <trim prefix="WHERE" prefixOverrides="AND">
+        WHERE tp.purchase_status != 'DELETE'
             <if test="searchStartDate != null and searchStartDate != ''">
                 <![CDATA[
                 AND #{searchStartDate} <= tp.purchase_contract_date
@@ -32,10 +32,14 @@
             <if test="searchName != null">
                 AND tc.client_name LIKE CONCAT('%', #{searchName}, '%')
             </if>
-            <if test="searchStatus != null">
-                AND tp.purchase_status = #{searchStatus}
+            <if test="searchStatus != null and searchStatus != ''">
+                AND tp.purchase_status IN
+                <trim prefix="(" suffix=")" suffixOverrides=",">
+                    <foreach collection="searchStatus.split(',')" item="status" separator=",">
+                        #{status}
+                    </foreach>
+                </trim>
             </if>
-        </trim>
         ORDER BY tp.purchase_seq
         <if test="limit != null">
             LIMIT #{limit} OFFSET #{offset}
@@ -67,7 +71,7 @@
         JOIN tb_user tu USING (user_seq)
         JOIN tb_purchase_order tpo USING (purchase_order_seq)
         JOIN tb_client tc ON (tpo.client_seq = tc.client_seq)
-        <trim prefix="WHERE" prefixOverrides="AND">
+        WHERE tp.purchase_status != 'DELETE'
             <if test="searchStartDate != null and searchStartDate != ''">
                 <![CDATA[
                 AND #{searchStartDate} <= tp.purchase_contract_date
@@ -81,10 +85,14 @@
             <if test="searchName != null">
                 AND tc.client_name LIKE CONCAT('%', #{searchName}, '%')
             </if>
-            <if test="searchStatus != null">
-                AND tp.purchase_status = #{searchStatus}
+            <if test="searchStatus != null and searchStatus != ''">
+                AND tp.purchase_status IN
+                <trim prefix="(" suffix=")" suffixOverrides=",">
+                    <foreach collection="searchStatus.split(',')" item="status" separator=",">
+                        #{status}
+                    </foreach>
+                </trim>
             </if>
-        </trim>
     </select>
 
 </mapper>
