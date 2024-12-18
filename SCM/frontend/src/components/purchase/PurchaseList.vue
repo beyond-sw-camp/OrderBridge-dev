@@ -10,7 +10,7 @@ import router from "@/router/index.js";
 
 const totalCount = ref(0);
 const pageNumber = ref(1);
-const purchaseOrderList = ref([]);
+const purchaseList = ref([]);
 const searchStartDate = ref('');
 const searchEndDate = ref('');
 const searchName = ref('');
@@ -21,7 +21,7 @@ const toggleDetails = (index) => {
   expandedIndex.value = expandedIndex.value === index ? null : index;
 };
 
-const fetchPurchaseOrderList = async () => {
+const fetchPurchaseList = async () => {
   try {
     const params = {
       searchStartDate: searchStartDate.value,
@@ -35,7 +35,7 @@ const fetchPurchaseOrderList = async () => {
         Object.entries(params).filter(([_, value]) => value !== null && value !== undefined && value !== '')
     );
 
-    const response = await axios.get(`http://localhost:8090/api/v1/purchaseOrder`, {
+    const response = await axios.get(`http://localhost:8090/api/v1/purchase`, {
       params: filteredParams,
       paramsSerializer: (params) => {
         return new URLSearchParams(params).toString();
@@ -44,17 +44,17 @@ const fetchPurchaseOrderList = async () => {
 
     console.log(filteredParams);
     console.log(response.data);
-    purchaseOrderList.value = response.data.purchaseOrderResponseList; // 발주서 목록
+    purchaseList.value = response.data.purchaseResponseList; // 구매서 목록
     totalCount.value = response.data.pagination.totalCount;
 
   } catch (error) {
-    console.error("발주서 불러오기 실패 :", error);
+    console.error("구매서 불러오기 실패 :", error);
   }
 };
 
 
 const excelDown = async () => {
-  const excelName = "발주서_" + new Date().getFullYear() + (new Date().getMonth() + 1) + new Date().getDay();
+  const excelName = "구매서_" + new Date().getFullYear() + (new Date().getMonth() + 1) + new Date().getDay();
   try {
     const params = {
       searchStartDate: searchStartDate.value,
@@ -68,7 +68,7 @@ const excelDown = async () => {
         Object.entries(params).filter(([_, value]) => value !== null && value !== undefined && value !== '')
     );
 
-    const response = await axios.get(`http://localhost:8090/api/v1/purchaseOrder/excelDown`, {
+    const response = await axios.get(`http://localhost:8090/api/v1/purchase/excelDown`, {
       params: filteredParams
       , paramsSerializer: (params) => {
         return new URLSearchParams(params).toString();
@@ -89,12 +89,12 @@ const excelDown = async () => {
     URL.revokeObjectURL(link.href);
 
   } catch (error) {
-    console.error("발주서 엑셀다운로드 실패 :", error);
+    console.error("구매서 엑셀다운로드 실패 :", error);
   }
 }
 
 onMounted(() => {
-  fetchPurchaseOrderList();
+  fetchPurchaseList();
 })
 
 watch(
@@ -112,30 +112,28 @@ function check(status) {
     searchStatus.value.push(status);
   }
 
-  console.log("현재 searchStatus 상태:", searchStatus.value.toString());
   search();
 }
 
 watch(pageNumber, () => {
-  fetchPurchaseOrderList();
+  fetchPurchaseList();
 })
 
 function search() {
   pageNumber.value = 1;
-  fetchPurchaseOrderList();
+  fetchPurchaseList();
 }
 
 function register() {
-  router.push("/purchaseOrder/input");
+  router.push("/purchase/input");
 }
 
 const itemDelete = async (seq) => {
   const result = confirm("정말 삭제하시겠습니까?");
-  console.log(seq);
   if (result) {
     try {
-      const response = await axios.delete(`http://localhost:8090/api/v1/purchaseOrder/${seq}`);
-      alert('발주서의 상태가 변경되었습니다.');
+      const response = await axios.delete(`http://localhost:8090/api/v1/purchase/${seq}`);
+      alert('구매서의 상태가 변경되었습니다.');
 
       search(); // 삭제 후 목록 갱신
     } catch (error) {
@@ -169,7 +167,7 @@ const printItem = (index) => {
     <div class="col-md-3">
       <div class="side-box card">
         <div class="card-body">
-          <p class="card-title">목표 납기일</p>
+          <p class="card-title">구매 계약일</p>
           <input type="date" v-model="searchStartDate"/> ~ <input type="date" v-model="searchEndDate"/>
         </div>
       </div>
@@ -186,29 +184,17 @@ const printItem = (index) => {
       </div>
       <div class="side-box card">
         <div class="card-body">
-          <p class="card-title">발주서 상태</p>
+          <p class="card-title">구매서 상태</p>
           <b-form-checkbox
-              :checked="searchStatus.includes('APPROVAL_BEFORE')"
-              @change="check('APPROVAL_BEFORE')">
-            서명전
+              :checked="searchStatus.includes('PROGRESS')"
+              @change="check('PROGRESS')">
+            정산중
           </b-form-checkbox>
 
           <b-form-checkbox
-              :checked="searchStatus.includes('APPROVAL_AFTER')"
-              @change="check('APPROVAL_AFTER')">
-            서명후
-          </b-form-checkbox>
-
-          <b-form-checkbox
-              :checked="searchStatus.includes('APPROVAL_REFUSAL')"
-              @change="check('APPROVAL_REFUSAL')">
-            반려
-          </b-form-checkbox>
-
-          <b-form-checkbox
-              :checked="searchStatus.includes('APPROVAL_COMPLETE')"
-              @change="check('APPROVAL_COMPLETE')">
-            구매완료
+              :checked="searchStatus.includes('COMPLETE')"
+              @change="check('COMPLETE')">
+            정산완료
           </b-form-checkbox>
 
           <b-form-checkbox
@@ -225,79 +211,77 @@ const printItem = (index) => {
           <div>검색결과: {{ totalCount }}개</div>
           <div class="d-flex justify-content-end mt-3">
             <b-button @click="excelDown()" variant="light" size="sm" class="button">엑셀 다운로드</b-button>
-            <b-button @click="register()" variant="light" size="sm" class="button ms-2">발주서 등록</b-button>
+            <b-button @click="register()" variant="light" size="sm" class="button ms-2">구매서 등록</b-button>
           </div>
         </div>
         <div class="list-headline row">
-          <div class="list-head col-5">발주서명</div>
+          <div class="list-head col-5">구매서명</div>
           <div class="list-head col-2">거래처명</div>
-          <div class="list-head col-3">목표 납기일</div>
+          <div class="list-head col-3">계약일</div>
           <div class="list-head col-2">상태</div>
         </div>
-        <template v-if="purchaseOrderList?.length > 0">
+        <template v-if="purchaseList?.length > 0">
           <div style="max-height: 600px; overflow-y: auto;">
-            <div v-for="(purchaseOrder, index) in purchaseOrderList" :key="purchaseOrder.purchaseOrderSeq || index"
+            <div v-for="(purchase, index) in purchaseList" :key="purchase.purchaseSeq || index"
                  class="list-line row" :id="'print-area-' + index" @click="toggleDetails(index)">
               <div class="list-body col-5 left">
-                {{ purchaseOrder.purchaseOrderName }}
-                <div v-if="purchaseOrder.purchaseOrderItemResponseList?.length > 0">
-                  <template v-for="(purchaseOrderItem, idx) in purchaseOrder.purchaseOrderItemResponseList"
-                            :key="purchaseOrderItem.purchaseOrderItemSeq || idx">
+                {{ purchase.purchaseName }}
+                <div v-if="purchase.purchaseItemResponseList?.length > 0">
+                  <template v-for="(purchaseItem, idx) in purchase.purchaseItemResponseList"
+                            :key="purchaseItem.purchaseItemSeq || idx">
                     <span v-if="expandedIndex !== index">
-                      {{ purchaseOrderItem.itemName }}
-                      <span v-if="idx < purchaseOrder.purchaseOrderItemResponseList.length - 1">, </span>
+                      {{ purchaseItem.itemName }}
+                      <span v-if="idx < purchase.purchaseItemResponseList.length - 1">, </span>
                     </span>
                   </template>
                 </div>
               </div>
-              <div class="list-body col-2">{{ purchaseOrder.clientName }}</div>
+              <div class="list-body col-2">{{ purchase.clientName }}</div>
               <div class="list-body col-3">
-                {{ dayjs(purchaseOrder.purchaseOrderTargetDueDate).format('YYYY-MM-DD HH:mm:ss') }}
+                {{ purchase.purchaseContractDate ? dayjs(purchase.purchaseContractDate).format('YYYY/MM/DD HH:mm:ss') : ' - ' }}
               </div>
-              <div class="list-body col-2">{{ purchaseOrder.purchaseOrderStatusValue }}</div>
+              <div class="list-body col-2">{{ purchase.purchaseStatusValue }}</div>
 
               <!-- 확장된 상세 내용 -->
               <div class="d-flex justify-content-center">
                 <div v-if="expandedIndex === index" class="col-md-11 mt-3">
-                    <p>총수량 : {{
-                        purchaseOrder.purchaseOrderTotalItemQuantity
-                      }} 개</p>
-                    <p>총금액 : {{
-                        purchaseOrder.purchaseOrderExtendedPrice.toLocaleString()
-                      }} 원</p>
-                    <p>담당자 : {{
-                        purchaseOrder.userName
-                      }}</p>
-                    <p>계약 납기일 : {{
-                        dayjs(purchaseOrder.purchaseOrderDueDate).format('YYYY/MM/DD HH:mm:ss')
-                      }}</p>
-                    <p>목표 납기일 : {{
-                        dayjs(purchaseOrder.purchaseOrderTargetDueDate).format('YYYY/MM/DD HH:mm:ss')
-                      }}</p>
-                    <p>
-                      출하지시서 비고 :
-                      {{ purchaseOrder.purchaseOrderNote }}
-                    </p>
+                  <p>총금액 : {{
+                      purchase.purchaseExtendedPrice.toLocaleString()
+                    }} 원</p>
+                  <p>담당자 : {{
+                      purchase.userName
+                    }}</p>
+                  <p>등록일 : {{
+                          purchase.purchaseRegDate ? dayjs(purchase.purchaseRegDate).format('YYYY/MM/DD HH:mm:ss') : ' - '
+                    }}</p>
+                  <p>수정일 : {{
+                      purchase.purchaseModDate ? dayjs(purchase.purchaseModDate).format('YYYY/MM/DD HH:mm:ss') : ' - '
+                    }}</p>
+                  <p>
+                    구매서 비고 :
+                    {{ purchase.purchaseNote }}
+                  </p>
                   <div class="mb-3 d-flex flex-row">
-                  <div v-for="(purchaseOrderItem, idx) in purchaseOrder.purchaseOrderItemResponseList"
-                       :key="purchaseOrderItem.purchaseOrderItemSeq || idx"
-                       style="max-height: 250px;" class="me-5 col-md-3 d-flex flex-column border border-secondary rounded">
+                    <div v-for="(purchaseItem, idx) in purchase.purchaseItemResponseList"
+                         :key="purchaseItem.purchaseItemSeq || idx"
+                         style="max-height: 250px;" class="me-5 col-md-3 d-flex flex-column border border-secondary rounded">
                       <b-img
                           style="max-height: 100px;"
-                          :src="purchaseOrderItem.itemImageUrl != null ? purchaseOrderItem.itemImageUrl : 'https://picsum.photos/200/200'"
+                          :src="purchaseItem.itemImageUrl != null ? purchaseItem.itemImageUrl : 'https://picsum.photos/200/200'"
                           fluid
                           alt="Responsive image">
                       </b-img>
-                      <p class="ms-3"> 상품명: {{ purchaseOrderItem.itemName }}</p>
-                      <p class="ms-3"> 수량: {{ purchaseOrderItem.purchaseOrderItemQuantity }}</p>
-                      <p class="ms-3"> 가격: {{ purchaseOrderItem.purchaseOrderItemPrice }}</p>
-                      <p class="ms-3"> 비고: {{ purchaseOrderItem.purchaseOrderItemNote }}</p>
+                      <p class="ms-3"> 상품명: {{ purchaseItem.itemName }}</p>
+                      <p class="ms-3"> 입고 창고명: {{ purchaseItem.warehouseName }}</p>
+                      <p class="ms-3"> 수량: {{ purchaseItem.purchaseItemQuantity }}</p>
+                      <p class="ms-3"> 가격: {{ purchaseItem.purchaseItemPrice }}</p>
+                      <p class="ms-3"> 비고: {{ purchaseItem.purchaseItemNote }}</p>
                     </div>
                   </div>
                   <div class="d-flex justify-content-end align-items-center">
                     <printIcon class="me-3 icon" @click.stop="printItem(index)"/>
                     <editIcon class="me-3 icon" @click.stop=""/>
-                    <trashIcon class="icon" @click.stop="itemDelete(purchaseOrder.purchaseOrderSeq)"/>
+                    <trashIcon class="icon" @click.stop="itemDelete(purchase.purchaseSeq)"/>
                   </div>
                 </div>
               </div>
@@ -309,15 +293,14 @@ const printItem = (index) => {
                 v-model="pageNumber"
                 :totalRows="totalCount"
                 :perPage="10"
-                @input="fetchPurchaseOrderList">
+                @input="fetchPurchaseList">
             </b-pagination>
           </div>
         </template>
         <template v-else>
-          <b-card-text class="no-list-text">해당 검색조건에 부합한 발주서가 존재하지 않습니다.</b-card-text>
+          <b-card-text class="no-list-text">해당 검색조건에 부합한 구매서가 존재하지 않습니다.</b-card-text>
         </template>
       </div>
-
     </div>
   </div>
 </template>

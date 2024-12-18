@@ -13,28 +13,27 @@
             tp.purchase_extended_price,
             tp.purchase_note,
             tu.user_name,
-            tc.client_name,
-            tw.warehouse_name
+            tc.client_name
         FROM tb_purchase tp
         JOIN tb_user tu USING (user_seq)
-        JOIN tb_warehouse tw USING (warehouse_seq)
-        JOIN tb_client tc ON (tu.user_seq = tc.user_seq)
+        JOIN tb_purchase_order tpo USING (purchase_order_seq)
+        JOIN tb_client tc ON (tpo.client_seq = tc.client_seq)
         <trim prefix="WHERE" prefixOverrides="AND">
             <if test="searchStartDate != null and searchStartDate != ''">
                 <![CDATA[
-                AND #{searchStartDate} <= tpo.purchase_order_target_due_date
+                AND #{searchStartDate} <= tp.purchase_contract_date
                 ]]>
             </if>
             <if test="searchEndDate != null and searchEndDate != ''">
                 <![CDATA[
-                AND #{searchEndDate} >= tpo.purchase_order_target_due_date
+                AND #{searchEndDate} >= tp.purchase_contract_date
                 ]]>
             </if>
-            <if test="clientName != null">
-                AND tc.client_name LIKE CONCAT('%', #{clientName}, '%')
+            <if test="searchName != null">
+                AND tc.client_name LIKE CONCAT('%', #{searchName}, '%')
             </if>
-            <if test="purchaseStatus != null">
-                AND tp.purchase_status = #{purchaseStatus}
+            <if test="searchStatus != null">
+                AND tp.purchase_status = #{searchStatus}
             </if>
         </trim>
         ORDER BY tp.purchase_seq
@@ -52,9 +51,11 @@
             tpi.purchase_item_status,
             tpi.purchase_item_note,
             ti.item_name,
-            ti.item_image_url
+            ti.item_image_url,
+            tw.warehouse_name
         FROM tb_purchase_item tpi
         JOIN tb_item ti USING (item_seq)
+        JOIN tb_warehouse tw ON (ti.warehouse_seq = tw.warehouse_seq)
         WHERE tpi.purchase_seq = #{purchaseSeq}
         ORDER BY tpi.purchase_item_seq
     </select>
@@ -64,24 +65,24 @@
             COUNT(*)
         FROM tb_purchase tp
         JOIN tb_user tu USING (user_seq)
-        JOIN tb_warehouse tw USING (warehouse_seq)
-        JOIN tb_client tc ON (tu.user_seq = tc.user_seq)
+        JOIN tb_purchase_order tpo USING (purchase_order_seq)
+        JOIN tb_client tc ON (tpo.client_seq = tc.client_seq)
         <trim prefix="WHERE" prefixOverrides="AND">
             <if test="searchStartDate != null and searchStartDate != ''">
                 <![CDATA[
-                AND #{searchStartDate} <= tpo.purchase_order_target_due_date
+                AND #{searchStartDate} <= tp.purchase_contract_date
                 ]]>
             </if>
             <if test="searchEndDate != null and searchEndDate != ''">
                 <![CDATA[
-                AND #{searchEndDate} >= tpo.purchase_order_target_due_date
+                AND #{searchEndDate} >= tp.purchase_contract_date
                 ]]>
             </if>
-            <if test="clientName != null">
-                AND tc.client_name LIKE CONCAT('%', #{clientName}, '%')
+            <if test="searchName != null">
+                AND tc.client_name LIKE CONCAT('%', #{searchName}, '%')
             </if>
-            <if test="purchaseStatus != null">
-                AND tp.purchase_status = #{purchaseStatus}
+            <if test="searchStatus != null">
+                AND tp.purchase_status = #{searchStatus}
             </if>
         </trim>
     </select>
