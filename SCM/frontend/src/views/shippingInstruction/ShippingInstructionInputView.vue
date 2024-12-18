@@ -108,6 +108,11 @@ const handleSalesOrder = (formData) => {
   selectedSalesOrder.value = true;
 }
 
+// 품목 리스트 갱신
+const handleUpdateItemList = (updatedList) => {
+  itemList.value = updatedList; // 자식에서 전달된 새 itemList로 갱신
+};
+
 // 등록 핸들러
 const handleRegister = async (itemList) => {
   if (childRef.value) {
@@ -138,7 +143,7 @@ const handleRegister = async (itemList) => {
     });
 
     if (invalidItem) {
-      alert(`품목 수량을 확인해 주세요.`);
+      alert(`품목 수량을 확인해 주세요. 0이하거나 원래 수량보다 많습니다.`);
       return;
     }
 
@@ -153,6 +158,9 @@ const handleRegister = async (itemList) => {
 
 <template>
   <h4 class="title">영업관리 > 출하지시서 등록</h4>
+  <div class="d-flex justify-content-end mt-3">
+    <b-button @click="router.push('/shipping-instruction')" variant="light" size="sm" class="button ms-2">목록</b-button>
+  </div>
   <div class="d-flex justify-content-center">
     <ShippingInstructionInputForm ref="childRef"
                                   :salesOrderList="salesOrderList"
@@ -169,12 +177,18 @@ const handleRegister = async (itemList) => {
   <div class="d-flex justify-content-center">
     <ShippingInstructionInputItems :itemList="itemList"
                                    :selectedSalesOrder="selectedSalesOrder"
-                                   @registerEvent="handleRegister"/>
+                                   @registerEvent="handleRegister"
+                                   @updateItemListEvent="handleUpdateItemList"/>
   </div>
 </template>
 
 <style scoped>
 .title {
   padding-bottom: 20px;
+}
+
+.button {
+  background-color: #FFF8E7;
+  border: 1px solid;
 }
 </style>
