@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import shippingInstructionRoutes from './shipping-instruction.js'
 import productionReceivingRoutes from './production-receiving.js'
+import item from "@/router/item.js";
 
 const routes = [
     {
@@ -23,6 +24,7 @@ const routes = [
 
     ...shippingInstructionRoutes,
     ...productionReceivingRoutes,
+    ...item,
 ];
 
 const router = createRouter({
