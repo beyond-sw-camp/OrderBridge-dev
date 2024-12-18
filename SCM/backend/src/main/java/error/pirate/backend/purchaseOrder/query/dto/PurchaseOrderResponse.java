@@ -20,6 +20,9 @@ public class PurchaseOrderResponse {
 
     private PurchaseOrderStatus purchaseOrderStatus; // 발주서 상태
 
+    @Setter
+    private String purchaseOrderStatusValue;
+
     private LocalDateTime purchaseOrderDueDate; // 발주서 계약 납기일
 
     private LocalDateTime purchaseOrderTargetDueDate; // 발주서 목표 납기일
