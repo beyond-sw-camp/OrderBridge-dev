@@ -2,7 +2,6 @@ package error.pirate.backend.shippingInstruction.query.service;
 
 import error.pirate.backend.common.ExcelDownLoad;
 import error.pirate.backend.common.RemainingQuantity;
-import error.pirate.backend.productionReceiving.query.dto.ProductionReceivingSituationResponse;
 import error.pirate.backend.salesOrder.command.domain.aggregate.entity.SalesOrder;
 import error.pirate.backend.shippingInstruction.command.domain.aggregate.entity.ShippingInstruction;
 import error.pirate.backend.shippingInstruction.query.dto.*;
@@ -12,7 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -27,6 +25,9 @@ public class ShippingInstructionQueryService {
     @Transactional(readOnly = true)
     public ShippingInstructionListResponse readShippingInstructionList(ShippingInstructionListRequest request) {
         int offset = (request.getPage() - 1) * request.getSize();
+        if(request.getEndDate() != null){
+            request.setEndDate(request.getEndDate().plusDays(1));   // 하루 추가
+        }
         List<ShippingInstructionStatus> statusList = request.getShippingInstructionStatus();   // 상태 리스트
 
         // 리스트 응답 및 상태를 value로 변경
