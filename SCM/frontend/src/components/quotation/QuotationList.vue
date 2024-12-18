@@ -111,15 +111,26 @@ watch(searchPage, () => {
     fetchQuotationList();
 });
 
+// 상태 체크박스
 function statusCheck(status) {
     searchStatus.value.has(status) ? searchStatus.value.delete(status)
                                    : searchStatus.value.add(status);
 }
 
+// 검색
 function search() {
     searchPage.value = 1;
 
     fetchQuotationList();
+}
+
+// 상태 키로 값 반환
+function findStatusValue(array, key) {
+    for (const item of array) {
+        if (item.key === key) {
+            return item.value
+        }
+    }
 }
 
 </script>
@@ -174,7 +185,7 @@ function search() {
                             <div v-else>{{ quotation.itemName }}</div></div>
                         <div class="list-value col-2">{{ quotation.clientName }}</div>
                         <div class="list-value col-2">{{ quotation.quotationQuotationDate }}</div>
-                        <div class="list-value col-2">{{ quotation.quotationStatus }}</div>
+                        <div class="list-value col-2">{{ findStatusValue(quotationStatusList, quotation.quotationStatus) }}</div>
                     </div>
                 </div>
                 </template>
