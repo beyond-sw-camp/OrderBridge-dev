@@ -11,11 +11,17 @@ public interface ItemMapper {
 
     List<ItemResponse> findItemListByFilter(
             @Param("itemName") String itemName,
-            @Param("itemDivision") String itemDivision,
-            @Param("itemExpirationHour") Integer itemExpirationHour,
-            @Param("sortBy") String sortBy,
-            @Param("sortDirection") String sortDirection,
-            @Param("offset") int offset,
-            @Param("size") int size
+            @Param("itemDivisions") List<String> itemDivisions,
+            @Param("minExpirationHour") Integer minExpirationHour,
+            @Param("maxExpirationHour") Integer maxExpirationHour,
+            @Param("size") Integer size,
+            @Param("offset") Integer offset
+    );
+
+    int countItemsByFilter(
+            @Param("itemName") String itemName,
+            @Param("itemDivisions") List<String> itemDivisions,
+            @Param("minExpirationHour") Integer minExpirationHour,
+            @Param("maxExpirationHour") Integer maxExpirationHour
     );
 }
