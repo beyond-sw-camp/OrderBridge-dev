@@ -53,9 +53,8 @@ public class PurchaseOrderController {
 
     @DeleteMapping("/{purchaseOrderSeq}")
     @Operation(summary = "발주서 삭제")
-    public ResponseEntity<Void> deletePurchaseOrder(@PathVariable Long purchaseOrderSeq,
-                                                    @RequestParam Long salesOrderSeq) {
-        purchaseOrderApplicationService.deletePurchaseOrder(purchaseOrderSeq, salesOrderSeq);
+    public ResponseEntity<Void> deletePurchaseOrder(@PathVariable Long purchaseOrderSeq) {
+        purchaseOrderApplicationService.deletePurchaseOrder(purchaseOrderSeq);
 
         return ResponseEntity.status(HttpStatus.OK).build();
     }

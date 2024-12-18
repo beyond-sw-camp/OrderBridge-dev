@@ -129,6 +129,39 @@ function register() {
   router.push("/purchaseOrder/input");
 }
 
+const itemDelete = async (seq) => {
+  const result = confirm("정말 삭제하시겠습니까?");
+  console.log(seq);
+  if (result) {
+    try {
+      const response = await axios.delete(`http://localhost:8090/api/v1/purchaseOrder/${seq}`);
+      alert('발주서의 상태가 변경되었습니다.');
+
+      search(); // 삭제 후 목록 갱신
+    } catch (error) {
+      console.error("삭제 요청 실패:", error);
+      alert('삭제에 실패했습니다. 다시 시도해주세요.');
+    }
+  }
+};
+
+// 인쇄 함수
+const printItem = (index) => {
+  const printContent = document.getElementById(`print-area-${index}`).innerHTML;
+  const originalContent = document.body.innerHTML;
+
+  // 선택된 영역만 표시
+  document.body.innerHTML = printContent;
+
+  window.print();
+
+  // 원래 내용 복원
+  document.body.innerHTML = originalContent;
+
+  // Vue 리렌더링 방지
+  location.reload();
+};
+
 </script>
 
 <template>
@@ -204,7 +237,7 @@ function register() {
         <template v-if="purchaseOrderList?.length > 0">
           <div style="max-height: 600px; overflow-y: auto;">
             <div v-for="(purchaseOrder, index) in purchaseOrderList" :key="purchaseOrder.purchaseOrderSeq || index"
-                 class="list-line row" @click="toggleDetails(index)">
+                 class="list-line row" :id="'print-area-' + index" @click="toggleDetails(index)">
               <div class="list-body col-5 left">
                 {{ purchaseOrder.purchaseOrderName }}
                 <div v-if="purchaseOrder.purchaseOrderItemResponseList?.length > 0">
@@ -245,10 +278,10 @@ function register() {
                       출하지시서 비고 :
                       {{ purchaseOrder.purchaseOrderNote }}
                     </p>
+                  <div class="mb-3 d-flex flex-row">
                   <div v-for="(purchaseOrderItem, idx) in purchaseOrder.purchaseOrderItemResponseList"
                        :key="purchaseOrderItem.purchaseOrderItemSeq || idx"
-                       class="mb-3 d-flex flex-row">
-                    <div style="max-height: 250px;" class="me-5 col-md-3 d-flex flex-column border border-secondary rounded">
+                       style="max-height: 250px;" class="me-5 col-md-3 d-flex flex-column border border-secondary rounded">
                       <b-img
                           style="max-height: 100px;"
                           :src="purchaseOrderItem.itemImageUrl != null ? purchaseOrderItem.itemImageUrl : 'https://picsum.photos/200/200'"
@@ -264,7 +297,7 @@ function register() {
                   <div class="d-flex justify-content-end align-items-center">
                     <printIcon class="me-3 icon" @click.stop="printItem(index)"/>
                     <editIcon class="me-3 icon" @click.stop=""/>
-                    <trashIcon class="icon" @click.stop="itemDelete(shippingInstruction.shippingInstructionSeq)"/>
+                    <trashIcon class="icon" @click.stop="itemDelete(purchaseOrder.purchaseOrderSeq)"/>
                   </div>
                 </div>
               </div>
