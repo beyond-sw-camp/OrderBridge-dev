@@ -1,8 +1,10 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue';
+import searchIcon from "@/assets/searchIcon.svg"
 import axios from "@/axios"
 
 const quotationList = ref([]);
+const quotationStatusList = ref([]);
 const currentPage = ref(1);
 const totalPage = ref(1);
 const totalQuotation = ref(0);
@@ -11,8 +13,9 @@ const searchSize = ref(10);
 const searchStartDate = ref(null);
 const searchEndDate = ref(null);
 const searchClient = ref(null);
-const searchStatus = ref(null);
+const searchStatus = ref(new Set());
 
+// 견적서 목록 요청
 const fetchQuotationList = async () => {
     try {
         const response = await axios.get(`quotation`, {
@@ -22,7 +25,7 @@ const fetchQuotationList = async () => {
                 startDate: searchStartDate.value,
                 endDate: searchEndDate.value,
                 clientName: searchClient.value,
-                quotationStatus: searchStatus.value
+                quotationStatus: searchStatus.value.size === 0 ? null : Array.from(searchStatus.value).join(",")
             }
         });
 
@@ -30,11 +33,19 @@ const fetchQuotationList = async () => {
         currentPage.value = response.data.currentPage;
         totalPage.value = response.data.totalPages;
         totalQuotation.value = response.data.totalQuotation;
-
-        console.log(quotationList.value);
-
     } catch (error) {
-        console.log(error);
+        console.log(`견적서 목록 요청 실패`, error);
+    }
+}
+
+// 견적서 상태 분류 목록 요청
+const fetchQuotationStatus = async () => {
+    try { 
+        const response = await axios.get(`quotation/status`);
+        
+        quotationStatusList.value = response.data;
+    } catch (error) {
+        console.log(`견적서 상태 분류 목록 요청 실패`, error);
     }
 }
 
@@ -63,17 +74,19 @@ function addItemCard() {
 
 onMounted(() => {
     fetchQuotationList();
+    fetchQuotationStatus();
 });
 
-watch([searchStartDate, searchEndDate], () => {
+watch([searchStartDate, searchEndDate, searchStatus.value], () => {
     search();
 });
 
 watch(searchPage, () => {
+
     fetchQuotationList();
 });
 
-function check(status) {
+function statusCheck(status) {
     searchStatus.value.has(status) ? searchStatus.value.delete(status)
                                    : searchStatus.value.add(status);
 }
@@ -108,7 +121,7 @@ function search() {
                 <div class="card-body">
                     <p class="card-title">견적서 상태</p>
                     <template v-for="quotationStatus in quotationStatusList">
-                        <b-form-checkbox @click="check(quotationStatus.key)">{{ quotationStatus.value }}</b-form-checkbox>
+                        <b-form-checkbox @click="statusCheck(quotationStatus.key)">{{ quotationStatus.value }}</b-form-checkbox>
                     </template>
                 </div>
             </div>
@@ -205,6 +218,11 @@ div {
 .no-list-text {
     text-align: center;
     margin-top: 100px;
+}
+
+.icon {
+  width: 20px;
+  height: 20px;
 }
 
 </style>
