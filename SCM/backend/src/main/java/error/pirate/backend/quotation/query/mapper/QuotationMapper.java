@@ -36,15 +36,19 @@ public interface QuotationMapper {
             @Param("quotationSeq") Long quotationSeq);
 
     // 견적서 현황 조회
-    List<QuotationSituationDTO> selectQuotationSituation(LocalDate startDate, LocalDate endDate, String clientName);
+    List<QuotationSituationDTO> selectQuotationSituation(
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate,
+            @Param("clientName") String clientName);
 
+    // 견적서 합계 계산
     QuotationCalculateSumDTO calculateSum(
             @Param("quotationSeq") Long quotationSeq);
 
     // 견적서 목록 엑셀 다운로드
-    ArrayList<QuotationExcelDTO> selectQuotationExcel(
-            LocalDate startDate,
-            LocalDate endDate,
-            String clientName,
-            List<QuotationStatus> quotationStatus);
+    ArrayList<Object> selectQuotationExcel(
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate,
+            @Param("clientName") String clientName,
+            @Param("quotationStatus") List<QuotationStatus> quotationStatus);
 }
