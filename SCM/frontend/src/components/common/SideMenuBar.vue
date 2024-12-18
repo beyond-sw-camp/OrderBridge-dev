@@ -7,33 +7,35 @@ const isSidebar = ref(false);
 
 // 현재 활성화된 메뉴 상태
 const activeMenu = ref("");
-const activeMenu2 = ref("");
+const activeSubMenu = ref("");
 
 // 메뉴 열고 닫기 함수
 const toggleMenu = (menu) => {
   activeMenu.value = activeMenu.value === menu ? "" : menu;
 };
-const toggleMenu2 = (menu) => {
-  activeMenu2.value = activeMenu2.value === menu ? "" : menu;
+
+const toggleSubMenu = (subMenu) => {
+  activeSubMenu.value = activeSubMenu.value === subMenu ? "" : subMenu;
 };
 </script>
 
 <template>
-  <aside
-      class="side-bar"
-      style="z-index: 5"
-      :class="{ open: isSidebar }"
-      @mouseover="isSidebar = true"
-      @mouseleave="isSidebar = false"
-  >
-    <ul>
+  <aside class="side-bar" style="z-index: 5" :class="{ open: isSidebar }" @mouseover="isSidebar = true" @mouseleave="isSidebar = false">
+    <div class="icon-wrapper">
+      <span v-if="!isSidebar"><basicIcon class="icon"/></span>
+      <span v-if="!isSidebar"><salesIcon class="icon"/></span>
+      <span v-if="!isSidebar"><orderIcon class="icon"/></span>
+      <span v-if="!isSidebar"><productionIcon class="icon"/></span>
+      <span v-if="!isSidebar"><statisticsIcon class="icon"/></span>
+    </div>
+    <ul class="menu-list">
       <!-- 기본등록 -->
       <li>
-        <span @click="toggleMenu('basic')">기본등록</span>
+        <span @click="toggleMenu('basic')"><basicIcon class="icon"/>기본등록</span>
         <ul v-if="activeMenu === 'basic'">
           <li>
-            <span @click="toggleMenu2('item')">품목</span>
-            <ul v-if="activeMenu2 === 'item'">
+            <span @click="toggleSubMenu('item')">품목</span>
+            <ul v-if="activeSubMenu === 'item'">
               <li>
                 <RouterLink class="content-item" to="">
                   품목 관리
@@ -42,8 +44,8 @@ const toggleMenu2 = (menu) => {
             </ul>
           </li>
           <li>
-            <span @click="toggleMenu2('client')">거래처</span>
-            <ul v-if="activeMenu2 === 'client'">
+            <span @click="toggleSubMenu('client')">거래처</span>
+            <ul v-if="activeSubMenu === 'client'">
               <li>
                 <RouterLink class="content-item" to="">
                   거래처 관리
@@ -52,8 +54,8 @@ const toggleMenu2 = (menu) => {
             </ul>
           </li>
           <li>
-            <span @click="toggleMenu2('warehouse')">창고</span>
-            <ul v-if="activeMenu2 === 'warehouse'">
+            <span @click="toggleSubMenu('warehouse')">창고</span>
+            <ul v-if="activeSubMenu === 'warehouse'">
               <li>
                 <RouterLink class="content-item" to="">
                   창고 관리
@@ -68,8 +70,8 @@ const toggleMenu2 = (menu) => {
         <span @click="toggleMenu('sales')">영업관리</span>
         <ul v-if="activeMenu === 'sales'">
           <li>
-            <span @click="toggleMenu2('quotation')">견적서</span>
-            <ul v-if="activeMenu2 === 'quotation'">
+            <span @click="toggleSubMenu('quotation')">견적서</span>
+            <ul v-if="activeSubMenu === 'quotation'">
               <li>
                 <RouterLink class="content-item" to="">견적서 조회</RouterLink>
                 <RouterLink class="content-item" to="">견적서 등록</RouterLink>
@@ -78,8 +80,8 @@ const toggleMenu2 = (menu) => {
             </ul>
           </li>
           <li>
-            <span @click="toggleMenu2('salesOrder')">주문서</span>
-            <ul v-if="activeMenu2 === 'salesOrder'">
+            <span @click="toggleSubMenu('salesOrder')">주문서</span>
+            <ul v-if="activeSubMenu === 'salesOrder'">
               <li>
                 <RouterLink class="content-item" to="">주문서 조회</RouterLink>
                 <RouterLink class="content-item" to="">주문서 등록</RouterLink>
@@ -88,8 +90,8 @@ const toggleMenu2 = (menu) => {
             </ul>
           </li>
           <li>
-            <span @click="toggleMenu2('invoice')">판매</span>
-            <ul v-if="activeMenu2 === 'invoice'">
+            <span @click="toggleSubMenu('invoice')">판매</span>
+            <ul v-if="activeSubMenu === 'invoice'">
               <li>
                 <RouterLink class="content-item" to="">거래명세서 조회</RouterLink>
                 <RouterLink class="content-item" to="">거래명세서 등록</RouterLink>
@@ -98,8 +100,8 @@ const toggleMenu2 = (menu) => {
             </ul>
           </li>
           <li>
-            <span @click="toggleMenu2('shippingInstruction')">출하지시서</span>
-            <ul v-if="activeMenu2 === 'shippingInstruction'">
+            <span @click="toggleSubMenu('shippingInstruction')">출하지시서</span>
+            <ul v-if="activeSubMenu === 'shippingInstruction'">
               <li>
                 <RouterLink class="content-item" to="/shipping-instruction" active-class="active" replace>출하지시서 조회</RouterLink>
                 <RouterLink class="content-item" to="/shipping-instruction/input" active-class="active" replace>출하지시서 등록</RouterLink>
@@ -108,8 +110,8 @@ const toggleMenu2 = (menu) => {
             </ul>
           </li>
           <li>
-            <span @click="toggleMenu2('shippingSlip')">출하</span>
-            <ul v-if="activeMenu2 === 'shippingSlip'">
+            <span @click="toggleSubMenu('shippingSlip')">출하</span>
+            <ul v-if="activeSubMenu === 'shippingSlip'">
               <li>
                 <RouterLink class="content-item" to="">출하전표 조회</RouterLink>
                 <RouterLink class="content-item" to="">출하전표 등록</RouterLink>
@@ -124,8 +126,8 @@ const toggleMenu2 = (menu) => {
         <span @click="toggleMenu('order')">주문관리</span>
         <ul v-if="activeMenu === 'order'">
           <li>
-            <span @click="toggleMenu2('item')">발주서</span>
-            <ul v-if="activeMenu2 === 'item'">
+            <span @click="toggleSubMenu('item')">발주서</span>
+            <ul v-if="activeSubMenu === 'item'">
               <li>
                 <RouterLink class="content-item" to="">발주서 조회</RouterLink>
                 <RouterLink class="content-item" to="">발주서 입력</RouterLink>
@@ -135,8 +137,8 @@ const toggleMenu2 = (menu) => {
             </ul>
           </li>
           <li>
-            <span @click="toggleMenu2('client')">구매</span>
-            <ul v-if="activeMenu2 === 'client'">
+            <span @click="toggleSubMenu('client')">구매</span>
+            <ul v-if="activeSubMenu === 'client'">
               <li>
                 <RouterLink class="content-item" to="">구매서 조회</RouterLink>
                 <RouterLink class="content-item" to="">구매서 등록</RouterLink>
@@ -151,8 +153,8 @@ const toggleMenu2 = (menu) => {
         <span @click="toggleMenu('production')">생산관리</span>
         <ul v-if="activeMenu === 'production'">
           <li>
-            <span @click="toggleMenu2('item')">작업지시서</span>
-            <ul v-if="activeMenu2 === 'item'">
+            <span @click="toggleSubMenu('item')">작업지시서</span>
+            <ul v-if="activeSubMenu === 'item'">
               <li>
                 <RouterLink class="content-item" to="">작업지시서 조회</RouterLink>
                 <RouterLink class="content-item" to="">작업지시서 등록</RouterLink>
@@ -162,8 +164,8 @@ const toggleMenu2 = (menu) => {
             </ul>
           </li>
           <li>
-            <span @click="toggleMenu2('client')">생산불출</span>
-            <ul v-if="activeMenu2 === 'client'">
+            <span @click="toggleSubMenu('client')">생산불출</span>
+            <ul v-if="activeSubMenu === 'client'">
               <li>
                 <RouterLink class="content-item" to="">생산불출 조회</RouterLink>
                 <RouterLink class="content-item" to="">생산불출 등록</RouterLink>
@@ -206,10 +208,37 @@ const toggleMenu2 = (menu) => {
 </template>
 
 <style scoped>
+/* ul > li 스타일 */
+.menu-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.menu-list > li {
+  margin-bottom: 16px; /* li 간격 */
+}
+
+.icon-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px 0;
+  gap: 16px; /* 아이콘 간 간격 */
+}
+
+.icon {
+  margin-right: 8px; /* 아이콘과 텍스트 간 간격 */
+  width: 20px;
+  height: 20px;
+  fill: #333; /* 아이콘 색상 */
+}
+
 .side-bar {
   position: fixed;
+  top: 76px; /* 헤더의 높이 */
   bottom: 0;
-  height: 86%;
+  height: 100%;
   width: 40px;
   background-color: #fff8e7;
   overflow: hidden;
