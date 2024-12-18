@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -37,7 +38,7 @@ class QuotationQueryServiceTest {
     @MethodSource("readQuotationListParam")
     void readQuotationList(Integer page, Integer size,
                           LocalDate startDate, LocalDate endDate,
-                          String clientName, String quotationStatus) {
+                          String clientName, List<String> quotationStatus) {
 
         assertDoesNotThrow(() -> quotationQueryService.readQuotationList(
                 page, size, startDate, endDate, clientName, quotationStatus));
