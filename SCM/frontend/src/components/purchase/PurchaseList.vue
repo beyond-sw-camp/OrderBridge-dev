@@ -240,7 +240,7 @@ const printItem = (index) => {
               <div class="list-body col-3">
                 {{ purchase.purchaseContractDate ? dayjs(purchase.purchaseContractDate).format('YYYY/MM/DD HH:mm:ss') : ' - ' }}
               </div>
-              <div class="list-body col-2">{{ purchase.purchaseStatus }}</div>
+              <div class="list-body col-2">{{ purchase.purchaseStatusValue }}</div>
 
               <!-- 확장된 상세 내용 -->
               <div class="d-flex justify-content-center">

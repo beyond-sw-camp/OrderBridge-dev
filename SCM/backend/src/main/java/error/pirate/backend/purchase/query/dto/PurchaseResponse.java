@@ -22,6 +22,9 @@ public class PurchaseResponse {
 
     private PurchaseStatus purchaseStatus; // 상태
 
+    @Setter
+    private String purchaseStatusValue;
+
     private LocalDateTime purchaseContractDate; // 계약일
 
     private LocalDateTime purchaseRegDate;

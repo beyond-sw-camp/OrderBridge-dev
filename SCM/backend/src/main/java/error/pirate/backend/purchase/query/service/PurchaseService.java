@@ -33,6 +33,8 @@ public class PurchaseService {
 
         int totalCount = purchaseMapper.readPurchaseListCount(request);
 
+        purchaseResponseList.forEach(order -> order.setPurchaseStatusValue(order.getPurchaseStatus().getValue()));
+        
         Pagination pagination = new Pagination();
         pagination.responsePaging(request.getPageNo(), totalCount);
 
