@@ -20,7 +20,7 @@ public class QuotationQueryService {
     public QuotationListResponse readQuotationList(
             Integer page, Integer size,
             LocalDate startDate, LocalDate endDate,
-            String clientName, String quotationStatus) {
+            String clientName, List<String> quotationStatus) {
 
         // 견적서 목록 조회
         List<QuotationListItemDTO> quotationList = quotationMapper.selectQuotationList(

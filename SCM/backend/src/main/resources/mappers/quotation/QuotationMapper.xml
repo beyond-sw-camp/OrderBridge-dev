@@ -30,7 +30,8 @@
             AND tb_client.client_name LIKE CONCAT('%', #{clientName}, '%')
         </if>
         <if test="quotationStatus != null">
-            AND tb_quotation.quotation_status LIKE #{quotationStatus}
+            AND tb_quotation.quotation_status IN 
+            <foreach collection="quotationStatus" item="item" open="(" separator="," close=")">#{item}</foreach>
         </if>
         LIMIT #{limit} OFFSET #{offset}
     </select>
@@ -52,7 +53,8 @@
             AND tb_client.client_name LIKE CONCAT('%', #{clientName}, '%')
         </if>
         <if test="quotationStatus != null">
-            AND tb_quotation.quotation_status LIKE #{quotationStatus}
+            AND tb_quotation.quotation_status IN
+            <foreach collection="quotationStatus" item="item" open="(" separator="," close=")">#{item}</foreach>
         </if>
     </select>
 
