@@ -49,6 +49,31 @@ const fetchQuotationStatus = async () => {
     }
 }
 
+// 견적서 목록 엑셀 다운로드
+const excelDown = async () => {
+    const response = await axios.get(`quotation/excel`, {
+        params: {
+            startDate: searchStartDate.value,
+            endDate: searchEndDate.value,
+            clientName: searchClient.value,
+            quotationStatus: searchStatus.value.size === 0 ? null : Array.from(searchStatus.value).join(",")
+        }, responseType: "blob"
+    });
+
+    const blob = new Blob([response.data], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    });
+
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = decodeURIComponent(response.headers["content-disposition"].split('filename=')[1]);
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.URL.revokeObjectURL(url);
+}
+
 // 선택한 Item 확장 | 축소
 function itemExtend(event) {
     // 선택한 list-line의 id 추출
@@ -130,7 +155,10 @@ function search() {
             <div style="width: 90%;">
                 <div class="d-flex justify-content-between">
                     <div>검색결과: {{ totalQuotation }}개</div>
-                    <b-button variant="light" size="sm" class="button">견적서 등록</b-button>
+                    <div class="d-flex justify-content-end mt-3">
+                        <b-button @click="excelDown()" variant="light" size="sm" class="button">엑셀 다운로드</b-button>
+                        <b-button variant="light" size="sm" class="button ms-2">견적서 등록</b-button>
+                    </div>
                 </div>
                 <div class="list-headline row">
                     <div class="list-headvalue col-6">견적서</div>
