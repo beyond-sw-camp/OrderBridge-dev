@@ -144,8 +144,8 @@ const printItem = (index) => {
         <div class="card-body">
           <p class="card-title">출하지시서 상태</p>
           <template v-for="shippingInstructionStatus in props.shippingInstructionStatusList">
-            <b-form-checkbox v-if="shippingInstructionStatus.key !== 'DELETE'"
-                             @click="check(shippingInstructionStatus.key)">{{ shippingInstructionStatus.value }}
+            <b-form-checkbox
+                @click="check(shippingInstructionStatus.key)">{{ shippingInstructionStatus.value }}
             </b-form-checkbox>
           </template>
         </div>
@@ -202,7 +202,9 @@ const printItem = (index) => {
                       }}</p>
                     <p v-if="expandShippingInstruction[shippingInstruction.shippingInstructionSeq].shippingInstructionNote">
                       출하지시서 비고 :
-                      {{ expandShippingInstruction[shippingInstruction.shippingInstructionSeq].shippingInstructionNote }}
+                      {{
+                        expandShippingInstruction[shippingInstruction.shippingInstructionSeq].shippingInstructionNote
+                      }}
                     </p>
                     <!-- 확장된 상세 품목 정보 표시-->
                     <div v-for="(row, rowIndex) in getChunkedItems(shippingInstruction.shippingInstructionSeq)"

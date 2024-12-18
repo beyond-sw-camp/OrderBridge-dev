@@ -33,18 +33,10 @@ public class ShippingInstructionQueryService {
         List<ShippingInstructionListDTO> shippingInstructionList
                 = shippingInstructionMapper.selectShippingInstructionList(offset, request, statusList);
 
-        // enum 상태 리스트 응답
-        List<ShippingInstructionStatus.ShippingInstructionStatusResponse> shippingInstructionStatusResponse
-                = Arrays.stream(ShippingInstructionStatus.class.getEnumConstants()).map(key ->
-                new ShippingInstructionStatus.ShippingInstructionStatusResponse(
-                        key.toString(), ShippingInstructionStatus.valueOf(key.toString())
-                )).toList();
-
         long totalItems = shippingInstructionMapper.countShippingInstruction(request, statusList);
 
         return ShippingInstructionListResponse.builder()
                 .shippingInstructionList(shippingInstructionList)
-                .shippingInstructionStatusList(shippingInstructionStatusResponse)
                 .currentPage(request.getPage())
                 .totalPages((int) Math.ceil((double) totalItems / request.getSize()))
                 .totalItems(totalItems)

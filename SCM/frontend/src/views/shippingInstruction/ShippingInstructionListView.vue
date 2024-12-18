@@ -36,11 +36,21 @@ const fetchShippingInstructionList = async () => {
     });
 
     shippingInstructionList.value = response.data.shippingInstructionList;
-    shippingInstructionStatusList.value = response.data.shippingInstructionStatusList;
     totalCount.value = response.data.totalItems;
 
   } catch (error) {
     console.error("출하지시서 불러오기 실패 :", error);
+  }
+};
+
+const fetchShippingInstructionStatusList = async () => {
+  try {
+    const response = await axios.get(`http://localhost:8090/api/v1/shipping-instruction/status`, {});
+
+    shippingInstructionStatusList.value = response.data;
+
+  } catch (error) {
+    console.error("출하지시서 상태 리스트불러오기 실패 :", error);
   }
 };
 
@@ -114,8 +124,9 @@ const excelDown = async () => {
   }
 }
 
-onMounted(() => {
-  fetchShippingInstructionList();
+onMounted(async () => {
+  await fetchShippingInstructionList();
+  await fetchShippingInstructionStatusList();
 });
 
 // 페이지 이동

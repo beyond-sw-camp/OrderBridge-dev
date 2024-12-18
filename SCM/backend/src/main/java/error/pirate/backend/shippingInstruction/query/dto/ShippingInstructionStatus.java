@@ -3,9 +3,13 @@ package error.pirate.backend.shippingInstruction.query.dto;
 import error.pirate.backend.exception.CustomException;
 import error.pirate.backend.exception.ErrorCodeType;
 import error.pirate.backend.productionReceiving.command.domain.aggregate.entity.ProductionReceivingStatus;
+import error.pirate.backend.quotation.command.domain.aggregate.entity.QuotationStatus;
 import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+
+import java.util.Arrays;
+import java.util.List;
 
 @Getter
 @RequiredArgsConstructor
@@ -25,6 +29,12 @@ public enum ShippingInstructionStatus {
             this.key = key;
             this.value = shippingInstructionStatus.getValue();
         }
+    }
+
+    public static List<ShippingInstructionStatus.ShippingInstructionStatusResponse> readShippingInstructionList() {
+        return Arrays.stream(ShippingInstructionStatus.class.getEnumConstants())
+                .filter(key -> !key.equals(ShippingInstructionStatus.DELETE))
+                .map(key -> new ShippingInstructionStatus.ShippingInstructionStatusResponse(key.toString(), ShippingInstructionStatus.valueOf(key.toString()))).toList();
     }
 
     public static String statusValue(String status) {
