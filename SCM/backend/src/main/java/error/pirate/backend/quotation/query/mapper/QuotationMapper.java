@@ -1,5 +1,6 @@
 package error.pirate.backend.quotation.query.mapper;
 
+import error.pirate.backend.quotation.command.domain.aggregate.entity.QuotationStatus;
 import error.pirate.backend.quotation.query.dto.*;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.data.repository.query.Param;
@@ -16,14 +17,14 @@ public interface QuotationMapper {
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate,
             @Param("clientName") String clientName,
-            @Param("quotationStatus") List<String> quotationStatus);
+            @Param("quotationStatus") List<QuotationStatus> quotationStatus);
 
     // 견적서 개수 목록 조회
     int countQuotationList(
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate,
             @Param("clientName") String clientName,
-            @Param("quotationStatus") List<String> quotationStatus);
+            @Param("quotationStatus") List<QuotationStatus> quotationStatus);
 
     // 견적서 상세 조회
     QuotationDTO selectQuotation(

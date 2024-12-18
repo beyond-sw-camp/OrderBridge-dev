@@ -32,7 +32,7 @@ public class QuotationQueryController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
             @RequestParam(required = false) String clientName,
-            @RequestParam(required = false) List<String> quotationStatus) {
+            @RequestParam(required = false) List<QuotationStatus> quotationStatus) {
 
         return ResponseEntity.ok(quotationQueryService.readQuotationList(
                 page, size, startDate, endDate, clientName, quotationStatus));

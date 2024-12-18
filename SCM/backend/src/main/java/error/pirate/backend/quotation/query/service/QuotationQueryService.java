@@ -1,5 +1,6 @@
 package error.pirate.backend.quotation.query.service;
 
+import error.pirate.backend.quotation.command.domain.aggregate.entity.QuotationStatus;
 import error.pirate.backend.quotation.query.dto.*;
 import error.pirate.backend.quotation.query.mapper.QuotationMapper;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +21,7 @@ public class QuotationQueryService {
     public QuotationListResponse readQuotationList(
             Integer page, Integer size,
             LocalDate startDate, LocalDate endDate,
-            String clientName, List<String> quotationStatus) {
+            String clientName, List<QuotationStatus> quotationStatus) {
 
         // 견적서 목록 조회
         List<QuotationListItemDTO> quotationList = quotationMapper.selectQuotationList(
