@@ -1,6 +1,6 @@
 package error.pirate.backend.shippingInstruction.command.application.service;
 
-import error.pirate.backend.shippingInstruction.command.application.dto.ShippingInstructionItemDTO;
+import error.pirate.backend.shippingInstruction.command.application.dto.ShippingInstructionItemRequest;
 import error.pirate.backend.shippingInstruction.command.application.dto.ShippingInstructionRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -31,9 +31,9 @@ class ShippingInstructionApplicationServiceTest {
                                 "인천시",
                                 "첫번째 출하지시서",
                                 List.of(
-                                        new ShippingInstructionItemDTO(1L, 100, "출하지시서 물품1"),
-                                        new ShippingInstructionItemDTO(2L, 500, "출하지시서 물품2"),
-                                        new ShippingInstructionItemDTO(3L, 5000, "출하지시서 물품3")
+                                        new ShippingInstructionItemRequest(1L, 100, "출하지시서 물품1"),
+                                        new ShippingInstructionItemRequest(2L, 500, "출하지시서 물품2"),
+                                        new ShippingInstructionItemRequest(3L, 5000, "출하지시서 물품3")
                                 )
                         )
                 ),
@@ -44,8 +44,8 @@ class ShippingInstructionApplicationServiceTest {
                                 "부산시",
                                 "두번째 출하지시서",
                                 List.of(
-                                        new ShippingInstructionItemDTO(4L, 100, "출하지시서 물품1"),
-                                        new ShippingInstructionItemDTO(5L, 500, "출하지시서 물품2")
+                                        new ShippingInstructionItemRequest(4L, 100, "출하지시서 물품1"),
+                                        new ShippingInstructionItemRequest(5L, 500, "출하지시서 물품2")
                                 )
                         )
                 )
@@ -72,8 +72,8 @@ class ShippingInstructionApplicationServiceTest {
                                 "부산시",
                                 "두번째 출하지시서",
                                 List.of(
-                                        new ShippingInstructionItemDTO(4L, 100, "출하지시서 물품1"),
-                                        new ShippingInstructionItemDTO(5L, 500, "출하지시서 물품2")
+                                        new ShippingInstructionItemRequest(4L, 100, "출하지시서 물품1"),
+                                        new ShippingInstructionItemRequest(5L, 500, "출하지시서 물품2")
                                 )
                         )
                 ),
@@ -85,9 +85,9 @@ class ShippingInstructionApplicationServiceTest {
                                 "인천시",
                                 "첫번째 출하지시서",
                                 List.of(
-                                        new ShippingInstructionItemDTO(1L, 100, "출하지시서 물품1"),
-                                        new ShippingInstructionItemDTO(2L, 500, "출하지시서 물품2"),
-                                        new ShippingInstructionItemDTO(3L, 5000, "출하지시서 물품3")
+                                        new ShippingInstructionItemRequest(1L, 100, "출하지시서 물품1"),
+                                        new ShippingInstructionItemRequest(2L, 500, "출하지시서 물품2"),
+                                        new ShippingInstructionItemRequest(3L, 5000, "출하지시서 물품3")
                                 )
                         )
                 )

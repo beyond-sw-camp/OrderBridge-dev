@@ -4,7 +4,7 @@ import error.pirate.backend.common.NameGenerator;
 import error.pirate.backend.item.command.application.service.ItemService;
 import error.pirate.backend.item.command.domain.aggregate.entity.Item;
 import error.pirate.backend.salesOrder.command.domain.aggregate.entity.SalesOrder;
-import error.pirate.backend.shippingInstruction.command.application.dto.ShippingInstructionItemDTO;
+import error.pirate.backend.shippingInstruction.command.application.dto.ShippingInstructionItemRequest;
 import error.pirate.backend.shippingInstruction.command.application.dto.ShippingInstructionRequest;
 import error.pirate.backend.shippingInstruction.command.domain.aggregate.entity.ShippingInstruction;
 import error.pirate.backend.shippingInstruction.command.domain.aggregate.entity.ShippingInstructionItem;
@@ -67,7 +67,7 @@ public class ShippingInstructionApplicationService {
         /* 물품 불러오기 */
         List<Long> itemSeqList = shippingInstructionRequest.getShippingInstructionItems()
                 .stream()
-                .map(ShippingInstructionItemDTO::getItemSeq) // itemSeq 필드 추출
+                .map(ShippingInstructionItemRequest::getItemSeq) // itemSeq 필드 추출
                 .toList(); // 추출한 값을 List로 변환
         List<Item> itemList = itemService.findAllById(itemSeqList);
 
@@ -125,7 +125,7 @@ public class ShippingInstructionApplicationService {
             /* 물품 불러오기 */
             List<Long> itemSeqList = shippingInstructionRequest.getShippingInstructionItems()
                     .stream()
-                    .map(ShippingInstructionItemDTO::getItemSeq) // itemSeq 필드 추출
+                    .map(ShippingInstructionItemRequest::getItemSeq) // itemSeq 필드 추출
                     .toList(); // 추출한 값을 List로 변환
             List<Item> itemList = itemService.findAllById(itemSeqList);
 
