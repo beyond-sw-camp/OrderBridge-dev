@@ -18,7 +18,7 @@
         FROM tb_purchase_order tpo
         JOIN tb_user tu USING (user_seq)
         JOIN tb_client tc USING (client_seq)
-        <trim prefix="WHERE" prefixOverrides="AND">
+        WHERE tpo.purchase_order_status != 'DELETE'
             <if test="searchStartDate != null and searchStartDate != ''">
                 <![CDATA[
                 AND #{searchStartDate} <= tpo.purchase_order_target_due_date
@@ -40,7 +40,6 @@
                     </foreach>
                 </trim>
             </if>
-        </trim>
         ORDER BY tpo.purchase_order_seq
         <if test="limit != null">
             LIMIT #{limit} OFFSET #{offset}
@@ -67,7 +66,7 @@
         FROM tb_purchase_order tpo
         JOIN tb_user tu USING (user_seq)
         JOIN tb_client tc USING (client_seq)
-        <trim prefix="WHERE" prefixOverrides="AND">
+        WHERE tpo.purchase_order_status != 'DELETE'
             <if test="searchStartDate != null and searchStartDate != ''">
                 <![CDATA[
                 AND #{searchStartDate} <= tpo.purchase_order_target_due_date
@@ -89,7 +88,6 @@
                     </foreach>
                 </trim>
             </if>
-        </trim>
     </select>
 
 </mapper>

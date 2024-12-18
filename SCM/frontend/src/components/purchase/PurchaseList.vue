@@ -196,12 +196,6 @@ const printItem = (index) => {
               @change="check('COMPLETE')">
             정산완료
           </b-form-checkbox>
-
-          <b-form-checkbox
-              :checked="searchStatus.includes('DELETE')"
-              @change="check('DELETE')">
-            삭제
-          </b-form-checkbox>
         </div>
       </div>
     </div>
