@@ -50,7 +50,7 @@ const fetchShippingInstructionStatusList = async () => {
     shippingInstructionStatusList.value = response.data;
 
   } catch (error) {
-    console.error("출하지시서 상태 리스트불러오기 실패 :", error);
+    console.error("출하지시서 상태 리스트 불러오기 실패 :", error);
   }
 };
 

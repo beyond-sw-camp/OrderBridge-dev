@@ -29,7 +29,7 @@ public enum ShippingInstructionStatus {
         }
     }
 
-    public static List<ShippingInstructionStatus.ShippingInstructionStatusResponse> readShippingInstructionList() {
+    public static List<ShippingInstructionStatus.ShippingInstructionStatusResponse> readShippingInstructionStatusList() {
         return Arrays.stream(ShippingInstructionStatus.class.getEnumConstants())
                 .filter(key -> !key.equals(ShippingInstructionStatus.DELETE))
                 .map(key -> new ShippingInstructionStatus.ShippingInstructionStatusResponse(key.toString(), ShippingInstructionStatus.valueOf(key.toString()))).toList();

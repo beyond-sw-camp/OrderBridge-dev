@@ -10,6 +10,7 @@ const pageSize = ref(10);
 const pageNumber = ref(1);
 const salesOrderList = ref([]);
 const registerListener = ref(false);
+const addressList = ref([]);
 
 const itemList = ref([]);
 const selectedSalesOrder = ref(false);
@@ -97,6 +98,17 @@ const fetchSalesOrder = async (salesOrderSeq) => {
   }
 };
 
+const fetchShippingInstructionAddressList = async () => {
+  try {
+    const response = await axios.get(`http://localhost:8090/api/v1/shipping-instruction/address`, {});
+
+    addressList.value = response.data;
+
+  } catch (error) {
+    console.error("출하지시서 주소 리스트 불러오기 실패 :", error);
+  }
+};
+
 const createShippingInstruction = async (formData, itemData) => {
   try {
     const response = await axios.post('http://localhost:8090/api/v1/shipping-instruction',
@@ -130,8 +142,9 @@ const createShippingInstruction = async (formData, itemData) => {
   }
 };
 
-onMounted(() => {
-  fetchSalesOrderList();
+onMounted(async () => {
+  await fetchSalesOrderList();
+  await fetchShippingInstructionAddressList();
 });
 
 // 페이지 이동
@@ -167,7 +180,7 @@ const handleRegister = async (itemList) => {
       return;
     }
     if (!formData.value.address) {
-      alert("주소를 입력해주세요.");
+      alert("주소를 선택해주세요.");
       return;
     }
 
@@ -206,6 +219,7 @@ const handleRegister = async (itemList) => {
                                   :pageNumber="pageNumber"
                                   :pageSize="pageSize"
                                   :registerListener="registerListener"
+                                  :addressList="addressList"
                                   @pageEvent="handlePage"
                                   @salesOrderEvent="handleSalesOrder"/>
   </div>

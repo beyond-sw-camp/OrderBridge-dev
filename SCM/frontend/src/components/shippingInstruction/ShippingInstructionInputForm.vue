@@ -1,5 +1,5 @@
 <script setup>
-import {defineProps, ref, watch} from "vue";
+import {computed, defineProps, ref, watch} from "vue";
 import searchIcon from '@/assets/searchIcon.svg'
 import dayjs from "dayjs";
 
@@ -8,6 +8,7 @@ const props = defineProps({
   totalCount: {type: Number, required: true},       // 검색 결과 총 개수
   pageNumber: {type: Number, required: true},       // 현재 페이지 번호
   pageSize: {type: Number, required: true},         // 페이지 사이즈
+  addressList: {type: Array, required: true},   // 출하지시서 주소 목록
 });
 
 const emit = defineEmits(
@@ -34,6 +35,14 @@ const addClient = (index) => {
   emit('salesOrderEvent', formData);
 }
 
+// addressList를 <b-form-select>의 options 형식으로 변환
+const addressOptions = computed(() =>
+    props.addressList.map((address) => ({
+      value: address.key, // 고유 값 (key)
+      text: address.value, // 표시되는 텍스트 (value)
+    }))
+);
+
 // 부모 컴포넌트가 이 메서드를 호출해 데이터를 가져갈 수 있도록 노출
 const getData  = () => {
   return formData;
@@ -51,52 +60,52 @@ const formatStatus = (status) => {
 
 <template>
   <div class="col-6 d-flex flex-column">
-    <b-form-group label-cols="4" label-cols-lg="2" label="출하예정일자" label-for="quote-date">
+    <b-form-group label-cols="4" label-cols-lg="2" label="출하예정일자" label-for="shippingInstructionDate">
       <!--   b-form-input 에서  datetime-local 을 사용할 수 없음  -->
       <input
           class="form-control form-control-sm w-75"
           type="datetime-local"
-          id="quote-date"
+          id="shippingInstructionDate"
           v-model="formData.shippingInstructionDate"
           placeholder="출하지시일자를 입력해 주세요.">
     </b-form-group>
 
-    <b-form-group label-cols="4" label-cols-lg="2" label-size="default" label="주문서" label-for="client">
+    <b-form-group label-cols="4" label-cols-lg="2" label-size="default" label="주문서" label-for="salesOrder">
       <b-input-group class="w-75" size="sm">
         <b-form-input
             type="text"
-            id="client"
+            id="salesOrder"
             v-model="formData.salesOrder"
             placeholder="주문서를 선택해 주세요."
             readonly="">
         </b-form-input>
         <b-input-group-text>
-          <searchIcon class="icon" data-bs-toggle="modal" data-bs-target="#ClientModal"/>
+          <searchIcon class="icon" data-bs-toggle="modal" data-bs-target="#SalesOrderModal"/>
         </b-input-group-text>
       </b-input-group>
     </b-form-group>
 
-    <b-form-group label-cols="4" label-cols-lg="2" label-size="default" label="거래처" label-for="manager">
+    <b-form-group label-cols="4" label-cols-lg="2" label-size="default" label="거래처" label-for="client">
       <b-form-input
           class="w-75"
           size="sm"
           type="text"
-          id="manager"
+          id="client"
           v-model="formData.client"
           placeholder="거래처"
           readonly="">
       </b-form-input>
     </b-form-group>
 
-    <b-form-group label-cols="4" label-cols-lg="2" label-size="default" label="출하 주소" label-for="note">
-      <b-form-input
+    <b-form-group label-cols="4" label-cols-lg="2" label-size="default" label="출하 주소" label-for="address">
+      <b-form-select
           class="w-75"
-          type="text"
+          :options="addressOptions"
           size="sm"
-          id="note"
+          id="address"
           v-model="formData.address"
           placeholder="출하 주소를 입력해 주세요.">
-      </b-form-input>
+      </b-form-select>
     </b-form-group>
 
     <b-form-group label-cols="4" label-cols-lg="2" label-size="default" label="출하지시 비고" label-for="note">
@@ -111,7 +120,7 @@ const formatStatus = (status) => {
   </div>
 
   <!-- client Modal bootstrap -->
-  <div class="modal fade" id="ClientModal" tabindex="-1" aria-labelledby="ClientModalLabel" aria-hidden="true">
+  <div class="modal fade" id="SalesOrderModal" tabindex="-1" aria-labelledby="SalesOrderModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header">
