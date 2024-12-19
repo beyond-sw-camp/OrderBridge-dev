@@ -12,7 +12,7 @@ public interface ItemMapper {
 
     List<ItemResponse> findItemListByFilter(
             @Param("itemName") String itemName,
-            @Param("itemDivisions") ItemDivision itemDivisions,
+            @Param("itemDivisions") List<ItemDivision> itemDivisions,
             @Param("minExpirationHour") Integer minExpirationHour,
             @Param("maxExpirationHour") Integer maxExpirationHour,
             @Param("size") Integer size,
@@ -21,7 +21,7 @@ public interface ItemMapper {
 
     int countItemsByFilter(
             @Param("itemName") String itemName,
-            @Param("itemDivisions") ItemDivision itemDivisions,
+            @Param("itemDivisions") List<ItemDivision> itemDivisions,
             @Param("minExpirationHour") Integer minExpirationHour,
             @Param("maxExpirationHour") Integer maxExpirationHour
     );
