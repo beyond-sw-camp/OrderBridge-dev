@@ -1,5 +1,6 @@
 package error.pirate.backend.item.query.mapper;
 
+import error.pirate.backend.item.command.domain.aggregate.entity.ItemDivision;
 import error.pirate.backend.item.query.dto.ItemResponse;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -11,7 +12,7 @@ public interface ItemMapper {
 
     List<ItemResponse> findItemListByFilter(
             @Param("itemName") String itemName,
-            @Param("itemDivisions") String itemDivisions,
+            @Param("itemDivisions") ItemDivision itemDivisions,
             @Param("minExpirationHour") Integer minExpirationHour,
             @Param("maxExpirationHour") Integer maxExpirationHour,
             @Param("size") Integer size,
@@ -20,7 +21,7 @@ public interface ItemMapper {
 
     int countItemsByFilter(
             @Param("itemName") String itemName,
-            @Param("itemDivisions") String itemDivisions,
+            @Param("itemDivisions") ItemDivision itemDivisions,
             @Param("minExpirationHour") Integer minExpirationHour,
             @Param("maxExpirationHour") Integer maxExpirationHour
     );
