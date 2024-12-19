@@ -4,15 +4,15 @@ import error.pirate.backend.common.ExcelDownLoad;
 import error.pirate.backend.exception.CustomException;
 import error.pirate.backend.exception.ErrorCodeType;
 import error.pirate.backend.productionReceiving.command.domain.aggregate.entity.ProductionReceiving;
-import error.pirate.backend.productionReceiving.command.domain.aggregate.entity.ProductionReceivingItem;
 import error.pirate.backend.productionReceiving.command.domain.aggregate.entity.ProductionReceivingStatus;
 import error.pirate.backend.productionReceiving.command.domain.repository.ProductionReceivingItemRepository;
 import error.pirate.backend.productionReceiving.command.domain.repository.ProductionReceivingRepository;
 import error.pirate.backend.productionReceiving.query.dto.*;
 import error.pirate.backend.productionReceiving.query.mapper.ProductionReceivingMapper;
-import error.pirate.backend.warehouse.command.domain.aggregate.entity.Warehouse;
 import error.pirate.backend.warehouse.command.domain.repository.WarehouseRepository;
-import error.pirate.backend.warehouse.query.dto.WarehouseDTO;
+import error.pirate.backend.workOrder.command.domain.aggregate.entity.WorkOrder;
+import error.pirate.backend.workOrder.command.domain.repository.WorkOrderRepository;
+import error.pirate.backend.workOrder.query.dto.WorkOrderListDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -21,6 +21,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -36,6 +37,7 @@ public class ProductionReceivingQueryService {
     private final ModelMapper modelMapper;
     private final ExcelDownLoad excelDownBody;
     private final ProductionReceivingMapper productionReceivingMapper;
+    private final WorkOrderRepository workOrderRepository;
 
     public ProductionReceivingListResponse readProductionReceivingList(ProductionReceivingListRequest request, Pageable pageable) {
         Page<ProductionReceivingListDTO> productionReceivingList = productionReceivingRepository.findAllByFilter(request, pageable);
@@ -58,8 +60,17 @@ public class ProductionReceivingQueryService {
     public ProductionReceivingResponse readProductionReceiving(Long productionReceivingSeq) {
         ProductionReceiving productionReceiving = productionReceivingRepository.findById(productionReceivingSeq).orElseThrow(() -> new CustomException(ErrorCodeType.PRODUCTION_RECEIVING_NOT_FOUND));
         List<ProductionReceivingItemQueryDTO> productionReceivingItemList = productionReceivingItemRepository.findAllByProductionReceivingSeq(productionReceivingSeq);
+        List<WorkOrder> workOrders = workOrderRepository.findByProductionReceiving(productionReceiving);
 
-         return new ProductionReceivingResponse(modelMapper.map(productionReceiving, ProductionReceivingDTO.class), productionReceivingItemList);
+        List<WorkOrderListDTO> workOrderList = new ArrayList<>();
+        for(WorkOrder workOrder : workOrders) {
+            workOrderList.add(modelMapper.map(workOrder, WorkOrderListDTO.class));
+        }
+        return new ProductionReceivingResponse(
+                modelMapper.map(productionReceiving, ProductionReceivingDTO.class),
+                productionReceivingItemList,
+                workOrderList
+                );
     }
 
     public byte[] productionReceivingExcelDown(ProductionReceivingListRequest request, Pageable pageable) {

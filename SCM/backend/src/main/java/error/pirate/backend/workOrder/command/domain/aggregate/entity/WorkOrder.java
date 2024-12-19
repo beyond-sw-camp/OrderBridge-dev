@@ -178,6 +178,5 @@ public class WorkOrder {
 
     public void createProductionReceiving(ProductionReceiving productionReceiving) {
         specifyProductionReceiving(productionReceiving);
-        this.workOrderStatus = WorkOrderStatus.COMPLETE;
     }
 }
