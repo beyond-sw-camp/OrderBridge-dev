@@ -2,6 +2,7 @@ package error.pirate.backend.item.command.domain.aggregate.entity;
 
 import error.pirate.backend.item.command.application.dto.ItemUpdateRequest;
 import error.pirate.backend.user.command.domain.aggregate.entity.User;
+import error.pirate.backend.warehouse.command.domain.aggregate.entity.Warehouse;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -28,6 +29,10 @@ public class Item {
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinColumn(name = "itemUnitSeq")
     private ItemUnit itemUnit; // 품목 단위
+
+    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    @JoinColumn(name = "warehouseSeq")
+    private Warehouse warehouse; // 창고
 
     private String itemName; // 품목명
 
