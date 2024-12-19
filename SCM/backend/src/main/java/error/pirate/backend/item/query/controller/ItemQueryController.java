@@ -27,7 +27,7 @@ public class ItemQueryController {
             @RequestParam(defaultValue = "0") int page, // 기본값 0
             @RequestParam(defaultValue = "8") int size, // 기본값 8
             @RequestParam(required = false) String itemName, // 검색어 필터
-            @RequestParam(required = false) List<String> itemDivisions, // 품목 구분 필터
+            @RequestParam(required = false) String itemDivisions, // 품목 구분 필터
             @RequestParam(required = false) Integer minExpirationHour, // 최소 유통기한
             @RequestParam(required = false) Integer maxExpirationHour  // 최대 유통기한
     ) {
