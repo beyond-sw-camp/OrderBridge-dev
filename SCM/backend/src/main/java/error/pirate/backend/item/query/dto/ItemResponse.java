@@ -20,4 +20,6 @@ public class ItemResponse {
     private Integer itemPrice;
     private LocalDateTime itemRegDate;
     private LocalDateTime itemModDate;
+    private Integer bomChildItemQuantity;
+    private String itemUnit;
 }

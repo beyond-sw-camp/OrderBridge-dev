@@ -83,42 +83,29 @@ public class ShippingInstructionApplicationService {
         List<ShippingInstructionItem> shippingInstructionItem
                 = shippingInstructionItemDomainService.saveShippingInstructionItem(newShippingInstructionItemList);
 
-        // 주문서와 출하지시서의 품목 수량 비교와 모든 품목이 출하되었는지 체크
-        boolean allRemainingQuantitiesZero = shippingInstructionDomainService.validateItem(shippingInstructionRequest.getSalesOrderSeq());
-
-        // 모든 품목이 출하되었다면 주문서를 출하완료 상태로 변경하고 만약 결재전인 출하지시서가 있다면 모두 결재후로 변경
-        if(allRemainingQuantitiesZero) {
-            // 만약 결재전인 출하지시서가 있다면 모두 결재후로 변경
-            List<ShippingInstruction> shippingInstructionList = shippingInstructionDomainService.findBySalesOrder(salesOrder);
-            for(ShippingInstruction si : shippingInstructionList) {
-                shippingInstructionDomainService.updateShippingInstructionStatus(si, "AFTER");
-            }
-            shippingInstructionDomainService.updateShippingInstructionStatus(shippingInstruction, "AFTER");
-            salesOrderDomainService.updateSalesOrderStatus(salesOrder, "SHIPMENT_COMPLETE");
-        }
+        // 주문서와 출하지시서의 품목 수량 비교
+        shippingInstructionDomainService.validateItem(shippingInstructionRequest.getSalesOrderSeq());
     }
 
     /* 출하지시서 수정 */
     @Transactional
     public void updateShippingInstruction(Long shippingInstructionSeq, ShippingInstructionRequest shippingInstructionRequest) {
+        // 불러온 주문서가 있으면 주문서 확인 절차
+        shippingInstructionItemDomainService.validateItem(
+                shippingInstructionRequest.getSalesOrderSeq(), shippingInstructionRequest.getShippingInstructionItems());
+
         /* 출하지시서 찾기 */
         ShippingInstruction shippingInstruction = shippingInstructionDomainService.findByShippingInstructionSeq(shippingInstructionSeq);
 
         /* 수정이 가능한 상태인지 체크 */
         shippingInstructionDomainService.checkShippingInstructionApprovalStatus(shippingInstruction.getShippingInstructionStatus());
 
-        /* 현재 주문서 저장 */
-        SalesOrder salesOrder = shippingInstruction.getSalesOrder();
-
         // 등록과 동일
-        SalesOrder newSalesOrder = entityManager.getReference(SalesOrder.class, shippingInstructionRequest.getSalesOrderSeq());
-
+        SalesOrder salesOrder = entityManager.getReference(SalesOrder.class, shippingInstructionRequest.getSalesOrderSeq());
         // 주문서가 생산완료 상태인지 체크
-        shippingInstructionDomainService.checkSalesOrderStatus(newSalesOrder);
-
+        shippingInstructionDomainService.checkSalesOrderStatus(salesOrder);
         // 출하지시서 유저는 주문서 작성 유저
-        User user = newSalesOrder.getUser();
-
+        User user = salesOrder.getUser();
         /* 출하예정일을 서울 시간으로 변경 */
         LocalDateTime shippingInstructionScheduledShipmentDate =
                 shippingInstructionDomainService.setShippingInstructionScheduledShipmentDate(
@@ -130,34 +117,27 @@ public class ShippingInstructionApplicationService {
         /* ShippingInstruction 도메인 수정 로직 실행 */
         ShippingInstruction newShippingInstruction =
                 shippingInstructionDomainService.updateShippingInstruction(
-                        shippingInstruction, shippingInstructionRequest, newSalesOrder, user,
+                        shippingInstruction, shippingInstructionRequest, salesOrder, user,
                         shippingInstructionScheduledShipmentDate, itemTotalQuantity
                 );
 
-        /* 주문서가 변경되었는지 체크 */
-        boolean changeSalesOrder =
-                shippingInstructionDomainService.checkChangedSalesOrder(salesOrder, newSalesOrder);
+        /* 기존에 저장된 출하지시서 품목 리스트 삭제 */
+        shippingInstructionItemDomainService.deleteByShippingInstruction(newShippingInstruction);
 
-        /* 주문서가 변경되었다면 출하지시서 품목도 변경*/
-        if (changeSalesOrder){
-            /* 물품 불러오기 */
-            List<Long> itemSeqList = shippingInstructionRequest.getShippingInstructionItems()
-                    .stream()
-                    .map(ShippingInstructionItemRequest::getItemSeq) // itemSeq 필드 추출
-                    .toList(); // 추출한 값을 List로 변환
-            List<Item> itemList = itemService.findAllById(itemSeqList);
+        /* 물품 불러오기 */
+        List<Long> itemSeqList = shippingInstructionRequest.getShippingInstructionItems()
+                .stream()
+                .map(ShippingInstructionItemRequest::getItemSeq) // itemSeq 필드 추출
+                .toList(); // 추출한 값을 List로 변환
+        List<Item> itemList = itemService.findAllById(itemSeqList);
 
-            /* 기존에 저장된 출하지시서 품목 리스트 삭제 */
-            shippingInstructionItemDomainService.deleteByShippingInstruction(newShippingInstruction);
+        /* ShippingInstructionItem 도메인 생성 로직 실행, entity 반환 */
+        List<ShippingInstructionItem> newShippingInstructionItemList
+                = shippingInstructionItemDomainService.createShippingInstructionItemList(shippingInstructionRequest, newShippingInstruction, itemList);
 
-            /* ShippingInstructionItem 도메인 생성 로직 실행, entity 반환 */
-            List<ShippingInstructionItem> newShippingInstructionItemList
-                    = shippingInstructionItemDomainService.createShippingInstructionItemList(shippingInstructionRequest, newShippingInstruction, itemList);
-
-            /* saveAll 로직 실행 */
-            List<ShippingInstructionItem> shippingInstructionItem
-                    = shippingInstructionItemDomainService.saveShippingInstructionItem(newShippingInstructionItemList);
-        }
+        /* saveAll 로직 실행 */
+        List<ShippingInstructionItem> shippingInstructionItem
+                = shippingInstructionItemDomainService.saveShippingInstructionItem(newShippingInstructionItemList);
     }
 
     /* 출하지시서 결재 상태 변경 */

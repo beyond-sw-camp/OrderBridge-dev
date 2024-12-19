@@ -21,7 +21,7 @@ const props = defineProps({
 
 const emit = defineEmits(
     ['pageEvent', 'searchEvent', 'checkStatusEvent', 'extendItemEvent',
-      'itemDeleteEvent', 'registerEvent', 'excelEvent']);
+      'itemEditEvent', 'itemDeleteEvent', 'registerEvent', 'excelEvent']);
 
 const startDate = ref(props.searchStartDate);
 const endDate = ref(props.searchEndDate);
@@ -59,6 +59,10 @@ const register = () => {
 
 const excel = () => {
   emit('excelEvent');
+}
+
+const itemEdit = (seq) => {
+  emit('itemEditEvent', seq);
 }
 
 const itemDelete = (seq) => {
@@ -144,8 +148,8 @@ const printItem = (index) => {
         <div class="card-body">
           <p class="card-title">출하지시서 상태</p>
           <template v-for="shippingInstructionStatus in props.shippingInstructionStatusList">
-            <b-form-checkbox v-if="shippingInstructionStatus.key !== 'DELETE'"
-                             @click="check(shippingInstructionStatus.key)">{{ shippingInstructionStatus.value }}
+            <b-form-checkbox
+                @click="check(shippingInstructionStatus.key)">{{ shippingInstructionStatus.value }}
             </b-form-checkbox>
           </template>
         </div>
@@ -202,7 +206,9 @@ const printItem = (index) => {
                       }}</p>
                     <p v-if="expandShippingInstruction[shippingInstruction.shippingInstructionSeq].shippingInstructionNote">
                       출하지시서 비고 :
-                      {{ expandShippingInstruction[shippingInstruction.shippingInstructionSeq].shippingInstructionNote }}
+                      {{
+                        expandShippingInstruction[shippingInstruction.shippingInstructionSeq].shippingInstructionNote
+                      }}
                     </p>
                     <!-- 확장된 상세 품목 정보 표시-->
                     <div v-for="(row, rowIndex) in getChunkedItems(shippingInstruction.shippingInstructionSeq)"
@@ -223,9 +229,10 @@ const printItem = (index) => {
                       </div>
                     </div>
                     <div class="d-flex justify-content-end align-items-center">
+                      <b-button v-if="shippingInstruction.shippingInstructionStatus === 'AFTER'" variant="light" class="me-3 button" @click="">출하전표 등록</b-button>
                       <printIcon class="me-3 icon" @click.stop="printItem(index)"/>
-                      <editIcon class="me-3 icon" @click.stop=""/>
-                      <trashIcon class="icon" @click.stop="itemDelete(shippingInstruction.shippingInstructionSeq)"/>
+                      <editIcon v-if="shippingInstruction.shippingInstructionStatus === 'BEFORE'" class="me-3 icon" @click.stop="itemEdit(shippingInstruction.shippingInstructionSeq)"/>
+                      <trashIcon v-if="shippingInstruction.shippingInstructionStatus === 'BEFORE'" class="icon" @click.stop="itemDelete(shippingInstruction.shippingInstructionSeq)"/>
                     </div>
                   </div>
                 </div>

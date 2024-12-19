@@ -11,7 +11,6 @@ import java.util.List;
 @Schema(description = "출하지시서 리스트 응답")
 public class ShippingInstructionListResponse {
     private List<ShippingInstructionListDTO> shippingInstructionList;
-    private List<ShippingInstructionStatus.ShippingInstructionStatusResponse> shippingInstructionStatusList; // enum 상태 리스트
     private int currentPage;            // 현재 페이지
     private int totalPages;             // 전체 페이지 수
     private long totalItems;            // 총 아이템 수

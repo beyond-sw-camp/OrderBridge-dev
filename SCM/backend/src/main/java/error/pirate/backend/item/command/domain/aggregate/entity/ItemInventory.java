@@ -31,6 +31,8 @@ public class ItemInventory {
 
     private LocalDateTime itemInventoryExpirationDate; // 품목 재고 유통기한
 
+    private String itemInventoryNote;
+
     public static ItemInventory createItemInventory(Item item, Integer itemInventoryQuantityReceived,
                                              Integer itemInventoryRemainAmount) {
         ItemInventory itemInventory = new ItemInventory(item, itemInventoryQuantityReceived, itemInventoryRemainAmount);

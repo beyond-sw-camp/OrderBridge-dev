@@ -1,5 +1,6 @@
 package error.pirate.backend.shippingInstruction.query.dto;
 
+import error.pirate.backend.shippingInstruction.command.domain.aggregate.entity.ShippingInstructionStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
