@@ -1,9 +1,8 @@
 package error.pirate.backend.item.query.controller;
 
 import error.pirate.backend.item.command.domain.aggregate.entity.ItemDivision;
-import error.pirate.backend.item.query.dto.ItemDetailResponse;
-import error.pirate.backend.item.query.dto.ItemFilterRequest;
-import error.pirate.backend.item.query.dto.ItemResponse;
+import error.pirate.backend.item.command.domain.aggregate.entity.ItemUnit;
+import error.pirate.backend.item.query.dto.*;
 import error.pirate.backend.item.query.service.ItemQueryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -11,8 +10,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/item")
@@ -45,6 +46,20 @@ public class ItemQueryController {
 
         // 결과 반환
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/unit")
+    @Operation(summary = "품목 단위 조회", description = "등록 가능한 품목 단위를 조회한다.")
+    public ResponseEntity<List<ItemUnitResponse>> readItemUnits() {
+        List<ItemUnitResponse> itemUnits = itemQueryService.getItemUnits();
+        return ResponseEntity.ok(itemUnits);
+    }
+
+    @GetMapping("/division")
+    @Operation(summary = "품목 구분 조회", description = "등록 가능한 품목 구분을 조회한다.")
+    public ResponseEntity<List<ItemDivisionResponse>> getItemDivisions() {
+        List<ItemDivisionResponse> divisions = itemQueryService.getAllItemDivisions();
+        return ResponseEntity.ok(divisions);
     }
 
     @GetMapping("/{itemSeq}")
