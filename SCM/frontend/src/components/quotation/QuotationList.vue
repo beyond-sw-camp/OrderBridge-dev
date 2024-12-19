@@ -2,9 +2,13 @@
 import { ref, onMounted, watch } from 'vue';
 import searchIcon from "@/assets/searchIcon.svg"
 import axios from "@/axios"
+import dayjs from 'dayjs';
 
+const quotationDetail = ref({});
+const quotationExtended = ref({});
 const quotationList = ref([]);
 const quotationStatusList = ref([]);
+const itemDivisionList = ref([])
 const currentPage = ref(1);
 const totalPage = ref(1);
 const totalQuotation = ref(0);
@@ -38,6 +42,18 @@ const fetchQuotationList = async () => {
     }
 }
 
+// 견적서 상세 요청
+const fetchQuotation = async (quotationSeq) => {
+    try {
+        const response = await axios.get(`quotation/${quotationSeq}`);
+
+        quotationDetail.value[quotationSeq] = response.data;
+        quotationExtended.value[quotationSeq] = true;
+    } catch (error) {
+        console.error(`견적서 상세 요청 실패 ${error}`);
+    }
+}
+
 // 견적서 상태 분류 목록 요청
 const fetchQuotationStatus = async () => {
     try { 
@@ -46,6 +62,17 @@ const fetchQuotationStatus = async () => {
         quotationStatusList.value = response.data;
     } catch (error) {
         console.log(`견적서 상태 분류 목록 요청 실패`, error);
+    }
+}
+
+// 품목 분류 요청
+const fetchItemDivision = async () => {
+    try {
+        const response = await axios.get(`item/item-division`);
+
+        itemDivisionList.value = response.data;
+    } catch (error) {
+        console.log(`품목 분류 요청 실패 ${error}`);
     }
 }
 
@@ -74,32 +101,10 @@ const excelDown = async () => {
     window.URL.revokeObjectURL(url);
 }
 
-// 선택한 Item 확장 | 축소
-function itemExtend(event) {
-    // 선택한 list-line의 id 추출
-    let listLine = event.target;
-    for (let i = 0; i < 5; i++) {
-        if (listLine.classList[0] === "list-line") { break; }
-        else { listLine = listLine.parentNode; }
-    }
-    let id = listLine.getElementsByClassName("col-6")[0].innerHTML.split("<br")[0];
-
-    console.log(id);
-    console.log(listLine);
-
-    // 찾은 id 기반으로 API 호출
-
-    // API 응답값으로 list-line 확장 | 축소
-}
-
-// 품목 만드는 반복문 추가
-function addItemCard() {
-
-}
-
 onMounted(() => {
     fetchQuotationList();
     fetchQuotationStatus();
+    fetchItemDivision();
 });
 
 watch([searchStartDate, searchEndDate, searchStatus.value], () => {
@@ -131,6 +136,21 @@ function findStatusValue(array, key) {
             return item.value
         }
     }
+}
+
+// 견적서 클릭
+function quotationClick(quotationSeq) {
+    if (quotationExtended.value[quotationSeq]) {
+        delete quotationExtended.value[quotationSeq];
+        delete quotationDetail.value[quotationSeq];
+    } else {
+        fetchQuotation(quotationSeq);
+    }
+}
+
+// 숫자 쉼표 삽입
+function numberThree(number) {
+    return `${number.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}`;
 }
 
 </script>
@@ -179,13 +199,41 @@ function findStatusValue(array, key) {
                 </div>
                 <template v-if="quotationList.length > 0">
                 <div style="max-height: 600px; overflow-y: auto;">
-                    <div v-for="quotation in quotationList" :key="quotation.quotationSeq" class="list-line row" @click="itemExtend">
-                        <div class="col-6">{{ quotation.quotationName }}<br>
-                            <div v-if="!quotation.itemName"><br></div>
-                            <div v-else>{{ quotation.itemName }}</div></div>
+                    <div v-for="quotation in quotationList" :key="quotation.quotationSeq" class="list-line row" @click="quotationClick(quotation.quotationSeq)">
+                        <div class="col-6">
+                            <b>{{ quotation.quotationName }}</b>
+                            <div v-if="!quotationExtended[quotation.quotationSeq]">{{ quotation.itemName }}</div>
+                        </div>
                         <div class="list-value col-2">{{ quotation.clientName }}</div>
                         <div class="list-value col-2">{{ quotation.quotationQuotationDate }}</div>
                         <div class="list-value col-2">{{ findStatusValue(quotationStatusList, quotation.quotationStatus) }}</div>
+
+                        <div class="d-flex justify-content-center">
+                            <div v-if="quotationExtended[quotation.quotationSeq]" class="col-md-11 mt-3">
+                                <b>총 수량</b>: {{ numberThree(quotationDetail[quotation.quotationSeq].quotationTotalQuantity) }} 개<br>
+                                <b>총 금액</b>: {{ `\\ ` + numberThree(quotationDetail[quotation.quotationSeq].quotationExtendedPrice) }}<br>
+                                <b>담당자</b>: {{ quotationDetail[quotation.quotationSeq].userName }}<br>
+                                <b>견적일시</b>: {{ dayjs(quotationDetail[quotation.quotationSeq].quotationQuotationDate).format(`YYYY/MM/DD HH:mm:ss`) }}<br>
+                                <b>유효일시</b>: {{ dayjs(quotationDetail[quotation.quotationSeq].quotationEffectiveDate).format(`YYYY/MM/DD HH:mm:ss`) }}<br>
+                                <b>비고</b>: {{ quotationDetail[quotation.quotationSeq].quotationNote }}<br>
+                                <div style="display:flex; flex-wrap: wrap;">
+                                <template v-for="quotationItem in quotationDetail[quotation.quotationSeq].quotationItem">
+                                        <div class="card item-card">
+                                            <img :src=quotationItem.itemImageUrl class="card-img-top">
+                                            <div style="margin: 5px;">
+                                                <small>{{ findStatusValue(itemDivisionList, quotationItem.itemDivision) }}</small>
+                                                <div style="display: flex; justify-content: space-between;">
+                                                    <b style="font-size: medium;">{{ quotationItem.itemName }}</b>
+                                                    <small>{{ numberThree(quotationItem.quotationItemQuantity * quotationItem.quotationItemPrice) }} 원</small>
+                                                </div>
+                                                <small>{{ numberThree(quotationItem.quotationItemQuantity) }}개 / 개당 {{ numberThree(quotationItem.quotationItemPrice) }}원</small><br><br>
+                                                <small style="margin-top: 20px;">비고: {{ quotationItem.quotationItemNote }}</small>
+                                            </div>
+                                        </div>
+                                </template>
+                            </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 </template>
@@ -247,6 +295,8 @@ div {
 .list-value {
     text-align: center;
     margin: auto 0;
+    overflow: hidden;
+    word-break: keep-all;
 }
 
 .pagenation {
@@ -262,6 +312,16 @@ div {
 .icon {
   width: 20px;
   height: 20px;
+}
+
+.item-card {
+    width: 220px;
+    margin: 10px;
+}
+
+.card-img-top {
+    max-height: 80px;
+    object-fit: cover;
 }
 
 </style>
