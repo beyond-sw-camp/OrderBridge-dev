@@ -51,6 +51,8 @@ public class Purchase {
 
     private Integer purchaseExtendedPrice; // 구매서 총금액
 
+    private Integer purchaseOrderTotalQuantity;  //구매서 총수량
+
     private String purchaseNote; // 구매서 비고
 
     public void changePurchaseName(String purchaseName) {

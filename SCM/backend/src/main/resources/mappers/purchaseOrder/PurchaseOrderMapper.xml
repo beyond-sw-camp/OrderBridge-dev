@@ -12,6 +12,7 @@
             tpo.purchase_order_due_date,
             tpo.purchase_order_target_due_date,
             tpo.purchase_order_extended_price,
+            tpo.purchase_order_total_quantity,
             tpo.purchase_order_note,
             tu.user_name,
             tc.client_name
@@ -88,6 +89,41 @@
                     </foreach>
                 </trim>
             </if>
+    </select>
+
+    <select id="readPurchaseOrderSituationList" resultType="error.pirate.backend.purchaseOrder.query.dto.PurchaseOrderSituationResponse">
+        SELECT
+            tpoi.purchase_order_item_quantity,
+            tpoi.purchase_order_item_price,
+            tpoi.purchase_order_item_note,
+            tpoi.purchase_order_item_extended_price,
+            ti.item_name,
+            tpo.purchase_order_reg_date,
+            DATE_FORMAT(tpo.purchase_order_reg_date, '%Y-%m') as purchase_order_reg_month,
+            IFNULL(SUM(tpoi.purchase_order_item_extended_price), 0) as purchase_order_extended_price,
+            IFNULL(SUM(tpoi.purchase_order_item_quantity), 0) as purchase_order_total_quantity,
+            tc.client_name
+        FROM tb_purchase_order_item tpoi
+        JOIN tb_item ti USING (item_seq)
+        JOIN tb_purchase_order tpo USING (purchase_order_seq)
+        JOIN tb_client tc ON (tpo.client_seq = tc.client_seq)
+        WHERE tpo.purchase_order_status != 'DELETE'
+        <if test="searchStartDate != null and searchStartDate != ''">
+            <![CDATA[
+                AND #{searchStartDate} <= tpo.purchase_order_reg_date
+                ]]>
+        </if>
+        <if test="searchEndDate != null and searchEndDate != ''">
+            <![CDATA[
+                AND #{searchEndDate} >= tpo.purchase_order_reg_date
+                ]]>
+        </if>
+        <if test="searchName != null">
+            AND tc.client_name LIKE CONCAT('%', #{searchName}, '%')
+        </if>
+        GROUP BY
+        DATE_FORMAT(tpo.purchase_order_reg_date, '%Y-%m'),
+        tpo.purchase_order_reg_date WITH ROLLUP;
     </select>
 
 </mapper>

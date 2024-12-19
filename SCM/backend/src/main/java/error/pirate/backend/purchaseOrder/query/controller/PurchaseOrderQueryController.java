@@ -2,6 +2,7 @@ package error.pirate.backend.purchaseOrder.query.controller;
 
 import error.pirate.backend.purchaseOrder.query.dto.PurchaseOrderRequest;
 import error.pirate.backend.purchaseOrder.query.dto.PurchaseOrderResponsePagination;
+import error.pirate.backend.purchaseOrder.query.dto.PurchaseOrderSituationResponse;
 import error.pirate.backend.purchaseOrder.query.service.PurchaseOrderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -18,6 +19,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -49,8 +51,8 @@ public class PurchaseOrderQueryController {
 
     @GetMapping("/situation")
     @Operation(summary = "발주서 현황")
-    public void purchaseOrderSituation() {
-        
+    public ResponseEntity<List<PurchaseOrderSituationResponse>> purchaseOrderSituation(PurchaseOrderRequest request) {
+        return ResponseEntity.ok(purchaseOrderService.readPurchaseOrderSituationList(request));
     }
 
     @GetMapping("/situation/excelDown")

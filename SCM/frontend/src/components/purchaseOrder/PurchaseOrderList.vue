@@ -42,8 +42,6 @@ const fetchPurchaseOrderList = async () => {
       }
     });
 
-    console.log(filteredParams);
-    console.log(response.data);
     purchaseOrderList.value = response.data.purchaseOrderResponseList; // 발주서 목록
     totalCount.value = response.data.pagination.totalCount;
 
@@ -254,7 +252,7 @@ const printItem = (index) => {
               <div class="d-flex justify-content-center">
                 <div v-if="expandedIndex === index" class="col-md-11 mt-3">
                     <p>총수량 : {{
-                        purchaseOrder.purchaseOrderTotalItemQuantity
+                        purchaseOrder.purchaseOrderTotalQuantity
                       }} 개</p>
                     <p>총금액 : {{
                         purchaseOrder.purchaseOrderExtendedPrice.toLocaleString()
@@ -269,7 +267,7 @@ const printItem = (index) => {
                         dayjs(purchaseOrder.purchaseOrderTargetDueDate).format('YYYY/MM/DD HH:mm:ss')
                       }}</p>
                     <p>
-                      출하지시서 비고 :
+                      발주서 비고 :
                       {{ purchaseOrder.purchaseOrderNote }}
                     </p>
                   <div class="mb-3 d-flex flex-row">

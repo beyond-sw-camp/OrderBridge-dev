@@ -2,10 +2,7 @@ package error.pirate.backend.purchaseOrder.query.service;
 
 import error.pirate.backend.common.ExcelDownLoad;
 import error.pirate.backend.common.Pagination;
-import error.pirate.backend.purchaseOrder.query.dto.PurchaseOrderItemResponse;
-import error.pirate.backend.purchaseOrder.query.dto.PurchaseOrderRequest;
-import error.pirate.backend.purchaseOrder.query.dto.PurchaseOrderResponse;
-import error.pirate.backend.purchaseOrder.query.dto.PurchaseOrderResponsePagination;
+import error.pirate.backend.purchaseOrder.query.dto.*;
 import error.pirate.backend.purchaseOrder.query.mapper.PurchaseOrderMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -73,6 +70,10 @@ public class PurchaseOrderService {
         }
 
         return excelDownBody.excelDownBody(excel, headers, "발주서");
+    }
+
+    public List<PurchaseOrderSituationResponse> readPurchaseOrderSituationList(PurchaseOrderRequest request) {
+        return purchaseOrderMapper.readPurchaseOrderSituationList(request);
     }
 
 }

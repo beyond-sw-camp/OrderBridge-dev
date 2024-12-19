@@ -1,36 +1,36 @@
 <script setup>
-import {onMounted, ref, watch} from 'vue';
+import {onMounted, ref, watch, computed} from 'vue';
 import axios from "axios";
 import dayjs from "dayjs";
 import searchIcon from "@/assets/searchIcon.svg";
 
-const searchStartDate = ref(null);
-const searchEndDate = ref(null);
-const searchName = ref(null);
+const searchStartDate = ref('');
+const searchEndDate = ref('');
+const searchName = ref('');
 const purchaseOrderSituationList = ref([]);
-const purchaseOrderSituationTotal = ref(null);
 
 const fetchPurchaseOrderSituationList = async () => {
   try {
+    const params = {
+      searchStartDate: searchStartDate.value,
+      searchEndDate: searchEndDate.value,
+      searchName: searchName.value,
+    };
+
+    const filteredParams = Object.fromEntries(
+        Object.entries(params).filter(([_, value]) => value !== null && value !== undefined && value !== '')
+    );
+
     const response = await axios.get(`http://localhost:8090/api/v1/purchaseOrder/situation`, {
-      params: {
-        searchStartDate: searchStartDate.value,
-        searchEndDate: searchEndDate.value,
-        searchName: searchName.value,
-      }, paramsSerializer: (params) => {
-        // null이나 undefined 값을 필터링
-        const filteredParams = Object.fromEntries(
-            Object.entries(params).filter(([_, value]) => value !== null && value !== undefined)
-        );
-        return new URLSearchParams(filteredParams).toString();
+      params: filteredParams,
+      paramsSerializer: (params) => {
+        return new URLSearchParams(params).toString();
       }
     });
-    console.log(response.data);
-    purchaseOrderSituationList.value = response.data.pop();
-    purchaseOrderSituationTotal.value = response.data;
-    console.log(response.data);
+
+    purchaseOrderSituationList.value = response.data;
   } catch (error) {
-    console.error("생산입고 현황 불러오기 실패 :", error);
+    console.error("발주 현황 불러오기 실패 :", error);
   }
 };
 
@@ -62,17 +62,20 @@ const printTable = () => {
 const excelDown = async () => {
   const excelName = "발주현황_" + new Date().getFullYear() + (new Date().getMonth() + 1) + new Date().getDay();
   try {
+    const params = {
+      searchStartDate: searchStartDate.value,
+      searchEndDate: searchEndDate.value,
+      searchName: searchName.value,
+    };
+
+    const filteredParams = Object.fromEntries(
+        Object.entries(params).filter(([_, value]) => value !== null && value !== undefined && value !== '')
+    );
+
     const response = await axios.get(`http://localhost:8090/api/v1/purchaseOrder/situation/excelDown`, {
-      params: {
-        searchStartDate: searchStartDate.value,
-        searchEndDate: searchEndDate.value,
-        searchName: searchName.value
-      }, paramsSerializer: (params) => {
-        // null이나 undefined 값을 필터링
-        const filteredParams = Object.fromEntries(
-            Object.entries(params).filter(([_, value]) => value !== null && value !== undefined)
-        );
-        return new URLSearchParams(filteredParams).toString();
+      params: filteredParams,
+      paramsSerializer: (params) => {
+        return new URLSearchParams(params).toString();
       },
       responseType: "blob", // 중요: blob 형식으로 설정
     });
@@ -93,6 +96,17 @@ const excelDown = async () => {
     console.error("발주현황 엑셀다운로드 실패 :", error);
   }
 }
+
+const totalExtendedPrice = computed(() => {
+  return purchaseOrderSituationList.value.reduce((sum, purchaseOrderSituation) => {
+    if (purchaseOrderSituation.purchaseOrderRegDate) {
+      const amount = (purchaseOrderSituation.purchaseOrderItemQuantity || 0) * (purchaseOrderSituation.purchaseOrderItemPrice || 0);
+      return sum + amount;
+    }
+    return sum; // 조건에 맞지 않는 경우 합산하지 않음
+  }, 0);
+});
+
 </script>
 
 <template>
@@ -109,7 +123,9 @@ const excelDown = async () => {
           <p class="card-title">거래처명</p>
           <b-input-group class="mt-3">
             <b-form-input v-model="searchName"></b-form-input>
-            <b-button variant="light" class="button" @click="fetchProductionReceivingSituationList()"><searchIcon class="icon"/></b-button>
+            <b-button variant="light" class="button" @click="fetchPurchaseOrderSituationList()">
+              <searchIcon class="icon"/>
+            </b-button>
           </b-input-group>
         </div>
       </div>
@@ -131,7 +147,6 @@ const excelDown = async () => {
               <th>수량</th>
               <th>단가</th>
               <th>금액</th>
-              <th>구분</th>
               <th>거래처명</th>
               <th>품목비고</th>
             </tr>
@@ -139,21 +154,28 @@ const excelDown = async () => {
             <tbody v-if="purchaseOrderSituationList.length > 0">
             <!-- 필터링된 결과 및 월별 합계 출력 -->
             <template v-for="(purchaseOrderSituation, index) in purchaseOrderSituationList" :key="index">
-              <tr v-if="purchaseOrderSituation.productionReceivingRegDate">
-                <td>{{ index+1 }}</td>
-                <td>{{ dayjs(purchaseOrderSituation.productionReceivingRegDate).format('YYYY-MM-DD HH:mm:ss') }}</td>
-                <td>{{ purchaseOrderSituation.productionReceivingName }}</td>
-                <td>{{ purchaseOrderSituation.productionReceivingExtendedPrice }} ￦</td>
-                <td>{{ purchaseOrderSituation.clientName}}</td>
-                <td>{{ purchaseOrderSituation.productionReceivingNote }}</td>
+              <tr v-if="purchaseOrderSituation.purchaseOrderRegDate">
+                <td>{{ index + 1 }}</td>
+                <td>{{ dayjs(purchaseOrderSituation.purchaseOrderRegDate).format('YYYY/MM/DD HH:mm:ss') }}</td>
+                <td>{{ purchaseOrderSituation.itemName }}</td>
+                <td>{{ purchaseOrderSituation.purchaseOrderItemQuantity.toLocaleString() }} </td>
+                <td> ￦ {{ purchaseOrderSituation.purchaseOrderItemPrice.toLocaleString() }}</td>
+                <td> ￦ {{
+                    ((purchaseOrderSituation.purchaseOrderItemQuantity || 0) * (purchaseOrderSituation.purchaseOrderItemPrice || 0)).toLocaleString()
+                  }}
+                </td>
+                <td>{{ purchaseOrderSituation.clientName }}</td>
+                <td>{{ purchaseOrderSituation.purchaseOrderItemNote }}</td>
               </tr>
               <tr v-else class="monthly-total">
-                <td>{{ index+1 }}</td>
-                <td>{{ purchaseOrderSituation.productionReceivingRegMonth }}</td>
-                <td> - </td>
-                <td>{{ purchaseOrderSituation.productionReceivingSum }} ￦</td>
-                <td> - </td>
-                <td> - </td>
+                <td> -</td>
+                <td>{{ purchaseOrderSituation.purchaseOrderRegDate }}</td>
+                <td> -</td>
+                <td>{{ purchaseOrderSituation.purchaseOrderTotalQuantity.toLocaleString() }}</td>
+                <td> -</td>
+                <td> ￦ {{ purchaseOrderSituation.purchaseOrderExtendedPrice.toLocaleString() }}</td>
+                <td> -</td>
+                <td> -</td>
               </tr>
             </template>
 
@@ -164,10 +186,10 @@ const excelDown = async () => {
             </tr>
             </tbody>
             <!-- 총합 -->
-            <tfoot v-if="purchaseOrderSituationTotal">
+            <tfoot>
             <tr>
-              <td colspan="3">총합</td>
-              <td colspan="1">{{purchaseOrderSituationTotal.purchaseOrderSituationSum}} ￦</td>
+              <td colspan="4">총합</td>
+              <td colspan="3">￦ {{ totalExtendedPrice.toLocaleString() }}</td>
             </tr>
             </tfoot>
           </table>
@@ -183,7 +205,7 @@ const excelDown = async () => {
   border: 1px solid;
 }
 
-.content{
+.content {
   display: flex;
   justify-content: space-around;
   max-height: 400px; /* 스크롤바가 나타날 최대 높이 */
@@ -196,7 +218,7 @@ const excelDown = async () => {
   overflow-x: auto; /* 가로 스크롤바 */
 }
 
-.search-input>input {
+.search-input > input {
   width: 100%;
   border: 1px solid #D9D9D9;
   border-radius: 8px;
@@ -204,15 +226,15 @@ const excelDown = async () => {
   font-size: 14px;
 }
 
-.search-input>img {
-  position : absolute;
+.search-input > img {
+  position: absolute;
   width: 17px;
   top: 10px;
   right: 12px;
   margin: 0;
 }
 
-.table-container{
+.table-container {
   border: 1px solid #000000;
 }
 
