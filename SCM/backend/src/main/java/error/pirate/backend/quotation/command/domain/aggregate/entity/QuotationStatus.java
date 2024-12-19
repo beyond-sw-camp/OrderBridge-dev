@@ -28,7 +28,10 @@ public enum QuotationStatus {
     }
 
     public static List<QuotationStatusResponse> readQuotationStatusList() {
-        return Arrays.stream(QuotationStatus.class.getEnumConstants()).map(key ->
-                new QuotationStatusResponse(key.toString(), QuotationStatus.valueOf(key.toString()))).toList();
+        return Arrays.stream(QuotationStatus.class.getEnumConstants())
+                .filter(key -> !key.equals(QuotationStatus.DELETE))
+                .map(key ->
+                        new QuotationStatusResponse(key.toString(), QuotationStatus.valueOf(key.toString())))
+                .toList();
     }
 }
