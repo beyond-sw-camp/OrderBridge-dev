@@ -3,9 +3,13 @@ import axios from "@/axios"
 import {onMounted, ref, watch} from "vue";
 import searchIcon from "@/assets/searchIcon.svg";
 import dayjs from "dayjs";
+import printIcon from "@/assets/printIcon.svg"
+import editIcon from "@/assets/editIcon.svg"
+import trashIcon from "@/assets/trashIcon.svg"
 
 const workOrderList = ref([]);
 const workOrderStatusList = ref([]);
+const workOrderDetail = ref([]);
 
 const searchStartDate = ref(null);
 const searchEndDate = ref(null);
@@ -19,6 +23,7 @@ const totalPage = ref(1);
 const totalCount = ref(0);
 
 const fetchWorkOrderList = async () => {
+  workOrderDetail.value = [];
   try {
     const response = await axios.get(`workOrder`, {
       params: {
@@ -50,17 +55,39 @@ const fetchWorkOrderList = async () => {
     }
     console.log("작업지시서 불러오기 실패: ", error);
   }
-}
+};
 
-const fetchShippingInstruction = async (seq) => {
-  try {
-    const response = await axios.get(`http://localhost:8090/api/v1/shipping-instruction/${seq}`, {});
+const fetchWorkOrderDetail = async (workOrderSeq) => {
+  if(workOrderDetail.value[workOrderSeq] === undefined) {
+    try {
+      const response = await axios.get(`workOrder/${workOrderSeq}`, {});
+      console.log(response.data);
 
-    expandShippingInstruction.value[seq] = response.data.shippingInstructionDTO; // ref 값에 추가
-    expandItemList.value[seq] = response.data.itemList;
+      workOrderDetail.value[workOrderSeq] = {
+        workOrderSeq : response.data.workOrderDetail.workOrderSeq,
+        workOrderIndicatedDate : response.data.workOrderDetail.workOrderIndicatedDate,
+        workOrderStatus : response.data.workOrderDetail.workOrderStatus,
+        workOrderPrice : response.data.workOrderDetail.workOrderPrice,
+        workOrderIndicatedQuantity : response.data.workOrderDetail.workOrderIndicatedQuantity,
+        workOrderWorkQuantity: response.data.workOrderDetail.workOrderWorkQuantity ?? 0,
+        userName : response.data.workOrderDetail.userName,
+        clientName : response.data.workOrderDetail.clientName,
+        workOrderEndDate : response.data.workOrderDetail.workOrderEndDate || " 없음",
+        workOrderDueDate : response.data.workOrderDetail.workOrderDueDate,
+        warehouseName : response.data.workOrderDetail.warehouseName,
+        workOrderNote : response.data.workOrderDetail.workOrderNote,
+        workOrderItem: Array.isArray(response.data.workOrderItem)
+            ? response.data.workOrderItem
+            : [response.data.workOrderItem || {}],
+      }
 
-  } catch (error) {
-    console.error("상세 출하지시서 불러오기 실패 :", error);
+      console.log(response.data.workOrderDetail);
+      console.log(response.data.workOrderItem);
+    } catch (error) {
+      console.error("작업지시서 상세 불러오기 실패 :", error);
+    }
+  } else {
+    workOrderDetail.value[workOrderSeq] = undefined;
   }
 };
 
@@ -72,6 +99,23 @@ function findStatusValue(array, key) {
     }
   }
 }
+
+// 상세보기 인쇄
+const workOrderDetailPrint = (workOrderSeq) => {
+  const printContent = document.getElementById(`print-area-${workOrderSeq}`).innerHTML;
+  const originalContent = document.body.innerHTML;
+
+  // 선택된 영역만 표시
+  document.body.innerHTML = printContent;
+
+  window.print();
+
+  // 원래 내용 복원
+  document.body.innerHTML = originalContent;
+
+  // Vue 리렌더링 방지
+  location.reload();
+};
 
 onMounted(() => {
   fetchWorkOrderList();
@@ -100,28 +144,6 @@ function search() {
   fetchWorkOrderList();
 }
 
-// // 선택한 Item 확장 | 축소
-// function itemExtend(event) {
-//   // 선택한 list-line의 id 추출
-//   let listLine = event.target;
-//   for (let i = 0; i < 5; i++) {
-//     if (listLine.classList[0] === "list-line") { break; }
-//     else { listLine = listLine.parentNode; }
-//   }
-//   let id = listLine.getElementsByClassName("col-6")[0].innerHTML.split("<br")[0];
-//
-//   console.log(id);
-//   console.log(listLine);
-//
-//   // 찾은 id 기반으로 API 호출
-//
-//   // API 응답값으로 list-line 확장 | 축소
-// }
-//
-// // 품목 만드는 반복문 추가
-// function addItemCard() {
-//
-// }
 </script>
 
 <template>
@@ -170,58 +192,62 @@ function search() {
         </div>
         <template v-if="workOrderList.length > 0">
           <div style="max-height: 600px; overflow-y: auto;">
-            <div v-for="workOrder in workOrderList" :key="workOrder.workOrderSeq" class="list-line row" @click="itemExtend">
-              <div class="list-body col-5 left">
-                {{ workOrder.workOrderName }}
-                <div v-if="!workOrder.itemName"><br></div>
-                <div v-else>{{ workOrder.itemName }}</div></div>
-              <div class="list-body col-2">{{ workOrder.warehouseName }}</div>
-              <div class="list-body col-3">{{ dayjs(workOrder.workOrderIndicatedDate).format('YYYY-MM-DD HH:mm:ss') }}</div>
-              <div class="list-body col-2">{{ findStatusValue(workOrderStatusList, workOrder.workOrderStatus) }}</div>
+            <div v-for="workOrder in workOrderList"
+                 :key="workOrder.workOrderSeq"
+                 @click="fetchWorkOrderDetail(workOrder.workOrderSeq)">
+              <div class="list-line row" :id="'print-area-' + workOrder.workOrderSeq">
+                <div class="list-body col-5 left">
+                  {{ workOrder.workOrderName }}
+                  <div v-if="!workOrder.itemName"><br></div>
+                  <div v-else>{{ workOrder.itemName }}</div></div>
+                <div class="list-body col-2">{{ workOrder.warehouseName }}</div>
+                <div class="list-body col-3">{{ dayjs(workOrder.workOrderIndicatedDate).format('YYYY-MM-DD HH:mm:ss') }}</div>
+                <div class="list-body col-2">{{ findStatusValue(workOrderStatusList, workOrder.workOrderStatus) }}</div>
 
-<!--              &lt;!&ndash; 확장된 상세 정보 표시 &ndash;&gt;-->
-<!--              <div class="d-flex justify-content-center">-->
-<!--                <div v-if="expandShippingInstruction[shippingInstruction.shippingInstructionSeq]"-->
-<!--                     class="col-md-11 mt-3">-->
-<!--                  <p>총수량 : {{-->
-<!--                      expandShippingInstruction[shippingInstruction.shippingInstructionSeq].shippingInstructionTotalQuantity-->
-<!--                    }} 개</p>-->
-<!--                  <p>출하 주소 : {{-->
-<!--                      expandShippingInstruction[shippingInstruction.shippingInstructionSeq].shippingInstructionAddress-->
-<!--                    }}</p>-->
-<!--                  <p>담당자 : {{ expandShippingInstruction[shippingInstruction.shippingInstructionSeq].userName }}</p>-->
-<!--                  <p>출하예정일시 : {{-->
-<!--                      dayjs(expandShippingInstruction[shippingInstruction.shippingInstructionSeq].shippingInstructionScheduledShipmentDate).format('YYYY/MM/DD HH:mm:ss')-->
-<!--                    }}</p>-->
-<!--                  <p v-if="expandShippingInstruction[shippingInstruction.shippingInstructionSeq].shippingInstructionNote">-->
-<!--                    출하지시서 비고 :-->
-<!--                    {{ expandShippingInstruction[shippingInstruction.shippingInstructionSeq].shippingInstructionNote }}-->
-<!--                  </p>-->
-<!--                  &lt;!&ndash; 확장된 상세 품목 정보 표시&ndash;&gt;-->
-<!--                  <div v-for="(row, rowIndex) in getChunkedItems(shippingInstruction.shippingInstructionSeq)"-->
-<!--                       :key="rowIndex"-->
-<!--                       class="mb-3 d-flex flex-row">-->
-<!--                    <div style="max-height: 250px;"-->
-<!--                         v-for="(expandItem, index) in row"-->
-<!--                         :key="index"-->
-<!--                         class="me-5 col-md-3 d-flex flex-column border border-secondary rounded">-->
-<!--                      <b-img style="max-height: 100px;" src="https://picsum.photos/200/200" fluid-->
-<!--                             alt="Responsive image"></b-img>-->
-<!--                      <p class="ms-3">· 구분 : {{ formatDivision(expandItem.itemDivision) }}</p>-->
-<!--                      <p class="ms-3">· 품목 : {{ expandItem.itemName }}</p>-->
-<!--                      <p class="ms-3">· 수량 : {{ expandItem.shippingInstructionItemQuantity }} 개</p>-->
-<!--                      <p v-if="expandItem.shippingInstructionItemNote" class="ms-3">· 비고 :-->
-<!--                        {{ expandItem.shippingInstructionItemNote }}</p>-->
-<!--                      <p v-else class="ms-3">· 비고 : 없음</p>-->
-<!--                    </div>-->
-<!--                  </div>-->
-<!--                  <div class="d-flex justify-content-end align-items-center">-->
-<!--                    <printIcon class="me-3 icon" @click.stop="printItem(index)"/>-->
-<!--                    <editIcon class="me-3 icon" @click.stop=""/>-->
-<!--                    <trashIcon class="icon" @click.stop="itemDelete(shippingInstruction.shippingInstructionSeq)"/>-->
-<!--                  </div>-->
-<!--                </div>-->
-<!--              </div>-->
+                <!-- 확장된 상세 정보 표시 -->
+                <div class="d-flex justify-content-center" v-if="workOrderDetail[workOrder.workOrderSeq]">
+                  <div class="col-md-11 mt-3">
+                    <p>주문 금액 : {{ workOrderDetail[workOrder.workOrderSeq].workOrderPrice.toLocaleString()}} ₩</p>
+                    <p>주문 수량 : {{ workOrderDetail[workOrder.workOrderSeq].workOrderIndicatedQuantity.toLocaleString()}} </p>
+                    <p>작업완료 수량 : {{ (workOrderDetail[workOrder.workOrderSeq].workOrderWorkQuantity)}} </p>
+                    <p>담당자 : {{ workOrderDetail[workOrder.workOrderSeq].userName }} </p>
+                    <p>납품처명 : {{ workOrderDetail[workOrder.workOrderSeq].clientName}} </p>
+                    <p>작업 지시일 : {{ workOrderDetail[workOrder.workOrderSeq].workOrderIndicatedDate}}</p>
+                    <p v-if ="workOrderDetail[workOrder.workOrderSeq].workOrderEndDate != null">작업 완료일 : {{ workOrderDetail[workOrder.workOrderSeq].workOrderEndDate}}</p>
+                    <p v-else>작업 완료일 : 없음</p>
+                    <p>작업 납기일 : {{ workOrderDetail[workOrder.workOrderSeq].workOrderDueDate}}</p>
+                    <p>생산창고 : {{ workOrderDetail[workOrder.workOrderSeq].warehouseName}}</p>
+                    <p>작업지시서 비고 : {{ workOrderDetail[workOrder.workOrderSeq].workOrderNote}}</p>
+                    <div class="container">
+                      <div class="row">
+                        <div v-for="workOrderItem in workOrderDetail[workOrder.workOrderSeq].workOrderItem" :key="workOrderItem.itemSeq"  class="col-12 col-md-6 col-lg-4 mb-4">
+                          <div class="card h-100">
+                            <b-img
+                                class="card-img-top"
+                                style="max-height: 100px;"
+                                :src="workOrderItem.itemImageUrl"
+                                fluia
+                                alt="Responsive image"
+                            ></b-img>
+                            <div class="card-body">
+                              <p class="card-text">· 품목 : {{ workOrderItem.itemName }}</p>
+                              <p class="card-text">· 수량 : {{ workOrderDetail[workOrder.workOrderSeq].workOrderIndicatedQuantity }} 개</p>
+                              <p class="card-text">· 가격 : {{ Number(workOrderItem.itemPrice).toLocaleString() }} ₩</p>
+                              <p class="card-text">· 보관창고 : {{ workOrderItem.ingredientWarehouseName }}</p>
+                              <p v-if="workOrderItem.itemNote !== ''" class="card-text">· 비고 : {{ workOrderItem.itemNote }}</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="d-flex justify-content-end align-items-center">
+                      <printIcon class="me-3 icon" @click.stop="workOrderDetailPrint(workOrder.workOrderSeq)"/>
+                      <editIcon class="me-3 icon" @click.stop=""/>
+                      <trashIcon class="icon" @click.stop=""/>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 

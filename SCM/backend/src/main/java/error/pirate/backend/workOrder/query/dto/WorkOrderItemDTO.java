@@ -17,6 +17,7 @@ public class WorkOrderItemDTO {
     private Integer itemPrice;
     private ItemUnit itemUnitTitle;
     private ItemDivision itemDivision;
+    private String ingredientWarehouseName;
     private String itemNote;
 
 }
