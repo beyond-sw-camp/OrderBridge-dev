@@ -27,7 +27,7 @@
             , FORMAT(IFNULL(SUM(production_receiving_extended_price), 0), 0) production_receiving_sum
         FROM tb_production_receiving pr
         JOIN tb_work_order wo
-            ON wo.work_order_seq = pr.work_order_seq
+            ON wo.production_receiving_seq = pr.production_receiving_seq
         JOIN tb_client c
             ON c.client_seq = wo.client_seq
         WHERE 1=1

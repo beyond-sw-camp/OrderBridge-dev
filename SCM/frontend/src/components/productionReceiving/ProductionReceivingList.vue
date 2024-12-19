@@ -144,13 +144,32 @@ const productionReceivingDetail = async (productionReceivingSeq) => {
         productionReceivingItemList: response.data.productionReceivingItemList
       };
     } catch (error) {
-      console.error("생산입고 엑셀다운로드 실패 :", error);
+      console.error("생산입고 상세조회 실패 :", error);
     }
   } else {
     detailProductionReceiving.value[productionReceivingSeq] = undefined;
   }
 
 }
+
+// 수정 페이지로 이동
+const handleModify = (productionReceivingSeq) => {
+  router.push(`/productionReceiving/modify/${productionReceivingSeq}`);
+}
+
+const productionReceivingDelete = async (productionReceivingSeq) => {
+  if(confirm("해당 생산입고를 삭제하시겠습니까?")) {
+    try {
+      await axios.delete(`productionReceiving/${productionReceivingSeq}`);
+
+      alert("삭제가 완료되었습니다.");
+      search();
+    } catch (error) {
+      console.error("생산입고 삭제 실패 :", error);
+    }
+  }
+}
+
 </script>
 
 <template>
@@ -240,9 +259,9 @@ const productionReceivingDetail = async (productionReceivingSeq) => {
                           </div>
                         </div>
                         <div class="d-flex justify-content-end align-items-center">
-                          <printIcon class="me-3 icon" @click.stop="productionReceivingPrint(productionReceiving.productionReceivingSeq)"/>
-                          <editIcon class="me-3 icon" @click.stop=""/>
-                          <trashIcon class="icon" @click.stop="productionReceivingDelete(productionReceiving.productionReceivingSeq)"/>
+                          <printIcon class="me-3 icon" @click="productionReceivingPrint(productionReceiving.productionReceivingSeq)"/>
+                          <editIcon class="me-3 icon" @click="handleModify(productionReceiving.productionReceivingSeq)"/>
+                          <trashIcon class="icon" @click="productionReceivingDelete(productionReceiving.productionReceivingSeq)"/>
                         </div>
                       </div>
                     </div>

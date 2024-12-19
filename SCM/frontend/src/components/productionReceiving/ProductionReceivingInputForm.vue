@@ -1,9 +1,15 @@
 <script setup>
-import {onMounted, ref, watch} from "vue";
+import {defineProps, onMounted, ref, watch} from "vue";
 import searchIcon from '@/assets/searchIcon.svg'
 import dayjs from "dayjs";
-import axios from "axios";
+import axios from "@/axios";
 import router from "@/router/index.js";
+
+const props = defineProps({
+  productionReceivingDetail: {type: Object, required: false},       // 출하지시서 목록
+  productionReceivingItemList: {type: Array, required: false},       // 검색 결과 총 개수
+  workOrderList: {type: Array, required: false}
+});
 
 const workOrderTotalCount = ref(0);
 const workOrderPageSize = ref(10);
@@ -15,9 +21,20 @@ watch(workOrderPageNumber, () => {
   fetchWorkOrderList();
 })
 
+watch(props, () => {
+
+  formData.value.productionReceivingReceiptDate = props.productionReceivingDetail.productionReceivingReceiptDate;
+  formData.value.productionReceivingExtendedPrice = props.productionReceivingDetail.productionReceivingExtendedPrice;
+  formData.value.productionReceivingNote = props.productionReceivingDetail.productionReceivingNote;
+
+  for(const workOrder of props.workOrderList) {
+    checkWorkOrder(workOrder.workOrderSeq, );
+  }
+})
+
 const fetchWorkOrderList = async () => {
   try {
-    const response = await axios.get(`http://localhost:8090/api/v1/workOrder`, {
+    const response = await axios.get(`workOrder`, {
       params: {
         startDate: null,
         endDate: null,
@@ -53,13 +70,15 @@ const workOrderHandlePage = (pageNumber) => {
 };
 
 onMounted(() => {
+  console.log()
   fetchWorkOrderList();
 });
 
 const checkWorkOrderList = ref([]);
 const fetchWorkOrder = async (workOrderSeq) => {
   try {
-    const response = await axios.get(`http://localhost:8090/api/v1/workOrder/${workOrderSeq}`);
+    const response = await axios.get(`workOrder/${workOrderSeq}`);
+
     const checkWorkOrder = {
       workOrderSeq: response.data.workOrderDetail.workOrderSeq,
       workOrderName: response.data.workOrderDetail.workOrderName, // 작업지시서명
@@ -75,7 +94,7 @@ const fetchWorkOrder = async (workOrderSeq) => {
       itemName: response.data.workOrderItem.itemName, // 품목명
       itemPrice: response.data.workOrderItem.itemPrice, // 품목 가격
       itemUnitTitle: response.data.workOrderItem.itemUnitTitle, // 품목 단위
-      itemNote: ''
+      itemNote: response.data.workOrderDetail.workOrderNote
     }
 
     formData.value.productionReceivingItemList.push({
@@ -136,7 +155,7 @@ const createProductionReceiving = async () => {
     return;
   }
   try {
-    const response = await axios.post('http://localhost:8090/api/v1/productionReceiving',
+    const response = await axios.post('productionReceiving',
         {
           workOrderSeqList: formData.value.workOrderSeqList,
           productionReceivingExtendedPrice: formData.value.productionReceivingExtendedPrice,
@@ -169,6 +188,43 @@ function closeModal() {
   modal.setAttribute('aria-hidden', 'true'); // 모달 비활성화 시 aria-hidden 추가
   modal.style.display = 'none';
 }
+
+const updateProductionReceiving = async () => {
+  formData.value.workOrderSeqList = Array.from(checkWorkOrderSeqSet.value);
+  if(formData.value.workOrderSeqList.length === 0) {
+    alert("작업지시서를 선택해주세요.")
+    return;
+  }
+  console.log(formData.value.productionReceivingReceiptDate);
+  if(formData.value.productionReceivingReceiptDate === '') {
+    alert("생산입고일을 지정해주세요.")
+    return;
+  }
+  if(formData.value.productionReceivingExtendedPrice === 0) {
+    alert("생산입고 총액을 입력해주세요.")
+    return;
+  }
+  try {
+    const response = await axios.put(`productionReceiving/${props.productionReceivingDetail.productionReceivingSeq}`,
+        {
+          workOrderSeqList: formData.value.workOrderSeqList,
+          productionReceivingExtendedPrice: formData.value.productionReceivingExtendedPrice,
+          productionReceivingNote: formData.value.productionReceivingNote,
+          productionReceivingReceiptDate: formData.value.productionReceivingReceiptDate,
+          productionReceivingItemList: formData.value.productionReceivingItemList
+        }, {
+        });
+
+    console.log(response);
+    alert('생산입고가 수정되었습니다!');
+    // 조회 페이지 이동
+    await router.push('/productionReceiving')
+
+  } catch (error) {
+    console.error('생산입고 수정 실패', error);
+    throw error;
+  }
+};
 </script>
 
 <template>
@@ -225,8 +281,7 @@ function closeModal() {
               <li class="mb-3 col-md-6">· 주문 개수 : {{ workOrder.workOrderIndicatedQuantity.toLocaleString() }}</li>
               <li class="mb-3 col-md-6">· 주문 총액 : {{ workOrder.workOrderPrice }} ₩</li>
               <li class="mb-3 col-md-12 d-flex align-items-center">
-                <span class="me-3 text-nowrap">· 품목 비고 :</span>
-                <b-form-input v-model="workOrder.itemNote" class="flex-grow-1" placeholder="생산입고 품목 비고를 입력해주세요."/>
+                <span class="me-3 text-nowrap">· 품목 비고 : {{workOrder.itemNote}}</span>
               </li>
             </ul>
           </div>
@@ -240,7 +295,9 @@ function closeModal() {
       </div>
       <!-- 확인 버튼 -->
       <div class="mx-5 my-3 d-flex justify-content-end">
-        <b-button @click="createProductionReceiving" variant="light" size="sm" class="button ms-2">확인</b-button>
+        <b-button v-if="props" @click="updateProductionReceiving" variant="light" size="sm" class="button ms-2">수정</b-button>
+        <b-button v-else @click="createProductionReceiving" variant="light" size="sm" class="button ms-2">등록</b-button>
+
       </div>
     </div>
   </div>

@@ -12,7 +12,7 @@ export default [
         component: () => import("@/views/productionReceiving/ProductionReceivingRegisterView.vue")
     },
     {
-        path: "/productionReceiving/modify",
+        path: "/productionReceiving/modify/:productionReceivingSeq",
         component: () => import("@/views/productionReceiving/ProductionReceivingModifyView.vue")
     }
 ]
