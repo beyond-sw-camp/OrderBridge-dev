@@ -17,7 +17,7 @@ public class ProductionDisbursementItem {
     private Long productionDisbursementItemSeq;
 
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
-    @JoinColumn(name = "productionDisbursementItemSeq")
+    @JoinColumn(name = "productionDisbursementSeq")
     private ProductionDisbursement productionDisbursement; // 생산불출
 
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
