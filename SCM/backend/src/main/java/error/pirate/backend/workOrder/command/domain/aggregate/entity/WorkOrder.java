@@ -4,6 +4,7 @@ import error.pirate.backend.client.command.domain.aggregate.entity.Client;
 import error.pirate.backend.exception.CustomException;
 import error.pirate.backend.exception.ErrorCodeType;
 import error.pirate.backend.item.command.domain.aggregate.entity.Item;
+import error.pirate.backend.productionReceiving.command.domain.aggregate.entity.ProductionReceiving;
 import error.pirate.backend.salesOrder.command.domain.aggregate.entity.SalesOrder;
 import error.pirate.backend.salesOrder.command.domain.aggregate.entity.SalesOrderItem;
 import error.pirate.backend.user.command.domain.aggregate.entity.User;
@@ -50,6 +51,10 @@ public class WorkOrder {
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinColumn(name = "itemSeq")
     private Item item; // 품목
+
+    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    @JoinColumn(name = "productionReceivingSeq")
+    private ProductionReceiving productionReceiving; // 생산입고
 
     private String workOrderName; // 작업지시서 명
 

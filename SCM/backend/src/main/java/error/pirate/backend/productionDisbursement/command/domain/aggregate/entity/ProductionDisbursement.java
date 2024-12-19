@@ -21,19 +21,11 @@ import java.time.LocalDateTime;
 public class ProductionDisbursement {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long productionDisbursementId;
+    private Long productionDisbursementSeq;  // 생산불출 번호
 
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinColumn(name = "userSeq")
     private User user; // 생산불출 담당자
-
-    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
-    @JoinColumn(name = "ingredientsWarehouseSeq")
-    private Warehouse ingredientsWarehouse; // 원자재 창고
-
-    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
-    @JoinColumn(name = "productionWarehouseSeq")
-    private Warehouse productionWarehouse; // 생산 공장
 
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinColumn(name = "workOrderSeq")
