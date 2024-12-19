@@ -21,7 +21,7 @@ const props = defineProps({
 
 const emit = defineEmits(
     ['pageEvent', 'searchEvent', 'checkStatusEvent', 'extendItemEvent',
-      'itemDeleteEvent', 'registerEvent', 'excelEvent']);
+      'itemEditEvent', 'itemDeleteEvent', 'registerEvent', 'excelEvent']);
 
 const startDate = ref(props.searchStartDate);
 const endDate = ref(props.searchEndDate);
@@ -59,6 +59,10 @@ const register = () => {
 
 const excel = () => {
   emit('excelEvent');
+}
+
+const itemEdit = (seq) => {
+  emit('itemEditEvent', seq);
 }
 
 const itemDelete = (seq) => {
@@ -226,8 +230,8 @@ const printItem = (index) => {
                     </div>
                     <div class="d-flex justify-content-end align-items-center">
                       <printIcon class="me-3 icon" @click.stop="printItem(index)"/>
-                      <editIcon class="me-3 icon" @click.stop=""/>
-                      <trashIcon class="icon" @click.stop="itemDelete(shippingInstruction.shippingInstructionSeq)"/>
+                      <editIcon v-if="shippingInstruction.shippingInstructionStatus === 'BEFORE'" class="me-3 icon" @click.stop="itemEdit(shippingInstruction.shippingInstructionSeq)"/>
+                      <trashIcon v-if="shippingInstruction.shippingInstructionStatus === 'BEFORE'" class="icon" @click.stop="itemDelete(shippingInstruction.shippingInstructionSeq)"/>
                     </div>
                   </div>
                 </div>

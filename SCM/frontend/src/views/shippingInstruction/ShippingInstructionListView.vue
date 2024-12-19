@@ -155,6 +155,13 @@ const handleStatus = (payload) => {
   search();
 };
 
+// 수정 페이지로 이동
+const handleEdit = (seq) => {
+  if (seq != null){
+    router.push(`/shipping-instruction/edit/${seq}`);
+  }
+}
+
 // 삭제 수행
 const handleDelete = async (seq) => {
   if (seq != null) {
@@ -199,6 +206,7 @@ const handleExtendItem = (seq) => {
                            @checkStatusEvent="handleStatus"
                            @extendItemEvent="handleExtendItem"
                            @registerEvent="router.push('/shipping-instruction/input')"
+                           @itemEditEvent="handleEdit"
                            @itemDeleteEvent="handleDelete"
                            @excelEvent="excelDown"
   />
