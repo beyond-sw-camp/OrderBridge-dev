@@ -1,6 +1,7 @@
 <script setup>
 import Header from '@/components/common/Header.vue';
 import SideMenuBar from "@/components/common/SideMenuBar.vue";
+import ItemListView from "@/views/item/ItemListView.vue";
 </script>
 
 <template>
