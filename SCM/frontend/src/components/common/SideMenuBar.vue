@@ -154,7 +154,7 @@ const toggleMenu2 = (menu) => {
             <span @click="toggleMenu2('item')">작업지시서</span>
             <ul v-if="activeMenu2 === 'item'">
               <li>
-                <RouterLink class="content-item" to="">작업지시서 조회</RouterLink>
+                <RouterLink class="content-item" to="/workOrder" active-class="active" replace>작업지시서 조회</RouterLink>
                 <RouterLink class="content-item" to="">작업지시서 등록</RouterLink>
                 <RouterLink class="content-item" to="">작업지시서 작업처리</RouterLink>
                 <RouterLink class="content-item" to="">작업지시서 진행현황</RouterLink>

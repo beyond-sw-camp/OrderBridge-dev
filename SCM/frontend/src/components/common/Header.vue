@@ -38,7 +38,7 @@ import statisticsIcon from '@/assets/statisticsIcon.svg'
         </b-nav-item-dropdown>
         <b-nav-item-dropdown>
           <template #button-content><productionIcon class="icon" />생산관리</template>
-          <b-dropdown-item href="#">작업지시서 관리</b-dropdown-item>
+          <b-dropdown-item href="/workOrder">작업지시서 관리</b-dropdown-item>
           <b-dropdown-item href="#">생산불출 관리</b-dropdown-item>
           <b-dropdown-item href="#"><RouterLink to="/productionReceiving" active-class="active" replace>생산입고 관리</RouterLink></b-dropdown-item>
         </b-nav-item-dropdown>

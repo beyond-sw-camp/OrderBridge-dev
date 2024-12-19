@@ -3,10 +3,7 @@ package error.pirate.backend.workOrder.query.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import error.pirate.backend.workOrder.command.domain.aggregate.entity.WorkOrderStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
@@ -16,6 +13,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 @Schema(description = "작업지시서 목록 필터링 DTO")
 public class WorkOrderFilterDTO {
 

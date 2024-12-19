@@ -41,6 +41,7 @@ public class WorkOrderQueryService {
 
         // 상태 목록
         List<WorkOrderStatus> statusList = filter.getWorkOrderStatus();
+        log.info("상태: {}",statusList);
 
         // 작업지시서 목록 조회
         List<WorkOrderListDTO> workOrderList = workOrderMapper.readWorkOrderList(filter, statusList, offset);
