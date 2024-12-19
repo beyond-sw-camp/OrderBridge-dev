@@ -29,6 +29,10 @@ public class Item {
     @JoinColumn(name = "itemUnitSeq")
     private ItemUnit itemUnit; // 품목 단위
 
+    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    @JoinColumn(name = "warehouseSeq")
+    private ItemUnit warehouse; // 품목 단위
+
     private String itemName; // 품목명
 
     @Enumerated(EnumType.STRING)
