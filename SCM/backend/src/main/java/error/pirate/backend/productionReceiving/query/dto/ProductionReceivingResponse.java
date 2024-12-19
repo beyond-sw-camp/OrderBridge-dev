@@ -6,12 +6,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProductionReceivingResponse {
     private ProductionReceivingDTO productionReceivingDTO;
-    private WarehouseDTO productionWarehouse;
-    private WarehouseDTO storeWarehouse;
+    List<ProductionReceivingItemQueryDTO> productionReceivingItemList;
 }

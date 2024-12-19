@@ -190,13 +190,13 @@ const printItem = (index) => {
           <b-form-checkbox
               :checked="searchStatus.includes('APPROVAL_BEFORE')"
               @change="check('APPROVAL_BEFORE')">
-            서명전
+            결재전
           </b-form-checkbox>
 
           <b-form-checkbox
               :checked="searchStatus.includes('APPROVAL_AFTER')"
               @change="check('APPROVAL_AFTER')">
-            서명후
+            결재후
           </b-form-checkbox>
 
           <b-form-checkbox
@@ -209,12 +209,6 @@ const printItem = (index) => {
               :checked="searchStatus.includes('APPROVAL_COMPLETE')"
               @change="check('APPROVAL_COMPLETE')">
             구매완료
-          </b-form-checkbox>
-
-          <b-form-checkbox
-              :checked="searchStatus.includes('DELETE')"
-              @change="check('DELETE')">
-            삭제
           </b-form-checkbox>
         </div>
       </div>
@@ -254,7 +248,7 @@ const printItem = (index) => {
               <div class="list-body col-3">
                 {{ dayjs(purchaseOrder.purchaseOrderTargetDueDate).format('YYYY-MM-DD HH:mm:ss') }}
               </div>
-              <div class="list-body col-2">{{ purchaseOrder.purchaseOrderStatus }}</div>
+              <div class="list-body col-2">{{ purchaseOrder.purchaseOrderStatusValue }}</div>
 
               <!-- 확장된 상세 내용 -->
               <div class="d-flex justify-content-center">

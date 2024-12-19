@@ -19,9 +19,9 @@ import statisticsIcon from '@/assets/statisticsIcon.svg'
       <b-navbar-nav class="ml-auto">
         <b-nav-item-dropdown>
           <template #button-content><basicIcon class="icon"/>기본등록</template>
-          <b-dropdown-item href="#">거래처 등록</b-dropdown-item>
-          <b-dropdown-item href="#">창고 등록</b-dropdown-item>
-          <b-dropdown-item href="#">품목 등록</b-dropdown-item>
+          <b-dropdown-item href="#">거래처 관리</b-dropdown-item>
+          <b-dropdown-item href="#">창고 관리</b-dropdown-item>
+          <b-dropdown-item href="/item">품목 관리</b-dropdown-item>
         </b-nav-item-dropdown>
         <b-nav-item-dropdown>
           <template #button-content><salesIcon class="icon" />영업관리</template>
@@ -38,11 +38,11 @@ import statisticsIcon from '@/assets/statisticsIcon.svg'
         <b-nav-item-dropdown>
           <template #button-content><orderIcon class="icon" />주문관리</template>
           <b-dropdown-item href="#"><RouterLink to="/purchaseOrder" active-class="active none-decoration" replace>발주서 관리</RouterLink></b-dropdown-item>
-          <b-dropdown-item href="#">구매서 관리</b-dropdown-item>
+          <b-dropdown-item href="#"><RouterLink to="/purchase" active-class="active none-decoration" replace>구매서 관리</RouterLink></b-dropdown-item>
         </b-nav-item-dropdown>
         <b-nav-item-dropdown>
           <template #button-content><productionIcon class="icon" />생산관리</template>
-          <b-dropdown-item href="#">작업지시서 관리</b-dropdown-item>
+          <b-dropdown-item href="/workOrder">작업지시서 관리</b-dropdown-item>
           <b-dropdown-item href="#">생산불출 관리</b-dropdown-item>
           <b-dropdown-item href="#"><RouterLink to="/productionReceiving" active-class="active" replace>생산입고 관리</RouterLink></b-dropdown-item>
         </b-nav-item-dropdown>

@@ -28,7 +28,7 @@ public class SalesOrderQueryRepositoryImpl implements SalesOrderQueryRepository 
         return queryFactory
                 .selectFrom(salesOrder)
                 .leftJoin(workOrder).on(workOrder.salesOrder.salesOrderSeq.eq(salesOrder.salesOrderSeq))
-                .leftJoin(productionReceiving).on(productionReceiving.workOrder.eq(workOrder))
+                .leftJoin(productionReceiving).on(workOrder.productionReceiving.eq(productionReceiving))
                 .where(productionReceiving.productionReceivingSeq.eq(productionReceivingSeq))
                 .fetchOne();
     }

@@ -1,5 +1,6 @@
 package error.pirate.backend.quotation.query.dto;
 
+import error.pirate.backend.quotation.command.domain.aggregate.entity.QuotationStatus;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,5 +13,5 @@ public class QuotationListItemDTO {
     private String itemName;
     private String clientName;
     private LocalDate quotationQuotationDate;
-    private String quotationStatus;
+    private QuotationStatus quotationStatus;
 }

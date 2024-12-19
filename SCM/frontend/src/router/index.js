@@ -1,6 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import shippingInstructionRoutes from './shipping-instruction.js'
 import productionReceivingRoutes from './production-receiving.js'
+import item from "@/router/item.js";
+import workOrderRoutes from "@/router/work-order.js";
 
 const routes = [
     {
@@ -29,9 +31,19 @@ const routes = [
         path: "/purchaseOrder/input",
         component: () => import("@/views/purchaseOrder/PurchaseOrderInputView.vue")
     },
+    {
+        path: "/purchase",
+        component: () => import("@/views/purchase/PurchaseListView.vue")
+    },
+    {
+        path: "/purchase/input",
+        component: () => import("@/views/purchase/PurchaseInputView.vue")
+    },
 
     ...shippingInstructionRoutes,
     ...productionReceivingRoutes,
+    ...item,
+    ...workOrderRoutes,
 ];
 
 const router = createRouter({
