@@ -21,7 +21,7 @@ import statisticsIcon from '@/assets/statisticsIcon.svg'
           <template #button-content><basicIcon class="icon"/>기본등록</template>
           <b-dropdown-item href="#">거래처 관리</b-dropdown-item>
           <b-dropdown-item href="#">창고 관리</b-dropdown-item>
-          <b-dropdown-item href="/item">품목 관리</b-dropdown-item>
+          <b-dropdown-item href="#"><RouterLink to="/item" active-class="active none-decoration" replace>품목 관리</RouterLink></b-dropdown-item>
         </b-nav-item-dropdown>
         <b-nav-item-dropdown>
           <template #button-content><salesIcon class="icon" />영업관리</template>

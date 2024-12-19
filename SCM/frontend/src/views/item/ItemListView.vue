@@ -164,7 +164,11 @@
           <div class="d-flex justify-content-between">
             <div>검색결과: {{ rows }}개</div>
           </div>
-          <b-button variant="light" size="sm" class="button">품목 등록</b-button>
+          <RouterLink to="/item/input">
+            <b-button variant="light" size="sm" class="button">
+              품목 등록
+            </b-button>
+          </RouterLink>
         </div>
         <div class="list-headline row"></div>
         <div style="max-height: 600px; overflow-y: auto;">
