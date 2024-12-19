@@ -2,12 +2,14 @@
   import { onMounted, ref, watch } from 'vue';
   import axios from 'axios';
   import { BInputGroup, BFormInput, BFormCheckbox, BButton, BInputGroupText, BPagination } from 'bootstrap-vue-3';
+  import dayjs from "dayjs";
+  import item from "../../router/item.js";
 
   const items = ref([]);
   const selectedDivisions = ref([]);
   const searchName = ref("");
   const rows = ref(0);
-  const perPage = ref(8);
+  const perPage = ref(4);
   const currentPage = ref(1);
 
   // 유통기한 필터용 상태 (일 단위)
@@ -26,7 +28,8 @@
   SUB: "원재료",
 };
 
-  const findItemsByFilter = async () => {
+const findItemsByFilter = async () => {
+  itemDTO.value = null;
   console.log("현재 검색어:", searchName.value);
   console.log("현재 선택된 품목 구분:", selectedDivisions.value);
   console.log("현재 페이지:", currentPage.value);
@@ -38,63 +41,61 @@
   const maxHour = (maxExpiration.value != null && maxExpiration.value >= 0) ? maxExpiration.value * 24 : null;
 
   try {
-  const response = await axios.get("http://localhost:8090/api/v1/item", {
-  params: {
-  page: currentPage.value,
-  size: perPage.value,
-  itemName: searchName.value || null,
-  itemDivisions: selectedDivisions.value.length > 0 ? selectedDivisions.value : null,
-  minExpirationHour: minHour,
-  maxExpirationHour: maxHour,
-},
-  paramsSerializer: (params) => {
-  const searchParams = new URLSearchParams();
-  for (const key in params) {
-  const value = params[key];
-  if (Array.isArray(value)) {
-  value.forEach(v => {
-  if (v !== null && v !== undefined) {
-  searchParams.append(key, v);
-}
-});
-} else if (value !== null && value !== undefined) {
-  searchParams.append(key, value);
-}
-}
-  return searchParams.toString();
-}
-});
+    const response = await axios.get("http://localhost:8090/api/v1/item", {
+      params: {
+        page: currentPage.value,
+        size: perPage.value,
+        itemName: searchName.value || null,
+        itemDivisions: selectedDivisions.value.length > 0 ? selectedDivisions.value : null,
+        minExpirationHour: minHour,
+        maxExpirationHour: maxHour,
+      }, paramsSerializer: (params) => {
+        const searchParams = new URLSearchParams();
+        for (const key in params) {
+          const value = params[key];
+          if (Array.isArray(value)) {
+            value.forEach(v => {
+            if (v !== null && v !== undefined) {
+              searchParams.append(key, v);
+              }
+            });
+          } else if (value !== null && value !== undefined) {
+            searchParams.append(key, value);
+          }
+        }
+        return searchParams.toString();
+      }
+    });
+    console.log("서버 응답 데이터:", response.data);
 
-  console.log("서버 응답 데이터:", response.data);
-
-  rows.value = response.data.totalElements;
-  items.value = response.data.content;
-} catch (error) {
-  console.error("데이터 불러오기 실패:", error);
-}
+    rows.value = response.data.totalElements;
+    items.value = response.data.content;
+  } catch (error) {
+    console.error("데이터 불러오기 실패:", error);
+  }
 };
 
-  // 검색어 변경 시 자동 검색
-  watch(searchName, (newValue) => {
+// 검색어 변경 시 자동 검색
+watch(searchName, (newValue) => {
   console.log("검색어 변경됨:", newValue);
   findItemsByFilter();
 });
 
-  // 페이지 변경 시 자동 검색
-  watch(currentPage, () => {
+// 페이지 변경 시 자동 검색
+watch(currentPage, () => {
   findItemsByFilter();
 });
 
   // 유통기한 변경 시 자동 검색
-  watch([minExpiration, maxExpiration], () => {
+watch([minExpiration, maxExpiration], () => {
   findItemsByFilter();
 });
 
-  onMounted(() => {
+onMounted(() => {
   findItemsByFilter();
 });
 
-  function checkItemDivision(key) {
+function checkItemDivision(key) {
   const index = selectedDivisions.value.indexOf(key);
   if (index > -1) {
   selectedDivisions.value.splice(index, 1);
@@ -103,8 +104,34 @@
 }
   findItemsByFilter();
 }
-</script>
 
+const childItemList = ref([]);
+const itemInventoryList = ref([]);
+const itemDTO = ref();
+const itemInventoryCurrentPage = ref(0);
+const itemInventory = ref();
+
+const itemDetail = async (itemSeq) => {
+  itemInventoryCurrentPage.value = 0;
+
+  try {
+    const response = await axios.get(`http://localhost:8090/api/v1/item/${itemSeq}`)
+
+    childItemList.value = response.data.childItemList;
+    itemInventoryList.value = response.data.itemInventoryList;
+    itemDTO.value = response.data.itemDTO;
+    itemInventory.value = itemInventoryList.value[0];
+    console.log(response.data);
+  } catch (error) {
+    console.error("품목 상세보기 불러오기 실패 :", error);
+  }
+}
+
+watch(itemInventoryCurrentPage, () => {
+  itemInventory.value = itemInventoryList.value[itemInventoryCurrentPage.value - 1];
+})
+
+</script>
 
 <template>
   <h4 class="title">품목관리 > 품목 조회</h4>
@@ -169,7 +196,7 @@
         <div class="list-headline row"></div>
         <div style="max-height: 600px; overflow-y: auto;">
           <div class="item-container">
-            <div v-for="item in items" :key="item.id" class="item-card">
+            <div v-for="item in items" :key="item.id" class="item-card" @click="itemDetail(item.itemSeq)">
               <div class="item-image">
                 <img :src="item.itemImageUrl" alt="품목 이미지" />
               </div>
@@ -180,6 +207,43 @@
                   <li>유통기한: {{ (item.itemExpirationHour / 24).toFixed(0) }} 일</li>
                   <li>단가: {{ item.itemPrice.toLocaleString() }} ₩</li>
                 </ul>
+              </div>
+            </div>
+          </div>
+          <!-- 클릭 시 하단 상세보기 -->
+          <div v-if="itemDTO" class="mt-4 p-4 border rounded shadow-sm bg-light">
+            <div class="row">
+              <!-- 이미지 -->
+              <div class="col-md-2">
+                <img :src="itemDTO.itemImageUrl" class="img-fluid rounded" alt="상세 이미지"/>
+              </div>
+
+              <!-- BOM 정보 -->
+              <div class="col-md-3">
+                <h5 class="item-name">{{ itemDTO.itemName }} BOM</h5>
+                <ul class="list-unstyled">
+                  <li v-for="childItem in childItemList" :key="childItem.itemSeq">
+                    · {{ childItem.itemName }} : {{ childItem.bomChildItemQuantity }} {{ childItem.itemUnit }}
+                  </li>
+                </ul>
+              </div>
+
+              <!-- 재고 정보 -->
+              <div v-if="itemInventoryList.length > 0" class="col-md-6">
+                <h5 class="item-name">재고 조회</h5>
+                <ul class="list-unstyled">
+                  <li>입고일: {{ dayjs(itemInventory.itemInventoryReceiptDate).format('YYYY년 MM월 DD일 HH시') }}</li>
+                  <li>유통기한: {{ dayjs(itemInventory.itemInventoryExpirationDate).format('~ YYYY년 MM월 DD일 HH시') }}</li>
+                  <li>잔량 / 입고수량: {{ itemInventory.itemInventoryRemainAmount }} / {{ itemInventory.itemInventoryQuantityReceived }}</li>
+                  <li v-if="itemInventory.itemInventoryNote">비고: {{ itemInventory.itemInventoryNote }}</li>
+                </ul>
+                <div class="pagenation">
+                  <b-pagination
+                      v-model="itemInventoryCurrentPage"
+                      :total-rows="itemInventoryList.length"
+                      :per-page="1"
+                  ></b-pagination>
+                </div>
               </div>
             </div>
           </div>

@@ -5,9 +5,11 @@ import error.pirate.backend.exception.ErrorCodeType;
 import error.pirate.backend.item.command.domain.aggregate.entity.BomItem;
 import error.pirate.backend.item.command.domain.aggregate.entity.Item;
 import error.pirate.backend.item.command.domain.aggregate.entity.ItemInventory;
+import error.pirate.backend.item.command.domain.aggregate.entity.ItemUnit;
 import error.pirate.backend.item.command.domain.repository.BomItemRepository;
 import error.pirate.backend.item.command.domain.repository.ItemInventoryRepository;
 import error.pirate.backend.item.command.domain.repository.ItemRepository;
+import error.pirate.backend.item.command.domain.repository.ItemUnitRepository;
 import error.pirate.backend.item.query.dto.ItemDetailResponse;
 import error.pirate.backend.item.query.dto.ItemResponse;
 import error.pirate.backend.item.query.dto.ItemFilterRequest;
@@ -15,8 +17,6 @@ import error.pirate.backend.item.query.dto.ItemInventoryDTO;
 import error.pirate.backend.item.query.mapper.ItemMapper;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -33,6 +33,7 @@ public class ItemQueryService {
     private final ItemInventoryRepository itemInventoryRepository;
     private final BomItemRepository bomItemRepository;
     private final ModelMapper modelMapper;
+    private final ItemUnitRepository itemUnitRepository;
 
     public Map<String, Object> readItemList(ItemFilterRequest itemFilterRequest) {
 
@@ -77,8 +78,13 @@ public class ItemQueryService {
         List<BomItem> bomItems = bomItemRepository.findAllByParentItem(item);
         for(BomItem bomItem : bomItems) {
             Item childItem = itemRepository.findById(bomItem.getChildItem().getItemSeq()).orElseThrow(() -> new CustomException(ErrorCodeType.ITEM_NOT_FOUND));
+            ItemUnit itemUnit = itemUnitRepository.findById(childItem.getItemUnit().getItemUnitSeq()).orElseThrow(() -> new CustomException(ErrorCodeType.ITEM_UNIT_NOT_FOUND));
 
-            childItemList.add(modelMapper.map(childItem, ItemResponse.class));
+            ItemResponse itemResponse = modelMapper.map(childItem, ItemResponse.class);
+            itemResponse.setItemUnit(itemUnit.getItemUnitTitle());
+            itemResponse.setBomChildItemQuantity(bomItem.getBomChildItemQuantity());
+
+            childItemList.add(itemResponse);
         }
 
         // 재고가 다 떨어진 재고는 조회하지 않는다.

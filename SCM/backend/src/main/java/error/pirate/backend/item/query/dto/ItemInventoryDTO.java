@@ -17,4 +17,5 @@ public class ItemInventoryDTO {
     private Integer itemInventoryQuantityReceived;
     private LocalDateTime itemInventoryReceiptDate;
     private Integer itemInventoryRemainAmount;
+    private String itemInventoryNote;
 }
