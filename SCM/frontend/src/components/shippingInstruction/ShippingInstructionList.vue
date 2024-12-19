@@ -229,6 +229,7 @@ const printItem = (index) => {
                       </div>
                     </div>
                     <div class="d-flex justify-content-end align-items-center">
+                      <b-button v-if="shippingInstruction.shippingInstructionStatus === 'AFTER'" variant="light" class="me-3 button" @click="">출하전표 등록</b-button>
                       <printIcon class="me-3 icon" @click.stop="printItem(index)"/>
                       <editIcon v-if="shippingInstruction.shippingInstructionStatus === 'BEFORE'" class="me-3 icon" @click.stop="itemEdit(shippingInstruction.shippingInstructionSeq)"/>
                       <trashIcon v-if="shippingInstruction.shippingInstructionStatus === 'BEFORE'" class="icon" @click.stop="itemDelete(shippingInstruction.shippingInstructionSeq)"/>
