@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
@@ -29,9 +30,13 @@ public class WorkOrderQueryService {
     public WorkOrderListResponse readWorkOrderList(WorkOrderFilterDTO filter) {
         log.info("-------------- 작업지시서 목록조회 서비스 진입 :목록조회 필터링 조건 - filter: {} --------------", filter);
 
+        // 날짜 변환
+        LocalDateTime startDateTime = filter.getStartDateTime(); // 00:00:00
+        LocalDateTime endDateTime = filter.getEndDateTime();     // 23:59:59
+
         // null 체크 및 날짜 유효성 검증
-        if (filter.getStartDate() != null && filter.getEndDate() != null) {
-            if (filter.getStartDate().isAfter(filter.getEndDate())) {
+        if (startDateTime != null && endDateTime != null) {
+            if (startDateTime.isAfter(endDateTime)) {
                 throw new CustomException(ErrorCodeType.INVALID_DATE_RANGE);
             }
         }
@@ -44,7 +49,7 @@ public class WorkOrderQueryService {
         log.info("상태: {}",statusList);
 
         // 작업지시서 목록 조회
-        List<WorkOrderListDTO> workOrderList = workOrderMapper.readWorkOrderList(filter, statusList, offset);
+        List<WorkOrderListDTO> workOrderList = workOrderMapper.readWorkOrderList(startDateTime, endDateTime, statusList, offset, filter);
 
         // enum 상태와 함께 응답
         List<WorkOrderStatus.WorkOrderStatusResponse> workOrderStatusResponse
@@ -54,7 +59,7 @@ public class WorkOrderQueryService {
                 )).toList();
 
         // 총 개수
-        long totalItems = workOrderMapper.readWorkOrderListCount(filter, statusList);
+        long totalItems = workOrderMapper.readWorkOrderListCount(startDateTime, endDateTime, statusList, filter);
         // 총 페이지 수
         int totalPages = (int) Math.ceil((double) totalItems / filter.getSize());
 

@@ -1,6 +1,5 @@
 <script setup>
-
-import axios from "axios";
+import axios from "@/axios"
 import {onMounted, ref, watch} from "vue";
 import searchIcon from "@/assets/searchIcon.svg";
 import dayjs from "dayjs";
@@ -21,7 +20,7 @@ const totalCount = ref(0);
 
 const fetchWorkOrderList = async () => {
   try {
-    const response = await axios.get(`http://localhost:8090/api/v1/workOrder`, {
+    const response = await axios.get(`workOrder`, {
       params: {
         page: searchPage.value,
         size: searchSize.value,
@@ -46,25 +45,33 @@ const fetchWorkOrderList = async () => {
     totalPage.value = response.data.totalPages;
     console.log(workOrderList.value);
   } catch (error) {
+    if (error.response.data.errorCode === 'COMMON_ERROR_002') {
+      alert(error.response.data.message);
+    }
     console.log("작업지시서 불러오기 실패: ", error);
   }
 }
 
-// 상태 포맷
-const formatStatus = (status) => {
-  if (status === 'BEFORE') {
-    return '결재 전';
-  } else if (status === 'AFTER') {
-    return '결재 후';
-  } else if (status === 'ONGOING') {
-    return '진행중';
-  } else if (status === 'COMPLETE') {
-    return '완료';
-  } else if (status === 'STOP') {
-    return '중단';
+const fetchShippingInstruction = async (seq) => {
+  try {
+    const response = await axios.get(`http://localhost:8090/api/v1/shipping-instruction/${seq}`, {});
+
+    expandShippingInstruction.value[seq] = response.data.shippingInstructionDTO; // ref 값에 추가
+    expandItemList.value[seq] = response.data.itemList;
+
+  } catch (error) {
+    console.error("상세 출하지시서 불러오기 실패 :", error);
   }
-  return status; // 상태가 다른 경우 그대로 반환
 };
+
+// 상태 키로 값 반환
+function findStatusValue(array, key) {
+  for (const item of array) {
+    if (item.key === key) {
+      return item.value
+    }
+  }
+}
 
 onMounted(() => {
   fetchWorkOrderList();
@@ -170,7 +177,51 @@ function search() {
                 <div v-else>{{ workOrder.itemName }}</div></div>
               <div class="list-body col-2">{{ workOrder.warehouseName }}</div>
               <div class="list-body col-3">{{ dayjs(workOrder.workOrderIndicatedDate).format('YYYY-MM-DD HH:mm:ss') }}</div>
-              <div class="list-body col-2">{{ formatStatus(workOrder.workOrderStatus) }}</div>
+              <div class="list-body col-2">{{ findStatusValue(workOrderStatusList, workOrder.workOrderStatus) }}</div>
+
+<!--              &lt;!&ndash; 확장된 상세 정보 표시 &ndash;&gt;-->
+<!--              <div class="d-flex justify-content-center">-->
+<!--                <div v-if="expandShippingInstruction[shippingInstruction.shippingInstructionSeq]"-->
+<!--                     class="col-md-11 mt-3">-->
+<!--                  <p>총수량 : {{-->
+<!--                      expandShippingInstruction[shippingInstruction.shippingInstructionSeq].shippingInstructionTotalQuantity-->
+<!--                    }} 개</p>-->
+<!--                  <p>출하 주소 : {{-->
+<!--                      expandShippingInstruction[shippingInstruction.shippingInstructionSeq].shippingInstructionAddress-->
+<!--                    }}</p>-->
+<!--                  <p>담당자 : {{ expandShippingInstruction[shippingInstruction.shippingInstructionSeq].userName }}</p>-->
+<!--                  <p>출하예정일시 : {{-->
+<!--                      dayjs(expandShippingInstruction[shippingInstruction.shippingInstructionSeq].shippingInstructionScheduledShipmentDate).format('YYYY/MM/DD HH:mm:ss')-->
+<!--                    }}</p>-->
+<!--                  <p v-if="expandShippingInstruction[shippingInstruction.shippingInstructionSeq].shippingInstructionNote">-->
+<!--                    출하지시서 비고 :-->
+<!--                    {{ expandShippingInstruction[shippingInstruction.shippingInstructionSeq].shippingInstructionNote }}-->
+<!--                  </p>-->
+<!--                  &lt;!&ndash; 확장된 상세 품목 정보 표시&ndash;&gt;-->
+<!--                  <div v-for="(row, rowIndex) in getChunkedItems(shippingInstruction.shippingInstructionSeq)"-->
+<!--                       :key="rowIndex"-->
+<!--                       class="mb-3 d-flex flex-row">-->
+<!--                    <div style="max-height: 250px;"-->
+<!--                         v-for="(expandItem, index) in row"-->
+<!--                         :key="index"-->
+<!--                         class="me-5 col-md-3 d-flex flex-column border border-secondary rounded">-->
+<!--                      <b-img style="max-height: 100px;" src="https://picsum.photos/200/200" fluid-->
+<!--                             alt="Responsive image"></b-img>-->
+<!--                      <p class="ms-3">· 구분 : {{ formatDivision(expandItem.itemDivision) }}</p>-->
+<!--                      <p class="ms-3">· 품목 : {{ expandItem.itemName }}</p>-->
+<!--                      <p class="ms-3">· 수량 : {{ expandItem.shippingInstructionItemQuantity }} 개</p>-->
+<!--                      <p v-if="expandItem.shippingInstructionItemNote" class="ms-3">· 비고 :-->
+<!--                        {{ expandItem.shippingInstructionItemNote }}</p>-->
+<!--                      <p v-else class="ms-3">· 비고 : 없음</p>-->
+<!--                    </div>-->
+<!--                  </div>-->
+<!--                  <div class="d-flex justify-content-end align-items-center">-->
+<!--                    <printIcon class="me-3 icon" @click.stop="printItem(index)"/>-->
+<!--                    <editIcon class="me-3 icon" @click.stop=""/>-->
+<!--                    <trashIcon class="icon" @click.stop="itemDelete(shippingInstruction.shippingInstructionSeq)"/>-->
+<!--                  </div>-->
+<!--                </div>-->
+<!--              </div>-->
             </div>
           </div>
 

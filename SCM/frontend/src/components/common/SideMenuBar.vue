@@ -164,7 +164,7 @@ const toggleSubMenu = (subMenu) => {
                 <RouterLink class="content-item" to="/workOrder" active-class="active" replace>작업지시서 조회</RouterLink>
                 <RouterLink class="content-item" to="">작업지시서 등록</RouterLink>
                 <RouterLink class="content-item" to="">작업지시서 작업처리</RouterLink>
-                <RouterLink class="content-item" to="">작업지시서 진행현황</RouterLink>
+                <RouterLink class="content-item" to="">작업지시서 현황</RouterLink>
               </li>
             </ul>
           </li>
