@@ -1,5 +1,6 @@
 package error.pirate.backend.common;
 
+import io.micrometer.common.util.StringUtils;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
@@ -17,9 +18,20 @@ public class Pagination {
 
     private String searchEndDate;
 
+    private String searchStatus;
+
+    private String searchName;
+
     private int totalCount;
 
     private int totalPageNo;
+
+    public String getSearchEndDate() {
+        if(StringUtils.isNotEmpty(searchEndDate)) {
+            return searchEndDate + " 23:59:59";
+        }
+        return null;
+    }
 
     public int getOffset() {
         return (pageNo - 1) * limit;

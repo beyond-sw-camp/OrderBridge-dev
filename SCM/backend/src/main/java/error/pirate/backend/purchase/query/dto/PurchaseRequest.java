@@ -5,7 +5,7 @@ import error.pirate.backend.purchase.command.domain.aggregate.entity.PurchaseSta
 
 public class PurchaseRequest extends Pagination {
 
-    private String clientName;  // 거래처명
+    private String clientName;
 
     private PurchaseStatus purchaseStatus;
 

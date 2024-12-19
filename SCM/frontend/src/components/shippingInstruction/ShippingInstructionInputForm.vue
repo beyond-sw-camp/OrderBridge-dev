@@ -1,6 +1,7 @@
 <script setup>
 import {defineProps, ref, watch} from "vue";
 import searchIcon from '@/assets/searchIcon.svg'
+import dayjs from "dayjs";
 
 const props = defineProps({
   salesOrderList: {type: Array, required: true},       // 출하지시서 목록
@@ -38,18 +39,6 @@ const getData  = () => {
   return formData;
 };
 defineExpose({ getData });
-
-// 날짜 포맷 함수
-const formatDate = (dateString) => {
-  if (!dateString) return '';
-
-  const date = new Date(dateString);
-  const year = date.getFullYear();
-  const month = (date.getMonth() + 1).toString().padStart(2, '0');
-  const day = date.getDate().toString().padStart(2, '0');
-
-  return `${year}/${month}/${day}`;
-};
 
 // 상태 포맷 함수
 const formatStatus = (status) => {
@@ -123,7 +112,7 @@ const formatStatus = (status) => {
 
   <!-- client Modal bootstrap -->
   <div class="modal fade" id="ClientModal" tabindex="-1" aria-labelledby="ClientModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
+    <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header">
           <h1 class="modal-title fs-5" id="exampleModalLabel">물품 선택</h1>
@@ -131,30 +120,30 @@ const formatStatus = (status) => {
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <div style="max-height: 500px; overflow-y: scroll"
+          <div style="max-height: 500px; overflow-y: auto"
                class="d-flex row justify-content-center align-items-center">
             <div class="list-headline row">
-              <div class="list-head col-6">주문서</div>
-              <div class="list-head col-2">거래처</div>
-              <div class="list-head col-2">주문일</div>
-              <div class="list-head col-2">상태</div>
+              <div class="list-head col-md-6">주문서</div>
+              <div class="list-head col-md-2">거래처</div>
+              <div class="list-head col-md-2">주문일</div>
+              <div class="list-head col-md-2">상태</div>
             </div>
             <template v-if="salesOrderList.length > 0">
               <div v-for="(salesOrder, index) in salesOrderList"
                    :key="salesOrder.salesOrderSeq"
                    class="list-line row" data-bs-dismiss="modal" @click="addClient(index)">
-                <div class="list-body col-6 left">
+                <div class="list-body col-md-6 left">
                   {{ salesOrder.salesOrderName }}
                   <br>
                   <div v-if="!salesOrder.itemName"><br></div>
                   <div v-else>{{ salesOrder.itemName }}</div>
                 </div>
-                <div class="list-body col-2">{{ salesOrder.clientName }}</div>
-                <div class="list-body col-2">{{
-                    formatDate(salesOrder.salesOrderOrderDate)
+                <div class="list-body col-md-2">{{ salesOrder.clientName }}</div>
+                <div class="list-body col-md-2">{{
+                    dayjs(salesOrder.salesOrderOrderDate).format('YYYY/MM/DD')
                   }}
                 </div>
-                <div class="list-body col-2">{{ formatStatus(salesOrder.salesOrderStatus) }}</div>
+                <div class="list-body col-md-2">{{ formatStatus(salesOrder.salesOrderStatus) }}</div>
               </div>
             </template>
             <template v-else>
@@ -187,8 +176,9 @@ div {
 .list-headline {
   width: 90%;
   border-bottom: 1px solid black;
+  margin-left: 1px;
   margin-bottom: 10px;
-  padding: 20px 40px 20px 20px;
+  padding: 10px 5px 10px 5px;
 }
 
 .list-head {
@@ -201,7 +191,7 @@ div {
   border-radius: 8px;
   margin-left: 1px;
   margin-top: 20px;
-  padding: 20px 40px 20px 20px;
+  padding: 10px 5px 10px 5px;
 }
 
 .list-body {
@@ -212,5 +202,9 @@ div {
 .pagination {
   justify-content: center; /* 가로 중앙 정렬 */
   margin-top: 20px;
+}
+
+.left {
+  text-align: left;
 }
 </style>

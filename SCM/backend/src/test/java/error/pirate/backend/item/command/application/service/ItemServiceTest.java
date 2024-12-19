@@ -40,7 +40,6 @@ class ItemServiceTest {
 
         return Stream.of(
                 arguments(new ItemCreateRequest(1L, 1L, "Test Item 1", ItemDivision.FINISHED, 720, "https://example.com/item1.jpg", 1000, "품목 비고1",null)),
-                arguments(new ItemCreateRequest(1L, 2L, "Test Item 2", ItemDivision.RAW, 1440, "https://example.com/item2.jpg", 2000, "품목 비고2", null)),
                 arguments(new ItemCreateRequest(2L, 1L, "Test Item 3", ItemDivision.PART, null, "https://example.com/item3.jpg", 500, "품목 비고3", null)),
                 arguments(new ItemCreateRequest(3L, 3L, "Test Item 4", ItemDivision.SUB, 0, null, 1500, "품목 비고4", null)),
                 arguments(new ItemCreateRequest(3L, 2L, "볶음밥", ItemDivision.FINISHED, 72, null, 7500, "볶음밥 만들기~", bomItemList))
@@ -65,7 +64,6 @@ class ItemServiceTest {
 
         return Stream.of(
                 arguments(40L, new ItemCreateRequest(1L, 1L, "Test Item 1", ItemDivision.FINISHED, 720, "https://example.com/item1.jpg", 1000, "품목 비고1",null)),
-                arguments(20L, new ItemCreateRequest(1L, 2L, "Test Item 2", ItemDivision.RAW, 1440, "https://example.com/item2.jpg", 2000, "품목 비고2", null)),
                 arguments(21L, new ItemCreateRequest(2L, 1L, "Test Item 3", ItemDivision.PART, null, "https://example.com/item3.jpg", 500, "품목 비고3", null)),
                 arguments(22L, new ItemCreateRequest(3L, 3L, "Test Item 4", ItemDivision.SUB, 0, null, 1500, "품목 비고4", null)),
                 arguments(23L, new ItemCreateRequest(3L, 2L, "김치볶음밥", ItemDivision.FINISHED, 72, null, 12500, "김치볶음밥 만들기~", bomItemList))

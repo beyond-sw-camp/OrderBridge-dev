@@ -18,7 +18,7 @@
         FROM tb_purchase_order tpo
         JOIN tb_user tu USING (user_seq)
         JOIN tb_client tc USING (client_seq)
-        <trim prefix="WHERE" prefixOverrides="AND">
+        WHERE tpo.purchase_order_status != 'DELETE'
             <if test="searchStartDate != null and searchStartDate != ''">
                 <![CDATA[
                 AND #{searchStartDate} <= tpo.purchase_order_target_due_date
@@ -29,13 +29,17 @@
                 AND #{searchEndDate} >= tpo.purchase_order_target_due_date
                 ]]>
             </if>
-            <if test="clientName != null">
-                AND tc.client_name LIKE CONCAT('%', #{clientName}, '%')
+            <if test="searchName != null">
+                AND tc.client_name LIKE CONCAT('%', #{searchName}, '%')
             </if>
-            <if test="purchaseOrderStatus != null">
-                AND tpo.purchase_order_status = #{purchaseOrderStatus}
+            <if test="searchStatus != null and searchStatus != ''">
+                AND tpo.purchase_order_status IN
+                <trim prefix="(" suffix=")" suffixOverrides=",">
+                    <foreach collection="searchStatus.split(',')" item="status" separator=",">
+                        #{status}
+                    </foreach>
+                </trim>
             </if>
-        </trim>
         ORDER BY tpo.purchase_order_seq
         <if test="limit != null">
             LIMIT #{limit} OFFSET #{offset}
@@ -62,9 +66,7 @@
         FROM tb_purchase_order tpo
         JOIN tb_user tu USING (user_seq)
         JOIN tb_client tc USING (client_seq)
-        LEFT JOIN tb_purchase_order_item tpoi ON (tpo.purchase_order_seq = tpoi.purchase_order_seq)
-        LEFT JOIN tb_item ti ON (tpoi.item_seq = ti.item_seq)
-        <trim prefix="WHERE" prefixOverrides="AND">
+        WHERE tpo.purchase_order_status != 'DELETE'
             <if test="searchStartDate != null and searchStartDate != ''">
                 <![CDATA[
                 AND #{searchStartDate} <= tpo.purchase_order_target_due_date
@@ -75,13 +77,17 @@
                 AND #{searchEndDate} >= tpo.purchase_order_target_due_date
                 ]]>
             </if>
-            <if test="clientName != null">
-                AND tc.client_name LIKE CONCAT('%', #{clientName}, '%')
+            <if test="searchName != null">
+                AND tc.client_name LIKE CONCAT('%', #{searchName}, '%')
             </if>
-            <if test="purchaseOrderStatus != null">
-                AND tpo.purchase_order_status = #{purchaseOrderStatus}
+            <if test="searchStatus != null and !searchStatus.isEmpty()">
+                AND tpo.purchase_order_status IN
+                <trim prefix="(" suffix=")" suffixOverrides=",">
+                    <foreach collection="searchStatus.split(',')" item="status" separator=",">
+                        #{status}
+                    </foreach>
+                </trim>
             </if>
-        </trim>
     </select>
 
 </mapper>

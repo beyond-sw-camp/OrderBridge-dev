@@ -1,5 +1,6 @@
 package error.pirate.backend.quotation.query.controller;
 
+import error.pirate.backend.quotation.command.domain.aggregate.entity.QuotationStatus;
 import error.pirate.backend.quotation.query.dto.QuotationListResponse;
 import error.pirate.backend.quotation.query.dto.QuotationResponse;
 import error.pirate.backend.quotation.query.dto.QuotationSituationResponse;
@@ -8,10 +9,18 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -30,7 +39,7 @@ public class QuotationQueryController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
             @RequestParam(required = false) String clientName,
-            @RequestParam(required = false) String quotationStatus) {
+            @RequestParam(required = false) List<QuotationStatus> quotationStatus) {
 
         return ResponseEntity.ok(quotationQueryService.readQuotationList(
                 page, size, startDate, endDate, clientName, quotationStatus));
@@ -53,5 +62,30 @@ public class QuotationQueryController {
 
         return ResponseEntity.ok(quotationQueryService.readQuotationSituation(
                 startDate, endDate, clientName));
+    }
+
+    @GetMapping("/status")
+    @Operation(summary = "견적서 상태 분류 조회")
+    public ResponseEntity<List<QuotationStatus.QuotationStatusResponse>> readQuotationStatus() {
+        return ResponseEntity.ok(QuotationStatus.readQuotationStatusList());
+    }
+
+    @GetMapping("/excel")
+    @Operation(summary = "견적서 목록 엑셀 다운로드")
+    public ResponseEntity<byte[]> readQuotationExcel(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @RequestParam(required = false) String clientName,
+            @RequestParam(required = false) List<QuotationStatus> quotationStatus) {
+
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + URLEncoder.encode(
+                new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date()) + "_견적서.xlsx"
+                , StandardCharsets.UTF_8));
+
+        return ResponseEntity.ok()
+                .headers(httpHeaders)
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(quotationQueryService.readQuotationExcel(startDate, endDate, clientName, quotationStatus));
     }
 }

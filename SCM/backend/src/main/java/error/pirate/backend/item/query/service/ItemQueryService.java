@@ -15,10 +15,14 @@ import error.pirate.backend.item.query.dto.ItemInventoryDTO;
 import error.pirate.backend.item.query.mapper.ItemMapper;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -30,18 +34,36 @@ public class ItemQueryService {
     private final BomItemRepository bomItemRepository;
     private final ModelMapper modelMapper;
 
-    public List<ItemResponse> readItemList(ItemFilterRequest itemFilterRequest) {
-        int offset = itemFilterRequest.getSize() * (itemFilterRequest.getPage() - 1) ;
+    public Map<String, Object> readItemList(ItemFilterRequest itemFilterRequest) {
 
-        return itemMapper.findItemListByFilter(
+        int page = Math.max(1, itemFilterRequest.getPage());
+        int offset = itemFilterRequest.getSize() * (page - 1);
+
+        // 1. 전체 데이터 개수 조회
+        int totalElements = itemMapper.countItemsByFilter(
                 itemFilterRequest.getItemName(),
-                itemFilterRequest.getItemDivision(),
-                itemFilterRequest.getItemExpirationHour(),
-                itemFilterRequest.getSortBy(),
-                itemFilterRequest.getSortDirection(),
-                offset,
-                itemFilterRequest.getSize()
+                itemFilterRequest.getItemDivisions(),
+                itemFilterRequest.getMinExpirationHour(),
+                itemFilterRequest.getMaxExpirationHour()
         );
+
+        // 2. 현재 페이지 데이터 목록 조회
+        List<ItemResponse> items = itemMapper.findItemListByFilter(
+                itemFilterRequest.getItemName(),
+                itemFilterRequest.getItemDivisions(),
+                itemFilterRequest.getMinExpirationHour(),
+                itemFilterRequest.getMaxExpirationHour(),
+                itemFilterRequest.getSize(),
+                offset
+        );
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("content", items);
+        result.put("totalElements", totalElements);
+        result.put("size", itemFilterRequest.getSize());
+        result.put("number", page);
+
+        return result;
     }
 
     public ItemDetailResponse readItem(Long itemSeq) {
