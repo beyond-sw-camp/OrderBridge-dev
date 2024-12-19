@@ -182,9 +182,9 @@ const toggleSubMenu = (subMenu) => {
             <span @click="toggleSubMenu('warehouse')">생산입고</span>
             <ul v-if="activeSubMenu === 'warehouse'">
               <li>
-                <RouterLink class="content-item" to="">생산입고 조회</RouterLink>
-                <RouterLink class="content-item" to="">생산입고 입력</RouterLink>
-                <RouterLink class="content-item" to="">생산입고 현황</RouterLink>
+                <RouterLink class="content-item" to="/productionReceiving">생산입고 조회</RouterLink>
+                <RouterLink class="content-item" to="/productionReceiving/register">생산입고 입력</RouterLink>
+                <RouterLink class="content-item" to="/productionReceiving/situation">생산입고 현황</RouterLink>
               </li>
             </ul>
           </li>
@@ -240,6 +240,7 @@ const toggleSubMenu = (subMenu) => {
 }
 
 .side-bar {
+
   position: fixed;
   top: 76px; /* 헤더의 높이 */
   bottom: 0;
