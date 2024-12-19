@@ -4,6 +4,7 @@ import error.pirate.backend.common.ExcelDownLoad;
 import error.pirate.backend.exception.CustomException;
 import error.pirate.backend.exception.ErrorCodeType;
 import error.pirate.backend.productionReceiving.command.domain.aggregate.entity.ProductionReceiving;
+import error.pirate.backend.productionReceiving.command.domain.aggregate.entity.ProductionReceivingItem;
 import error.pirate.backend.productionReceiving.command.domain.aggregate.entity.ProductionReceivingStatus;
 import error.pirate.backend.productionReceiving.command.domain.repository.ProductionReceivingItemRepository;
 import error.pirate.backend.productionReceiving.command.domain.repository.ProductionReceivingRepository;
@@ -56,20 +57,15 @@ public class ProductionReceivingQueryService {
 
     public ProductionReceivingResponse readProductionReceiving(Long productionReceivingSeq) {
         ProductionReceiving productionReceiving = productionReceivingRepository.findById(productionReceivingSeq).orElseThrow(() -> new CustomException(ErrorCodeType.PRODUCTION_RECEIVING_NOT_FOUND));
-        Warehouse productionWarehouse = warehouseRepository.findById(productionReceiving.getProductionWarehouse().getWarehouseSeq()).orElseThrow(() -> new CustomException(ErrorCodeType.WAREHOUSE_NOT_FOUND));
-        Warehouse storeWarehouse = warehouseRepository.findById(productionReceiving.getStoreWarehouse().getWarehouseSeq()).orElseThrow(() -> new CustomException(ErrorCodeType.WAREHOUSE_NOT_FOUND));
+        List<ProductionReceivingItemQueryDTO> productionReceivingItemList = productionReceivingItemRepository.findAllByProductionReceivingSeq(productionReceivingSeq);
 
-        return new ProductionReceivingResponse(
-                modelMapper.map(productionReceiving, ProductionReceivingDTO.class),
-                modelMapper.map(productionWarehouse, WarehouseDTO.class),
-                modelMapper.map(storeWarehouse, WarehouseDTO.class)
-        );
+         return new ProductionReceivingResponse(modelMapper.map(productionReceiving, ProductionReceivingDTO.class), productionReceivingItemList);
     }
 
     public byte[] productionReceivingExcelDown(ProductionReceivingListRequest request, Pageable pageable) {
         Page<ProductionReceivingListDTO> productionReceivingList = productionReceivingRepository.findAllByFilter(request, pageable);
 
-        String[] headers = {"생산입고명", "생산입고 품목", "생산공장명", "보관창고명", "입고일", "상태"};
+        String[] headers = {"생산입고명", "생산입고 품목", "입고일", "상태"};
         String[][] excel = new String[productionReceivingList.getSize()][headers.length];
 
         for(int i = 0; i < productionReceivingList.getContent().size(); i++) {
@@ -81,10 +77,8 @@ public class ProductionReceivingQueryService {
                     .stream()
                     .map(ProductionReceivingItemQueryDTO::getItemName)
                     .collect(Collectors.joining(", "));// 생산입고 품목
-            excel[i][2] = dto.getProductionWarehouseName();       // 생산창고
-            excel[i][3] = dto.getStoreWarehouseName();            // 보관창고
-            excel[i][4] = dto.getProductReceivingRegDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")); // 등록일
-            excel[i][5] = String.valueOf(dto.getProductionReceivingStatus());
+            excel[i][2] = dto.getProductionReceivingReceiptDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")); // 등록일
+            excel[i][3] = String.valueOf(dto.getProductionReceivingStatus());
         }
 
         return excelDownBody.excelDownBody(excel, headers, "생산입고");

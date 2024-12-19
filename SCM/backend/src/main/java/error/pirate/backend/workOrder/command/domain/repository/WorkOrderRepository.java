@@ -1,9 +1,12 @@
 package error.pirate.backend.workOrder.command.domain.repository;
 
+import error.pirate.backend.productionReceiving.command.domain.aggregate.entity.ProductionReceiving;
 import error.pirate.backend.workOrder.command.domain.aggregate.entity.WorkOrder;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+
+import java.util.List;
 
 public interface WorkOrderRepository extends JpaRepository<WorkOrder, Long> {
 
@@ -13,4 +16,6 @@ public interface WorkOrderRepository extends JpaRepository<WorkOrder, Long> {
         "AND w.item.itemSeq = :itemSeq")
     boolean existsBySalesOrderSeqAndItemSeq(@Param("salesOrderSeq")Long salesOrderSeq,
                                             @Param("itemSeq")Long itemSeq);
+
+    List<WorkOrder> findByProductionReceiving(ProductionReceiving productionReceiving);
 }
