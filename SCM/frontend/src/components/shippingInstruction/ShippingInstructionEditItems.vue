@@ -7,13 +7,13 @@ const props = defineProps({
   selectedSalesOrder: {type: Boolean},       // 주문서 선택 여부
 });
 
-const emit = defineEmits(['registerEvent', 'updateItemListEvent']);
+const emit = defineEmits(['updateEvent', 'updateItemListEvent']);
 
 // itemList의 각 아이템에 대해 itemData 초기화
 const itemData = ref(props.itemList.map(item => ({
   originalQuantity: Number(item.salesOrderItemQuantity) || 0,
   Seq: Number(item.itemSeq) || 0,
-  quantity: Number(item.salesOrderItemQuantity) || 0,
+  quantity: Number(item.shippingInstructionItemQuantity) || 0,
   note: item.salesOrderItemNote || '',
 })));
 
@@ -23,7 +23,7 @@ watch(() => props.itemList, (newItemList) => {
   itemData.value = newItemList.map(item => ({
     originalQuantity: Number(item.salesOrderItemQuantity) || 0,
     Seq: Number(item.itemSeq) || 0,
-    quantity: Number(item.salesOrderItemQuantity) || 0,
+    quantity: Number(item.shippingInstructionItemQuantity) || 0,
     note: item.salesOrderItemNote || '',
   }));
 });
@@ -46,7 +46,7 @@ const deleteItem = (index) => {
 };
 
 const addShippingInstruction = () => {
-  emit('registerEvent', itemData);
+  emit('updateEvent', itemData);
 }
 
 // 품목 포맷 함수
@@ -67,7 +67,7 @@ const formatDivision = (divisionString) => {
 <template>
   <template v-if="props.selectedSalesOrder">
     <div class="col-md-10 d-flex flex-column">
-      <h5 class="px-4">출하지시 물품 등록</h5>
+      <h5 class="px-4">출하지시 물품 수정</h5>
       <template v-if="itemList.length > 0">
         <div style="max-height: 250px; overflow-y: auto;">
           <div style="max-height: 200px;" v-for="(item, index) in itemList" :key="item.salesOrderItemSeq"
@@ -87,7 +87,7 @@ const formatDivision = (divisionString) => {
                     · 수량 :
                     <b-form-input class="ms-2 me-2 w-25" type="text" v-model="itemData[index].quantity"
                                   size="sm"></b-form-input>
-                    개 (최대 : {{ itemData[index].originalQuantity }} 개)
+                    개 (최대 : {{itemData[index].originalQuantity }} 개)
                   </li>
                 </ul>
                 <ul class="col-md-6 p-0 d-flex flex-column justify-content-between">
@@ -102,13 +102,11 @@ const formatDivision = (divisionString) => {
         </div>
       </template>
       <template v-else>
-        <b-card-text class="no-list-text">출하지시가 완료된 주문서 입니다. 다시 선택해 주세요</b-card-text>
+        <b-card-text class="no-list-text">물품이 존재하지 않습니다.</b-card-text>
       </template>
-      <template v-if="itemList.length > 0">
-        <div class="mx-5 my-3 d-flex justify-content-end">
-          <b-button class="button mx-3" variant="light" size="sm" @click="addShippingInstruction">등록</b-button>
-        </div>
-      </template>
+      <div class="mx-5 my-3 d-flex justify-content-end">
+        <b-button class="button mx-3" variant="light" size="sm" @click="addShippingInstruction">수정</b-button>
+      </div>
     </div>
   </template>
 </template>
