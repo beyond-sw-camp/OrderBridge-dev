@@ -32,7 +32,7 @@ public class Item {
 
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinColumn(name = "warehouseSeq")
-    private Warehouse warehouse; // 품목 단위
+    private Warehouse warehouse; // 창고
 
     private String itemName; // 품목명
 
