@@ -16,5 +16,5 @@ public class ProductionReceivingDTO {
     private Integer productionReceivingExtendedPrice; // 생산 입고 총금액
     private String productionReceivingNote; // 생산 입고 비고
     private ProductionReceivingStatus productionReceivingStatus;
-    private LocalDateTime productionReceivingRegDate;
+    private LocalDateTime productionReceivingReceiptDate;
 }

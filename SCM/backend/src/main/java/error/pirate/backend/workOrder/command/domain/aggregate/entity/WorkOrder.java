@@ -167,5 +167,17 @@ public class WorkOrder {
         this.workOrderEndDate = LocalDateTime.now();
     }
 
+    protected void specifyProductionReceiving(ProductionReceiving productionReceiving) {
+        this.productionReceiving = productionReceiving;
+    }
 
+    public void deleteProductionReceiving() {
+        this.productionReceiving = null;
+        this.workOrderStatus = WorkOrderStatus.ONGOING;
+    }
+
+    public void createProductionReceiving(ProductionReceiving productionReceiving) {
+        specifyProductionReceiving(productionReceiving);
+        this.workOrderStatus = WorkOrderStatus.COMPLETE;
+    }
 }

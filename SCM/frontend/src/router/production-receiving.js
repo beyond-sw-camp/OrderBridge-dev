@@ -10,6 +10,9 @@ export default [
     {
         path: "/productionReceiving/register",
         component: () => import("@/views/productionReceiving/ProductionReceivingRegisterView.vue")
+    },
+    {
+        path: "/productionReceiving/modify",
+        component: () => import("@/views/productionReceiving/ProductionReceivingModifyView.vue")
     }
-
 ]

@@ -22,7 +22,7 @@ const fetchWorkOrderList = async () => {
         startDate: null,
         endDate: null,
         warehouseName: null,
-        workOrderStatus: 'COMPLETE',
+        workOrderStatus: 'ONGOING',
         page: workOrderPageNumber.value,
         size: workOrderPageSize.value
       }, paramsSerializer: (params) => {
@@ -225,8 +225,8 @@ function closeModal() {
               <li class="mb-3 col-md-6">· 주문 개수 : {{ workOrder.workOrderIndicatedQuantity.toLocaleString() }}</li>
               <li class="mb-3 col-md-6">· 주문 총액 : {{ workOrder.workOrderPrice }} ₩</li>
               <li class="mb-3 col-md-12 d-flex align-items-center">
-                <span class="me-3 text-nowrap">· 생산입고 비고 :</span>
-                <b-form-input v-model="workOrder.itemNote" class="flex-grow-1" placeholder="생산입고 비고를 입력해주세요."/>
+                <span class="me-3 text-nowrap">· 품목 비고 :</span>
+                <b-form-input v-model="workOrder.itemNote" class="flex-grow-1" placeholder="생산입고 품목 비고를 입력해주세요."/>
               </li>
             </ul>
           </div>

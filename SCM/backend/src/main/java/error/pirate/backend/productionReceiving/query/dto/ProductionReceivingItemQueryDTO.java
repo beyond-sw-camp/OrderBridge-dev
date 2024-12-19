@@ -13,4 +13,10 @@ public class ProductionReceivingItemQueryDTO {
     private Long productionReceivingItemSeq;
     private Long itemSeq;
     private String itemName;
+    private String itemImageUrl;
+    private Long warehouseSeq;
+    private String warehouseName;
+    private Integer productionReceivingItemQuantity;
+    private Integer productionReceivingUnitPrice;
+    private String productionReceivingItemNote;
 }

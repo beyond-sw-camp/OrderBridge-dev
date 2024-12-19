@@ -12,6 +12,7 @@ import java.util.List;
 
 import static error.pirate.backend.item.command.domain.aggregate.entity.QItem.item;
 import static error.pirate.backend.productionReceiving.command.domain.aggregate.entity.QProductionReceivingItem.productionReceivingItem;
+import static error.pirate.backend.warehouse.command.domain.aggregate.entity.QWarehouse.warehouse;
 
 @Repository
 @RequiredArgsConstructor
@@ -25,9 +26,16 @@ public class ProductionReceivingItemQueryRepositoryImpl implements ProductionRec
                 .select(Projections.constructor(ProductionReceivingItemQueryDTO.class,
                         productionReceivingItem.productionReceivingItemSeq,
                         item.itemSeq,
-                        item.itemName))
+                        item.itemName,
+                        item.itemImageUrl,
+                        warehouse.warehouseSeq,
+                        warehouse.warehouseName,
+                        productionReceivingItem.productionReceivingItemQuantity,
+                        productionReceivingItem.productionReceivingUnitPrice,
+                        productionReceivingItem.productionReceivingItemNote))
                 .from(productionReceivingItem)
                 .leftJoin(productionReceivingItem.item, item)
+                .leftJoin(productionReceivingItem.warehouse, warehouse)
                 .where(productionReceivingItem.productionReceiving.productionReceivingSeq.eq(productionReceivingSeq))
                 .fetch();
     }
