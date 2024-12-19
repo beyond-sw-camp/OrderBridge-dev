@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -19,5 +20,6 @@ public class ProductionReceivingCreateRequest {
     private String productionReceivingName; // 생산입고명
     private Integer productionReceivingExtendedPrice; // 생산입고 총액
     private String productionReceivingNote; // 생산입고 비고
+    private LocalDateTime productionReceivingReceiptDate; // 생산입고일
     private List<ProductionReceivingItemDTO> productionReceivingItemList;
 }

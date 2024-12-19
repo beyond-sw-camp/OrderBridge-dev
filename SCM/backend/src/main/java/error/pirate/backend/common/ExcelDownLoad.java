@@ -8,6 +8,9 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayOutputStream;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
 
 @Slf4j
 @Component
@@ -15,7 +18,7 @@ public class ExcelDownLoad {
 
     public byte[] excelDownBody(String[][] excel, String[] header, String name) {
         try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-            Sheet sheet = workbook.createSheet(name + ".xlsx");
+            Sheet sheet = workbook.createSheet(name);
 
             CellStyle headerStyle = workbook.createCellStyle();
             Font headerFont = workbook.createFont();
@@ -50,5 +53,30 @@ public class ExcelDownLoad {
 
             throw new CustomException(ErrorCodeType.EXCEL_DOWN_ERROR);
         }
+    }
+
+    public byte[] writeCells(String[] headers, ArrayList<Object> list) {
+        String[][] cells = new String[list.size()][headers.length];
+
+        for (int i = 0; i < list.size(); i++) {
+            Field[] fields = list.get(i).getClass().getDeclaredFields();
+            for (int j = 0; j < headers.length; j++) {
+                Field field = fields[j];
+
+                String fieldName = field.getName();
+                String getterMethodName = "get" + Character.toUpperCase(fieldName.charAt(0)) + fieldName.substring(1);
+
+                try {
+                    Method getterMethod = list.get(i).getClass().getMethod(getterMethodName);
+                    Object value = getterMethod.invoke(list.get(i));
+                    String stringValue = value == null ? "" : value.toString();
+                    cells[i][j] = stringValue;
+                } catch (Exception e) {
+                    log.error("writeCells Exception: ", e);
+                }
+            }
+        }
+
+        return excelDownBody(cells, headers, "Sheet");
     }
 }
