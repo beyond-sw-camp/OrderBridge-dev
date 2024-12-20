@@ -18,6 +18,8 @@ import error.pirate.backend.item.command.domain.aggregate.entity.*;
 import error.pirate.backend.item.command.domain.repository.*;
 import error.pirate.backend.item.query.dto.*;
 import error.pirate.backend.item.query.mapper.ItemMapper;
+import error.pirate.backend.warehouse.command.domain.aggregate.entity.Warehouse;
+import error.pirate.backend.warehouse.command.domain.repository.WarehouseRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -35,6 +37,7 @@ public class ItemQueryService {
     private final BomItemRepository bomItemRepository;
     private final ModelMapper modelMapper;
     private final ItemUnitRepository itemUnitRepository;
+    private final WarehouseRepository warehouseRepository;
 
 
     public Map<String, Object> readItemList(ItemFilterRequest itemFilterRequest) {
@@ -73,6 +76,10 @@ public class ItemQueryService {
         Item item = itemRepository.findById(itemSeq).orElseThrow(() -> new CustomException(ErrorCodeType.ITEM_NOT_FOUND));
 
         ItemResponse itemDTO = modelMapper.map(item, ItemResponse.class);
+        ItemUnit itemUnit = itemUnitRepository.findById(item.getItemUnit().getItemUnitSeq()).orElseThrow(() -> new CustomException(ErrorCodeType.ITEM_UNIT_NOT_FOUND));
+        Warehouse warehouse = warehouseRepository.findById(item.getWarehouse().getWarehouseSeq()).orElseThrow(() -> new CustomException(ErrorCodeType.WAREHOUSE_NOT_FOUND));
+        itemDTO.setItemUnitSeq(itemUnit.getItemUnitSeq());
+        itemDTO.setWarehouseSeq(warehouse.getWarehouseSeq());
 
         List<ItemResponse> childItemList = new ArrayList<>();
         List<ItemInventoryDTO> itemInventoryList = new ArrayList<>();
@@ -80,10 +87,10 @@ public class ItemQueryService {
         List<BomItem> bomItems = bomItemRepository.findAllByParentItem(item);
         for (BomItem bomItem : bomItems) {
             Item childItem = itemRepository.findById(bomItem.getChildItem().getItemSeq()).orElseThrow(() -> new CustomException(ErrorCodeType.ITEM_NOT_FOUND));
-            ItemUnit itemUnit = itemUnitRepository.findById(childItem.getItemUnit().getItemUnitSeq()).orElseThrow(() -> new CustomException(ErrorCodeType.ITEM_UNIT_NOT_FOUND));
+            ItemUnit childItemUnit = itemUnitRepository.findById(childItem.getItemUnit().getItemUnitSeq()).orElseThrow(() -> new CustomException(ErrorCodeType.ITEM_UNIT_NOT_FOUND));
 
             ItemResponse itemResponse = modelMapper.map(childItem, ItemResponse.class);
-            itemResponse.setItemUnit(itemUnit.getItemUnitTitle());
+            itemResponse.setItemUnitTitle(childItemUnit.getItemUnitTitle());
             itemResponse.setBomChildItemQuantity(bomItem.getBomChildItemQuantity());
 
             childItemList.add(itemResponse);

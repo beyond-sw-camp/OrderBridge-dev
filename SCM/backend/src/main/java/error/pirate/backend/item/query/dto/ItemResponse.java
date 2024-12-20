@@ -21,5 +21,8 @@ public class ItemResponse {
     private LocalDateTime itemRegDate;
     private LocalDateTime itemModDate;
     private Integer bomChildItemQuantity;
-    private String itemUnit;
+    private Long itemUnitSeq;
+    private String itemUnitTitle;
+    private String itemNote;
+    private Long warehouseSeq;
 }

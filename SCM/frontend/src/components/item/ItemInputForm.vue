@@ -1,9 +1,50 @@
 <script setup>
-import {ref, onMounted, watch} from 'vue';
+import {ref, onMounted, watch, defineProps} from 'vue';
 import axios from 'axios';
 import {BButton, BPagination} from "bootstrap-vue-3";
 import plusIcon from "@/assets/plus.svg";
 import router from "@/router/index.js";
+
+const props = defineProps({
+  itemDTO: {type: Object, required: false},
+  childItemList: {type: Array, required: false},
+});
+
+/*const payload = {
+  userSeq: 1,
+  itemUnitSeq: itemUnitSeq.value,
+  itemName: itemName.value,
+  itemDivision: itemDivision.value,
+  itemExpirationHour: itemExpiration.value,
+  itemImageUrl: itemImageUrl.value,
+  itemPrice: itemPrice.value,
+  itemNote: itemNote.value,
+  warehouseSeq: warehouseSeq.value,
+
+  bomItemList: bomItems.value
+};*/
+
+
+watch(props, () => {
+
+  itemUnitSeq.value = props.itemDTO.itemUnitSeq;
+  itemName.value = props.itemDTO.itemName;
+  itemDivision.value = props.itemDTO.itemDivision;
+  itemExpiration.value = props.itemDTO.itemExpirationHour;
+  itemImageUrl.value = props.itemDTO.itemImageUrl;
+  itemPrice.value = props.itemDTO.itemPrice;
+  itemNote.value = props.itemDTO.itemNote;
+  itemUnitSeq.value = props.itemDTO.itemUnitSeq;
+  warehouseSeq.value = props.itemDTO.warehouseSeq;
+
+  bomItems.value = props.childItemList;
+  for(const item of props.childItemList) {
+
+    selectedItems.value.push(item.itemSeq);
+  }
+  updatePreviewImage();
+})
+
 // 폼 데이터 관리
 const itemName = ref('');
 const itemDivision = ref('');
@@ -118,6 +159,66 @@ const registerItems = async () => {
   }
 };
 
+const updateItem = async () => {
+  if (!itemName.value) {
+    alert('품목명을 입력해주세요.');
+    return;
+  } else if(!itemDivision.value) {
+    alert('품목 구분을 선택해주세요.');
+    return;
+  } else if(!itemExpiration.value) {
+    alert('품목 유통기한을 입력해주세요.')
+    return;
+  } else if(!itemPrice.value) {
+    alert('품목 단가를 입력해주세요.')
+    return;
+  } else if(!itemUnitSeq.value) {
+    alert('품목 단위를 선택해주세요.')
+    return;
+  } else if(!warehouseSeq.value) {
+    alert('보관 창고를 입력해주세요.')
+    return;
+  }
+
+  for(const bomItem of bomItems.value) {
+    console.log(bomItem.bomChildItemQuantity);
+    if(!bomItem.bomChildItemQuantity > 0) {
+      alert(`${bomItem.itemName} 품목의 수량을 입력해주세요.`);
+      return;
+    }
+  }
+
+  const payload = {
+    userSeq: 1,
+    itemUnitSeq: itemUnitSeq.value,
+    itemName: itemName.value,
+    itemDivision: itemDivision.value,
+    itemExpirationHour: itemExpiration.value,
+    itemImageUrl: itemImageUrl.value,
+    itemPrice: itemPrice.value,
+    itemNote: itemNote.value,
+    warehouseSeq: warehouseSeq.value,
+
+    bomItemList: bomItems.value
+  };
+
+  isLoading.value = true;
+  try {
+    await axios.put(`http://localhost:8090/api/v1/item/${props.itemDTO.itemSeq}`, payload, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    alert('품목 수정이 완료되었습니다.');
+    await router.push("/item");
+  } catch (error) {
+    console.error('품목 수정 실패:', error.response || error.message);
+    alert('품목 수정에 실패했습니다.');
+  } finally {
+    isLoading.value = false;
+  }
+}
+
 // 초기 데이터 로드
 onMounted(() => {
   fetchItemDivisions();
@@ -198,127 +299,125 @@ const toggleSelection = (itemSeq) => {
 </script>
 
 <template>
-  <div>
-    <h4 class="title">품목관리 > 품목 등록</h4>
-    <div class="d-flex justify-content-end mt-3">
-      <b-button @click="router.push('/item')" variant="light" size="sm" class="button">목록</b-button>
-    </div>
-    <div class="d-flex justify-content-center mt-3">
-      <div class="col-md-10 d-flex">
-        <!-- 왼쪽 이미지 미리보기 -->
-        <div class="col-md-4 pe-4">
-          <div class="preview-image border border-secondary rounded d-flex justify-content-center align-items-center">
-            <img v-if="previewImageUrl" :src="previewImageUrl" alt="이미지 미리보기" class="img-fluid"/>
-            <span v-else>이미지를 추가하세요</span>
-          </div>
-        </div>
-        <!-- 오른쪽 폼 필드들 -->
-        <div class="col-md-8">
-          <!-- 품목명 -->
-          <b-form-group label-cols="3" label-size="default" label="품목명" label-for="itemName">
-            <b-input-group size="sm">
-              <b-form-input type="text" id="itemName" v-model="itemName" placeholder="품목명을 입력하세요"/>
-            </b-input-group>
-          </b-form-group>
-          <!-- 품목 구분 -->
-          <b-form-group label-cols="3" label-size="default" label="품목 구분" label-for="itemDivision">
-            <b-form-select size="sm" id="itemDivision" v-model="itemDivision">
-              <option value="">선택하세요</option>
-              <option v-for="division in itemDivisions" :key="division.key" :value="division.key">{{ division.value }} </option>
-            </b-form-select>
-          </b-form-group>
-          <!-- 품목 유통기한 -->
-          <b-form-group label-cols="3" label-size="default" label="품목 유통기한" label-for="itemExpiration">
-            <b-input-group size="sm">
-              <b-form-input type="number" id="itemExpiration" v-model="itemExpiration" placeholder="유통기한 입력"/>
-              <b-input-group-append>
-                <b-input-group-text>시간</b-input-group-text>
-              </b-input-group-append>
-            </b-input-group>
-          </b-form-group>
-          <!-- 품목 단가 -->
-          <b-form-group label-cols="3" label-size="default" label="품목 단가" label-for="itemPrice">
-            <b-input-group size="sm">
-              <b-form-input type="number" id="itemPrice" v-model="itemPrice" placeholder="단가 입력"/>
-              <b-input-group-append>
-                <b-input-group-text>₩</b-input-group-text>
-              </b-input-group-append>
-            </b-input-group>
-          </b-form-group>
-          <!-- 품목 단위 -->
-          <b-form-group label-cols="3" label-size="default" label="품목 단위" label-for="itemUnitSeq">
-            <b-form-select size="sm" id="itemUnitSeq" v-model="itemUnitSeq">
-              <option value="">선택하세요</option>
-              <option v-for="unit in itemUnits" :key="unit.itemUnitSeq" :value="unit.itemUnitSeq">{{ unit.itemUnitTitle }}</option>
-            </b-form-select>
-          </b-form-group>
-          <!-- 창고 -->
-          <b-form-group label-cols="3" label-size="default" label="창고" label-for="warehouseSeq">
-            <b-form-select size="sm" id="warehouseSeq" v-model="warehouseSeq">
-              <option value="">선택하세요</option>
-              <option v-for="warehouse in warehouses" :key="warehouse.warehouseSeq" :value="warehouse.warehouseSeq">{{ warehouse.warehouseName }}</option>
-            </b-form-select>
-          </b-form-group>
-          <!-- 이미지 URL -->
-          <b-form-group label-cols="3" label-size="default" label="이미지 URL" label-for="itemImageUrl">
-            <b-input-group size="sm">
-              <b-form-input type="text" id="itemImageUrl" v-model="itemImageUrl" @input="updatePreviewImage" placeholder="이미지 URL을 입력하세요"/>
-            </b-input-group>
-          </b-form-group>
-          <!-- 품목 비고 -->
-          <b-form-group label-cols="3" label-size="default" label="품목 비고" label-for="itemNote">
-            <b-form-textarea size="sm" id="itemNote" v-model="itemNote" placeholder="비고를 입력하세요" rows="3"/>
-          </b-form-group>
+  <div class="d-flex justify-content-end mt-3">
+    <b-button @click="router.push('/item')" variant="light" size="sm" class="button">목록</b-button>
+  </div>
+  <div class="d-flex justify-content-center mt-3">
+    <div class="col-md-10 d-flex">
+      <!-- 왼쪽 이미지 미리보기 -->
+      <div class="col-md-4 pe-4">
+        <div class="preview-image border border-secondary rounded d-flex justify-content-center align-items-center">
+          <img v-if="previewImageUrl" :src="previewImageUrl" alt="이미지 미리보기" class="img-fluid"/>
+          <span v-else>이미지를 추가하세요</span>
         </div>
       </div>
-    </div>
-    <div class="px-4 d-flex flex-column align-items-center">
-      <hr class="col-md-10 d-flex flex-column">
-    </div>
-    <!-- BOM 품목 등록 -->
-    <div class="d-flex justify-content-center mt-4">
-      <div class="col-md-9 ms-3"> <!-- ms-3로 들여쓰기 -->
-        <h5 class="title">BOM 등록</h5>
-        <div class="table-responsive">
-          <table class="table table-bordered">
-            <thead>
-              <tr v-if="bomItems.length > 0">
-                <th class="text-center header-image">품목 이미지</th>
-                <th class="text-center header-text">품목명</th>
-                <th class="text-center header-text">품목 구분</th>
-                <th class="text-center header-text">유통기한</th>
-                <th class="text-center header-text">품목 단가</th>
-                <th class="text-center header-text small-input">수량</th>
-                <th class="text-center header-text">단위</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(bomItem, index) in bomItems" :key="index">
-                <td><div class="item-image"><b-img :src="bomItem.itemImageUrl"/></div></td>
-                <td class="text-center">{{ bomItem.itemName }}</td>
-                <td class="text-center">{{ itemDivisionMap[bomItem.itemDivision] }}</td>
-                <td class="text-center">{{ bomItem.itemExpirationHour }} 시간</td>
-                <td class="text-center">{{ bomItem.itemPrice.toLocaleString() }} ₩</td>
-                <td style="white-space: nowrap;">
-                  <b-form-input class="small-input" size="sm" type="number" v-model="bomItem.bomChildItemQuantity" placeholder="수량 입력"/>
-                </td>
-                <td class="text-center">{{ bomItem.itemUnit}}</td>
-              </tr>
-              <tr>
-                <td colspan="7" class="text-center" @click="openModal" data-bs-toggle="modal" data-bs-target="#bomItemModal">
-                  <plusIcon class="icon"/>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+      <!-- 오른쪽 폼 필드들 -->
+      <div class="col-md-8">
+        <!-- 품목명 -->
+        <b-form-group label-cols="3" label-size="default" label="품목명" label-for="itemName">
+          <b-input-group size="sm">
+            <b-form-input type="text" id="itemName" v-model="itemName" placeholder="품목명을 입력하세요"/>
+          </b-input-group>
+        </b-form-group>
+        <!-- 품목 구분 -->
+        <b-form-group label-cols="3" label-size="default" label="품목 구분" label-for="itemDivision">
+          <b-form-select size="sm" id="itemDivision" v-model="itemDivision">
+            <option value="">선택하세요</option>
+            <option v-for="division in itemDivisions" :key="division.key" :value="division.key">{{ division.value }} </option>
+          </b-form-select>
+        </b-form-group>
+        <!-- 품목 유통기한 -->
+        <b-form-group label-cols="3" label-size="default" label="품목 유통기한" label-for="itemExpiration">
+          <b-input-group size="sm">
+            <b-form-input type="number" id="itemExpiration" v-model="itemExpiration" placeholder="유통기한 입력"/>
+            <b-input-group-append>
+              <b-input-group-text>시간</b-input-group-text>
+            </b-input-group-append>
+          </b-input-group>
+        </b-form-group>
+        <!-- 품목 단가 -->
+        <b-form-group label-cols="3" label-size="default" label="품목 단가" label-for="itemPrice">
+          <b-input-group size="sm">
+            <b-form-input type="number" id="itemPrice" v-model="itemPrice" placeholder="단가 입력"/>
+            <b-input-group-append>
+              <b-input-group-text>₩</b-input-group-text>
+            </b-input-group-append>
+          </b-input-group>
+        </b-form-group>
+        <!-- 품목 단위 -->
+        <b-form-group label-cols="3" label-size="default" label="품목 단위" label-for="itemUnitSeq">
+          <b-form-select size="sm" id="itemUnitSeq" v-model="itemUnitSeq">
+            <option value="">선택하세요</option>
+            <option v-for="unit in itemUnits" :key="unit.itemUnitSeq" :value="unit.itemUnitSeq">{{ unit.itemUnitTitle }}</option>
+          </b-form-select>
+        </b-form-group>
+        <!-- 창고 -->
+        <b-form-group label-cols="3" label-size="default" label="창고" label-for="warehouseSeq">
+          <b-form-select size="sm" id="warehouseSeq" v-model="warehouseSeq">
+            <option value="">선택하세요</option>
+            <option v-for="warehouse in warehouses" :key="warehouse.warehouseSeq" :value="warehouse.warehouseSeq">{{ warehouse.warehouseName }}</option>
+          </b-form-select>
+        </b-form-group>
+        <!-- 이미지 URL -->
+        <b-form-group label-cols="3" label-size="default" label="이미지 URL" label-for="itemImageUrl">
+          <b-input-group size="sm">
+            <b-form-input type="text" id="itemImageUrl" v-model="itemImageUrl" @input="updatePreviewImage" placeholder="이미지 URL을 입력하세요"/>
+          </b-input-group>
+        </b-form-group>
+        <!-- 품목 비고 -->
+        <b-form-group label-cols="3" label-size="default" label="품목 비고" label-for="itemNote">
+          <b-form-textarea size="sm" id="itemNote" v-model="itemNote" placeholder="비고를 입력하세요" rows="3"/>
+        </b-form-group>
       </div>
     </div>
+  </div>
+  <div class="px-4 d-flex flex-column align-items-center">
+    <hr class="col-md-10 d-flex flex-column">
+  </div>
+  <!-- BOM 품목 등록 -->
+  <div class="d-flex justify-content-center mt-4">
+    <div class="col-md-9 ms-3"> <!-- ms-3로 들여쓰기 -->
+      <h5 class="title">BOM 등록</h5>
+      <div class="table-responsive">
+        <table class="table table-bordered">
+          <thead>
+            <tr v-if="bomItems.length > 0">
+              <th class="text-center header-image">품목 이미지</th>
+              <th class="text-center header-text">품목명</th>
+              <th class="text-center header-text">품목 구분</th>
+              <th class="text-center header-text">유통기한</th>
+              <th class="text-center header-text">품목 단가</th>
+              <th class="text-center header-text small-input">수량</th>
+              <th class="text-center header-text">단위</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(bomItem, index) in bomItems" :key="index">
+              <td><div class="item-image"><b-img :src="bomItem.itemImageUrl"/></div></td>
+              <td class="text-center">{{ bomItem.itemName }}</td>
+              <td class="text-center">{{ itemDivisionMap[bomItem.itemDivision] }}</td>
+              <td class="text-center">{{ bomItem.itemExpirationHour }} 시간</td>
+              <td class="text-center">{{ bomItem.itemPrice.toLocaleString() }} ₩</td>
+              <td style="white-space: nowrap;">
+                <b-form-input class="small-input" size="sm" type="number" v-model="bomItem.bomChildItemQuantity" placeholder="수량 입력"/>
+              </td>
+              <td class="text-center">{{ bomItem.itemUnitTitle}}</td>
+            </tr>
+            <tr>
+              <td colspan="7" class="text-center" @click="openModal" data-bs-toggle="modal" data-bs-target="#bomItemModal">
+                <plusIcon class="icon"/>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 
-    <!-- 버튼 그룹 -->
-    <div class="d-flex justify-content-end mt-3">
-      <b-button :disabled="isLoading" @click="registerItems" variant="light" size="sm" class="button ms-2">등록</b-button>
-    </div>
+  <!-- 버튼 그룹 -->
+  <div class="d-flex justify-content-end mt-3">
+    <b-button v-if="props" @click="updateItem" variant="light" size="sm" class="button ms-2">수정</b-button>
+    <b-button v-else :disabled="isLoading" @click="registerItems" variant="light" size="sm" class="button ms-2">등록</b-button>
   </div>
 
   <!-- bomItemModal -->

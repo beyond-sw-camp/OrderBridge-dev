@@ -1,31 +1,32 @@
 <script setup>
-  import { onMounted, ref, watch } from 'vue';
-  import axios from 'axios';
-  import { BInputGroup, BFormInput, BFormCheckbox, BButton, BInputGroupText, BPagination } from 'bootstrap-vue-3';
-  import {useRouter} from "vue-router";
-  import dayjs from "dayjs";
-  import item from "../../router/item.js";
-  import editIcon from "@/assets/editIcon.svg";
+import { onMounted, ref, watch } from 'vue';
+import axios from 'axios';
+import { BInputGroup, BFormInput, BFormCheckbox, BButton, BInputGroupText, BPagination } from 'bootstrap-vue-3';
+import {useRouter} from "vue-router";
+import dayjs from "dayjs";
+import item from "../../router/item.js";
+import editIcon from "@/assets/editIcon.svg";
+import trashIcon from "@/assets/trashIcon.svg";
 
-  const router = useRouter();
-  const items = ref([]);
-  const selectedDivisions = ref([]);
-  const searchName = ref("");
-  const rows = ref(0);
-  const perPage = ref(4);
-  const currentPage = ref(1);
+const router = useRouter();
+const items = ref([]);
+const selectedDivisions = ref([]);
+const searchName = ref("");
+const rows = ref(0);
+const perPage = ref(4);
+const currentPage = ref(1);
 
-  // 유통기한 필터용 상태 (일 단위)
-  const minExpiration = ref(null);
-  const maxExpiration = ref(null);
+// 유통기한 필터용 상태 (일 단위)
+const minExpiration = ref(null);
+const maxExpiration = ref(null);
 
-  const itemDivisionList = [
+const itemDivisionList = [
   { key: 'FINISHED', value: '완제품' },
   { key: 'PART', value: '부재료' },
   { key: 'SUB', value: '원재료' },
-  ];
+];
 
-  const itemDivisionMap = {
+const itemDivisionMap = {
   FINISHED: "완제품",
   PART: "부재료",
   SUB: "원재료",
@@ -98,8 +99,8 @@ onMounted(() => {
   findItemsByFilter();
 });
 
-const handleItemUpdate = (item) => {
-  router.push(`/item/update/${item.itemSeq}`);
+const handleItemUpdate = (itemSeq) => {
+  router.push(`/item/update/${itemSeq}`);
 };
 
 function checkItemDivision(key) {
@@ -134,9 +135,17 @@ const itemDetail = async (itemSeq) => {
   }
 }
 
+const itemDelete = async (itemSeq) => {
+  try{
+    await axios.delete(`http://localhost:8090/api/v1/item/${itemSeq}`)
+  } catch (error) {
+    alert(`품목 삭제 실패`);
+  }
+}
 watch(itemInventoryCurrentPage, () => {
   itemInventory.value = itemInventoryList.value[itemInventoryCurrentPage.value - 1];
 })
+
 
 </script>
 
@@ -218,7 +227,10 @@ watch(itemInventoryCurrentPage, () => {
                   <li>유통기한: {{ (item.itemExpirationHour / 24).toFixed(0) }} 일</li>
                   <li>단가: {{ item.itemPrice.toLocaleString() }} ₩</li>
                 </ul>
-                <editIcon @click="handleItemUpdate" class="icon"/>
+                <div class="d-flex justify-content-end mt-3">
+                  <editIcon @click="handleItemUpdate(item.itemSeq)" class="icon"/>
+                  <trashIcon @click="itemDelete(item.itemSeq)" class="icon"/>
+                </div>
               </div>
             </div>
           </div>
@@ -249,7 +261,7 @@ watch(itemInventoryCurrentPage, () => {
                   <li>잔량 / 입고수량: {{ itemInventory.itemInventoryRemainAmount }} / {{ itemInventory.itemInventoryQuantityReceived }}</li>
                   <li v-if="itemInventory.itemInventoryNote">비고: {{ itemInventory.itemInventoryNote }}</li>
                 </ul>
-                <div class="pagenation">
+                <div class="pagination">
                   <b-pagination
                       v-model="itemInventoryCurrentPage"
                       :total-rows="itemInventoryList.length"
@@ -261,13 +273,8 @@ watch(itemInventoryCurrentPage, () => {
           </div>
         </div>
       </div>
-      <div class="pagenation">
-        <b-pagination
-            v-model="currentPage"
-            :total-rows="rows"
-            :per-page="perPage"
-            @change="findItemsByFilter"
-        ></b-pagination>
+      <div class="pagination">
+        <b-pagination v-model="currentPage" :total-rows="rows" :per-page="perPage" @change="findItemsByFilter"></b-pagination>
       </div>
     </div>
   </div>
@@ -345,7 +352,7 @@ div {
   padding: 20px 40px 20px 20px;
 }
 
-.pagenation {
+.pagination {
   justify-items: center;
   margin-top: 20px;
 }
