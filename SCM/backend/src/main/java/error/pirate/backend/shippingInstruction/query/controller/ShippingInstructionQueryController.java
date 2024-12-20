@@ -1,6 +1,6 @@
 package error.pirate.backend.shippingInstruction.query.controller;
 
-import error.pirate.backend.shippingInstruction.command.domain.aggregate.entity.ShippingInstructionAddress;
+import error.pirate.backend.shippingInstruction.command.domain.aggregate.entity.ShippingAddress;
 import error.pirate.backend.shippingInstruction.command.domain.aggregate.entity.ShippingInstructionStatus;
 import error.pirate.backend.shippingInstruction.query.dto.*;
 import error.pirate.backend.shippingInstruction.query.service.ShippingInstructionQueryService;
@@ -93,8 +93,8 @@ public class ShippingInstructionQueryController {
 
     @GetMapping("/address")
     @Operation(summary = "출하지시서 주소 리스트 조회")
-    public ResponseEntity<List<ShippingInstructionAddress.ShippingInstructionAddressResponse>> readShippingInstructionAddress() {
-        return ResponseEntity.ok(ShippingInstructionAddress.readShippingInstructionAddressList());
+    public ResponseEntity<List<ShippingAddress.ShippingInstructionAddressResponse>> readShippingInstructionAddress() {
+        return ResponseEntity.ok(ShippingAddress.readShippingInstructionAddressList());
     }
 
     @Operation(summary = "출하지시서 등록 시 남아있는 주문서 품목 수량 조회", description = "출하지시서 등록 시 남아있는 주문서 품목 수량 조회")

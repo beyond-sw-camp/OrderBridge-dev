@@ -16,7 +16,7 @@ public class ShippingSlipMapper {
                 shippingInstruction,
                 user,
                 shippingSlipName,
-                shippingInstruction.getShippingInstructionAddress(),
+                shippingInstruction.getShippingAddress(),
                 shippingSlipShippingDate,
                 itemTotalQuantity,
                 shippingSlipRequest.getShippingSlipNote()

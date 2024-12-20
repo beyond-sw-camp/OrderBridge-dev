@@ -1,6 +1,6 @@
 package error.pirate.backend.shippingInstruction.query.dto;
 
-import error.pirate.backend.shippingInstruction.command.domain.aggregate.entity.ShippingInstructionAddress;
+import error.pirate.backend.shippingInstruction.command.domain.aggregate.entity.ShippingAddress;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -15,7 +15,7 @@ public class ShippingInstructionDTO {
     private String clientName;  // 거래처명
     private LocalDateTime shippingInstructionScheduledShipmentDate; // 출하예정일
     private int shippingInstructionTotalQuantity;   // 출하지시서 총수량
-    private ShippingInstructionAddress shippingInstructionAddress;  // 출하지시서 주소
+    private ShippingAddress shippingAddress;  // 출하지시서 주소
     private String userName;    // 출하지시서 담당자
     private String shippingInstructionNote; // 출하지시서 비고
 }

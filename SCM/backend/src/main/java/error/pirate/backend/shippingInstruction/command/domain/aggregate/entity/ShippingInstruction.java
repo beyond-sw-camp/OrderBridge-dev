@@ -33,7 +33,7 @@ public class ShippingInstruction {
     private String shippingInstructionName; // 출하지시서 명
 
     @Enumerated(EnumType.STRING)
-    private ShippingInstructionAddress shippingInstructionAddress; // 출하지시서 주소
+    private ShippingAddress shippingAddress; // 출하지시서 주소
 
     @Enumerated(EnumType.STRING)
     private ShippingInstructionStatus shippingInstructionStatus; // 출하지시서 상태
@@ -51,26 +51,26 @@ public class ShippingInstruction {
 
     private String shippingInstructionNote; // 출하 지시서 비고
 
-    private ShippingInstruction(SalesOrder salesOrder, User user, String shippingInstructionName, ShippingInstructionAddress shippingInstructionAddress, LocalDateTime shippingInstructionScheduledShipmentDate, int itemTotalQuantity, String shippingInstructionNote) {
+    private ShippingInstruction(SalesOrder salesOrder, User user, String shippingInstructionName, ShippingAddress shippingAddress, LocalDateTime shippingInstructionScheduledShipmentDate, int itemTotalQuantity, String shippingInstructionNote) {
         this.salesOrder = salesOrder;
         this.user = user;
         this.shippingInstructionName = shippingInstructionName;
-        this.shippingInstructionAddress = shippingInstructionAddress;
+        this.shippingAddress = shippingAddress;
         this.shippingInstructionScheduledShipmentDate = shippingInstructionScheduledShipmentDate;
         this.shippingInstructionStatus = ShippingInstructionStatus.BEFORE;
         this.shippingInstructionTotalQuantity = itemTotalQuantity;
         this.shippingInstructionNote = shippingInstructionNote;
     }
 
-    public static ShippingInstruction create(SalesOrder salesOrder, User user, String shippingInstructionName, ShippingInstructionAddress shippingInstructionAddress, LocalDateTime shippingInstructionScheduledShipmentDate, int itemTotalQuantity, String shippingInstructionNote) {
-        return new ShippingInstruction(salesOrder, user, shippingInstructionName, shippingInstructionAddress, shippingInstructionScheduledShipmentDate, itemTotalQuantity, shippingInstructionNote);
+    public static ShippingInstruction create(SalesOrder salesOrder, User user, String shippingInstructionName, ShippingAddress shippingAddress, LocalDateTime shippingInstructionScheduledShipmentDate, int itemTotalQuantity, String shippingInstructionNote) {
+        return new ShippingInstruction(salesOrder, user, shippingInstructionName, shippingAddress, shippingInstructionScheduledShipmentDate, itemTotalQuantity, shippingInstructionNote);
     }
 
     // 다른 필드를 변경하는 메소드
-    public void update(SalesOrder salesOrder, User user, ShippingInstructionAddress shippingInstructionAddress, LocalDateTime shippingInstructionScheduledShipmentDate, int itemTotalQuantity, String shippingInstructionNote) {
+    public void update(SalesOrder salesOrder, User user, ShippingAddress shippingAddress, LocalDateTime shippingInstructionScheduledShipmentDate, int itemTotalQuantity, String shippingInstructionNote) {
         this.salesOrder = salesOrder;
         this.user = user;
-        this.shippingInstructionAddress = shippingInstructionAddress;
+        this.shippingAddress = shippingAddress;
         this.shippingInstructionScheduledShipmentDate = shippingInstructionScheduledShipmentDate;
         this.shippingInstructionStatus = ShippingInstructionStatus.BEFORE;
         this.shippingInstructionTotalQuantity = itemTotalQuantity;

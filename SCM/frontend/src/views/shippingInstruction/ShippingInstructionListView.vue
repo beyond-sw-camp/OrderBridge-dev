@@ -9,7 +9,8 @@ const pageSize = ref(10);
 const pageNumber = ref(1);
 const shippingInstructionList = ref([]);
 const shippingInstructionStatusList = ref([]);
-const shippingInstructionAddressList = ref([]);
+const shippingAddressList = ref([]);
+
 const searchStartDate = ref(null);
 const searchEndDate = ref(null);
 const searchName = ref(null);
@@ -92,15 +93,15 @@ const fetchShippingInstructionStatusList = async () => {
   }
 };
 
-// 출하지시서 주소 목록 요청
-const fetchShippingInstructionAddressList = async () => {
+// 출하주소 목록 요청
+const fetchShippingAddressList = async () => {
   try {
     const response = await axios.get(`shipping-instruction/address`, {});
 
-    shippingInstructionAddressList.value = response.data;
+    shippingAddressList.value = response.data;
 
   } catch (error) {
-    console.error("출하지시서 주소 목록 불러오기 실패 :", error);
+    console.error("출하주소 목록 불러오기 실패 :", error);
   }
 };
 
@@ -158,7 +159,7 @@ onMounted(async () => {
   await fetchShippingInstructionList();
 
   await fetchShippingInstructionStatusList();
-  await fetchShippingInstructionAddressList();
+  await fetchShippingAddressList();
   await fetchItemDivision();
 });
 
@@ -229,7 +230,7 @@ const handleExtendItem = (seq) => {
                            :searchName="searchName"
                            :shippingInstructionList="shippingInstructionList"
                            :shippingInstructionStatusList="shippingInstructionStatusList"
-                           :shippingInstructionAddressList="shippingInstructionAddressList"
+                           :shippingAddressList="shippingAddressList"
                            :totalCount="totalCount"
                            :pageNumber="pageNumber"
                            :pageSize="pageSize"

@@ -1,7 +1,7 @@
 package error.pirate.backend.shippingSlip.command.domain.aggregate.entity;
 
+import error.pirate.backend.shippingInstruction.command.domain.aggregate.entity.ShippingAddress;
 import error.pirate.backend.shippingInstruction.command.domain.aggregate.entity.ShippingInstruction;
-import error.pirate.backend.shippingInstruction.command.domain.aggregate.entity.ShippingInstructionAddress;
 import error.pirate.backend.user.command.domain.aggregate.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -33,7 +33,7 @@ public class ShippingSlip {
     private String shippingSlipName; // 출하전표 명
 
     @Enumerated(EnumType.STRING)
-    private ShippingInstructionAddress shippingSlipAddress; // 출하전표 주소
+    private ShippingAddress shippingSlipAddress; // 출하전표 주소
 
     @Enumerated(EnumType.STRING)
     private ShippingSlipStatus shippingSlipStatus; // 출하전표 상태
@@ -51,25 +51,25 @@ public class ShippingSlip {
 
     private String shippingSlipNote; // 출하전표 비고
 
-    private ShippingSlip(ShippingInstruction shippingInstruction, User user, String shippingSlipName, ShippingInstructionAddress shippingInstructionAddress, LocalDateTime shippingSlipShippingDate, int itemTotalQuantity, String shippingSlipNote){
+    private ShippingSlip(ShippingInstruction shippingInstruction, User user, String shippingSlipName, ShippingAddress shippingAddress, LocalDateTime shippingSlipShippingDate, int itemTotalQuantity, String shippingSlipNote){
         this.shippingInstruction = shippingInstruction;
         this.user = user;
         this.shippingSlipName = shippingSlipName;
-        this.shippingSlipAddress = shippingInstructionAddress;
+        this.shippingSlipAddress = shippingAddress;
         this.shippingSlipShippingDate = shippingSlipShippingDate;
         this.shippingSlipTotalQuantity = itemTotalQuantity;
         this.shippingSlipNote = shippingSlipNote;
     }
 
-    public static ShippingSlip create(ShippingInstruction shippingInstruction, User user, String shippingSlipName, ShippingInstructionAddress shippingSlipAddress, LocalDateTime shippingSlipShippingDate, int itemTotalQuantity, String shippingSlipNote) {
+    public static ShippingSlip create(ShippingInstruction shippingInstruction, User user, String shippingSlipName, ShippingAddress shippingSlipAddress, LocalDateTime shippingSlipShippingDate, int itemTotalQuantity, String shippingSlipNote) {
         return new ShippingSlip(shippingInstruction, user, shippingSlipName, shippingSlipAddress, shippingSlipShippingDate, itemTotalQuantity, shippingSlipNote);
     }
 
     // 다른 필드를 변경하는 메소드
-    public void update(ShippingInstruction shippingInstruction, User user, ShippingInstructionAddress shippingInstructionAddress, LocalDateTime shippingSlipShippingDate, int itemTotalQuantity, String shippingSlipNote) {
+    public void update(ShippingInstruction shippingInstruction, User user, ShippingAddress shippingAddress, LocalDateTime shippingSlipShippingDate, int itemTotalQuantity, String shippingSlipNote) {
         this.shippingInstruction = shippingInstruction;
         this.user = user;
-        this.shippingSlipAddress = shippingInstructionAddress;
+        this.shippingSlipAddress = shippingAddress;
         this.shippingSlipShippingDate = shippingSlipShippingDate;
         this.shippingSlipTotalQuantity = itemTotalQuantity;
         this.shippingSlipNote = shippingSlipNote;

@@ -1,7 +1,5 @@
 package error.pirate.backend.shippingSlip.query.controller;
 
-import error.pirate.backend.shippingInstruction.query.dto.ShippingInstructionListRequest;
-import error.pirate.backend.shippingInstruction.query.dto.ShippingInstructionSituationRequest;
 import error.pirate.backend.shippingSlip.query.dto.*;
 import error.pirate.backend.shippingSlip.query.service.ShippingSlipQueryService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -9,14 +7,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 @Tag(name = "출하전표")

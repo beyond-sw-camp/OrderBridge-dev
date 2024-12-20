@@ -43,7 +43,7 @@ import statisticsIcon from '@/assets/statisticsIcon.svg'
           <RouterLink to="/shipping-instruction" class="none-line" active-class="active">
             <b-dropdown-item>출하지시서 관리</b-dropdown-item>
           </RouterLink>
-          <RouterLink to="" class="none-line" active-class="active">
+          <RouterLink to="/shipping-slip" class="none-line" active-class="active">
             <b-dropdown-item>출하 관리</b-dropdown-item>
           </RouterLink>
         </b-nav-item-dropdown>
@@ -119,7 +119,7 @@ import statisticsIcon from '@/assets/statisticsIcon.svg'
   background-color: #FFF9EA;
 }
 
-.none-decoration {
+.none-line {
   text-decoration: none;
 }
 </style>
