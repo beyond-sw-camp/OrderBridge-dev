@@ -57,6 +57,9 @@ public class PurchaseApplicationService {
             User user = userDomainService.findById(request.getUserSeq());
             Warehouse warehouse = warehouseDomainService.findById(request.getWarehouseSeq());
             purchase.objectInjection(user, warehouse, purchaseOrder);
+            purchase.changePurchaseTotalQuantity(
+                    request.getPurchaseItemDtoList().stream().mapToInt(PurchaseItemDto::getPurchaseItemQuantity).sum()
+            );
 
             Purchase purchaseResponse = purchaseDomainService.createPurchase(purchase);
 
