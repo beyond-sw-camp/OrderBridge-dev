@@ -247,7 +247,7 @@ watch(itemInventoryCurrentPage, () => {
                 <h5 class="item-name">{{ itemDTO.itemName }} BOM</h5>
                 <ul class="list-unstyled">
                   <li v-for="childItem in childItemList" :key="childItem.itemSeq">
-                    · {{ childItem.itemName }} : {{ childItem.bomChildItemQuantity }} {{ childItem.itemUnit }}
+                    · {{ childItem.itemName }} : {{ childItem.bomChildItemQuantity }} {{ childItem.itemUnitTitle }}
                   </li>
                 </ul>
               </div>
