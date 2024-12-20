@@ -33,7 +33,8 @@ public class ShippingSlip {
     private String shippingSlipName; // 출하전표 명
 
     @Enumerated(EnumType.STRING)
-    private ShippingAddress shippingSlipAddress; // 출하전표 주소
+    @Column(name = "shippingSlipAddress")
+    private ShippingAddress shippingAddress; // 출하 주소
 
     @Enumerated(EnumType.STRING)
     private ShippingSlipStatus shippingSlipStatus; // 출하전표 상태
@@ -55,7 +56,7 @@ public class ShippingSlip {
         this.shippingInstruction = shippingInstruction;
         this.user = user;
         this.shippingSlipName = shippingSlipName;
-        this.shippingSlipAddress = shippingAddress;
+        this.shippingAddress = shippingAddress;
         this.shippingSlipShippingDate = shippingSlipShippingDate;
         this.shippingSlipTotalQuantity = itemTotalQuantity;
         this.shippingSlipNote = shippingSlipNote;
@@ -69,7 +70,7 @@ public class ShippingSlip {
     public void update(ShippingInstruction shippingInstruction, User user, ShippingAddress shippingAddress, LocalDateTime shippingSlipShippingDate, int itemTotalQuantity, String shippingSlipNote) {
         this.shippingInstruction = shippingInstruction;
         this.user = user;
-        this.shippingSlipAddress = shippingAddress;
+        this.shippingAddress = shippingAddress;
         this.shippingSlipShippingDate = shippingSlipShippingDate;
         this.shippingSlipTotalQuantity = itemTotalQuantity;
         this.shippingSlipNote = shippingSlipNote;
