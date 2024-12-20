@@ -12,7 +12,7 @@ import statisticsIcon from '@/assets/statisticsIcon.svg'
 <template>
   <b-navbar toggleable="lg" type="dark" class="header">
     <!-- 로고 -->
-    <b-navbar-brand href="#">
+    <b-navbar-brand href="/">
       <img src="@/images/logo.png" alt="OrderBridge Logo" class="logo-img" />
     </b-navbar-brand>
     <b-collapse id="nav-collapse" is-nav>
