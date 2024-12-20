@@ -124,4 +124,37 @@
         tpo.purchase_order_reg_date WITH ROLLUP;
     </select>
 
+    <select id="readPurchaseOrderStockSituationList" resultType="error.pirate.backend.purchaseOrder.query.dto.PurchaseOrderSituationResponse">
+        SELECT
+            tpo.purchase_order_name,
+            tpo.purchase_order_reg_date,
+            tpo.purchase_order_total_quantity,
+            tpo.purchase_order_extended_price,
+            tpo.purchase_order_target_due_date,
+            tpo.purchase_order_reg_date,
+            tc.client_name,
+            DATE_FORMAT(tpo.purchase_order_reg_date, '%Y-%m') as purchase_order_reg_month,
+            IFNULL(SUM(tpo.purchase_order_extended_price), 0) as purchase_order_month_price,
+            IFNULL(SUM(tpo.purchase_order_total_quantity), 0) as purchase_order_month_quantity
+        FROM tb_purchase_order tpo
+        JOIN tb_client tc USING (client_seq)
+        WHERE tpo.purchase_order_status != 'DELETE'
+        <if test="searchStartDate != null and searchStartDate != ''">
+            <![CDATA[
+                AND #{searchStartDate} <= tpo.purchase_order_reg_date
+                ]]>
+        </if>
+        <if test="searchEndDate != null and searchEndDate != ''">
+            <![CDATA[
+                AND #{searchEndDate} >= tpo.purchase_order_reg_date
+                ]]>
+        </if>
+        <if test="searchName != null">
+            AND tc.client_name LIKE CONCAT('%', #{searchName}, '%')
+        </if>
+        GROUP BY
+        DATE_FORMAT(tpo.purchase_order_reg_date, '%Y-%m'),
+        tpo.purchase_order_reg_date WITH ROLLUP;
+    </select>
+
 </mapper>
