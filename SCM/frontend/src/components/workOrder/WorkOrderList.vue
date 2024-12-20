@@ -260,7 +260,7 @@ function search() {
           </div>
         </template>
         <template v-else>
-          <b-card-text class="no-list-text">해당 검색조건에 부합한 작업지시서 존재하지 않습니다.</b-card-text>
+          <b-card-text class="no-list-text">해당 검색조건에 부합한 작업지시서가 존재하지 않습니다.</b-card-text>
         </template>
       </div>
 
