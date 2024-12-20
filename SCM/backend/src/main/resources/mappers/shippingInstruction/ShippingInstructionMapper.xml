@@ -74,12 +74,17 @@
             resultType="error.pirate.backend.shippingInstruction.query.dto.ShippingInstructionDTO">
         SELECT
             si.shipping_instruction_seq,
+            si.sales_order_seq,
+            so.sales_order_name,
+            c.client_name,
             si.shipping_instruction_scheduled_shipment_date,
             si.shipping_instruction_total_quantity,
             si.shipping_instruction_address,
             u.user_name,
             si.shipping_instruction_note
         FROM tb_shipping_instruction si
+        JOIN tb_sales_order so ON (si.sales_order_seq = so.sales_order_seq)
+        JOIN tb_client c ON (so.client_seq = c.client_seq)
         JOIN tb_user u ON (si.user_seq = u.user_seq)
         WHERE si.shipping_instruction_seq = #{shippingInstructionSeq}
     </select>

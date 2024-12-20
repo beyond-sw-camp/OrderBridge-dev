@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -13,10 +15,9 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProductionReceivingUpdateRequest {
-    private Long productionWarehouseSeq; // 생산 공장 번호
-    private Long storeWarehouseSeq; // 입고 창고 번호
-    private String productionReceivingName; // 생산입고명
+    private List<Long> workOrderSeqList; // 작업지시서 번호
     private Integer productionReceivingExtendedPrice; // 생산입고 총액
     private String productionReceivingNote; // 생산입고 비고
+    private LocalDateTime productionReceivingReceiptDate;
     private List<ProductionReceivingItemDTO> productionReceivingItemList; // 생산입고 품목
 }

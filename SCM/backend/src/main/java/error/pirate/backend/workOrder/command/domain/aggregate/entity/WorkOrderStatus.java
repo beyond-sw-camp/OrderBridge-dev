@@ -11,8 +11,8 @@ import lombok.RequiredArgsConstructor;
 public enum WorkOrderStatus {
     BEFORE("결재 전"), // 결재전
     AFTER("결재 후"), // 결재후
-    ONGOING("진행중"), // 진행중
-    COMPLETE("완료"), // 완료
+    ONGOING("생산 진행중"), // 생산 진행중
+    COMPLETE("생산완료"), // 생산 완료
     STOP("중단"),    // 중단
     DELETE("삭제");  // 삭제
 

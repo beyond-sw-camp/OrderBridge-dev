@@ -1,9 +1,10 @@
 <script setup>
-import ShippingInstructionInputForm from "@/components/shippingInstruction/ShippingInstructionInputForm.vue";
-import ShippingInstructionInputItems from "@/components/shippingInstruction/ShippingInstructionInputItems.vue";
 import {onMounted, ref} from "vue";
 import axios from "axios";
 import router from "@/router/index.js";
+import {useRoute} from "vue-router";
+import ShippingInstructionEditForm from "@/components/shippingInstruction/ShippingInstructionEditForm.vue";
+import ShippingInstructionEditItems from "@/components/shippingInstruction/ShippingInstructionEditItems.vue";
 
 const totalCount = ref(0);
 const pageSize = ref(10);
@@ -17,6 +18,23 @@ const selectedSalesOrder = ref(false);
 
 // 자식으로 부터 데이터 받아옴
 const childRef = ref(null);
+
+// 라우터의 값 받기
+const route = useRoute();
+const editShippingInstruction = ref({});
+const editItemList = ref([]);
+
+const fetchShippingInstruction = async (seq) => {
+  try {
+    const response = await axios.get(`http://localhost:8090/api/v1/shipping-instruction/${seq}`, {});
+
+    editShippingInstruction.value = response.data.shippingInstructionDTO; // ref 값에 추가
+    editItemList.value = response.data.itemList;
+
+  } catch (error) {
+    console.error("상세 출하지시서 불러오기 실패 :", error);
+  }
+};
 
 const fetchSalesOrderList = async () => {
   try {
@@ -37,7 +55,6 @@ const fetchSalesOrderList = async () => {
       }
     });
 
-    console.log(response);
     salesOrderList.value = response.data.salesOrder;
     totalCount.value = response.data.totalSalesOrder;
 
@@ -68,14 +85,27 @@ const fetchSalesOrder = async (salesOrderSeq) => {
       }
     });
 
-    console.log(response.data.salesOrderItem);
+    console.log(`response : `, response.data);
+    console.log(`quantityResponse : `, quantityResponse.data);
 
     if (Array.isArray(quantityResponse.data) && response.data.salesOrderItem.length === quantityResponse.data.length) {
-      // 수량 업데이트 및 필터링
       const updatedItems = response.data.salesOrderItem
           .map((item, index) => {
-            item.salesOrderItemQuantity = quantityResponse.data[index]; // 각 아이템의 quantity를 업데이트
-            return item; // 업데이트된 아이템 반환
+            // response.data.salesOrderSeq와 editShippingInstruction.value.salesOrderSeq가 동일한 경우
+            if (response.data.salesOrderSeq === editShippingInstruction.value.salesOrderSeq) {
+              // editItemList에서 itemSeq와 일치하는 아이템을 찾음
+              const matchedItem = editItemList.value.find(editItem => editItem.itemSeq === item.itemSeq);
+
+              // 매칭되는 항목이 있다면 shippingInstructionItemQuantity 추가, 없으면 0
+              item.shippingInstructionItemQuantity = matchedItem ? matchedItem.shippingInstructionItemQuantity : 0;
+              // 이전 것을 포함하여 quantity를 업데이트
+              item.salesOrderItemQuantity = quantityResponse.data[index] + item.shippingInstructionItemQuantity;
+            } else {
+              // 그냥 바로 quantity를 업데이트
+              item.salesOrderItemQuantity = quantityResponse.data[index];
+            }
+
+            return item;
           })
           .filter(item => item.salesOrderItemQuantity > 0); // 수량이 0인 항목은 제외
 
@@ -109,9 +139,9 @@ const fetchShippingInstructionAddressList = async () => {
   }
 };
 
-const createShippingInstruction = async (formData, itemData) => {
+const updateShippingInstruction = async (formData, itemData, seq) => {
   try {
-    const response = await axios.post('http://localhost:8090/api/v1/shipping-instruction',
+    const response = await axios.put(`http://localhost:8090/api/v1/shipping-instruction/${seq}`,
         {
           shippingInstructionScheduledShipmentDate: formData.value.shippingInstructionDate,
           salesOrderSeq: formData.value.salesOrderSeq,
@@ -125,7 +155,7 @@ const createShippingInstruction = async (formData, itemData) => {
         }, {});
 
     console.log(response);
-    alert('출하지시서가 등록되었습니다!');
+    alert('출하지시서가 수정되었습니다!');
     // 조회 페이지 이동
     await router.push("/shipping-instruction");
 
@@ -143,6 +173,10 @@ const createShippingInstruction = async (formData, itemData) => {
 };
 
 onMounted(async () => {
+  await fetchShippingInstruction(route.params.seq); // 수정할 데이터 호출
+  await fetchSalesOrder(editShippingInstruction.value.salesOrderSeq);
+  selectedSalesOrder.value = true;
+
   await fetchSalesOrderList();
   await fetchShippingInstructionAddressList();
 });
@@ -154,8 +188,8 @@ const handlePage = (newPageNumber) => {
 };
 
 // 주문서 전달
-const handleSalesOrder = (formData) => {
-  fetchSalesOrder(formData.value.salesOrderSeq);
+const handleSalesOrder = async (formData) => {
+  await fetchSalesOrder(formData.value.salesOrderSeq);
   selectedSalesOrder.value = true;
 }
 
@@ -164,8 +198,8 @@ const handleUpdateItemList = (updatedList) => {
   itemList.value = updatedList; // 자식에서 전달된 새 itemList로 갱신
 };
 
-// 등록 핸들러
-const handleRegister = async (itemList) => {
+// 수정 핸들러
+const handleUpdate = async (itemList) => {
   if (childRef.value) {
     const formData = childRef.value.getData();
     const itemData = itemList.value;
@@ -199,7 +233,7 @@ const handleRegister = async (itemList) => {
     }
 
     // 체크 후 등록 실행
-    await createShippingInstruction(formData, itemData);
+    await updateShippingInstruction(formData, itemData, route.params.seq);
 
   } else {
     alert("자식 컴포넌트가 준비되지 않았습니다.");
@@ -208,29 +242,30 @@ const handleRegister = async (itemList) => {
 </script>
 
 <template>
-  <h4 class="title">영업관리 > 출하지시서 등록</h4>
+  <h4 class="title">영업관리 > 출하지시서 수정</h4>
   <div class="d-flex justify-content-end mt-3">
     <b-button @click="router.push('/shipping-instruction')" variant="light" size="sm" class="button ms-2">목록</b-button>
   </div>
   <div class="d-flex justify-content-center">
-    <ShippingInstructionInputForm ref="childRef"
-                                  :salesOrderList="salesOrderList"
-                                  :totalCount="totalCount"
-                                  :pageNumber="pageNumber"
-                                  :pageSize="pageSize"
-                                  :registerListener="registerListener"
-                                  :addressList="addressList"
-                                  @pageEvent="handlePage"
-                                  @salesOrderEvent="handleSalesOrder"/>
+    <ShippingInstructionEditForm ref="childRef"
+                                 :salesOrderList="salesOrderList"
+                                 :totalCount="totalCount"
+                                 :pageNumber="pageNumber"
+                                 :pageSize="pageSize"
+                                 :registerListener="registerListener"
+                                 :addressList="addressList"
+                                 :editShippingInstruction="editShippingInstruction"
+                                 @pageEvent="handlePage"
+                                 @salesOrderEvent="handleSalesOrder"/>
   </div>
   <div class="px-4 d-flex flex-column align-items-center">
     <hr class="col-md-10 d-flex flex-column">
   </div>
   <div class="d-flex justify-content-center">
-    <ShippingInstructionInputItems :itemList="itemList"
-                                   :selectedSalesOrder="selectedSalesOrder"
-                                   @registerEvent="handleRegister"
-                                   @updateItemListEvent="handleUpdateItemList"/>
+    <ShippingInstructionEditItems :itemList="itemList"
+                                  :selectedSalesOrder="selectedSalesOrder"
+                                  @updateEvent="handleUpdate"
+                                  @updateItemListEvent="handleUpdateItemList"/>
   </div>
 </template>
 

@@ -161,10 +161,10 @@ const toggleSubMenu = (subMenu) => {
             <span @click="toggleSubMenu('item')">작업지시서</span>
             <ul v-if="activeSubMenu === 'item'">
               <li>
-                <RouterLink class="content-item" to="">작업지시서 조회</RouterLink>
+                <RouterLink class="content-item" to="/workOrder" active-class="active" replace>작업지시서 조회</RouterLink>
                 <RouterLink class="content-item" to="">작업지시서 등록</RouterLink>
                 <RouterLink class="content-item" to="">작업지시서 작업처리</RouterLink>
-                <RouterLink class="content-item" to="">작업지시서 진행현황</RouterLink>
+                <RouterLink class="content-item" to="">작업지시서 현황</RouterLink>
               </li>
             </ul>
           </li>
@@ -182,9 +182,9 @@ const toggleSubMenu = (subMenu) => {
             <span @click="toggleSubMenu('warehouse')">생산입고</span>
             <ul v-if="activeSubMenu === 'warehouse'">
               <li>
-                <RouterLink class="content-item" to="">생산입고 조회</RouterLink>
-                <RouterLink class="content-item" to="">생산입고 입력</RouterLink>
-                <RouterLink class="content-item" to="">생산입고 현황</RouterLink>
+                <RouterLink class="content-item" to="/productionReceiving">생산입고 조회</RouterLink>
+                <RouterLink class="content-item" to="/productionReceiving/register">생산입고 입력</RouterLink>
+                <RouterLink class="content-item" to="/productionReceiving/situation">생산입고 현황</RouterLink>
               </li>
             </ul>
           </li>
@@ -195,20 +195,47 @@ const toggleSubMenu = (subMenu) => {
         <span @click="toggleMenu('stats')"><statisticsIcon class="icon"/>통계</span>
         <ul v-if="activeMenu === 'stats'">
           <li>
-            <RouterLink class="content-item" to="">재고관리 현황</RouterLink>
+            <span @click="toggleSubMenu('stock')">재고관리 현황</span>
+            <ul v-if="activeSubMenu === 'stock'">
+              <li>
+                <RouterLink class="content-item" to="">품목별 창고 현황</RouterLink>
+              </li>
+            </ul>
           </li>
           <li>
-            <RouterLink class="content-item" to="">영업관리 현황</RouterLink>
+            <span @click="toggleSubMenu('sale')">영업관리 현황</span>
+            <ul v-if="activeSubMenu === 'sale'">
+              <li>
+                <RouterLink class="content-item" to="">견적서 현황</RouterLink>
+                <RouterLink class="content-item" to="">주문서 현황</RouterLink>
+                <RouterLink class="content-item" to="">거래명세서 현황</RouterLink>
+                <RouterLink class="content-item" to="">출하지시서 현황</RouterLink>
+                <RouterLink class="content-item" to="">출하전표 현황</RouterLink>
+              </li>
+            </ul>
           </li>
           <li>
-            <RouterLink class="content-item" to="">구매관리 현황</RouterLink>
+            <span @click="toggleSubMenu('order')">주문관리 현황</span>
+            <ul v-if="activeSubMenu === 'order'">
+              <li>
+                <RouterLink class="content-item" to="">발주 현황</RouterLink>
+                <RouterLink class="content-item" to="">구매 현황</RouterLink>
+              </li>
+            </ul>
           </li>
           <li>
-            <RouterLink class="content-item" to="">기타 현황</RouterLink>
+            <span @click="toggleSubMenu('production')">생산관리 현황</span>
+            <ul v-if="activeSubMenu === 'production'">
+              <li>
+                <RouterLink class="content-item" to="">작업지시서 현황</RouterLink>
+                <RouterLink class="content-item" to="">생산불출 현황</RouterLink>
+                <RouterLink class="content-item" to="/productionReceiving/situation">생산입고 현황</RouterLink>
+              </li>
+            </ul>
           </li>
         </ul>
       </li>
-      </ul>
+    </ul>
   </aside>
 </template>
 
@@ -240,6 +267,7 @@ const toggleSubMenu = (subMenu) => {
 }
 
 .side-bar {
+
   position: fixed;
   top: 76px; /* 헤더의 높이 */
   bottom: 0;

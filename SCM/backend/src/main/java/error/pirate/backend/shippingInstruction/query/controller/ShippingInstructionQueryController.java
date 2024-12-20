@@ -1,10 +1,8 @@
 package error.pirate.backend.shippingInstruction.query.controller;
 
-import error.pirate.backend.shippingInstruction.query.dto.ShippingInstructionListRequest;
-import error.pirate.backend.shippingInstruction.query.dto.ShippingInstructionListResponse;
-import error.pirate.backend.shippingInstruction.query.dto.ShippingInstructionResponse;
-import error.pirate.backend.shippingInstruction.query.dto.ShippingInstructionSituationRequest;
-import error.pirate.backend.shippingInstruction.query.dto.ShippingInstructionSituationResponse;
+import error.pirate.backend.shippingInstruction.command.domain.aggregate.entity.ShippingInstructionAddress;
+import error.pirate.backend.shippingInstruction.command.domain.aggregate.entity.ShippingInstructionStatus;
+import error.pirate.backend.shippingInstruction.query.dto.*;
 import error.pirate.backend.shippingInstruction.query.service.ShippingInstructionQueryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -85,6 +83,18 @@ public class ShippingInstructionQueryController {
         return ResponseEntity.ok()
                 .headers(headersResponse)
                 .body(excelData);
+    }
+
+    @GetMapping("/status")
+    @Operation(summary = "견적서 상태 분류 조회")
+    public ResponseEntity<List<ShippingInstructionStatus.ShippingInstructionStatusResponse>> readShippingInstructionStatus() {
+        return ResponseEntity.ok(ShippingInstructionStatus.readShippingInstructionStatusList());
+    }
+
+    @GetMapping("/address")
+    @Operation(summary = "견적서 주소 리스트 조회")
+    public ResponseEntity<List<ShippingInstructionAddress.ShippingInstructionAddressResponse>> readShippingInstructionAddress() {
+        return ResponseEntity.ok(ShippingInstructionAddress.readShippingInstructionAddressList());
     }
 
     @Operation(summary = "출하지시서 등록 시 남아있는 주문서 품목 수량 조회", description = "출하지시서 등록 시 남아있는 주문서 품목 수량 조회")

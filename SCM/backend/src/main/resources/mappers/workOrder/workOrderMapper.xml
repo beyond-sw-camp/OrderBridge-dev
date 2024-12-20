@@ -32,14 +32,14 @@
             AND warehouse_name like concat('%', #{filter.warehouseName}, '%')
         </if>
         <!-- 작업지시일 검색 필터링 -->
-        <if test="filter.startDate != null">
+        <if test="startDateTime != null">
             <![CDATA[
-                AND work_order_indicated_date >= #{filter.startDate}
+                AND work_order_indicated_date >= #{startDateTime}
                 ]]>
         </if>
-        <if test="filter.endDate != null">
+        <if test="EndDateTime != null">
             <![CDATA[
-                AND work_order_indicated_date <= #{filter.endDate}
+                AND work_order_indicated_date <= #{EndDateTime}
                 ]]>
         </if>
         ORDER BY wo.work_order_indicated_date DESC
@@ -109,9 +109,11 @@
              , iu.item_unit_title
              , i.item_division
              , i.item_note
+             , w.warehouse_name AS ingredient_warehouse_name
           FROM tb_work_order wo
           JOIN tb_item i ON wo.item_seq = i.item_seq
           JOIN tb_item_unit iu ON i.item_unit_seq = iu.item_unit_seq
+          JOIN tb_warehouse w ON i.warehouse_seq = w.warehouse_seq
          WHERE wo.work_order_seq = #{workOrderSeq}
     </select>
 

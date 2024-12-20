@@ -32,21 +32,15 @@ public class ProductionReceivingQueryRepositoryImpl implements ProductionReceivi
     @Override
     public Page<ProductionReceivingListDTO> findAllByFilter(ProductionReceivingListRequest request, Pageable pageable) {
 
-        QWarehouse productionWarehouse = new QWarehouse("productionWarehouse");
-        QWarehouse storeWarehouse = new QWarehouse("storeWarehouse");
-
         List<ProductionReceivingListDTO> results = queryFactory
                 .select(Projections.constructor(ProductionReceivingListDTO.class,
                         productionReceiving.productionReceivingSeq,
                         productionReceiving.productionReceivingName,
                         productionReceiving.productionReceivingRegDate,
                         productionReceiving.productionReceivingStatus,
-                        productionWarehouse.warehouseName.as("productionWarehouse"),
-                        storeWarehouse.warehouseName.as("storeWarehouse")
+                        productionReceiving.productionReceivingReceiptDate
                 ))
                 .from(productionReceiving)
-                .leftJoin(productionReceiving.productionWarehouse, productionWarehouse)
-                .leftJoin(productionReceiving.storeWarehouse, storeWarehouse)
                 .where(productReceivingNameEq(request.getSearchName()),
                         productReceivingStatusIn(request.getSearchStatus()),
                         productReceivingRegDateGoeLoe(request.getSearchStartDate(), request.getSearchEndDate()),
@@ -59,8 +53,6 @@ public class ProductionReceivingQueryRepositoryImpl implements ProductionReceivi
         Long count = queryFactory
                 .select(productionReceiving.count())
                 .from(productionReceiving)
-                .leftJoin(productionReceiving.productionWarehouse, productionWarehouse)
-                .leftJoin(productionReceiving.storeWarehouse, storeWarehouse)
                 .where(productReceivingNameEq(request.getSearchName()),
                         productReceivingStatusIn(request.getSearchStatus()),
                         productReceivingRegDateGoeLoe(request.getSearchStartDate(), request.getSearchEndDate()),

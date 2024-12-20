@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -18,17 +19,15 @@ public class ProductionReceivingListDTO {
     private String productionReceivingName;
     private LocalDateTime productReceivingRegDate;
     private ProductionReceivingStatus productionReceivingStatus;
-    private String productionWarehouseName;
-    private String storeWarehouseName;
+    private LocalDateTime productionReceivingReceiptDate;
 
     private List<ProductionReceivingItemQueryDTO> productionReceivingItemList;
 
-    public ProductionReceivingListDTO(Long productionReceivingSeq, String productionReceivingName, LocalDateTime productReceivingRegDate, ProductionReceivingStatus productionReceivingStatus, String productionWarehouseName, String storeWarehouseName) {
+    public ProductionReceivingListDTO(Long productionReceivingSeq, String productionReceivingName, LocalDateTime productReceivingRegDate, ProductionReceivingStatus productionReceivingStatus, LocalDateTime productionReceivingReceiptDate) {
         this.productionReceivingSeq = productionReceivingSeq;
         this.productionReceivingName = productionReceivingName;
         this.productReceivingRegDate = productReceivingRegDate;
         this.productionReceivingStatus = productionReceivingStatus;
-        this.productionWarehouseName = productionWarehouseName;
-        this.storeWarehouseName = storeWarehouseName;
+        this.productionReceivingReceiptDate = productionReceivingReceiptDate;
     }
 }

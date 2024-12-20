@@ -133,22 +133,15 @@ public class ShippingInstructionDomainService {
     }
 
     // 주문서와 출하지시서의 품목 수량 비교
-    public boolean validateItem(long salesOrderSeq) {
+    public void validateItem(long salesOrderSeq) {
         List<ShippingInstructionItemCheckDTO> shippingInstructionItemCheckList =
                 shippingInstructionQueryService.shippingInstructionItemCheck(salesOrderSeq);
 
         /* 체크 후 잔여 수량이 마이너스면 에러 발생 */
-        /* 체크 후 잔여 수량이 모두 0이면 true 반환 */
-        boolean allRemainingQuantitiesZero = true;
         for (ShippingInstructionItemCheckDTO shippingInstructionItemCheck : shippingInstructionItemCheckList) {
             if (shippingInstructionItemCheck.getRemainingQuantity() < 0) {
                 throw new CustomException(ErrorCodeType.SHIPPING_INSTRUCTION_ITEM_NOT_MATCH);
             }
-            if (shippingInstructionItemCheck.getRemainingQuantity() > 0) {
-                allRemainingQuantitiesZero = false; // 잔여 수량이 0보다 크면 false로 설정
-            }
         }
-
-        return allRemainingQuantitiesZero;
     }
 }
