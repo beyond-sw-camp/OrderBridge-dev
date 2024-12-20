@@ -2,7 +2,7 @@ package error.pirate.backend.shippingInstruction.query.service;
 
 import error.pirate.backend.shippingInstruction.query.dto.ShippingInstructionListRequest;
 import error.pirate.backend.shippingInstruction.query.dto.ShippingInstructionSituationRequest;
-import error.pirate.backend.shippingInstruction.query.dto.ShippingInstructionStatus;
+import error.pirate.backend.shippingInstruction.command.domain.aggregate.entity.ShippingInstructionStatus;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;

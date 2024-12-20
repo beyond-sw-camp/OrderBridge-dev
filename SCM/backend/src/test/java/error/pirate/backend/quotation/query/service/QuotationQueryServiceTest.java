@@ -1,5 +1,6 @@
 package error.pirate.backend.quotation.query.service;
 
+import error.pirate.backend.quotation.command.domain.aggregate.entity.QuotationStatus;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -38,7 +39,7 @@ class QuotationQueryServiceTest {
     @MethodSource("readQuotationListParam")
     void readQuotationList(Integer page, Integer size,
                           LocalDate startDate, LocalDate endDate,
-                          String clientName, List<String> quotationStatus) {
+                          String clientName, List<QuotationStatus> quotationStatus) {
 
         assertDoesNotThrow(() -> quotationQueryService.readQuotationList(
                 page, size, startDate, endDate, clientName, quotationStatus));

@@ -1,14 +1,15 @@
 <script setup>
-import {computed, defineProps, ref, watch} from "vue";
+import {computed, defineProps, onMounted, ref, watch} from "vue";
 import searchIcon from '@/assets/searchIcon.svg'
 import dayjs from "dayjs";
 
 const props = defineProps({
-  salesOrderList: {type: Array, required: true},       // 출하지시서 목록
+  salesOrderList: {type: Array, required: true},       // 주문서 목록
   totalCount: {type: Number, required: true},       // 검색 결과 총 개수
   pageNumber: {type: Number, required: true},       // 현재 페이지 번호
   pageSize: {type: Number, required: true},         // 페이지 사이즈
   addressList: {type: Array, required: true},   // 출하지시서 주소 목록
+  editShippingInstruction: {type: Object, required: true}, // 이전 출하지시서 항목
 });
 
 const emit = defineEmits(
@@ -23,6 +24,22 @@ const formData = ref({
   note: '',
 });
 const pageNumber = ref(props.pageNumber);
+
+// props.editShippingInstruction 값이 변경되면 formData를 업데이트
+watch(
+    () => props.editShippingInstruction,
+    (newVal) => {
+      formData.value = {
+        salesOrderSeq: newVal.salesOrderSeq,
+        shippingInstructionDate: newVal.shippingInstructionScheduledShipmentDate,
+        salesOrder: newVal.salesOrderName,
+        client: newVal.clientName,
+        address: newVal.shippingInstructionAddress,
+        note: newVal.shippingInstructionNote,
+      };
+    },
+    { immediate: true } // 초기 실행 시에도 동작하도록 설정
+);
 
 watch(pageNumber, () => {
   emit('pageEvent', pageNumber);
@@ -156,7 +173,7 @@ const formatStatus = (status) => {
               </div>
             </template>
             <template v-else>
-              <b-card-text class="no-list-text">해당 검색조건에 부합한 주문서가 존재하지 않습니다.</b-card-text>
+              <b-card-text class="no-list-text">해당 검색조건에 부합한 출하지시서가 존재하지 않습니다.</b-card-text>
             </template>
           </div>
         </div>

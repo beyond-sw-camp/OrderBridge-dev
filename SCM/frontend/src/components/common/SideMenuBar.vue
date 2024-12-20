@@ -1,6 +1,11 @@
 <script setup>
 import { ref } from 'vue';
 import { RouterLink } from 'vue-router';
+import basicIcon from '@/assets/basicIcon.svg';
+import salesIcon from '@/assets/salesIcon.svg';
+import productionIcon from '@/assets/productionIcon.svg';
+import orderIcon from '@/assets/orderIcon.svg';
+import statisticsIcon from '@/assets/statisticsIcon.svg'
 
 // 사이드바 열림/닫힘 상태
 const isSidebar = ref(false);
@@ -67,7 +72,7 @@ const toggleSubMenu = (subMenu) => {
       </li>
       <!-- 영업관리 -->
       <li>
-        <span @click="toggleMenu('sales')">영업관리</span>
+        <span @click="toggleMenu('sales')"><salesIcon class="icon"/>영업관리</span>
         <ul v-if="activeMenu === 'sales'">
           <li>
             <span @click="toggleSubMenu('quotation')">견적서</span>
@@ -123,7 +128,7 @@ const toggleSubMenu = (subMenu) => {
       </li>
       <!-- 주문관리 -->
       <li>
-        <span @click="toggleMenu('order')">주문관리</span>
+        <span @click="toggleMenu('order')"><orderIcon class="icon"/>주문관리</span>
         <ul v-if="activeMenu === 'order'">
           <li>
             <span @click="toggleSubMenu('item')">발주서</span>
@@ -150,16 +155,16 @@ const toggleSubMenu = (subMenu) => {
       </li>
       <!-- 생산관리 -->
       <li>
-        <span @click="toggleMenu('production')">생산관리</span>
+        <span @click="toggleMenu('production')"><productionIcon class="icon"/>생산관리</span>
         <ul v-if="activeMenu === 'production'">
           <li>
             <span @click="toggleSubMenu('item')">작업지시서</span>
             <ul v-if="activeSubMenu === 'item'">
               <li>
-                <RouterLink class="content-item" to="">작업지시서 조회</RouterLink>
+                <RouterLink class="content-item" to="/workOrder" active-class="active" replace>작업지시서 조회</RouterLink>
                 <RouterLink class="content-item" to="">작업지시서 등록</RouterLink>
                 <RouterLink class="content-item" to="">작업지시서 작업처리</RouterLink>
-                <RouterLink class="content-item" to="">작업지시서 진행현황</RouterLink>
+                <RouterLink class="content-item" to="">작업지시서 현황</RouterLink>
               </li>
             </ul>
           </li>
@@ -174,12 +179,12 @@ const toggleSubMenu = (subMenu) => {
             </ul>
           </li>
           <li>
-            <span @click="toggleMenu2('warehouse')">생산입고</span>
-            <ul v-if="activeMenu2 === 'warehouse'">
+            <span @click="toggleSubMenu('warehouse')">생산입고</span>
+            <ul v-if="activeSubMenu === 'warehouse'">
               <li>
-                <RouterLink class="content-item" to="">생산입고 조회</RouterLink>
-                <RouterLink class="content-item" to="">생산입고 입력</RouterLink>
-                <RouterLink class="content-item" to="">생산입고 현황</RouterLink>
+                <RouterLink class="content-item" to="/productionReceiving">생산입고 조회</RouterLink>
+                <RouterLink class="content-item" to="/productionReceiving/register">생산입고 입력</RouterLink>
+                <RouterLink class="content-item" to="/productionReceiving/situation">생산입고 현황</RouterLink>
               </li>
             </ul>
           </li>
@@ -187,7 +192,7 @@ const toggleSubMenu = (subMenu) => {
       </li>
       <!-- 통계 -->
       <li>
-        <span @click="toggleMenu('stats')">통계</span>
+        <span @click="toggleMenu('stats')"><statisticsIcon class="icon"/>통계</span>
         <ul v-if="activeMenu === 'stats'">
           <li>
             <RouterLink class="content-item" to="">재고관리 현황</RouterLink>
@@ -235,6 +240,7 @@ const toggleSubMenu = (subMenu) => {
 }
 
 .side-bar {
+
   position: fixed;
   top: 76px; /* 헤더의 높이 */
   bottom: 0;

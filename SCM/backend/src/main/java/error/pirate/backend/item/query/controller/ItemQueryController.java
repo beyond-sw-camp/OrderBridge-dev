@@ -70,6 +70,10 @@ public class ItemQueryController {
         return ResponseEntity.ok(itemDetailResponse);
     }
 
-
+    @GetMapping("/item-division")
+    @Operation(summary = "품목 분류 조회")
+    public ResponseEntity<List<ItemDivision.ItemDivisionResponse>> readItemDivision() {
+        return ResponseEntity.ok(ItemDivision.readItemDivisionList());
+    }
 }
 
