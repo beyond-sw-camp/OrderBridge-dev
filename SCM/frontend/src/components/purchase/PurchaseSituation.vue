@@ -8,7 +8,6 @@ const searchStartDate = ref('');
 const searchEndDate = ref('');
 const searchName = ref('');
 const purchaseOrderSituationList = ref([]);
-const purchaseOrderSituationTotal = ref([]);
 
 const fetchPurchaseOrderSituationList = async () => {
   try {
@@ -29,10 +28,7 @@ const fetchPurchaseOrderSituationList = async () => {
       }
     });
 
-    console.log(response.data);
-    purchaseOrderSituationTotal.value = response.data.pop();
     purchaseOrderSituationList.value = response.data;
-    console.log(response.data);
   } catch (error) {
     console.error("발주 현황 불러오기 실패 :", error);
   }
@@ -101,6 +97,16 @@ const excelDown = async () => {
   }
 }
 
+const totalExtendedPrice = computed(() => {
+  return purchaseOrderSituationList.value.reduce((sum, purchaseOrderSituation) => {
+    if (purchaseOrderSituation.purchaseOrderRegDate) {
+      const amount = (purchaseOrderSituation.purchaseOrderItemQuantity || 0) * (purchaseOrderSituation.purchaseOrderItemPrice || 0);
+      return sum + amount;
+    }
+    return sum; // 조건에 맞지 않는 경우 합산하지 않음
+  }, 0);
+});
+
 </script>
 
 <template>
@@ -138,7 +144,7 @@ const excelDown = async () => {
               <th>번호</th>
               <th>발주일자</th>
               <th>발주서명</th>
-              <th>총 수량</th>
+              <th>총수량</th>
               <th>금액</th>
               <th>거래처명</th>
               <th>목표 납기일</th>
@@ -151,20 +157,24 @@ const excelDown = async () => {
               <tr v-if="purchaseOrderSituation.purchaseOrderRegDate">
                 <td>{{ index + 1 }}</td>
                 <td>{{ dayjs(purchaseOrderSituation.purchaseOrderRegDate).format('YYYY/MM/DD HH:mm:ss') }}</td>
-                <td>{{ purchaseOrderSituation.purchaseOrderName }}</td>
-                <td>{{ purchaseOrderSituation.purchaseOrderTotalQuantity !== null ? purchaseOrderSituation.purchaseOrderTotalQuantity.toLocaleString() : '0' }}</td>
-                <td> ￦ {{ purchaseOrderSituation.purchaseOrderExtendedPrice !== null ? purchaseOrderSituation.purchaseOrderExtendedPrice.toLocaleString() : '0' }}</td>
+                <td>{{ purchaseOrderSituation.itemName }}</td>
+                <td>{{ purchaseOrderSituation.purchaseOrderTotalQuantity.toLocaleString() }} </td>
+                <td> ￦ {{ purchaseOrderSituation.purchaseOrderExtendedPrice.toLocaleString() }}</td>
+                <td> ￦ {{
+                    ((purchaseOrderSituation.purchaseOrderTotalQuantity || 0) * (purchaseOrderSituation.purchaseOrderItemExtendedPrice || 0)).toLocaleString()
+                  }}
+                </td>
                 <td>{{ purchaseOrderSituation.clientName }}</td>
                 <td>{{ dayjs(purchaseOrderSituation.purchaseOrderTargetDueDate).format('YYYY/MM/DD HH:mm:ss') }}</td>
-                <td>{{ purchaseOrderSituation.purchaseOrderNote !== null ? purchaseOrderSituation.purchaseOrderNote : '-' }}</td>
+                <td>{{ purchaseOrderSituation.purchaseOrderNote }}</td>
               </tr>
               <tr v-else class="monthly-total">
                 <td> -</td>
                 <td>{{ purchaseOrderSituation.purchaseOrderRegMonth }}</td>
                 <td> -</td>
                 <td>{{ purchaseOrderSituation.purchaseOrderMonthQuantity.toLocaleString() }}</td>
-                <td> ￦ {{ purchaseOrderSituation.purchaseOrderMonthPrice.toLocaleString() }}</td>
                 <td> -</td>
+                <td> ￦ {{ purchaseOrderSituation.purchaseOrderMonthPrice.toLocaleString() }}</td>
                 <td> -</td>
                 <td> -</td>
               </tr>
@@ -177,10 +187,10 @@ const excelDown = async () => {
             </tr>
             </tbody>
             <!-- 총합 -->
-            <tfoot v-if="purchaseOrderSituationTotal">
+            <tfoot>
             <tr>
-              <td colspan="5">총합</td>
-              <td colspan="2">￦ {{ purchaseOrderSituationTotal.purchaseOrderMonthPrice }}</td>
+              <td colspan="4">총합</td>
+              <td colspan="3">￦ {{ totalExtendedPrice.toLocaleString() }}</td>
             </tr>
             </tfoot>
           </table>

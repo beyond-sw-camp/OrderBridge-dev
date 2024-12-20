@@ -57,7 +57,15 @@ public class PurchaseOrderQueryController {
 
     @GetMapping("/situation/excelDown")
     @Operation(summary = "발주서 현황 엑셀다운")
-    public void purchaseOrderSituationExcel() {
+    public ResponseEntity<byte[]> purchaseOrderSituationExcel(PurchaseOrderRequest request) {
+        HttpHeaders headersResponse = new HttpHeaders();
+        String fileName = URLEncoder.encode("발주서_현황[" + new SimpleDateFormat("yyyyMMdd").format(new Date()) + "].xlsx", StandardCharsets.UTF_8);
+        headersResponse.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileName);
+
+        return ResponseEntity.ok()
+                .headers(headersResponse)
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(purchaseOrderService.purchaseOrderSituationExcelDown(request));
 
     }
 

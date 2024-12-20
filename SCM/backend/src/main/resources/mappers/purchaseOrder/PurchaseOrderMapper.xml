@@ -93,20 +93,18 @@
 
     <select id="readPurchaseOrderSituationList" resultType="error.pirate.backend.purchaseOrder.query.dto.PurchaseOrderSituationResponse">
         SELECT
-            tpoi.purchase_order_item_quantity,
-            tpoi.purchase_order_item_price,
-            tpoi.purchase_order_item_note,
-            tpoi.purchase_order_item_extended_price,
-            ti.item_name,
+            tpo.purchase_order_name,
             tpo.purchase_order_reg_date,
+            tpo.purchase_order_total_quantity,
+            tpo.purchase_order_extended_price,
+            tpo.purchase_order_target_due_date,
+            tpo.purchase_order_reg_date,
+            tc.client_name,
             DATE_FORMAT(tpo.purchase_order_reg_date, '%Y-%m') as purchase_order_reg_month,
-            IFNULL(SUM(tpoi.purchase_order_item_extended_price), 0) as purchase_order_extended_price,
-            IFNULL(SUM(tpoi.purchase_order_item_quantity), 0) as purchase_order_total_quantity,
-            tc.client_name
-        FROM tb_purchase_order_item tpoi
-        JOIN tb_item ti USING (item_seq)
-        JOIN tb_purchase_order tpo USING (purchase_order_seq)
-        JOIN tb_client tc ON (tpo.client_seq = tc.client_seq)
+            IFNULL(SUM(tpo.purchase_order_extended_price), 0) as purchase_order_month_price,
+            IFNULL(SUM(tpo.purchase_order_total_quantity), 0) as purchase_order_month_quantity
+        FROM tb_purchase_order tpo
+        JOIN tb_client tc USING (client_seq)
         WHERE tpo.purchase_order_status != 'DELETE'
         <if test="searchStartDate != null and searchStartDate != ''">
             <![CDATA[
