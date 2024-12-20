@@ -16,6 +16,8 @@ import error.pirate.backend.item.command.domain.repository.ItemRepository;
 import error.pirate.backend.item.command.domain.repository.ItemUnitRepository;
 import error.pirate.backend.user.command.domain.aggregate.entity.User;
 import error.pirate.backend.user.command.domain.repository.UserRepository;
+import error.pirate.backend.warehouse.command.domain.aggregate.entity.Warehouse;
+import error.pirate.backend.warehouse.command.domain.repository.WarehouseRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -32,6 +34,7 @@ public class ItemService {
     private final UserRepository userRepository;
     private final BomItemRepository bomItemRepository;
     private final ModelMapper modelMapper;
+    private final WarehouseRepository warehouseRepository;
 
     @Transactional
     public void createItem(ItemCreateRequest request) {
@@ -41,9 +44,13 @@ public class ItemService {
         ItemUnit itemUnit = itemUnitRepository.findById(request.getItemUnitSeq())
                 .orElseThrow(() -> new CustomException(ErrorCodeType.ITEM_UNIT_NOT_FOUND));
 
+        Warehouse warehouse = warehouseRepository.findById(request.getWarehouseSeq())
+                .orElseThrow(() -> new CustomException(ErrorCodeType.WAREHOUSE_NOT_FOUND));
+
         ItemDTO itemDTO = modelMapper.map(request, ItemDTO.class);
         itemDTO.setUser(user);
         itemDTO.setItemUnit(itemUnit);
+        itemDTO.setWarehouse(warehouse);
 
         Item item = modelMapper.map(itemDTO, Item.class);
 
@@ -78,7 +85,10 @@ public class ItemService {
         ItemUnit itemUnit = itemUnitRepository.findById(request.getItemUnitSeq())
                 .orElseThrow(() -> new IllegalArgumentException("Invalid itemUnitSeq: " + request.getItemUnitSeq()));
 
-        item.updateItem(itemUnit, request);
+        Warehouse warehouse = warehouseRepository.findById(request.getWarehouseSeq())
+                .orElseThrow(() -> new CustomException(ErrorCodeType.WAREHOUSE_NOT_FOUND));
+
+        item.updateItem(itemUnit, warehouse, request);
 
 
         /* bom 수정 로직

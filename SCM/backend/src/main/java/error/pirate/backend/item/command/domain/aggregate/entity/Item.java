@@ -57,9 +57,12 @@ public class Item {
     @Enumerated(EnumType.STRING)
     private ItemStatus itemStatus = ItemStatus.ACTIVE;
 
-    public void updateItem(ItemUnit itemUnit, ItemUpdateRequest request) {
+    public void updateItem(ItemUnit itemUnit, Warehouse warehouse, ItemUpdateRequest request) {
         if(itemUnit != null) {
             this.itemUnit = itemUnit;
+        }
+        if(warehouse != null) {
+            this.warehouse = warehouse;
         }
         if(request.getItemName() != null) {
             this.itemName = request.getItemName();
