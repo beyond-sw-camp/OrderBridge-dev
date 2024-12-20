@@ -2,9 +2,12 @@
   import { onMounted, ref, watch } from 'vue';
   import axios from 'axios';
   import { BInputGroup, BFormInput, BFormCheckbox, BButton, BInputGroupText, BPagination } from 'bootstrap-vue-3';
+  import {useRouter} from "vue-router";
   import dayjs from "dayjs";
   import item from "../../router/item.js";
+  import editIcon from "@/assets/editIcon.svg";
 
+  const router = useRouter();
   const items = ref([]);
   const selectedDivisions = ref([]);
   const searchName = ref("");
@@ -94,6 +97,10 @@ watch([minExpiration, maxExpiration], () => {
 onMounted(() => {
   findItemsByFilter();
 });
+
+const handleItemUpdate = (item) => {
+  router.push(`/item/update/${item.itemSeq}`);
+};
 
 function checkItemDivision(key) {
   const index = selectedDivisions.value.indexOf(key);
@@ -211,6 +218,7 @@ watch(itemInventoryCurrentPage, () => {
                   <li>유통기한: {{ (item.itemExpirationHour / 24).toFixed(0) }} 일</li>
                   <li>단가: {{ item.itemPrice.toLocaleString() }} ₩</li>
                 </ul>
+                <editIcon @click="handleItemUpdate" class="icon"/>
               </div>
             </div>
           </div>
@@ -340,5 +348,15 @@ div {
 .pagenation {
   justify-items: center;
   margin-top: 20px;
+}
+
+.icon {
+
+  width: 20px;
+  height: 20px;
+  right: 10px; /* 오른쪽 끝에서 10px 간격 */
+  top: 50%; /* 세로 중앙에 배치 */
+  transform: translateY(-50%); /* 세로 중앙 정렬 */
+  cursor: pointer; /* 마우스 포인터 추가 */
 }
 </style>
