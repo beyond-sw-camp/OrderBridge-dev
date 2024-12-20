@@ -117,6 +117,7 @@ import statisticsIcon from '@/assets/statisticsIcon.svg'
 
 .header {
   background-color: #FFF9EA;
+  z-index: 999;
 }
 
 .none-line {

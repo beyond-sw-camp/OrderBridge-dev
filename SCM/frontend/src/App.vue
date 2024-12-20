@@ -2,9 +2,15 @@
 import Header from '@/components/common/Header.vue';
 import SideMenuBar from "@/components/common/SideMenuBar.vue";
 import Main from "@/views/main/MainView.vue";
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
+import { useRoute } from 'vue-router';
 
-const isMainPage = ref(true);
+const route = useRoute();
+const isMainPage = ref(route.path === '/');
+
+watch(() => route.path, (newPath) => {
+  isMainPage.value = newPath === '/';
+});
 </script>
 
 <template>

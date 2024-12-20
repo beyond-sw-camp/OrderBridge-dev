@@ -42,15 +42,16 @@ function tryDemo() {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background-color: #fdf4e4; /* 배경색 */
+  background-color: #fff8e7;
   height: 100vh;
-  padding: 0 5%;
+  padding: 0 4% 0 2%;
 }
 
 .hero-left {
-  flex: 1.5;
+  flex: 1.8;
   display: flex;
   height: 100%;
+  width: 100%;
   align-items: stretch; /* 자식 요소를 세로로도 채우기 */
   justify-content: stretch; /* 자식 요소를 가로로도 채우기 */
 }
