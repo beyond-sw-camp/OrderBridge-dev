@@ -10,6 +10,6 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BomItemDTO {
-    private Long childItemSeq;
+    private Long itemSeq;
     private Integer bomChildItemQuantity;
 }
