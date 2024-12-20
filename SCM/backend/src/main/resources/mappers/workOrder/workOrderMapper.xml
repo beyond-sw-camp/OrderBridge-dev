@@ -127,6 +127,7 @@
              , wo.work_order_indicated_quantity
              , wo.work_order_indicated_date
              , wo.work_order_due_date
+             , wo.work_order_note
           FROM tb_work_order wo
           LEFT JOIN tb_item i ON wo.item_seq = i.item_seq
           LEFT JOIN tb_client c ON wo.client_seq = c.client_seq

@@ -21,5 +21,6 @@ public class WorkOrderSituationDTO {
     private LocalDateTime workOrderIndicatedDate;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDateTime workOrderDueDate;
+    private String workOrderNote;
 
 }

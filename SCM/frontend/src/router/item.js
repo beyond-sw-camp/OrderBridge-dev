@@ -5,10 +5,10 @@ export default [
     },
     {
         path: "/item/input",
-        component: () => import("@/views/item/IteminputView.vue")
+        component: () => import("@/views/item/ItemRegisterView.vue")
     },
     {
-        path: "/item/update/:id",
-        component: () => import("@/views/item/ItemUpdateView.vue")
+        path: "/item/update/:itemSeq",
+        component: () => import("@/views/item/ItemModifyView.vue")
     },
 ]

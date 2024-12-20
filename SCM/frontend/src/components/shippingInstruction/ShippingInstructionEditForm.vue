@@ -9,7 +9,7 @@ const props = defineProps({
   totalCount: {type: Number, required: true},       // 검색 결과 총 개수
   pageNumber: {type: Number, required: true},       // 현재 페이지 번호
   pageSize: {type: Number, required: true},         // 페이지 사이즈
-  addressList: {type: Array, required: true},   // 출하지시서 주소 목록
+  shippingAddressList: {type: Array, required: true},   // 출하주소 목록
   editShippingInstruction: {type: Object, required: true}, // 이전 출하지시서 항목
 });
 
@@ -35,7 +35,7 @@ watch(
         shippingInstructionDate: newVal.shippingInstructionScheduledShipmentDate,
         salesOrder: newVal.salesOrderName,
         client: newVal.clientName,
-        address: newVal.shippingInstructionAddress,
+        address: newVal.shippingAddress,
         note: newVal.shippingInstructionNote,
       };
     },
@@ -55,7 +55,7 @@ const addClient = (index) => {
 
 // addressList를 <b-form-select>의 options 형식으로 변환
 const addressOptions = computed(() =>
-    props.addressList.map((address) => ({
+    props.shippingAddressList.map((address) => ({
       value: address.key, // 고유 값 (key)
       text: address.value, // 표시되는 텍스트 (value)
     }))

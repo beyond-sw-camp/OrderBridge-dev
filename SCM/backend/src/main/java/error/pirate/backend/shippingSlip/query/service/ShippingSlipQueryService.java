@@ -23,6 +23,9 @@ public class ShippingSlipQueryService {
     @Transactional(readOnly = true)
     public ShippingSlipListResponse readShippingSlipList(ShippingSlipListRequest request) {
         int offset = (request.getPage() - 1) * request.getSize();
+        if(request.getEndDate() != null){
+            request.setEndDate(request.getEndDate().plusDays(1));   // 하루 추가
+        }
         List<ShippingSlipListDTO> shippingSlipList
                 = shippingSlipMapper.selectShippingSlipList(offset, request);
 
@@ -109,7 +112,7 @@ public class ShippingSlipQueryService {
                 excel[i][2] = dto.getShippingSlipName();       // 출하지시서명
                 excel[i][3] = dto.getShippingSlipTotalQuantity() + " 개";  // 총수량
                 excel[i][4] = dto.getClientName(); // 거래처명
-                excel[i][5] = dto.getShippingSlipAddress(); // 주소
+                excel[i][5] = dto.getShippingAddress().getValue(); // 주소
                 excel[i][6] = dto.getShippingSlipNote(); // 비고
             }
         }

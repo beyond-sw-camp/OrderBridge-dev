@@ -11,7 +11,7 @@ const pageNumber = ref(1);
 const salesOrderList = ref([]);
 const salesOrderStatusList = ref([]);
 const registerListener = ref(false);
-const addressList = ref([]);
+const shippingAddressList = ref([]);
 const itemList = ref([]);
 const itemDivisionList = ref([]);
 const selectedSalesOrder = ref(false);
@@ -113,15 +113,15 @@ const fetchSalesOrderStatusList = async () => {
   }
 };
 
-// 출하지시서 주소 목록 요청
-const fetchShippingInstructionAddressList = async () => {
+// 출하주소 목록 요청
+const fetchShippingAddressList = async () => {
   try {
     const response = await axios.get(`shipping-instruction/address`, {});
 
-    addressList.value = response.data;
+    shippingAddressList.value = response.data;
 
   } catch (error) {
-    console.error("출하지시서 주소 리스트 불러오기 실패 :", error);
+    console.error("출하주소 리스트 불러오기 실패 :", error);
   }
 };
 
@@ -143,7 +143,7 @@ const createShippingInstruction = async (formData, itemData) => {
         {
           shippingInstructionScheduledShipmentDate: formData.value.shippingInstructionDate,
           salesOrderSeq: formData.value.salesOrderSeq,
-          shippingInstructionAddress: formData.value.address,
+          shippingAddress: formData.value.address,
           shippingInstructionNote: formData.value.note,
           shippingInstructionItems: itemData.map(item => ({
             itemSeq: item.Seq,
@@ -174,7 +174,7 @@ onMounted(async () => {
   await fetchSalesOrderList();
 
   await fetchSalesOrderStatusList();
-  await fetchShippingInstructionAddressList();
+  await fetchShippingAddressList();
   await fetchItemDivision();
 });
 
@@ -251,7 +251,7 @@ const handleRegister = async (itemList) => {
                                   :pageNumber="pageNumber"
                                   :pageSize="pageSize"
                                   :registerListener="registerListener"
-                                  :addressList="addressList"
+                                  :shippingAddressList="shippingAddressList"
                                   @pageEvent="handlePage"
                                   @salesOrderEvent="handleSalesOrder"/>
   </div>

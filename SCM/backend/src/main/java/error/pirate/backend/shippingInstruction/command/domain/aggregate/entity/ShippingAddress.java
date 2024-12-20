@@ -9,7 +9,7 @@ import java.util.List;
 
 @Getter
 @RequiredArgsConstructor
-public enum ShippingInstructionAddress {
+public enum ShippingAddress {
     GATE_1("인천공항 1번 게이트"),
     GATE_2("인천공항 2번 게이트"),
     GATE_3("인천공항 3번 게이트"),
@@ -28,14 +28,14 @@ public enum ShippingInstructionAddress {
         private String key;
         private String value;
 
-        public ShippingInstructionAddressResponse(String key, ShippingInstructionAddress shippingInstructionAddress) {
+        public ShippingInstructionAddressResponse(String key, ShippingAddress shippingAddress) {
             this.key = key;
-            this.value = shippingInstructionAddress.getValue();
+            this.value = shippingAddress.getValue();
         }
     }
 
-    public static List<ShippingInstructionAddress.ShippingInstructionAddressResponse> readShippingInstructionAddressList() {
-        return Arrays.stream(ShippingInstructionAddress.class.getEnumConstants())
-                .map(key -> new ShippingInstructionAddress.ShippingInstructionAddressResponse(key.toString(), ShippingInstructionAddress.valueOf(key.toString()))).toList();
+    public static List<ShippingAddress.ShippingInstructionAddressResponse> readShippingInstructionAddressList() {
+        return Arrays.stream(ShippingAddress.class.getEnumConstants())
+                .map(key -> new ShippingAddress.ShippingInstructionAddressResponse(key.toString(), ShippingAddress.valueOf(key.toString()))).toList();
     }
 }
