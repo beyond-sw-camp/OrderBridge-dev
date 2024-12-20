@@ -282,6 +282,11 @@ div {
     width: 100%;
   }
 
+  /* 페이지 여백 최소화 */
+  @page {
+    margin: 5mm; /* 페이지 여백 설정 */
+  }
+
   /* 버튼 숨기기 */
   button {
     display: none;
