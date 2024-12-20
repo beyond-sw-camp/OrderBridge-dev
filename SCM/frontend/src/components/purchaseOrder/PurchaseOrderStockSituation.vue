@@ -151,7 +151,6 @@ const excelDown = async () => {
                 <td>{{ purchaseOrderSituation.purchaseOrderName }}</td>
                 <td>{{ purchaseOrderSituation.purchaseOrderTotalQuantity !== null ? purchaseOrderSituation.purchaseOrderTotalQuantity.toLocaleString() : '0' }}</td>
                 <td> ￦ {{ purchaseOrderSituation.purchaseOrderExtendedPrice !== null ? purchaseOrderSituation.purchaseOrderExtendedPrice.toLocaleString() : '0' }}</td>
-                <td>{{ purchaseOrderSituation.clientName }}</td>
                 <td>{{ dayjs(purchaseOrderSituation.purchaseOrderTargetDueDate).format('YYYY/MM/DD HH:mm:ss') }}</td>
                 <td>{{ purchaseOrderSituation.purchaseOrderNote !== null ? purchaseOrderSituation.purchaseOrderNote : '-' }}</td>
               </tr>
