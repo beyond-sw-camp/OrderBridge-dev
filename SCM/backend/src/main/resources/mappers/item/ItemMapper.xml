@@ -29,15 +29,18 @@
     <!-- 품목 목록 조회 -->
     <select id="findItemListByFilter" resultType="error.pirate.backend.item.query.dto.ItemResponse">
         SELECT
-        item_seq AS itemSeq,
-        item_name AS itemName,
-        item_division AS itemDivision,
-        item_expiration_hour AS itemExpirationHour,
-        item_image_url AS itemImageUrl,
-        item_price AS itemPrice,
-        item_reg_date AS itemRegDate,
-        item_mod_date AS itemModDate
-        FROM tb_item
+            item_seq AS itemSeq,
+            item_name AS itemName,
+            item_division AS itemDivision,
+            item_expiration_hour AS itemExpirationHour,
+            item_image_url AS itemImageUrl,
+            item_price AS itemPrice,
+            item_reg_date AS itemRegDate,
+            item_mod_date AS itemModDate,
+            item_unit_title as itemUnit
+        FROM tb_item i
+        JOIN tb_item_unit iu
+            ON i.item_unit_seq = iu.item_unit_seq
         WHERE 1=1
 
         <if test="itemName != null and itemName != ''">

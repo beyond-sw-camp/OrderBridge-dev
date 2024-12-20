@@ -61,6 +61,9 @@ public class PurchaseOrderApplicationService {
                     .orElseThrow(() -> new CustomException(ErrorCodeType.CLIENT_NOT_FOUND));
 
             purchaseOrder.objectInjection(user, client, salesOrder);
+            purchaseOrder.changePurchaseOrderTotalQuantity(
+                    request.getPurchaseOrderItemDtoList().stream().mapToInt(PurchaseOrderItemDto::getPurchaseOrderItemQuantity).sum()
+            );
             PurchaseOrder purchaseOrderResponse = purchaseOrderDomainService.createPurchaseOrder(purchaseOrder);
 
             List<PurchaseOrderItem> items = new ArrayList<>();

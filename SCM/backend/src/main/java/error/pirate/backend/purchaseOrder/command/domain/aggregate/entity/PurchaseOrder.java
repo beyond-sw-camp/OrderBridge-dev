@@ -56,6 +56,12 @@ public class PurchaseOrder {
 
     private String purchaseOrderNote; // 발주서 비고
 
+    private Integer purchaseOrderTotalQuantity;
+
+    public void changePurchaseOrderTotalQuantity(Integer quantity) {
+        this.purchaseOrderTotalQuantity = quantity;
+    }
+
     public void changePurchaseOrderName(String name) {
         this.purchaseOrderName = name;
     }

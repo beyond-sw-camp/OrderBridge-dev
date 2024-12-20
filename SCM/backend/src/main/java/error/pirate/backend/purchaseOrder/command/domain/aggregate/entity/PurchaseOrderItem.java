@@ -26,6 +26,8 @@ public class PurchaseOrderItem {
 
     private int purchaseOrderItemPrice; // 발주서 품목 단가
 
+    private int purchaseOrderItemExtendedPrice;
+
     private String purchaseOrderItemNote; // 발주서 품목 비고
 
     public void insertPurchase(PurchaseOrder purchaseOrder) {

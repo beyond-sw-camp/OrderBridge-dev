@@ -134,9 +134,9 @@ const toggleSubMenu = (subMenu) => {
             <span @click="toggleSubMenu('item')">발주서</span>
             <ul v-if="activeSubMenu === 'item'">
               <li>
-                <RouterLink class="content-item" to="">발주서 조회</RouterLink>
-                <RouterLink class="content-item" to="">발주서 입력</RouterLink>
-                <RouterLink class="content-item" to="">발주서 현황</RouterLink>
+                <RouterLink class="content-item" to="/purchaseOrder">발주서 조회</RouterLink>
+                <RouterLink class="content-item" to="/purchaseOrder/input">발주서 입력</RouterLink>
+                <RouterLink class="content-item" to="/purchaseOrder/situation">발주서 현황</RouterLink>
                 <RouterLink class="content-item" to="">미입고 현황</RouterLink>
               </li>
             </ul>
@@ -145,8 +145,8 @@ const toggleSubMenu = (subMenu) => {
             <span @click="toggleSubMenu('client')">구매</span>
             <ul v-if="activeSubMenu === 'client'">
               <li>
-                <RouterLink class="content-item" to="">구매서 조회</RouterLink>
-                <RouterLink class="content-item" to="">구매서 등록</RouterLink>
+                <RouterLink class="content-item" to="/purchase">구매서 조회</RouterLink>
+                <RouterLink class="content-item" to="/purchase/input">구매서 등록</RouterLink>
                 <RouterLink class="content-item" to="">구매 현황</RouterLink>
               </li>
             </ul>

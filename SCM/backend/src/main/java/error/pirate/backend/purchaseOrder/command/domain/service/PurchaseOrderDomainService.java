@@ -1,24 +1,17 @@
 package error.pirate.backend.purchaseOrder.command.domain.service;
 
-import error.pirate.backend.client.command.domain.aggregate.entity.Client;
 import error.pirate.backend.exception.CustomException;
 import error.pirate.backend.exception.ErrorCodeType;
-import error.pirate.backend.purchaseOrder.command.application.dto.PurchaseOrderCreateRequest;
 import error.pirate.backend.purchaseOrder.command.application.dto.PurchaseOrderUpdateRequest;
 import error.pirate.backend.purchaseOrder.command.domain.aggregate.entity.PurchaseOrder;
 import error.pirate.backend.purchaseOrder.command.domain.aggregate.entity.PurchaseOrderStatus;
 import error.pirate.backend.purchaseOrder.command.domain.repository.PurchaseOrderRepository;
-import error.pirate.backend.salesOrder.command.domain.aggregate.entity.SalesOrder;
-import error.pirate.backend.user.command.domain.aggregate.entity.User;
-import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor

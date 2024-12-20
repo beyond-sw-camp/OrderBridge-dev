@@ -5,6 +5,7 @@ import dayjs from "dayjs";
 
 const props = defineProps({
   salesOrderList: {type: Array, required: true},       // 주문서 목록
+  salesOrderStatusList: {type: Array, required: true},       // 주문서 상태 목록
   totalCount: {type: Number, required: true},       // 검색 결과 총 개수
   pageNumber: {type: Number, required: true},       // 현재 페이지 번호
   pageSize: {type: Number, required: true},         // 페이지 사이즈
@@ -60,19 +61,20 @@ const addressOptions = computed(() =>
     }))
 );
 
+// 상태 키로 값 반환
+function findStatusValue(array, key) {
+  for (const item of array) {
+    if (item.key === key) {
+      return item.value
+    }
+  }
+}
+
 // 부모 컴포넌트가 이 메서드를 호출해 데이터를 가져갈 수 있도록 노출
 const getData  = () => {
   return formData;
 };
 defineExpose({ getData });
-
-// 상태 포맷 함수
-const formatStatus = (status) => {
-  if (status === 'PRODUCTION_COMPLETE') {
-    return '생산완료';
-  }
-  return status; // 상태가 다른 경우 그대로 반환
-};
 </script>
 
 <template>
@@ -169,7 +171,7 @@ const formatStatus = (status) => {
                     dayjs(salesOrder.salesOrderOrderDate).format('YYYY/MM/DD')
                   }}
                 </div>
-                <div class="list-body col-md-2">{{ formatStatus(salesOrder.salesOrderStatus) }}</div>
+                <div class="list-body col-md-2">{{ findStatusValue(salesOrderStatusList, salesOrder.salesOrderStatus) }}</div>
               </div>
             </template>
             <template v-else>

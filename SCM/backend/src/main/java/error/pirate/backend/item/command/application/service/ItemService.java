@@ -50,7 +50,7 @@ public class ItemService {
         // bom 등록
         if(NullCheck.nullCheck(request.getBomItemList())) {
             for(BomItemDTO bomItemDTO : request.getBomItemList()) {
-                Item childItem = itemRepository.findById(bomItemDTO.getChildItemSeq()).orElseThrow(() -> new CustomException(ErrorCodeType.ITEM_NOT_FOUND));
+                Item childItem = itemRepository.findById(bomItemDTO.getItemSeq()).orElseThrow(() -> new CustomException(ErrorCodeType.ITEM_NOT_FOUND));
                 BomItem bomItem = BomItem.createBomItem(item, childItem, bomItemDTO.getBomChildItemQuantity());
 
                 bomItemRepository.save(bomItem);
@@ -89,7 +89,7 @@ public class ItemService {
 
         if(NullCheck.nullCheck(request.getBomItemList())) {
             for(BomItemDTO bomItemDTO : request.getBomItemList()) {
-                Item childItem = itemRepository.findById(bomItemDTO.getChildItemSeq()).orElseThrow(() -> new CustomException(ErrorCodeType.ITEM_NOT_FOUND));
+                Item childItem = itemRepository.findById(bomItemDTO.getItemSeq()).orElseThrow(() -> new CustomException(ErrorCodeType.ITEM_NOT_FOUND));
                 BomItem bomItem = BomItem.createBomItem(item, childItem, bomItemDTO.getBomChildItemQuantity());
 
                 bomItemRepository.save(bomItem);

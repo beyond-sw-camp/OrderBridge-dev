@@ -1,6 +1,6 @@
 <script setup>
 import ShippingInstructionSituation from "@/components/shippingInstruction/ShippingInstructionSituation.vue";
-import axios from "axios";
+import axios from "@/axios"
 import {onMounted, ref} from "vue";
 
 const searchStartDate = ref(null);
@@ -9,9 +9,10 @@ const searchName = ref(null);
 const shippingInstructionSituationList = ref([]);
 const shippingInstructionSituationTotal = ref(null);
 
+// 출하지시서 현황 요청
 const fetchShippingInstructionSituationList = async () => {
   try {
-    const response = await axios.get(`http://localhost:8090/api/v1/shipping-instruction/situation`, {
+    const response = await axios.get(`shipping-instruction/situation`, {
       params: {
         startDate: searchStartDate.value,
         endDate: searchEndDate.value,
@@ -33,14 +34,11 @@ const fetchShippingInstructionSituationList = async () => {
   }
 };
 
-onMounted(() => {
-  fetchShippingInstructionSituationList();
-});
-
+// 현황 엑셀 다운 요청
 const excelDown = async () => {
   const excelName = "출하지시서현황_" + new Date().getFullYear() + (new Date().getMonth() + 1) + new Date().getDay();
   try {
-    const response = await axios.get(`http://localhost:8090/api/v1/shipping-instruction/situation/excelDown`, {
+    const response = await axios.get(`shipping-instruction/situation/excelDown`, {
       params: {
         startDate: searchStartDate.value,
         endDate: searchEndDate.value,
@@ -71,6 +69,10 @@ const excelDown = async () => {
     console.error("출하지시서 현황 엑셀다운로드 실패 :", error);
   }
 }
+
+onMounted(() => {
+  fetchShippingInstructionSituationList();
+});
 
 // 검색
 const handleSearch = (payload) => {
