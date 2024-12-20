@@ -29,10 +29,8 @@ const fetchPurchaseOrderSituationList = async () => {
       }
     });
 
-    console.log(response.data);
     purchaseOrderSituationTotal.value = response.data.pop();
     purchaseOrderSituationList.value = response.data;
-    console.log(response.data);
   } catch (error) {
     console.error("발주 현황 불러오기 실패 :", error);
   }

@@ -95,4 +95,35 @@
             </if>
     </select>
 
+    <select id="readPurchaseOrderSituationList" resultType="error.pirate.backend.purchaseOrder.query.dto.PurchaseOrderSituationResponse">
+        SELECT
+        tp.purchase_name,
+        tp.purchase_contract_date,
+        tp.purchase_reg_date,
+        tp.purchase_total_quantity,
+        tp.purchase_extended_price,
+        tp.purchase_note,
+        DATE_FORMAT(tp.purchase_reg_date, '%Y-%m') as purchase_reg_month,
+        IFNULL(SUM(tp.purchase_extended_price), 0) as purchase_month_price,
+        IFNULL(SUM(tp.purchase_total_quantity), 0) as purchase_month_quantity
+        FROM tb_purchase tp
+        WHERE 1=1
+        <if test="searchStartDate != null and searchStartDate != ''">
+            <![CDATA[
+                AND #{searchStartDate} <= tp.purchase_reg_date
+                ]]>
+        </if>
+        <if test="searchEndDate != null and searchEndDate != ''">
+            <![CDATA[
+                AND #{searchEndDate} >= tp.purchase_reg_date
+                ]]>
+        </if>
+        <if test="searchName != null">
+            AND tp.purchase_name LIKE CONCAT('%', #{searchName}, '%')
+        </if>
+        GROUP BY
+        DATE_FORMAT(tp.purchase_reg_date, '%Y-%m'),
+        tp.purchase_reg_date WITH ROLLUP;
+    </select>
+
 </mapper>

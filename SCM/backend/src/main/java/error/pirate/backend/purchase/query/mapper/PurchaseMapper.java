@@ -3,6 +3,7 @@ package error.pirate.backend.purchase.query.mapper;
 import error.pirate.backend.purchase.query.dto.PurchaseItemResponse;
 import error.pirate.backend.purchase.query.dto.PurchaseRequest;
 import error.pirate.backend.purchase.query.dto.PurchaseResponse;
+import error.pirate.backend.purchase.query.dto.PurchaseSituationResponse;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -16,4 +17,5 @@ public interface PurchaseMapper {
 
     List<PurchaseItemResponse> readPurchaseItemList(Long purchaseSeq);
 
+    List<PurchaseSituationResponse> readPurchaseOrderSituationList(PurchaseRequest request);
 }
