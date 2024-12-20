@@ -1,6 +1,6 @@
 <script setup>
 import {onMounted, ref} from "vue";
-import axios from "axios";
+import axios from "@/axios"
 import router from "@/router/index.js";
 import {useRoute} from "vue-router";
 import ShippingInstructionEditForm from "@/components/shippingInstruction/ShippingInstructionEditForm.vue";
@@ -10,10 +10,11 @@ const totalCount = ref(0);
 const pageSize = ref(10);
 const pageNumber = ref(1);
 const salesOrderList = ref([]);
+const salesOrderStatusList = ref([]);
 const registerListener = ref(false);
 const addressList = ref([]);
-
 const itemList = ref([]);
+const itemDivisionList = ref([]);
 const selectedSalesOrder = ref(false);
 
 // 자식으로 부터 데이터 받아옴
@@ -24,9 +25,10 @@ const route = useRoute();
 const editShippingInstruction = ref({});
 const editItemList = ref([]);
 
+// 상세 출하지시서 요청
 const fetchShippingInstruction = async (seq) => {
   try {
-    const response = await axios.get(`http://localhost:8090/api/v1/shipping-instruction/${seq}`, {});
+    const response = await axios.get(`shipping-instruction/${seq}`, {});
 
     editShippingInstruction.value = response.data.shippingInstructionDTO; // ref 값에 추가
     editItemList.value = response.data.itemList;
@@ -36,9 +38,10 @@ const fetchShippingInstruction = async (seq) => {
   }
 };
 
+// 주문서 목록 요청
 const fetchSalesOrderList = async () => {
   try {
-    const response = await axios.get(`http://localhost:8090/api/v1/sales-order`, {
+    const response = await axios.get(`sales-order`, {
       params: {
         startDate: null,
         endDate: null,
@@ -63,9 +66,10 @@ const fetchSalesOrderList = async () => {
   }
 };
 
+// 상세 주문서 목록 요청 및 수량 업데이트
 const fetchSalesOrder = async (salesOrderSeq) => {
   try {
-    const response = await axios.get(`http://localhost:8090/api/v1/sales-order/${salesOrderSeq}`, {
+    const response = await axios.get(`sales-order/${salesOrderSeq}`, {
       paramsSerializer: (salesOrderSeq) => {
         // null이나 undefined 값을 필터링
         const filteredParams = Object.fromEntries(
@@ -75,7 +79,7 @@ const fetchSalesOrder = async (salesOrderSeq) => {
       }
     });
 
-    const quantityResponse = await axios.get(`http://localhost:8090/api/v1/shipping-instruction/quantity/${salesOrderSeq}`, {
+    const quantityResponse = await axios.get(`shipping-instruction/quantity/${salesOrderSeq}`, {
       paramsSerializer: (salesOrderSeq) => {
         // null이나 undefined 값을 필터링
         const filteredParams = Object.fromEntries(
@@ -128,9 +132,22 @@ const fetchSalesOrder = async (salesOrderSeq) => {
   }
 };
 
+// 주문서 상태 목록 요청
+const fetchSalesOrderStatusList = async () => {
+  try {
+    const response = await axios.get(`sales-order/status`, {});
+
+    salesOrderStatusList.value = response.data;
+
+  } catch (error) {
+    console.error("출하지시서 상태 목록 불러오기 실패 :", error);
+  }
+};
+
+// 출하지시서 주소 목록 요청
 const fetchShippingInstructionAddressList = async () => {
   try {
-    const response = await axios.get(`http://localhost:8090/api/v1/shipping-instruction/address`, {});
+    const response = await axios.get(`shipping-instruction/address`, {});
 
     addressList.value = response.data;
 
@@ -139,9 +156,21 @@ const fetchShippingInstructionAddressList = async () => {
   }
 };
 
+// 품목 분류 요청
+const fetchItemDivision = async () => {
+  try {
+    const response = await axios.get(`item/item-division`);
+
+    itemDivisionList.value = response.data;
+  } catch (error) {
+    console.log(`품목 분류 요청 실패 ${error}`);
+  }
+}
+
+// 출하지시서 수정 요청
 const updateShippingInstruction = async (formData, itemData, seq) => {
   try {
-    const response = await axios.put(`http://localhost:8090/api/v1/shipping-instruction/${seq}`,
+    const response = await axios.put(`shipping-instruction/${seq}`,
         {
           shippingInstructionScheduledShipmentDate: formData.value.shippingInstructionDate,
           salesOrderSeq: formData.value.salesOrderSeq,
@@ -178,7 +207,9 @@ onMounted(async () => {
   selectedSalesOrder.value = true;
 
   await fetchSalesOrderList();
+  await fetchSalesOrderStatusList();
   await fetchShippingInstructionAddressList();
+  await fetchItemDivision();
 });
 
 // 페이지 이동
@@ -249,6 +280,7 @@ const handleUpdate = async (itemList) => {
   <div class="d-flex justify-content-center">
     <ShippingInstructionEditForm ref="childRef"
                                  :salesOrderList="salesOrderList"
+                                 :salesOrderStatusList="salesOrderStatusList"
                                  :totalCount="totalCount"
                                  :pageNumber="pageNumber"
                                  :pageSize="pageSize"
@@ -263,6 +295,7 @@ const handleUpdate = async (itemList) => {
   </div>
   <div class="d-flex justify-content-center">
     <ShippingInstructionEditItems :itemList="itemList"
+                                  :itemDivisionList="itemDivisionList"
                                   :selectedSalesOrder="selectedSalesOrder"
                                   @updateEvent="handleUpdate"
                                   @updateItemListEvent="handleUpdateItemList"/>

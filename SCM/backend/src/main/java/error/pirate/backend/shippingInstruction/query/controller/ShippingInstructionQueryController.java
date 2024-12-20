@@ -86,13 +86,13 @@ public class ShippingInstructionQueryController {
     }
 
     @GetMapping("/status")
-    @Operation(summary = "견적서 상태 분류 조회")
+    @Operation(summary = "출하지시서 상태 분류 조회")
     public ResponseEntity<List<ShippingInstructionStatus.ShippingInstructionStatusResponse>> readShippingInstructionStatus() {
         return ResponseEntity.ok(ShippingInstructionStatus.readShippingInstructionStatusList());
     }
 
     @GetMapping("/address")
-    @Operation(summary = "견적서 주소 리스트 조회")
+    @Operation(summary = "출하지시서 주소 리스트 조회")
     public ResponseEntity<List<ShippingInstructionAddress.ShippingInstructionAddressResponse>> readShippingInstructionAddress() {
         return ResponseEntity.ok(ShippingInstructionAddress.readShippingInstructionAddressList());
     }

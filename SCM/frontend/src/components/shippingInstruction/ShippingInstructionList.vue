@@ -12,11 +12,13 @@ const props = defineProps({
   searchName: {type: String, required: false},      // 검색 조건 이름
   shippingInstructionList: {type: Array, required: true},       // 출하지시서 목록
   shippingInstructionStatusList: {type: Array, required: true},       // 출하지시서 상태 목록
+  shippingInstructionAddressList: {type: Array, required: true},       // 출하지시서 주소 목록
   totalCount: {type: Number, required: true},       // 검색 결과 총 개수
   pageNumber: {type: Number, required: true},       // 현재 페이지 번호
   pageSize: {type: Number, required: true},         // 페이지 사이즈
   expandShippingInstruction: {type: Object, required: true},
   expandItemList: {type: Object, required: true},
+  itemDivisionList: {type: Array, required: true},       // 물품 구분 목록
 });
 
 const emit = defineEmits(
@@ -72,39 +74,19 @@ const itemDelete = (seq) => {
   }
 }
 
-// 상태 포맷 함수
-const formatStatus = (status) => {
-  if (status === 'BEFORE') {
-    return '결재 전';
-  } else if (status === 'AFTER') {
-    return '결재 후';
+// 상태 키로 값 반환
+function findStatusValue(array, key) {
+  for (const item of array) {
+    if (item.key === key) {
+      return item.value
+    }
   }
-  return status; // 상태가 다른 경우 그대로 반환
-};
-
-// 품목 포맷 함수
-const formatDivision = (divisionString) => {
-  if (divisionString === 'FINISHED') {
-    return '생산완료';
-  } else if (divisionString === 'RAW') {
-    return '구성품';
-  } else if (divisionString === 'PART') {
-    return '부재료';
-  } else if (divisionString === 'SUB') {
-    return '원재료';
-  }
-  return divisionString; // 품목가 다른 경우 그대로 반환
 }
 
-// 3개 단위로 나눈 데이터를 반환하는 함수
-const getChunkedItems = (seq) => {
-  const items = props.expandItemList[seq] || [];
-  const chunkedItems = [];
-  for (let i = 0; i < items.length; i += 3) {
-    chunkedItems.push(items.slice(i, i + 3));
-  }
-  return chunkedItems;
-};
+// 숫자 쉼표 삽입
+function numberThree(number) {
+  return `${number.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}`;
+}
 
 // 인쇄 함수
 const printItem = (index) => {
@@ -156,7 +138,7 @@ const printItem = (index) => {
       </div>
     </div>
     <div class="col-md-9">
-      <div>
+      <div style="width: 90%;">
         <div class="d-flex justify-content-between">
           <div>검색결과: {{ totalCount }}개</div>
           <div class="d-flex justify-content-end mt-3">
@@ -165,10 +147,10 @@ const printItem = (index) => {
           </div>
         </div>
         <div class="list-headline row">
-          <div class="list-head col-md-6">출하지시서명</div>
-          <div class="list-head col-md-2">거래처</div>
-          <div class="list-head col-md-2">출하예정일</div>
-          <div class="list-head col-md-2">상태</div>
+          <div class="list-headvalue col-md-6">출하지시서명</div>
+          <div class="list-headvalue col-md-2">거래처</div>
+          <div class="list-headvalue col-md-2">출하예정일</div>
+          <div class="list-headvalue col-md-2">상태</div>
         </div>
         <template v-if="shippingInstructionList.length > 0">
           <div style="max-height: 600px; overflow-y: auto;">
@@ -176,63 +158,71 @@ const printItem = (index) => {
                  :key="shippingInstruction.shippingInstructionSeq"
                  @click="itemExtend(shippingInstruction.shippingInstructionSeq)">
               <div class="list-line row" :id="'print-area-' + index">
-                <div class="list-body col-md-6 left">
-                  {{ shippingInstruction.shippingInstructionName }}
+                <div class="col-md-6">
+                  <b>{{ shippingInstruction.shippingInstructionName }}</b>
                   <div v-if="!expandShippingInstruction[shippingInstruction.shippingInstructionSeq]">
                     <div v-if="!shippingInstruction.itemName"><br></div>
                     <div v-else>{{ shippingInstruction.itemName }}</div>
                   </div>
                 </div>
-                <div class="list-body col-md-2">{{ shippingInstruction.clientName }}</div>
-                <div class="list-body col-md-2">{{
+                <div class="list-value col-md-2">{{ shippingInstruction.clientName }}</div>
+                <div class="list-value col-md-2">{{
                     dayjs(shippingInstruction.shippingInstructionScheduledShipmentDate).format('YYYY/MM/DD')
                   }}
                 </div>
-                <div class="list-body col-md-2">{{ formatStatus(shippingInstruction.shippingInstructionStatus) }}</div>
+                <div class="list-value col-md-2">
+                  {{ findStatusValue(shippingInstructionStatusList, shippingInstruction.shippingInstructionStatus) }}
+                </div>
 
                 <!-- 확장된 상세 정보 표시 -->
                 <div class="d-flex justify-content-center">
                   <div v-if="expandShippingInstruction[shippingInstruction.shippingInstructionSeq]"
                        class="col-md-11 mt-3">
-                    <p>총수량 : {{
-                        expandShippingInstruction[shippingInstruction.shippingInstructionSeq].shippingInstructionTotalQuantity
-                      }} 개</p>
-                    <p>출하 주소 : {{
-                        expandShippingInstruction[shippingInstruction.shippingInstructionSeq].shippingInstructionAddress
-                      }}</p>
-                    <p>담당자 : {{ expandShippingInstruction[shippingInstruction.shippingInstructionSeq].userName }}</p>
-                    <p>출하예정일시 : {{
-                        dayjs(expandShippingInstruction[shippingInstruction.shippingInstructionSeq].shippingInstructionScheduledShipmentDate).format('YYYY/MM/DD HH:mm:ss')
-                      }}</p>
-                    <p v-if="expandShippingInstruction[shippingInstruction.shippingInstructionSeq].shippingInstructionNote">
-                      출하지시서 비고 :
-                      {{
-                        expandShippingInstruction[shippingInstruction.shippingInstructionSeq].shippingInstructionNote
-                      }}
-                    </p>
+                    <b>총수량 : </b>
+                    {{ expandShippingInstruction[shippingInstruction.shippingInstructionSeq].shippingInstructionTotalQuantity }} 개<br>
+                    <b>출하 주소 : </b>
+                    {{ findStatusValue(shippingInstructionAddressList,
+                      expandShippingInstruction[shippingInstruction.shippingInstructionSeq].shippingInstructionAddress) }}
+                    {{  }}<br>
+                    <b>담당자 : </b>
+                    {{ expandShippingInstruction[shippingInstruction.shippingInstructionSeq].userName }}<br>
+                    <b>출하예정일시 : </b>
+                    {{ dayjs(expandShippingInstruction[shippingInstruction.shippingInstructionSeq].shippingInstructionScheduledShipmentDate).format('YYYY/MM/DD HH:mm:ss') }}<br>
+                    <div v-if="expandShippingInstruction[shippingInstruction.shippingInstructionSeq].shippingInstructionNote">
+                      <b>출하지시서 비고 :</b>
+                      {{ expandShippingInstruction[shippingInstruction.shippingInstructionSeq].shippingInstructionNote }}<br>
+                    </div>
+                    <div v-else>
+                      <b>출하지시서 비고 :</b>없음<br>
+                    </div>
                     <!-- 확장된 상세 품목 정보 표시-->
-                    <div v-for="(row, rowIndex) in getChunkedItems(shippingInstruction.shippingInstructionSeq)"
-                         :key="rowIndex"
-                         class="mb-3 d-flex flex-row">
-                      <div style="max-height: 250px;"
-                           v-for="(expandItem, index) in row"
-                           :key="index"
-                           class="me-5 col-md-3 d-flex flex-column border border-secondary rounded">
-                        <b-img style="max-height: 100px;" src="https://picsum.photos/200/200" fluid
-                               alt="Responsive image"></b-img>
-                        <p class="ms-3">· 구분 : {{ formatDivision(expandItem.itemDivision) }}</p>
-                        <p class="ms-3">· 품목 : {{ expandItem.itemName }}</p>
-                        <p class="ms-3">· 수량 : {{ expandItem.shippingInstructionItemQuantity }} 개</p>
-                        <p v-if="expandItem.shippingInstructionItemNote" class="ms-3">· 비고 :
-                          {{ expandItem.shippingInstructionItemNote }}</p>
-                        <p v-else class="ms-3">· 비고 : 없음</p>
-                      </div>
+                    <div style="display:flex; flex-wrap: wrap;">
+                      <template v-for="expandItem in expandItemList[shippingInstruction.shippingInstructionSeq]">
+                        <div class="card item-card">
+                          <img :src=expandItem.itemImageUrl class="card-img-top">
+                          <div style="margin: 5px;">
+                            <small>{{ findStatusValue(itemDivisionList, expandItem.itemDivision) }}</small>
+                            <div style="display: flex; justify-content: space-between;">
+                              <b style="font-size: medium;">{{ expandItem.itemName }}</b>
+                            </div>
+                            <small>{{ numberThree(expandItem.shippingInstructionItemQuantity) }}개 </small>
+                            <br><br>
+                            <small v-if="expandItem.shippingInstructionItemNote" style="margin-top: 20px;">
+                              비고: {{ expandItem.shippingInstructionItemNote }}</small>
+                            <small v-else style="margin-top: 20px;">비고: 없음</small>
+                          </div>
+                        </div>
+                      </template>
                     </div>
                     <div class="d-flex justify-content-end align-items-center">
-                      <b-button v-if="shippingInstruction.shippingInstructionStatus === 'AFTER'" variant="light" class="me-3 button" @click="">출하전표 등록</b-button>
+                      <b-button v-if="shippingInstruction.shippingInstructionStatus === 'AFTER'" variant="light"
+                                class="me-3 button" @click="">출하전표 등록
+                      </b-button>
                       <printIcon class="me-3 icon" @click.stop="printItem(index)"/>
-                      <editIcon v-if="shippingInstruction.shippingInstructionStatus === 'BEFORE'" class="me-3 icon" @click.stop="itemEdit(shippingInstruction.shippingInstructionSeq)"/>
-                      <trashIcon v-if="shippingInstruction.shippingInstructionStatus === 'BEFORE'" class="icon" @click.stop="itemDelete(shippingInstruction.shippingInstructionSeq)"/>
+                      <editIcon v-if="shippingInstruction.shippingInstructionStatus === 'BEFORE'" class="me-3 icon"
+                                @click.stop="itemEdit(shippingInstruction.shippingInstructionSeq)"/>
+                      <trashIcon v-if="shippingInstruction.shippingInstructionStatus === 'BEFORE'" class="icon"
+                                 @click.stop="itemDelete(shippingInstruction.shippingInstructionSeq)"/>
                     </div>
                   </div>
                 </div>
@@ -282,7 +272,7 @@ div {
   padding: 20px 40px 20px 20px;
 }
 
-.list-head {
+.list-headvalue {
   text-align: center;
 }
 
@@ -295,27 +285,37 @@ div {
   padding: 10px 5px 10px 5px;
 }
 
-.list-body {
+.list-value {
   text-align: center;
   margin: auto 0;
+  overflow: hidden;
+  word-break: keep-all;
 }
 
-.pagination {
-  justify-content: center; /* 가로 중앙 정렬 */
+.pagenation {
+  justify-items: center;
   margin-top: 20px;
-}
-
-.left {
-  text-align: left;
 }
 
 .no-list-text {
   text-align: center;
-  margin-top: 10%;
+  margin-top: 100px;
 }
 
 .icon {
   width: 20px;
   height: 20px;
 }
+
+.item-card {
+  width: 220px;
+  margin: 10px;
+}
+
+.card-img-top {
+  max-height: 80px;
+  object-fit: cover;
+}
+
+
 </style>
