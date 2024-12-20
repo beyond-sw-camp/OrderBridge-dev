@@ -252,6 +252,7 @@ const toggleSubMenu = (subMenu) => {
 
 .icon-wrapper {
   display: flex;
+  margin-top:76px;
   flex-direction: column;
   align-items: center;
   padding: 16px 0;
@@ -266,9 +267,8 @@ const toggleSubMenu = (subMenu) => {
 }
 
 .side-bar {
-
   position: fixed;
-  top: 76px; /* 헤더의 높이 */
+  top: 0; /* 헤더의 높이 */
   bottom: 0;
   height: 100%;
   width: 40px;
@@ -278,6 +278,7 @@ const toggleSubMenu = (subMenu) => {
   display: flex;
   flex-direction: column;
   align-items: center;
+  z-index: 0;
 }
 
 .side-bar.open {
