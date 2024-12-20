@@ -4,6 +4,7 @@ import trashIcon from '@/assets/trashIcon.svg'
 
 const props = defineProps({
   itemList: {type: Array, required: true},       // 주문서 품목 리스트
+  itemDivisionList: {type: Array, required: true},       // 주문서 구분 리스트
   selectedSalesOrder: {type: Boolean},       // 주문서 선택 여부
 });
 
@@ -49,18 +50,18 @@ const addShippingInstruction = () => {
   emit('updateEvent', itemData);
 }
 
-// 품목 포맷 함수
-const formatDivision = (divisionString) => {
-  if (divisionString === 'FINISHED') {
-    return '완제품';
-  } else if (divisionString === 'RAW') {
-    return '구성품';
-  } else if (divisionString === 'PART') {
-    return '부재료';
-  } else if (divisionString === 'SUB') {
-    return '원재료';
+// 상태 키로 값 반환
+function findStatusValue(array, key) {
+  for (const item of array) {
+    if (item.key === key) {
+      return item.value
+    }
   }
-  return divisionString; // 품목가 다른 경우 그대로 반환
+}
+
+// 숫자 쉼표 삽입
+function numberThree(number) {
+  return `${number.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}`;
 }
 </script>
 
@@ -72,7 +73,7 @@ const formatDivision = (divisionString) => {
         <div style="max-height: 250px; overflow-y: auto;">
           <div style="max-height: 200px;" v-for="(item, index) in itemList" :key="item.salesOrderItemSeq"
                class="mx-5 my-3 d-flex flex-row border border-secondary rounded">
-            <b-img class="p-2 col-md-4" src="https://picsum.photos/200/200" fluid alt="Responsive image"></b-img>
+            <img :src=item.itemImageUrl class="p-2 col-md-4 card-img-top">
             <div class="p-2 col-md-8">
               <div class="mb-4 d-flex justify-content-between">
                 <span class="fw-bold">{{ item.itemName }}</span>
@@ -81,7 +82,7 @@ const formatDivision = (divisionString) => {
               <div class="d-flex">
                 <ul class="col-md-6 p-0">
                   <li class="mb-3 ">
-                    · 품목 구분 : {{ formatDivision(item.itemDivision) }}
+                    · 품목 구분 : {{ findStatusValue(itemDivisionList, item.itemDivision) }}
                   </li>
                   <li class="mb-3 d-flex flex-row">
                     · 수량 :
@@ -129,5 +130,11 @@ li {
 .no-list-text {
   text-align: center;
   margin-top: 5%;
+}
+
+.card-img-top {
+  width: 33%;
+  max-height: 200px;
+  object-fit: cover;
 }
 </style>

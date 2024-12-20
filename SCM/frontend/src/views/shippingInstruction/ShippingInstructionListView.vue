@@ -1,7 +1,7 @@
 <script setup>
 import ShippingInstructionList from "@/components/shippingInstruction/ShippingInstructionList.vue";
 import {onMounted, reactive, ref, watch} from "vue";
-import axios from "axios";
+import axios from "@/axios"
 import router from "@/router/index.js";
 
 const totalCount = ref(0);
@@ -9,16 +9,19 @@ const pageSize = ref(10);
 const pageNumber = ref(1);
 const shippingInstructionList = ref([]);
 const shippingInstructionStatusList = ref([]);
+const shippingInstructionAddressList = ref([]);
 const searchStartDate = ref(null);
 const searchEndDate = ref(null);
 const searchName = ref(null);
 const searchStatus = ref(new Set([]));
 const expandShippingInstruction = ref({});
 const expandItemList = ref({});
+const itemDivisionList = ref([]);
 
+// 출하지시서 목록 요청
 const fetchShippingInstructionList = async () => {
   try {
-    const response = await axios.get(`http://localhost:8090/api/v1/shipping-instruction`, {
+    const response = await axios.get(`shipping-instruction`, {
       params: {
         startDate: searchStartDate.value,
         endDate: searchEndDate.value,
@@ -39,24 +42,14 @@ const fetchShippingInstructionList = async () => {
     totalCount.value = response.data.totalItems;
 
   } catch (error) {
-    console.error("출하지시서 불러오기 실패 :", error);
+    console.error("출하지시서 목록 불러오기 실패 :", error);
   }
 };
 
-const fetchShippingInstructionStatusList = async () => {
-  try {
-    const response = await axios.get(`http://localhost:8090/api/v1/shipping-instruction/status`, {});
-
-    shippingInstructionStatusList.value = response.data;
-
-  } catch (error) {
-    console.error("출하지시서 상태 리스트 불러오기 실패 :", error);
-  }
-};
-
+// 상세 출하지시서 요청
 const fetchShippingInstruction = async (seq) => {
   try {
-    const response = await axios.get(`http://localhost:8090/api/v1/shipping-instruction/${seq}`, {});
+    const response = await axios.get(`shipping-instruction/${seq}`, {});
 
     expandShippingInstruction.value[seq] = response.data.shippingInstructionDTO; // ref 값에 추가
     expandItemList.value[seq] = response.data.itemList;
@@ -66,10 +59,11 @@ const fetchShippingInstruction = async (seq) => {
   }
 };
 
+// 출하지시서 삭제 요청
 const deleteShippingInstruction = async (seq) => {
   console.log(seq);
   try {
-    const response = await axios.delete(`http://localhost:8090/api/v1/shipping-instruction/${seq}`, {});
+    const response = await axios.delete(`shipping-instruction/${seq}`, {});
 
     alert("출하지시서가 삭제되었습니다.");
 
@@ -86,10 +80,46 @@ const deleteShippingInstruction = async (seq) => {
   }
 };
 
+// 출하지시서 상태 목록 요청
+const fetchShippingInstructionStatusList = async () => {
+  try {
+    const response = await axios.get(`shipping-instruction/status`, {});
+
+    shippingInstructionStatusList.value = response.data;
+
+  } catch (error) {
+    console.error("출하지시서 상태 목록 불러오기 실패 :", error);
+  }
+};
+
+// 출하지시서 주소 목록 요청
+const fetchShippingInstructionAddressList = async () => {
+  try {
+    const response = await axios.get(`shipping-instruction/address`, {});
+
+    shippingInstructionAddressList.value = response.data;
+
+  } catch (error) {
+    console.error("출하지시서 주소 목록 불러오기 실패 :", error);
+  }
+};
+
+// 품목 분류 요청
+const fetchItemDivision = async () => {
+  try {
+    const response = await axios.get(`item/item-division`);
+
+    itemDivisionList.value = response.data;
+  } catch (error) {
+    console.log(`품목 분류 요청 실패 ${error}`);
+  }
+}
+
+// 엑셀 다운 요청
 const excelDown = async () => {
   const excelName = "출하지시서_" + new Date().getFullYear() + (new Date().getMonth() + 1) + new Date().getDay();
   try {
-    const response = await axios.get(`http://localhost:8090/api/v1/shipping-instruction/excelDown`, {
+    const response = await axios.get(`shipping-instruction/excelDown`, {
       params: {
         startDate: searchStartDate.value,
         endDate: searchEndDate.value,
@@ -126,7 +156,10 @@ const excelDown = async () => {
 
 onMounted(async () => {
   await fetchShippingInstructionList();
+
   await fetchShippingInstructionStatusList();
+  await fetchShippingInstructionAddressList();
+  await fetchItemDivision();
 });
 
 // 페이지 이동
@@ -196,11 +229,13 @@ const handleExtendItem = (seq) => {
                            :searchName="searchName"
                            :shippingInstructionList="shippingInstructionList"
                            :shippingInstructionStatusList="shippingInstructionStatusList"
+                           :shippingInstructionAddressList="shippingInstructionAddressList"
                            :totalCount="totalCount"
                            :pageNumber="pageNumber"
                            :pageSize="pageSize"
                            :expandShippingInstruction="expandShippingInstruction"
                            :expandItemList="expandItemList"
+                           :itemDivisionList="itemDivisionList"
                            @pageEvent="handlePage"
                            @searchEvent="handleSearch"
                            @checkStatusEvent="handleStatus"

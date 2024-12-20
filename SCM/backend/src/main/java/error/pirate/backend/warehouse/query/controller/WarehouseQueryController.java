@@ -27,4 +27,11 @@ public class WarehouseQueryController {
         List<WarehouseResponse> warehouseList = warehouseQueryService.readWarehouseList(warehouseFilterRequest);
         return ResponseEntity.ok(warehouseList);
     }
+    // 모든 데이터 반환
+    @GetMapping("/all")
+    @Operation(summary = "창고 목록 조회", description = "창고 목록을 조회한다.")
+    public ResponseEntity<List<WarehouseResponse>> readAllWarehouses() {
+        List<WarehouseResponse> warehouseList = warehouseQueryService.readAllWarehouses();
+        return ResponseEntity.ok(warehouseList);
+    }
 }

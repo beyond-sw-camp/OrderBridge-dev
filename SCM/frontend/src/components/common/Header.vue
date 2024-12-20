@@ -122,8 +122,4 @@ import statisticsIcon from '@/assets/statisticsIcon.svg'
 .none-decoration {
   text-decoration: none;
 }
-
-.none-line {
-  text-decoration-line: none;
-}
 </style>
