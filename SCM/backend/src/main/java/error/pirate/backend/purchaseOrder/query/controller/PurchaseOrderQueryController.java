@@ -2,6 +2,7 @@ package error.pirate.backend.purchaseOrder.query.controller;
 
 import error.pirate.backend.purchaseOrder.query.dto.PurchaseOrderRequest;
 import error.pirate.backend.purchaseOrder.query.dto.PurchaseOrderResponsePagination;
+import error.pirate.backend.purchaseOrder.query.dto.PurchaseOrderSituationResponse;
 import error.pirate.backend.purchaseOrder.query.service.PurchaseOrderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -18,6 +19,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -45,6 +47,38 @@ public class PurchaseOrderQueryController {
                 .headers(headersResponse)
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(purchaseOrderService.purchaseOrderExcelDown(purchaseOrderRequest));
+    }
+
+    @GetMapping("/situation")
+    @Operation(summary = "발주서 현황")
+    public ResponseEntity<List<PurchaseOrderSituationResponse>> purchaseOrderSituation(PurchaseOrderRequest request) {
+        return ResponseEntity.ok(purchaseOrderService.readPurchaseOrderSituationList(request));
+    }
+
+    @GetMapping("/situation/excelDown")
+    @Operation(summary = "발주서 현황 엑셀다운")
+    public ResponseEntity<byte[]> purchaseOrderSituationExcel(PurchaseOrderRequest request) {
+        HttpHeaders headersResponse = new HttpHeaders();
+        String fileName = URLEncoder.encode("발주서_현황[" + new SimpleDateFormat("yyyyMMdd").format(new Date()) + "].xlsx", StandardCharsets.UTF_8);
+        headersResponse.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileName);
+
+        return ResponseEntity.ok()
+                .headers(headersResponse)
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(purchaseOrderService.purchaseOrderSituationExcelDown(request));
+
+    }
+
+    @GetMapping("/stock/situation")
+    @Operation(summary = "미입고 현황")
+    public void notInStockSituation() {
+
+    }
+
+    @GetMapping("/stock/situation/excelDown")
+    @Operation(summary = "미입고 현황 엑셀다운")
+    public void notInStockSituationExcel() {
+
     }
 
 }

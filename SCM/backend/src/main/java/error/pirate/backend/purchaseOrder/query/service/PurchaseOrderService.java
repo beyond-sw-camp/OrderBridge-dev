@@ -2,11 +2,9 @@ package error.pirate.backend.purchaseOrder.query.service;
 
 import error.pirate.backend.common.ExcelDownLoad;
 import error.pirate.backend.common.Pagination;
-import error.pirate.backend.purchaseOrder.query.dto.PurchaseOrderItemResponse;
-import error.pirate.backend.purchaseOrder.query.dto.PurchaseOrderRequest;
-import error.pirate.backend.purchaseOrder.query.dto.PurchaseOrderResponse;
-import error.pirate.backend.purchaseOrder.query.dto.PurchaseOrderResponsePagination;
+import error.pirate.backend.purchaseOrder.query.dto.*;
 import error.pirate.backend.purchaseOrder.query.mapper.PurchaseOrderMapper;
+import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -53,7 +51,7 @@ public class PurchaseOrderService {
         String[] headers = {"발주서명", "발주서 품목", "거래처명", "계약 납기일", "목표 납기일", "상태"};
         String[][] excel = new String[purchaseOrderResponseList.size()][headers.length];
 
-        for(int i=0 ; i<purchaseOrderResponseList.size() ; i++) {
+        for (int i = 0; i < purchaseOrderResponseList.size(); i++) {
             PurchaseOrderResponse dto = purchaseOrderResponseList.get(i);
             dto.setPurchaseOrderItemResponseList(purchaseOrderMapper.readPurchaseOrderItemList(dto.getPurchaseOrderSeq()));
 
@@ -73,6 +71,47 @@ public class PurchaseOrderService {
         }
 
         return excelDownBody.excelDownBody(excel, headers, "발주서");
+    }
+
+    public List<PurchaseOrderSituationResponse> readPurchaseOrderSituationList(PurchaseOrderRequest request) {
+        return purchaseOrderMapper.readPurchaseOrderSituationList(request);
+    }
+
+    public byte[] purchaseOrderSituationExcelDown(PurchaseOrderRequest request) {
+        request.setLimit(null);
+        request.setOffset(null);
+        List<PurchaseOrderSituationResponse> purchaseOrderResponseList = purchaseOrderMapper.readPurchaseOrderSituationList(request);
+
+        String[] headers = {"발주일자", "발주서명", "총 수량", "금액", "거래처명", "목표 납기일", "비고"};
+        String[][] excel = new String[purchaseOrderResponseList.size()][headers.length];
+
+        for (int i = 0; i < purchaseOrderResponseList.size(); i++) {
+            String regMonth = "";
+            PurchaseOrderSituationResponse dto = purchaseOrderResponseList.get(i);
+
+            if (dto.getPurchaseOrderRegDate() != null) {
+                excel[i][0] = dto.getPurchaseOrderRegDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+                excel[i][1] = dto.getPurchaseOrderName();
+                excel[i][2] = (dto.getPurchaseOrderTotalQuantity() != null ? dto.getPurchaseOrderTotalQuantity() : "0") + " 개";
+                excel[i][3] = dto.getPurchaseOrderExtendedPrice() + " 원";
+                excel[i][4] = dto.getClientName();
+                excel[i][5] = dto.getPurchaseOrderTargetDueDate() != null
+                        ? dto.getPurchaseOrderTargetDueDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                        : null;
+                excel[i][6] = dto.getPurchaseOrderNote();
+            } else {
+                if (StringUtils.isNotEmpty(dto.getPurchaseOrderRegMonth())) {
+                    excel[i][0] = dto.getPurchaseOrderRegMonth();
+                    excel[i][1] = "-";
+                    excel[i][2] = dto.getPurchaseOrderMonthQuantity() + " 개";
+                    excel[i][3] = dto.getPurchaseOrderMonthPrice() + " 원";
+                    excel[i][4] = "-";
+                    excel[i][5] = "-";
+                    excel[i][6] = "-";
+                }
+            }
+        }
+        return excelDownBody.excelDownBody(excel, headers, "발주 현황");
     }
 
 }

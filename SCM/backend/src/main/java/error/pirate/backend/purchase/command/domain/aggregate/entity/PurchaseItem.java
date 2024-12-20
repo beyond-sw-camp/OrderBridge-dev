@@ -33,7 +33,13 @@ public class PurchaseItem {
     @Enumerated(EnumType.STRING)
     private PurchaseItemStatus purchaseItemStatus; // 구매 품목 상태
 
+    private int purchaseOrderExtendedPrice;
+
     private String purchaseItemNote; // 구매 품목 비고
+
+    public int getPurchaseOrderExtendedPrice() {
+        return purchaseItemQuantity * purchaseItemPrice;
+    }
 
     public void insertPurchase(Purchase purchaseResponse) {
         this.purchase = purchaseResponse;
