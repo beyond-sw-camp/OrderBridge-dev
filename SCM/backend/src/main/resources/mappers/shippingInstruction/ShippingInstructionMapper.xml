@@ -79,7 +79,7 @@
             c.client_name,
             si.shipping_instruction_scheduled_shipment_date,
             si.shipping_instruction_total_quantity,
-            si.shipping_instruction_address,
+            si.shipping_instruction_address AS shipping_address,
             u.user_name,
             si.shipping_instruction_note
         FROM tb_shipping_instruction si
@@ -116,7 +116,7 @@
             si.shipping_instruction_name,
             FORMAT(si.shipping_instruction_total_quantity, 0) shipping_instruction_total_quantity,
             c.client_name,
-            si.shipping_instruction_address,
+            si.shipping_instruction_address AS shipping_address,
             si.shipping_instruction_note,
             FORMAT(IFNULL(SUM(si.shipping_instruction_total_quantity), 0), 0) shipping_instruction_total_quantity_sum
         FROM tb_shipping_instruction si

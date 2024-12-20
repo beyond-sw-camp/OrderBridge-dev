@@ -118,9 +118,8 @@ const toggleSubMenu = (subMenu) => {
             <span @click="toggleSubMenu('shippingSlip')">출하</span>
             <ul v-if="activeSubMenu === 'shippingSlip'">
               <li>
-                <RouterLink class="content-item" to="">출하전표 조회</RouterLink>
-                <RouterLink class="content-item" to="">출하전표 등록</RouterLink>
-                <RouterLink class="content-item" to="">출하전표 현황</RouterLink>
+                <RouterLink class="content-item" to="/shipping-slip" active-class="active" replace>출하전표 조회</RouterLink>
+                <RouterLink class="content-item" to="/shipping-slip/situation" active-class="active" replace>출하전표 현황</RouterLink>
               </li>
             </ul>
           </li>

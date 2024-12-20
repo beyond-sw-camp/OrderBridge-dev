@@ -1,19 +1,19 @@
 <script setup>
-import ShippingInstructionSituation from "@/components/shippingInstruction/ShippingInstructionSituation.vue";
 import axios from "@/axios"
 import {onMounted, ref} from "vue";
+import ShippingSlipSituation from "@/components/shippingSlip/ShippingSlipSituation.vue";
 
 const searchStartDate = ref(null);
 const searchEndDate = ref(null);
 const searchName = ref(null);
-const shippingInstructionSituationList = ref([]);
-const shippingInstructionSituationTotal = ref(null);
-const shippingAddressList = ref([]);
+const shippingSlipSituationList = ref([]);
+const shippingSlipSituationTotal = ref(null);
+const shippingAddressList = ref(null);
 
-// 출하지시서 현황 요청
-const fetchShippingInstructionSituationList = async () => {
+// 출하전표 현황 요청
+const fetchShippingSlipSituationList = async () => {
   try {
-    const response = await axios.get(`shipping-instruction/situation`, {
+    const response = await axios.get(`shipping-slip/situation`, {
       params: {
         startDate: searchStartDate.value,
         endDate: searchEndDate.value,
@@ -27,11 +27,11 @@ const fetchShippingInstructionSituationList = async () => {
       }
     });
     console.log(response.data);
-    shippingInstructionSituationTotal.value = response.data.pop();
-    shippingInstructionSituationList.value = response.data;
+    shippingSlipSituationTotal.value = response.data.pop();
+    shippingSlipSituationList.value = response.data;
     console.log(response.data);
   } catch (error) {
-    console.error("출하지시서 현황 불러오기 실패 :", error);
+    console.error("출하전표 현황 불러오기 실패 :", error);
   }
 };
 
@@ -49,9 +49,9 @@ const fetchShippingAddressList = async () => {
 
 // 현황 엑셀 다운 요청
 const excelDown = async () => {
-  const excelName = "출하지시서현황_" + new Date().getFullYear() + (new Date().getMonth() + 1) + new Date().getDay();
+  const excelName = "출하전표현황_" + new Date().getFullYear() + (new Date().getMonth() + 1) + new Date().getDay();
   try {
-    const response = await axios.get(`shipping-instruction/situation/excelDown`, {
+    const response = await axios.get(`shipping-slip/situation/excelDown`, {
       params: {
         startDate: searchStartDate.value,
         endDate: searchEndDate.value,
@@ -79,12 +79,12 @@ const excelDown = async () => {
     URL.revokeObjectURL(link.href);
 
   } catch (error) {
-    console.error("출하지시서 현황 엑셀다운로드 실패 :", error);
+    console.error("출하전표 현황 엑셀다운로드 실패 :", error);
   }
 }
 
 onMounted(async () => {
-  await fetchShippingInstructionSituationList();
+  await fetchShippingSlipSituationList();
   await fetchShippingAddressList()
 });
 
@@ -98,20 +98,20 @@ const handleSearch = (payload) => {
 };
 
 function search() {
-  fetchShippingInstructionSituationList();
+  fetchShippingSlipSituationList();
 }
 </script>
 
 <template>
-  <h4 class="title">영업관리 > 출하지시서 현황 조회</h4>
-  <ShippingInstructionSituation :searchStartDate="searchStartDate"
-                                :searchEndDate="searchEndDate"
-                                :searchName="searchName"
-                                :shippingInstructionSituationList="shippingInstructionSituationList"
-                                :shippingInstructionSituationTotal="shippingInstructionSituationTotal"
-                                :shippingAddressList="shippingAddressList"
-                                @searchEvent="handleSearch"
-                                @excelEvent="excelDown"/>
+  <h4 class="title">영업관리 > 출하전표 현황 조회</h4>
+  <ShippingSlipSituation :searchStartDate="searchStartDate"
+                         :searchEndDate="searchEndDate"
+                         :searchName="searchName"
+                         :shippingSlipSituationList="shippingSlipSituationList"
+                         :shippingSlipSituationTotal="shippingSlipSituationTotal"
+                         :shippingAddressList="shippingAddressList"
+                         @searchEvent="handleSearch"
+                         @excelEvent="excelDown"/>
 </template>
 
 <style scoped>

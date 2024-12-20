@@ -13,7 +13,7 @@ public class ShippingInstructionMapper {
                 salesOrder,
                 user,
                 shippingInstructionName,
-                shippingInstructionRequest.getShippingInstructionAddress(),
+                shippingInstructionRequest.getShippingAddress(),
                 shippingInstructionScheduledShipmentDate,
                 itemTotalQuantity,
                 shippingInstructionRequest.getShippingInstructionNote()

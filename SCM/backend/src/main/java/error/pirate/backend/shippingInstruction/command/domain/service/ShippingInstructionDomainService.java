@@ -98,7 +98,7 @@ public class ShippingInstructionDomainService {
         shippingInstruction.update(
                 salesOrder,
                 user,
-                shippingInstructionRequest.getShippingInstructionAddress(),
+                shippingInstructionRequest.getShippingAddress(),
                 shippingInstructionScheduledShipmentDate,
                 itemTotalQuantity,
                 shippingInstructionRequest.getShippingInstructionNote()

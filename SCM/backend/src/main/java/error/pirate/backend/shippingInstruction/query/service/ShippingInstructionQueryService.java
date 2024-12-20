@@ -123,7 +123,7 @@ public class ShippingInstructionQueryService {
                 excel[i][2] = dto.getShippingInstructionName();       // 출하지시서명
                 excel[i][3] = dto.getShippingInstructionTotalQuantity() + " 개";  // 총수량
                 excel[i][4] = dto.getClientName(); // 거래처명
-                excel[i][5] = dto.getShippingInstructionAddress(); // 주소
+                excel[i][5] = dto.getShippingAddress().getValue(); // 주소
                 excel[i][6] = dto.getShippingInstructionNote(); // 비고
             }
         }

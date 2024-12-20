@@ -7,8 +7,8 @@ const props = defineProps({
   searchStartDate: {type: String, required: false}, // 시작 날짜
   searchEndDate: {type: String, required: false},   // 종료 날짜
   searchName: {type: String, required: false},      // 검색 조건 이름
-  shippingInstructionSituationList: {type: Array, required: true},       // 출하지시서 현황 목록
-  shippingInstructionSituationTotal: {type: Number, required: true},       // 출하지시서 총수량 총합계
+  shippingSlipSituationList: {type: Array, required: true},       // 출하전표 현황 목록
+  shippingSlipSituationTotal: {type: Number, required: true},       // 출하전표 총수량 총합계
   shippingAddressList: {type: Array, required: true},       // 출하주소 목록
 });
 
@@ -67,7 +67,7 @@ const printTable = () => {
     <div class="col-md-3">
       <div class="side-box card">
         <div class="card-body">
-          <p class="card-title">출하예정일</p>
+          <p class="card-title">출하일</p>
           <input type="date" v-model="startDate"/> ~ <input type="date" v-model="endDate"/>
         </div>
       </div>
@@ -93,32 +93,32 @@ const printTable = () => {
             <thead>
               <tr>
                 <th>번호</th>
-                <th>출하예정일</th>
-                <th>출하지시서명</th>
+                <th>출하일</th>
+                <th>출하전표명</th>
                 <th>총수량</th>
                 <th>거래처명</th>
                 <th>출하주소</th>
-                <th>출하지시서 비고</th>
+                <th>출하전표 비고</th>
               </tr>
             </thead>
-            <tbody v-if="shippingInstructionSituationList.length > 0">
+            <tbody v-if="shippingSlipSituationList.length > 0">
               <!-- 필터링된 결과 및 월별 합계 출력 -->
-              <template v-for="(shippingInstructionSituation, index) in shippingInstructionSituationList"
+              <template v-for="(shippingSlipSituation, index) in shippingSlipSituationList"
                         :key="index">
-                <tr v-if="shippingInstructionSituation.shippingInstructionScheduledShipmentDate">
+                <tr v-if="shippingSlipSituation.shippingSlipShippingDate">
                   <td>{{ index+1 }}</td>
-                  <td>{{ dayjs(shippingInstructionSituation.shippingInstructionScheduledShipmentDate).format('YYYY/MM/DD HH:mm:ss') }}</td>
-                  <td>{{ shippingInstructionSituation.shippingInstructionName }}</td>
-                  <td>{{ shippingInstructionSituation.shippingInstructionTotalQuantity }} 개</td>
-                  <td>{{ shippingInstructionSituation.clientName}}</td>
-                  <td>{{ findStatusValue(shippingAddressList, shippingInstructionSituation.shippingAddress) }}</td>
-                  <td>{{ shippingInstructionSituation.shippingInstructionNote }}</td>
+                  <td>{{ dayjs(shippingSlipSituation.shippingSlipShippingDate).format('YYYY/MM/DD HH:mm:ss') }}</td>
+                  <td>{{ shippingSlipSituation.shippingSlipName }}</td>
+                  <td>{{ shippingSlipSituation.shippingSlipTotalQuantity }} 개</td>
+                  <td>{{ shippingSlipSituation.clientName}}</td>
+                  <td>{{ findStatusValue(shippingAddressList, shippingSlipSituation.shippingAddress) }}</td>
+                  <td>{{ shippingSlipSituation.shippingSlipNote }}</td>
                 </tr>
                 <tr v-else class="monthly-total">
                   <td> - </td>
-                  <td>{{ shippingInstructionSituation.shippingInstructionScheduledShipmentMonthDate }}</td>
+                  <td>{{ shippingSlipSituation.shippingSlipShippingMonthDate }}</td>
                   <td> - </td>
-                  <td>{{ shippingInstructionSituation.shippingInstructionTotalQuantitySum }} 개</td>
+                  <td>{{ shippingSlipSituation.shippingSlipTotalQuantitySum }} 개</td>
                   <td> - </td>
                   <td> - </td>
                   <td> - </td>
@@ -128,14 +128,14 @@ const printTable = () => {
             </tbody>
             <tbody v-else>
               <tr>
-                <td colspan="7">해당 검색조건에 부합한 출하지시서가 존재하지 않습니다</td>
+                <td colspan="7">해당 검색조건에 부합한 출하전표가 존재하지 않습니다</td>
               </tr>
             </tbody>
             <!-- 총합 -->
-            <tfoot v-if="shippingInstructionSituationTotal">
+            <tfoot v-if="shippingSlipSituationTotal">
               <tr>
                 <td colspan="3">총합</td>
-                <td colspan="1">{{shippingInstructionSituationTotal.shippingInstructionTotalQuantitySum}} 개</td>
+                <td colspan="1">{{shippingSlipSituationTotal.shippingSlipTotalQuantitySum}} 개</td>
               </tr>
             </tfoot>
           </table>

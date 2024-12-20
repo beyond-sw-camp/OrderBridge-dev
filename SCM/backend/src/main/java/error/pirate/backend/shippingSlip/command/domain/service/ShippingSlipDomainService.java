@@ -114,7 +114,7 @@ public class ShippingSlipDomainService {
         shippingSlip.update(
                 shippingInstruction,
                 user,
-                shippingInstruction.getShippingInstructionAddress(),
+                shippingInstruction.getShippingAddress(),
                 shippingSlipShippingDate,
                 itemTotalQuantity,
                 shippingSlipRequest.getShippingSlipNote()
