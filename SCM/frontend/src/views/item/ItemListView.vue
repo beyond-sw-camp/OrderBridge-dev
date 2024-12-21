@@ -247,7 +247,7 @@ watch(itemInventoryCurrentPage, () => {
                 <h5 class="item-name">{{ itemDTO.itemName }} BOM</h5>
                 <ul class="list-unstyled">
                   <li v-for="childItem in childItemList" :key="childItem.itemSeq">
-                    · {{ childItem.itemName }} : {{ childItem.bomChildItemQuantity }} {{ childItem.itemUnit }}
+                    · {{ childItem.itemName }} : {{ childItem.bomChildItemQuantity }} {{ childItem.itemUnitTitle }}
                   </li>
                 </ul>
               </div>
@@ -261,7 +261,7 @@ watch(itemInventoryCurrentPage, () => {
                   <li>잔량 / 입고수량: {{ itemInventory.itemInventoryRemainAmount }} / {{ itemInventory.itemInventoryQuantityReceived }}</li>
                   <li v-if="itemInventory.itemInventoryNote">비고: {{ itemInventory.itemInventoryNote }}</li>
                 </ul>
-                <div class="pagination">
+                <div class="page-center">
                   <b-pagination
                       v-model="itemInventoryCurrentPage"
                       :total-rows="itemInventoryList.length"
@@ -273,7 +273,7 @@ watch(itemInventoryCurrentPage, () => {
           </div>
         </div>
       </div>
-      <div class="pagination">
+      <div class="page-center">
         <b-pagination v-model="currentPage" :total-rows="rows" :per-page="perPage" @change="findItemsByFilter"></b-pagination>
       </div>
     </div>
@@ -352,7 +352,7 @@ div {
   padding: 20px 40px 20px 20px;
 }
 
-.pagination {
+.page-center {
   justify-items: center;
   margin-top: 20px;
 }

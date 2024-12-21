@@ -416,7 +416,7 @@ const toggleSelection = (itemSeq) => {
 
   <!-- 버튼 그룹 -->
   <div class="d-flex justify-content-end mt-3">
-    <b-button v-if="props" @click="updateItem" variant="light" size="sm" class="button ms-2">수정</b-button>
+    <b-button v-if="props.itemDTO" @click="updateItem" variant="light" size="sm" class="button ms-2">수정</b-button>
     <b-button v-else :disabled="isLoading" @click="registerItems" variant="light" size="sm" class="button ms-2">등록</b-button>
   </div>
 
