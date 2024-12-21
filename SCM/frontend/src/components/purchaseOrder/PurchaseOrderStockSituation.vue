@@ -22,7 +22,7 @@ const fetchPurchaseOrderSituationList = async () => {
         Object.entries(params).filter(([_, value]) => value !== null && value !== undefined && value !== '')
     );
 
-    const response = await axios.get(`http://localhost:8090/api/v1/purchaseOrder/situation`, {
+    const response = await axios.get(`http://localhost:8090/api/v1/purchaseOrder/stock/situation`, {
       params: filteredParams,
       paramsSerializer: (params) => {
         return new URLSearchParams(params).toString();
@@ -74,7 +74,7 @@ const excelDown = async () => {
         Object.entries(params).filter(([_, value]) => value !== null && value !== undefined && value !== '')
     );
 
-    const response = await axios.get(`http://localhost:8090/api/v1/purchaseOrder/situation/excelDown`, {
+    const response = await axios.get(`http://localhost:8090/api/v1/purchaseOrder/stock/situation/excelDown`, {
       params: filteredParams,
       paramsSerializer: (params) => {
         return new URLSearchParams(params).toString();
@@ -135,11 +135,10 @@ const excelDown = async () => {
             <tr>
               <th>번호</th>
               <th>발주일자</th>
-              <th>미입고 품목</th>
+              <th>발주서명</th>
+              <th>품목명</th>
               <th>총 수량</th>
               <th>금액</th>
-              <th>거래처명</th>
-              <th>목표 납기일</th>
             </tr>
             </thead>
             <tbody v-if="purchaseOrderSituationList.length > 0">
@@ -149,19 +148,17 @@ const excelDown = async () => {
                 <td>{{ index + 1 }}</td>
                 <td>{{ dayjs(purchaseOrderSituation.purchaseOrderRegDate).format('YYYY/MM/DD HH:mm:ss') }}</td>
                 <td>{{ purchaseOrderSituation.purchaseOrderName }}</td>
-                <td>{{ purchaseOrderSituation.purchaseOrderTotalQuantity !== null ? purchaseOrderSituation.purchaseOrderTotalQuantity.toLocaleString() : '0' }}</td>
-                <td> ￦ {{ purchaseOrderSituation.purchaseOrderExtendedPrice !== null ? purchaseOrderSituation.purchaseOrderExtendedPrice.toLocaleString() : '0' }}</td>
-                <td>{{ dayjs(purchaseOrderSituation.purchaseOrderTargetDueDate).format('YYYY/MM/DD HH:mm:ss') }}</td>
-                <td>{{ purchaseOrderSituation.purchaseOrderNote !== null ? purchaseOrderSituation.purchaseOrderNote : '-' }}</td>
+                <td>{{ purchaseOrderSituation.itemName }}</td>
+                <td>{{ purchaseOrderSituation.purchaseOrderItemQuantity !== null ? purchaseOrderSituation.purchaseOrderItemQuantity : '0' }}</td>
+                <td> ￦ {{ purchaseOrderSituation.purchaseOrderItemExtendedPrice !== null ? purchaseOrderSituation.purchaseOrderItemExtendedPrice.toLocaleString() : '0' }}</td>
               </tr>
               <tr v-else class="monthly-total">
                 <td> -</td>
                 <td>{{ purchaseOrderSituation.purchaseOrderRegMonth }}</td>
                 <td> -</td>
+                <td> -</td>
                 <td>{{ purchaseOrderSituation.purchaseOrderMonthQuantity.toLocaleString() }}</td>
                 <td> ￦ {{ purchaseOrderSituation.purchaseOrderMonthPrice.toLocaleString() }}</td>
-                <td> -</td>
-                <td> -</td>
               </tr>
             </template>
 
@@ -174,8 +171,8 @@ const excelDown = async () => {
             <!-- 총합 -->
             <tfoot v-if="purchaseOrderSituationTotal">
             <tr>
-              <td colspan="5">총합</td>
-              <td colspan="2">￦ {{ purchaseOrderSituationTotal.purchaseOrderMonthPrice }}</td>
+              <td colspan="3">총합</td>
+              <td colspan="3">￦ {{ purchaseOrderSituationTotal.purchaseOrderMonthPrice }}</td>
             </tr>
             </tfoot>
           </table>

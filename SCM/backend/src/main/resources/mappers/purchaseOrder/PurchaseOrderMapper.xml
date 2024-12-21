@@ -124,21 +124,28 @@
         tpo.purchase_order_reg_date WITH ROLLUP;
     </select>
 
-    <select id="readPurchaseOrderStockSituationList" resultType="error.pirate.backend.purchaseOrder.query.dto.PurchaseOrderSituationResponse">
+    <select id="readPurchaseOrderStockSituationList" resultType="error.pirate.backend.purchaseOrder.query.dto.PurchaseOrderStockSituationResponse">
         SELECT
             tpo.purchase_order_name,
             tpo.purchase_order_reg_date,
-            tpo.purchase_order_total_quantity,
-            tpo.purchase_order_extended_price,
-            tpo.purchase_order_target_due_date,
-            tpo.purchase_order_reg_date,
-            tc.client_name,
             DATE_FORMAT(tpo.purchase_order_reg_date, '%Y-%m') as purchase_order_reg_month,
-            IFNULL(SUM(tpo.purchase_order_extended_price), 0) as purchase_order_month_price,
-            IFNULL(SUM(tpo.purchase_order_total_quantity), 0) as purchase_order_month_quantity
+            IFNULL(SUM(tpoi.purchase_order_item_extended_price), 0) as purchase_order_month_price,
+            IFNULL(SUM(tpoi.purchase_order_item_quantity), 0) as purchase_order_month_quantity,
+            ti.item_name,
+            tpoi.purchase_order_item_extended_price,
+            tpoi.purchase_order_item_quantity
         FROM tb_purchase_order tpo
-        JOIN tb_client tc USING (client_seq)
+        LEFT JOIN tb_purchase_order_item tpoi USING (purchase_order_seq)
+        LEFT JOIN tb_item ti ON tpoi.item_seq = ti.item_seq
         WHERE tpo.purchase_order_status != 'DELETE'
+        AND NOT EXISTS (
+            SELECT
+                1
+            FROM
+            tb_purchase tp
+            WHERE
+            tp.purchase_order_seq = tpoi.purchase_order_seq
+        )
         <if test="searchStartDate != null and searchStartDate != ''">
             <![CDATA[
                 AND #{searchStartDate} <= tpo.purchase_order_reg_date
@@ -150,11 +157,13 @@
                 ]]>
         </if>
         <if test="searchName != null">
-            AND tc.client_name LIKE CONCAT('%', #{searchName}, '%')
+            AND ti.item_name LIKE CONCAT('%', #{searchName}, '%')
         </if>
         GROUP BY
         DATE_FORMAT(tpo.purchase_order_reg_date, '%Y-%m'),
-        tpo.purchase_order_reg_date WITH ROLLUP;
+        tpo.purchase_order_reg_date,
+        ti.item_name
+        WITH ROLLUP;
     </select>
 
 </mapper>

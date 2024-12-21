@@ -124,32 +124,25 @@ public class PurchaseOrderService {
         request.setOffset(null);
         List<PurchaseOrderStockSituationResponse> purchaseOrderResponseList = purchaseOrderMapper.readPurchaseOrderStockSituationList(request);
 
-        String[] headers = {"발주일자", "품목명", "총 수량", "금액", "거래처명", "목표 납기일", "비고"};
+        String[] headers = {"발주일자", "발주서명", "품목명", "총 수량", "금액"};
         String[][] excel = new String[purchaseOrderResponseList.size()][headers.length];
 
         for (int i = 0; i < purchaseOrderResponseList.size(); i++) {
-            String regMonth = "";
             PurchaseOrderStockSituationResponse dto = purchaseOrderResponseList.get(i);
 
             if (dto.getPurchaseOrderRegDate() != null) {
                 excel[i][0] = dto.getPurchaseOrderRegDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
                 excel[i][1] = dto.getPurchaseOrderName();
-                excel[i][2] = (dto.getPurchaseOrderTotalQuantity() != null ? dto.getPurchaseOrderTotalQuantity() : "0") + " 개";
-                excel[i][3] = dto.getPurchaseOrderExtendedPrice() + " 원";
-                excel[i][4] = dto.getClientName();
-                excel[i][5] = dto.getPurchaseOrderTargetDueDate() != null
-                        ? dto.getPurchaseOrderTargetDueDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
-                        : null;
-                excel[i][6] = dto.getPurchaseOrderNote();
+                excel[i][2] = dto.getItemName();
+                excel[i][3] = (dto.getPurchaseOrderItemQuantity() != null ? dto.getPurchaseOrderItemQuantity() : "0") + " 개";
+                excel[i][4] = (dto.getPurchaseOrderItemExtendedPrice() != null ? dto.getPurchaseOrderItemExtendedPrice() : "0") + " 원";
             } else {
                 if (StringUtils.isNotEmpty(dto.getPurchaseOrderRegMonth())) {
                     excel[i][0] = dto.getPurchaseOrderRegMonth();
                     excel[i][1] = "-";
-                    excel[i][2] = dto.getPurchaseOrderMonthQuantity() + " 개";
-                    excel[i][3] = dto.getPurchaseOrderMonthPrice() + " 원";
-                    excel[i][4] = "-";
-                    excel[i][5] = "-";
-                    excel[i][6] = "-";
+                    excel[i][2] = "-";
+                    excel[i][3] = dto.getPurchaseOrderMonthQuantity() + " 개";
+                    excel[i][4] = dto.getPurchaseOrderMonthPrice() + " 원";
                 }
             }
         }
