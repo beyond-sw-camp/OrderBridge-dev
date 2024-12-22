@@ -127,8 +127,8 @@ watch([searchStartDate, searchEndDate], () => {
                 <td>{{ idx + 1 }}</td>
                 <td>{{ situation.workOrderName }}</td>
                 <td>{{ dayjs(situation.workOrderIndicatedDate).format('YYYY-MM-DD') }}</td>
-                <td>{{ situation.itemName }} ￦</td>
-                <td>{{ situation.workOrderIndicatedQuantity }} ￦</td>
+                <td>{{ situation.itemName }} </td>
+                <td>{{ situation.workOrderIndicatedQuantity }} 개</td>
                 <td>{{ situation.warehouseName }}</td>
                 <td>{{ situation.clientName }}</td>
                 <td>{{ situation.workOrderNote }}</td>
