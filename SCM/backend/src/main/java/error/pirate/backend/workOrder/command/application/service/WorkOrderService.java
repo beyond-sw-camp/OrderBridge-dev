@@ -35,9 +35,6 @@ public class WorkOrderService {
     private final WorkOrderDomainService workOrderDomainService;
     private final SalesOrderDomainService salesOrderDomainService;
     private final SalesOrderItemDomainService salesOrderItemDomainService;
-    private final ItemInventoryDomainService itemInventoryDomainService;
-    private final BomItemDomainService bomItemDomainService;
-    private final UserDomainService userDomainService;
     private final WarehouseDomainService warehouseDomainService;
     private final NameGenerator nameGenerator;
 
@@ -61,14 +58,27 @@ public class WorkOrderService {
         // 생산공장 확인
         Warehouse warehouse = warehouseDomainService.findById(request.getWarehouseSeq());
 
-        // 사용자 설정
-        User user = userDomainService.findById(request.getUserSeq());
+        // 사용자 설정 - 주문서 작성 유저
+        User user = salesOrder.getUser();
 
         // 작업지시서명 설정
-        request.setWorkOrderName(nameGenerator.nameGenerator(WorkOrder.class));
+        String workOrderName = nameGenerator.nameGenerator(WorkOrder.class);
+        log.info("Generated WorkOrderName: {}", workOrderName);
+
+        // 주문서 품목 수량 확인
+        int orderItemQuantity = salesOrderItem.getSalesOrderItemQuantity();
+        log.info("SalesOrderItem Quantity: {}", orderItemQuantity);
+
+        // workOrderIndicatedQuantity를 주문서 품목 수량으로 설정
+        int workOrderIndicatedQuantity = orderItemQuantity;
+
+        // 유효성 검사
+        if (workOrderIndicatedQuantity <= 0) {
+            throw new CustomException(ErrorCodeType.WORK_ORDER_REQUIRED_INFORMATION);
+        }
 
         // 주문서번호와 품목번호로(같은 주문서에서는 같은 품목 주문이 여러 개 들어오지 않는다는 가정) 중복체크 및 BOM 재고 검증
-        workOrderDomainService.validateAndCheckForDuplicates(salesOrder, salesOrderItem, request.getWorkOrderIndicatedQuantity());
+        workOrderDomainService.validateAndCheckForDuplicates(salesOrder, salesOrderItem, workOrderIndicatedQuantity);
 
         // 작업지시일 시간대 변경
         LocalDate indicatedDate = request.getWorkOrderIndicatedDate();
@@ -86,6 +96,11 @@ public class WorkOrderService {
         LocalDateTime seoulDueDate =  workOrderDomainService.convertDueDate(dueDate);
         log.info("-------------- 작업지시일 시간대 변경 완료 : {} --------------", seoulIndicatedDate);
 
+        // 납기일이 주문서 납기일보다 전이어야 함.
+        if (dueDate.isAfter(salesOrder.getSalesOrderDueDate().toLocalDate())) {
+            throw new CustomException(ErrorCodeType.INVALID_DATE_RANGE);
+        }
+
         // 작업지시서 생성
         WorkOrder workOrder = workOrderDomainService.createWorkOrder(
                 request,
@@ -93,6 +108,8 @@ public class WorkOrderService {
                 salesOrderItem,
                 warehouse,
                 user,
+                workOrderName,
+                workOrderIndicatedQuantity,
                 seoulDueDate,
                 seoulIndicatedDate
         );
