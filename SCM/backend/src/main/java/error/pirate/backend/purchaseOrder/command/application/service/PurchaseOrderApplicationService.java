@@ -50,6 +50,8 @@ public class PurchaseOrderApplicationService {
 
     @Transactional
     public void createPurchaseOrder(PurchaseOrderCreateRequest request) {
+        //TODO 아영 - 로그인이 완료되면 userSeq 정보 넣기
+
         SalesOrder salesOrder = salesOrderDomainService.findById(request.getSalesOrderSeq());
         if(salesOrder.getSalesOrderStatus() == SalesOrderStatus.AFTER) {
             PurchaseOrder purchaseOrder = modelMapper.map(request, PurchaseOrder.class);
