@@ -22,7 +22,7 @@ import statisticsIcon from '@/assets/statisticsIcon.svg'
               <basicIcon class="icon"/>기본등록
             </a>
             <ul class="dropdown-menu">
-              <li><RouterLink to="" class="dropdown-item">창고 관리</RouterLink></li>
+              <li><RouterLink to="warehouse" class="dropdown-item">창고 관리</RouterLink></li>
               <li><RouterLink to="" class="dropdown-item">거래처 관리</RouterLink></li>
               <li><RouterLink to="/item" class="dropdown-item">품목 관리</RouterLink></li>
             </ul>
