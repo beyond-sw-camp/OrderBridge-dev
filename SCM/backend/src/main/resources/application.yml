@@ -52,3 +52,12 @@ mybatis:
   configuration:
     map-underscore-to-camel-case: true
   mapper-locations: mappers/**/*.xml
+
+jwt:
+  secretKey: ${SECRET_KEY}
+  access:
+    expiration: 360000 # 1시간
+    header: Authorization
+  refresh:
+    expiration: 1209600000 # 2주
+    heeader: Authorization-refresh
