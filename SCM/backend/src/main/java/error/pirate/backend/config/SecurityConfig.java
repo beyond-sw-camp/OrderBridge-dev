@@ -3,6 +3,8 @@ package error.pirate.backend.config;
 import error.pirate.backend.security.*;
 import error.pirate.backend.security.filter.CustomAuthenticationFilter;
 import error.pirate.backend.security.filter.JwtFilter;
+import error.pirate.backend.user.command.domain.aggregate.entity.RefreshToken;
+import error.pirate.backend.user.command.domain.repository.RefreshTokenRepository;
 import error.pirate.backend.user.query.service.UserService;
 import jakarta.servlet.Filter;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +35,7 @@ public class SecurityConfig {
     private final UserService userService;
     private final Environment env;
     private final JwtUtil jwtUtil;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     @Bean
     protected SecurityFilterChain configure(HttpSecurity http) throws Exception {
@@ -49,7 +52,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         // 커스텀 로그인 필터 이전에 JWT 토큰 확인 필터를 설정
-        http.addFilterBefore(new JwtFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(new JwtFilter(jwtUtil, env, refreshTokenRepository), UsernamePasswordAuthenticationFilter.class);
         http.addFilterAfter(getAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
         // Exception 발생 시 핸들러 추가
         http.exceptionHandling(
@@ -65,7 +68,7 @@ public class SecurityConfig {
 
         CustomAuthenticationFilter filter = new CustomAuthenticationFilter();
         filter.setAuthenticationManager(getAuthenticationManager());
-        filter.setAuthenticationSuccessHandler(new LoginSuccessHandler(env));
+        filter.setAuthenticationSuccessHandler(new LoginSuccessHandler(jwtUtil, refreshTokenRepository));
         filter.setAuthenticationFailureHandler(new LoginFailureHandler());
 
         return filter;
