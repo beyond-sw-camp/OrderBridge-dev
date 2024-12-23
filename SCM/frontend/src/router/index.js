@@ -4,6 +4,7 @@ import productionReceivingRoutes from './production-receiving.js'
 import item from "@/router/item.js";
 import workOrderRoutes from "@/router/work-order.js";
 import shippingSlipRoutes from "@/router/shipping-slip.js";
+import warehouse from "@/router/warehouse.js";
 
 const routes = [
     {
@@ -58,6 +59,7 @@ const routes = [
     ...item,
     ...workOrderRoutes,
     ...shippingSlipRoutes,
+    ...warehouse,
 ];
 
 const router = createRouter({

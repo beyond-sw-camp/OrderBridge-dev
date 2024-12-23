@@ -42,9 +42,8 @@ const toggleSubMenu = (subMenu) => {
             <span @click="toggleSubMenu('item')">품목</span>
             <ul v-if="activeSubMenu === 'item'">
               <li>
-                <RouterLink class="content-item" to="">
-                  품목 관리
-                </RouterLink>
+                <RouterLink class="content-item" to="/item">품목 조회</RouterLink>
+                <RouterLink class="content-item" to="/item/input">품목 등록</RouterLink>
               </li>
             </ul>
           </li>
@@ -62,9 +61,8 @@ const toggleSubMenu = (subMenu) => {
             <span @click="toggleSubMenu('warehouse')">창고</span>
             <ul v-if="activeSubMenu === 'warehouse'">
               <li>
-                <RouterLink class="content-item" to="">
-                  창고 관리
-                </RouterLink>
+                <RouterLink class="content-item" to="/warehouse">창고 조회</RouterLink>
+                <RouterLink class="content-item" to="/warehouse/input">창고 등록</RouterLink>
               </li>
             </ul>
           </li>

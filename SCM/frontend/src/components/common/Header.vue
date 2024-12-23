@@ -19,10 +19,10 @@ import statisticsIcon from '@/assets/statisticsIcon.svg'
       <b-navbar-nav class="ml-auto">
         <b-nav-item-dropdown>
           <template #button-content><basicIcon class="icon"/>기본등록</template>
-          <RouterLink to="" class="none-line" active-class="active">
+          <RouterLink to="warehouse" class="none-line" active-class="active">
             <b-dropdown-item>창고 관리</b-dropdown-item>
           </RouterLink>
-          <RouterLink to="" class="none-line" active-class="active">
+          <RouterLink to="/" class="none-line" active-class="active">
             <b-dropdown-item>거래처 관리</b-dropdown-item>
           </RouterLink>
           <RouterLink to="/item" class="none-line" active-class="active">
