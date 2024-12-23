@@ -16,6 +16,7 @@
             WHERE tb_sales_order.sales_order_seq = tb_sales_order_item.sales_order_seq) AS item_name,
             tb_client.client_name,
             tb_sales_order.sales_order_order_date,
+            tb_sales_order.sales_order_due_date,
             tb_sales_order.sales_order_status
         FROM tb_sales_order
         JOIN tb_client USING (client_seq)
@@ -131,4 +132,17 @@
         JOIN tb_quotation_item USING (quotation_seq)
         WHERE tb_quotation.quotation_seq = #{quotationSeq}
     </select>
+
+    <select id="findRegisteredItemSeqsBySalesOrderSeq" resultType="Long">
+    SELECT soi.sales_order_item_seq
+      FROM tb_sales_order_item soi
+     WHERE soi.sales_order_seq = #{salesOrderSeq}
+       AND EXISTS (
+           SELECT 1
+             FROM tb_work_order wo
+            WHERE wo.sales_order_seq = soi.sales_order_seq
+              AND wo.item_seq = soi.item_seq
+    )
+    </select>
+
 </mapper>

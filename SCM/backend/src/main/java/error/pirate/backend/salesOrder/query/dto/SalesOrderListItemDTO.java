@@ -13,4 +13,6 @@ public class SalesOrderListItemDTO {
     private String clientName;
     private LocalDate salesOrderOrderDate;
     private String salesOrderStatus;
+
+    private LocalDate salesOrderDueDate;
 }

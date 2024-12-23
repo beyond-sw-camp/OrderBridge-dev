@@ -60,4 +60,12 @@ public class SalesOrderQueryController {
     public ResponseEntity<List<SalesOrderStatus.SalesOrderStatusResponse>> readSalesOrderStatus() {
         return ResponseEntity.ok(SalesOrderStatus.readSalesOrderStatusList());
     }
+
+    @GetMapping("/{salesOrderSeq}/registered-items")
+    @Operation(summary = "작업지시가 등록된 주문서 물품 조회")
+    public ResponseEntity<List<Long>> readRegisteredItems(@PathVariable Long salesOrderSeq) {
+        List<Long> registeredItemSeqs = salesOrderQueryService.readRegisteredItems(salesOrderSeq);
+        return ResponseEntity.ok(registeredItemSeqs);
+    }
+
 }

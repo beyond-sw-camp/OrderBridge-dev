@@ -42,4 +42,6 @@ public interface SalesOrderMapper {
     // 주문서 품목 값 확인
     List<SalesOrderItemCheckDTO> sumSalesOrderItemValue(
             @Param("quotationSeq") Long quotationSeq);
+
+    List<Long> findRegisteredItemSeqsBySalesOrderSeq(@Param("salesOrderSeq") Long salesOrderSeq);
 }

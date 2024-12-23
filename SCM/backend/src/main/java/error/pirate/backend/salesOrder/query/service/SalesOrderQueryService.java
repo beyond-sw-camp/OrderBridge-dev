@@ -63,4 +63,9 @@ public class SalesOrderQueryService {
     public List<SalesOrderItemCheckDTO> salesOrderItemCheck(Long quotationSeq) {
         return salesOrderMapper.sumSalesOrderItemValue(quotationSeq);
     }
+
+    // 작업지시가 등록된 주문서 물품 조회
+    public List<Long> readRegisteredItems(Long salesOrderSeq) {
+        return salesOrderMapper.findRegisteredItemSeqsBySalesOrderSeq(salesOrderSeq);
+    }
 }
