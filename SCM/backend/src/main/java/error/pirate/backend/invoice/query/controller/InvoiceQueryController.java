@@ -30,11 +30,10 @@ public class InvoiceQueryController {
             @RequestParam(defaultValue = "10") Integer size,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
-            @RequestParam(required = false) String clientName,
-            @RequestParam(required = false) List<InvoiceStatus> invoiceStatus) {
+            @RequestParam(required = false) String clientName) {
 
         return ResponseEntity.ok(invoiceQueryService.readInvoiceList(
-                page, size, startDate, endDate, clientName, invoiceStatus));
+                page, size, startDate, endDate, clientName));
     }
 
     @GetMapping("/{invoiceSeq}")

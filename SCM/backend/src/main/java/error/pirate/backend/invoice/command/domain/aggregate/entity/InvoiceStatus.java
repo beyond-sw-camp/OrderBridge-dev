@@ -9,9 +9,7 @@ import java.util.List;
 @Getter
 @RequiredArgsConstructor
 public enum InvoiceStatus {
-    BEFORE("결재 전"),
-    AFTER("결재 후"),
-    REFUSAL("반려"),
+    CREATED("등록"),
     DELETE("삭제");
     
     private final String value;

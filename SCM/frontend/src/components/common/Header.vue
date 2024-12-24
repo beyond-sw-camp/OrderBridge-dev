@@ -32,9 +32,9 @@ import statisticsIcon from '@/assets/statisticsIcon.svg'
               <salesIcon class="icon"/>영업관리
             </a>
             <ul class="dropdown-menu">
-              <li><RouterLink to="/quotation" class="dropdown-item">견적 관리</RouterLink></li>
+              <li><RouterLink to="quotation" class="dropdown-item">견적 관리</RouterLink></li>
               <li><RouterLink to="sales-order" class="dropdown-item">주문서 관리</RouterLink></li>
-              <li><RouterLink to="" class="dropdown-item">판매 관리</RouterLink></li>
+              <li><RouterLink to="invoice" class="dropdown-item">판매 관리</RouterLink></li>
               <li><RouterLink to="/shipping-instruction" class="dropdown-item">출하지시서 관리</RouterLink></li>
               <li><RouterLink to="/shipping-slip" class="dropdown-item">출하 관리</RouterLink></li>
             </ul>

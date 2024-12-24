@@ -17,15 +17,13 @@ public interface InvoiceMapper {
             @Param("limit") Integer limit,
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate,
-            @Param("clientName") String clientName,
-            @Param("invoiceStatus") List<InvoiceStatus> invoiceStatus);
+            @Param("clientName") String clientName);
 
     // 거래 명세서 목록 개수 조회
     int countInvoiceList(
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate,
-            @Param("clientName") String clientName,
-            @Param("invoiceStatus") List<InvoiceStatus> invoiceStatus);
+            @Param("clientName") String clientName);
 
     // 거래 명세서 상세 조회
     InvoiceDTO selectInvoice(

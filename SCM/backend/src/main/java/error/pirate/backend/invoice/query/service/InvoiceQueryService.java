@@ -19,14 +19,13 @@ public class InvoiceQueryService {
 
     // 거래 명세서 목록 조회
     public InvoiceListResponse readInvoiceList(
-            Integer page, Integer size, LocalDate startDate, LocalDate endDate, String clientName,
-            List<InvoiceStatus> invoiceStatus) {
+            Integer page, Integer size, LocalDate startDate, LocalDate endDate, String clientName) {
 
         // 거래 명세서 목록 조회
         List<InvoiceListItemDTO> invoiceList = invoiceMapper.selectInvoiceList(
-                (page - 1) * size, size, startDate, endDate, clientName, invoiceStatus);
+                (page - 1) * size, size, startDate, endDate, clientName);
 
-        int totalInvoice = invoiceMapper.countInvoiceList(startDate, endDate, clientName, invoiceStatus);
+        int totalInvoice = invoiceMapper.countInvoiceList(startDate, endDate, clientName);
 
         return new InvoiceListResponse(invoiceList, page, (int) Math.ceil((double) totalInvoice / size), totalInvoice);
     }

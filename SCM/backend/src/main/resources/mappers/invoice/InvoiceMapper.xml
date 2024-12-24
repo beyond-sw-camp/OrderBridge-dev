@@ -29,10 +29,6 @@
         <if test="clientName != null">
             AND tb_client.client_name LIKE CONCAT('%', #{clientName}, '%')
         </if>
-        <if test="invoiceStatus != null">
-            AND tb_invoice.invoice_status IN
-            <foreach collection="invoiceStatus" item="item" open="(" separator="," close=")">#{item}</foreach>
-        </if>
         ORDER BY tb_invoice.invoice_reg_date DESC
         LIMIT #{limit} OFFSET #{offset}
     </select>
@@ -53,10 +49,6 @@
         ]]></if>
         <if test="clientName != null">
             AND tb_client.client_name LIKE CONCAT('%', #{clientName}, '%')
-        </if>
-        <if test="invoiceStatus != null">
-            AND tb_invoice.invoice_status IN
-            <foreach collection="invoiceStatus" item="item" open="(" separator="," close=")">#{item}</foreach>
         </if>
     </select>
 
