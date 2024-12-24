@@ -1,5 +1,6 @@
 package error.pirate.backend.workOrder.query.service;
 
+import error.pirate.backend.common.ExcelDownLoad;
 import error.pirate.backend.exception.CustomException;
 import error.pirate.backend.exception.ErrorCodeType;
 import error.pirate.backend.workOrder.command.domain.aggregate.entity.WorkOrderStatus;
@@ -24,6 +25,7 @@ import java.util.stream.Collectors;
 public class WorkOrderQueryService {
 
     private final WorkOrderMapper workOrderMapper;
+    private final ExcelDownLoad excelDownBody;
 
     /* 작업지시서 목록 조회 */
     @Transactional
@@ -164,5 +166,21 @@ public class WorkOrderQueryService {
                 .slipDTO(workOrderSlip)
                 .items(bomItems)
                 .build();
+    }
+
+    // 목록조회 엑셀
+    public byte[] readWorkOrderExcel(LocalDate startDate, LocalDate endDate, String warehouseName, List<WorkOrderStatus> workOrderStatus) {
+        return excelDownBody.writeCells(
+                new String[] {"작업지시서명", "품목명", "지시수량", "생산공장명", "작업지시일", "상태"},
+                workOrderMapper.readWorkOrderExcel(startDate, endDate, warehouseName, workOrderStatus)
+        );
+    }
+
+    // 현황조회 엑셀
+    public byte[] readWorkOrderSituationExcel(LocalDate startDate, LocalDate endDate, String warehouseName, String clientName) {
+        return excelDownBody.writeCells(
+                new String[] {"번호", "작업지시서명", "작업지시일", "품목명", "지시수량", "생산공장명", "납품처명", "비고"},
+                workOrderMapper.readWorkOrderSituationExcel(startDate, endDate, warehouseName, clientName)
+        );
     }
 }

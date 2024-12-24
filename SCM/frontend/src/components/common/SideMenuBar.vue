@@ -42,9 +42,8 @@ const toggleSubMenu = (subMenu) => {
             <span @click="toggleSubMenu('item')">품목</span>
             <ul v-if="activeSubMenu === 'item'">
               <li>
-                <RouterLink class="content-item" to="">
-                  품목 관리
-                </RouterLink>
+                <RouterLink class="content-item" to="/item">품목 조회</RouterLink>
+                <RouterLink class="content-item" to="/item/input">품목 등록</RouterLink>
               </li>
             </ul>
           </li>
@@ -62,9 +61,8 @@ const toggleSubMenu = (subMenu) => {
             <span @click="toggleSubMenu('warehouse')">창고</span>
             <ul v-if="activeSubMenu === 'warehouse'">
               <li>
-                <RouterLink class="content-item" to="">
-                  창고 관리
-                </RouterLink>
+                <RouterLink class="content-item" to="/warehouse">창고 조회</RouterLink>
+                <RouterLink class="content-item" to="/warehouse/input">창고 등록</RouterLink>
               </li>
             </ul>
           </li>
@@ -136,7 +134,7 @@ const toggleSubMenu = (subMenu) => {
                 <RouterLink class="content-item" to="/purchaseOrder">발주서 조회</RouterLink>
                 <RouterLink class="content-item" to="/purchaseOrder/input">발주서 등록</RouterLink>
                 <RouterLink class="content-item" to="/purchaseOrder/situation">발주서 현황</RouterLink>
-                <RouterLink class="content-item" to="">미입고 현황</RouterLink>
+                <RouterLink class="content-item" to="/purchaseOrder/stock/situation">미입고 현황</RouterLink>
               </li>
             </ul>
           </li>
@@ -252,10 +250,9 @@ const toggleSubMenu = (subMenu) => {
 
 .icon-wrapper {
   display: flex;
-  margin-top:76px;
   flex-direction: column;
-  align-items: center;
-  padding: 16px 0;
+  align-items: end;
+  padding: 7px;
   gap: 16px; /* 아이콘 간 간격 */
 }
 
@@ -268,21 +265,30 @@ const toggleSubMenu = (subMenu) => {
 
 .side-bar {
   position: fixed;
-  top: 0; /* 헤더의 높이 */
+  top: 76px; /* 헤더의 높이 */
   bottom: 0;
   height: 100%;
-  width: 40px;
+  width: 200px;
   background-color: #fff8e7;
   overflow: hidden;
   transition: width 0.3s ease;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  z-index: 0;
+  border-radius: 0px 10px 0px 0px;
+  border-top: solid 1px silver;
+  border-right: solid 1px silver;
+  border-radius: 0px 10px 0px 0px;
+  left: -150px;
+  transition-property: left;
+  transition-duration: 0.5s;
 }
 
 .side-bar.open {
   width: 200px;
+  left: 0px;
+  align-items: center;
+  transition-property: left;
+  transition-duration: 0.5s;
 }
 
 .side-bar ul {
@@ -290,7 +296,6 @@ const toggleSubMenu = (subMenu) => {
   padding: 0;
   list-style: none;
   opacity: 0;
-  transition: opacity 0.3s ease;
 }
 
 .side-bar.open ul {

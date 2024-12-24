@@ -4,6 +4,7 @@ import error.pirate.backend.warehouse.command.domain.aggregate.entity.WarehouseT
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 public class WarehouseResponse {
@@ -13,4 +14,5 @@ public class WarehouseResponse {
     private String warehouseNote; // 창고 비고
     private LocalDateTime warehouseRegDate; // 창고 등록일
     private LocalDateTime warehouseModDate; // 창고 수정일
+    private String userName;
 }
