@@ -23,7 +23,7 @@ const props = defineProps({
 
 const emit = defineEmits(
     ['pageEvent', 'searchEvent', 'checkStatusEvent', 'extendItemEvent',
-      'itemEditEvent', 'itemDeleteEvent', 'registerEvent', 'excelEvent']);
+      'itemEditEvent', 'itemDeleteEvent', 'registerEvent', 'excelEvent', 'shippingSlipRegisterEvent']);
 
 const startDate = ref(props.searchStartDate);
 const endDate = ref(props.searchEndDate);
@@ -71,6 +71,13 @@ const itemDelete = (seq) => {
   const result = confirm("정말 삭제하시겠습니까?");
   if (result) {
     emit('itemDeleteEvent', seq);
+  }
+}
+
+const shippingSlipRegister = (seq) => {
+  const result = confirm("출하전표를 등록하시겠습니까?");
+  if (result) {
+    emit('shippingSlipRegisterEvent', seq);
   }
 }
 
@@ -216,7 +223,7 @@ const printItem = (index) => {
                     </div>
                     <div class="d-flex justify-content-end align-items-center">
                       <b-button v-if="shippingInstruction.shippingInstructionStatus === 'AFTER'" variant="light"
-                                class="me-3 button" @click="">출하전표 등록
+                                class="me-3 button" @click="shippingSlipRegister(shippingInstruction.shippingInstructionSeq)">출하전표 등록
                       </b-button>
                       <printIcon class="me-3 icon" @click.stop="printItem(index)"/>
                       <editIcon v-if="shippingInstruction.shippingInstructionStatus === 'BEFORE'" class="me-3 icon"
