@@ -103,6 +103,37 @@ const deleteInvoice = async (invoiceSeq) => {
     }
 }
 
+// 거래처 힌트 요청
+const clientHintList = ref(null);
+let clientSearchCount = 0;
+
+const fetchClientHint = async (clientName) => {
+    if (clientName.value === "") {
+        clientHintList.value = null;
+    } else {
+        try {
+            const response = await axios.get(`client`, {
+                params: {
+                    clientName: clientName.value
+                }
+            });
+            if (response.data.length > 0) {
+                clientHintList.value = response.data;
+                clientSearchCount = 0;
+            } else if (clientSearchCount > 2) {
+                clientHintList.value = null;
+            } else { clientSearchCount++; }
+        } catch (error) {
+            console.log(`거래처 힌트 요청 실패 ${error}`)
+        }
+    }
+    if (clientHintList.value) {
+        if (clientHintList.value.length === 1 && clientHintList.value[0].clientName === searchClient.value) {
+            clientHintList.value = null;
+        }
+    }
+}
+
 onMounted(() => {
     fetchInvoiceList();
     fetchItemDivision();
@@ -115,6 +146,10 @@ watch([searchStartDate, searchEndDate], () => {
 watch(searchPage, () => {
 
     fetchInvoiceList();
+});
+
+watch(searchClient, () => {
+    fetchClientHint(searchClient);
 });
 
 // 검색
@@ -166,6 +201,13 @@ function numberThree(number) {
                         <b-form-input v-model="searchClient"></b-form-input>
                         <b-button variant="light" class="button" @click="search()"><searchIcon class="icon"/></b-button>
                     </b-input-group>
+                    <div class="clientHint" style="position: absolute;">
+                        <ul class="list-group">
+                            <template v-for="hint in clientHintList">
+                                <li class="list-group-item list-group-item-action" @click="searchClient = hint.clientName">{{ hint.clientName }}</li>
+                            </template>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
