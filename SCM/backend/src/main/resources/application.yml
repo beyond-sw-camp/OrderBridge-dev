@@ -6,6 +6,8 @@ server:
       charset: UTF-8
 
 spring:
+  profiles:
+    active: oauth
   application:
     name: orderBridge
   config:

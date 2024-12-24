@@ -3,9 +3,11 @@ package error.pirate.backend.config;
 import error.pirate.backend.security.*;
 import error.pirate.backend.security.filter.CustomAuthenticationFilter;
 import error.pirate.backend.security.filter.JwtFilter;
-import error.pirate.backend.user.command.domain.aggregate.entity.RefreshToken;
+import error.pirate.backend.user.command.application.service.oauth2.CustomOAuth2UserService;
+import error.pirate.backend.user.command.application.service.oauth2.OAuth2LoginFailureHandler;
+import error.pirate.backend.user.command.application.service.oauth2.OAuth2LoginSuccessHandler;
 import error.pirate.backend.user.command.domain.repository.RefreshTokenRepository;
-import error.pirate.backend.user.query.service.UserService;
+import error.pirate.backend.user.command.application.service.UserService;
 import jakarta.servlet.Filter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -19,6 +21,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
@@ -36,6 +39,9 @@ public class SecurityConfig {
     private final Environment env;
     private final JwtUtil jwtUtil;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final CustomOAuth2UserService oAuth2UserService;
+    private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
+    private final OAuth2LoginFailureHandler oAuth2LoginFailureHandler;
 
     @Bean
     protected SecurityFilterChain configure(HttpSecurity http) throws Exception {
@@ -51,6 +57,10 @@ public class SecurityConfig {
                             .requestMatchers(new AntPathRequestMatcher("/**"))
                             .authenticated(); // 위의 요청 외에는 인증만 필요하다.
                 })
+                .oauth2Login(oauth2 -> oauth2
+                        .userInfoEndpoint(user -> user.userService(oAuth2UserService))
+                        .successHandler(oAuth2LoginSuccessHandler) // JWT 발행 로직이 포함된 핸들러
+                        .failureHandler(oAuth2LoginFailureHandler))
                 /* session 로그인 방식을 사용하지 않음(JWT Token 방식을 사용할 예정) */
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 

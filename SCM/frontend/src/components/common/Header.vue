@@ -74,7 +74,7 @@ import statisticsIcon from '@/assets/statisticsIcon.svg'
         <ul class="navbar-nav mb-lg-0 d-flex flex-row">
           <li class="nav-item"><RouterLink to="#" class="nav-link"><chatbotIcon class="icon-right"/></RouterLink></li>
           <li class="nav-item"><RouterLink to="#" class="nav-link"><notificationIcon class="icon-right"/></RouterLink></li>
-          <li class="nav-item"><RouterLink to="#" class="nav-link"><loginIcon class="icon-right"/></RouterLink></li>
+          <li class="nav-item"><RouterLink to="/login" class="nav-link"><loginIcon class="icon-right"/></RouterLink></li>
         </ul>
       </div>
   </nav>

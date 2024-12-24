@@ -1,4 +1,4 @@
-package error.pirate.backend.user.query.service;
+package error.pirate.backend.user.command.application.service;
 
 import error.pirate.backend.exception.CustomException;
 import error.pirate.backend.exception.ErrorCodeType;
