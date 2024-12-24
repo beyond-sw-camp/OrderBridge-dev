@@ -10,7 +10,7 @@ spring:
     name: orderBridge
   config:
     import:
-      optional:file:.env
+      optional:file:.env[.properties]
   datasource:
     url: jdbc:log4jdbc:mariadb://${MARIADB_HOST}:${MARIADB_PORT}/${MARIADB_DATABASE}?serverTimezone=Asia/Seoul
     username: ${MARIADB_USER}
@@ -28,7 +28,7 @@ spring:
       hibernate.dialect: org.hibernate.dialect.MariaDBDialect
   data:
     redis:
-      host: ${REDIS_HOSTNAME}
+      host: ${REDIS_HOST}
       port: ${REDIS_PORT}
 springdoc:
   packages-to-scan: error.pirate.backend

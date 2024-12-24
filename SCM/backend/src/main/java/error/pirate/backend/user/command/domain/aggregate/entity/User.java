@@ -22,7 +22,7 @@ public class User {
 
     private String userProfileImgUrl;
 
-    private Integer age;
+    private Integer userAge;
 
     @Enumerated(EnumType.STRING)
     private UserRole userRole;
@@ -38,17 +38,11 @@ public class User {
 
     private String userSocialId;
 
-    private String refreshToken;
-
     public void authorizeUser() {
         this.userRole = UserRole.MEMBER;
     }
 
     public void passwordEncode(BCryptPasswordEncoder passwordEncoder) {
         this.userPwd = passwordEncoder.encode(this.userPwd);
-    }
-
-    public void updateRefreshToken(String updateRefreshToken) {
-        this.refreshToken = updateRefreshToken;
     }
 }

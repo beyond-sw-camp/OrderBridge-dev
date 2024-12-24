@@ -44,7 +44,10 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> {
                     authorize.requestMatchers(
-                                    new AntPathRequestMatcher("/api/v1/login", "POST")).permitAll() // login 요청만이 모든 사용자가 요청할 수 있다..
+                                    new AntPathRequestMatcher("/api/v1/login", "POST"), // login 요청만이 모든 사용자가 요청할 수 있다..
+                                    new AntPathRequestMatcher("/swagger"),
+                                    new AntPathRequestMatcher("/swagger-ui/**"),
+                                    new AntPathRequestMatcher("/v3/api-docs/**")).permitAll()
                             .requestMatchers(new AntPathRequestMatcher("/**"))
                             .authenticated(); // 위의 요청 외에는 인증만 필요하다.
                 })

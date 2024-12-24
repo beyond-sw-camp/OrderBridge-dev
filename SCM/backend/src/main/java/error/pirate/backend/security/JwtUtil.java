@@ -26,23 +26,26 @@ public class JwtUtil {
 
     private final Key key;
     private final UserService userService;
+    private final String jwtSecretKey;
+    private final Long accessExpiration;
+    private final Long refreshExpiration;
+    private final String accessHeader;
+    private final String refreshHeader;
 
-    @Value("${jwt.secretKey}")
-    private String jwtSecretKey;
-
-    @Value("${jwt.access.expiration}")
-    private Long accessExpiration;
-
-    @Value("${jwt.refresh.expiration}")
-    private Long refreshExpiration;
-
-    @Value("${jwt.access.header}")
-    private String accessHeader;
-
-    public JwtUtil(UserService userService) {
+    public JwtUtil(UserService userService,
+                   @Value("${jwt.secretKey}") String jwtSecretKey,
+                   @Value("${jwt.access.expiration}") Long accessExpiration,
+                   @Value("${jwt.refresh.expiration}") Long refreshExpiration,
+                   @Value("${jwt.access.header}") String accessHeader,
+                   @Value("${jwt.refresh.header}") String refreshHeader) {
         byte[] keyBytes = Decoders.BASE64.decode(jwtSecretKey);
         this.key = Keys.hmacShaKeyFor(keyBytes);
         this.userService = userService;
+        this.jwtSecretKey = jwtSecretKey;
+        this.accessExpiration = accessExpiration;
+        this.refreshExpiration = refreshExpiration;
+        this.accessHeader = accessHeader;
+        this.refreshHeader = refreshHeader;
     }
 
     public boolean validateAccessToken(String accessToken) {
@@ -163,12 +166,6 @@ public class JwtUtil {
      * RefreshToken 헤더 설정
      */
     public void setRefreshTokenHeader(HttpServletResponse response, String refreshToken) {
-        ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken", refreshToken)
-                .httpOnly(true)
-                .secure(true)
-                .path("/")
-                .maxAge(refreshExpiration) // 2주
-                .build();
-        response.setHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
+        response.setHeader(refreshHeader, refreshToken);
     }
 }
