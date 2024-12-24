@@ -30,6 +30,8 @@ spring:
     redis:
       host: ${REDIS_HOST}
       port: ${REDIS_PORT}
+      username: ${REDIS_HOSTNAME}
+      password: ${REDIS_PASSWORD}
 springdoc:
   packages-to-scan: error.pirate.backend
   default-consumes-media-type: application/json;charset=UTF-8
