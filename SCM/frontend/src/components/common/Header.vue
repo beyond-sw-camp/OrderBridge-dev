@@ -7,98 +7,95 @@ import salesIcon from '@/assets/salesIcon.svg';
 import productionIcon from '@/assets/productionIcon.svg';
 import orderIcon from '@/assets/orderIcon.svg';
 import statisticsIcon from '@/assets/statisticsIcon.svg'
+
 </script>
 
 <template>
-  <b-navbar toggleable="lg" type="dark" class="header">
-    <!-- 로고 -->
-    <b-navbar-brand href="/">
-      <img src="@/images/logo.png" alt="OrderBridge Logo" class="logo-img" />
-    </b-navbar-brand>
-    <b-collapse id="nav-collapse" is-nav>
-      <b-navbar-nav class="ml-auto">
-        <b-nav-item-dropdown>
-          <template #button-content><basicIcon class="icon"/>기본등록</template>
-          <RouterLink to="" class="none-line" active-class="active">
-            <b-dropdown-item>창고 관리</b-dropdown-item>
-          </RouterLink>
-          <RouterLink to="" class="none-line" active-class="active">
-            <b-dropdown-item>거래처 관리</b-dropdown-item>
-          </RouterLink>
-          <RouterLink to="/item" class="none-line" active-class="active">
-            <b-dropdown-item>품목 관리</b-dropdown-item>
-          </RouterLink>
-        </b-nav-item-dropdown>
-        <b-nav-item-dropdown>
-          <template #button-content><salesIcon class="icon" />영업관리</template>
-          <RouterLink to="/quotation" class="none-line" active-class="active">
-            <b-dropdown-item>견적 관리</b-dropdown-item>
-          </RouterLink>
-          <RouterLink to="" class="none-line" active-class="active">
-            <b-dropdown-item>주문서 관리</b-dropdown-item>
-          </RouterLink>
-          <RouterLink to="" class="none-line" active-class="active">
-            <b-dropdown-item>판매 관리</b-dropdown-item>
-          </RouterLink>
-          <RouterLink to="/shipping-instruction" class="none-line" active-class="active">
-            <b-dropdown-item>출하지시서 관리</b-dropdown-item>
-          </RouterLink>
-          <RouterLink to="/shipping-slip" class="none-line" active-class="active">
-            <b-dropdown-item>출하 관리</b-dropdown-item>
-          </RouterLink>
-        </b-nav-item-dropdown>
-        <b-nav-item-dropdown>
-          <template #button-content><orderIcon class="icon" />주문관리</template>
-          <RouterLink to="/purchaseOrder" class="none-line" active-class="active">
-            <b-dropdown-item>발주서 관리</b-dropdown-item>
-          </RouterLink>
-          <RouterLink to="/purchase" class="none-line" active-class="active">
-            <b-dropdown-item>구매서 관리</b-dropdown-item>
-          </RouterLink>
-        </b-nav-item-dropdown>
-        <b-nav-item-dropdown>
-          <template #button-content><productionIcon class="icon" />생산관리</template>
-          <RouterLink to="/workOrder" class="none-line" active-class="active">
-            <b-dropdown-item>작업지시서 관리</b-dropdown-item>
-          </RouterLink>
-          <RouterLink to="" class="none-line" active-class="active">
-            <b-dropdown-item>생산불출 관리</b-dropdown-item>
-          </RouterLink>
-          <RouterLink to="/productionReceiving" class="none-line" active-class="active">
-            <b-dropdown-item>생산입고 관리</b-dropdown-item>
-          </RouterLink>
-        </b-nav-item-dropdown>
-        <b-nav-item-dropdown>
-          <template #button-content><statisticsIcon class="icon" />통계</template>
-          <RouterLink to="" class="none-line" active-class="active">
-            <b-dropdown-item>재고관리 현황</b-dropdown-item>
-          </RouterLink>
-          <RouterLink to="" class="none-line" active-class="active">
-            <b-dropdown-item>영업관리 현황</b-dropdown-item>
-          </RouterLink>
-          <RouterLink to="" class="none-line" active-class="active">
-            <b-dropdown-item>구매관리 현황</b-dropdown-item>
-          </RouterLink>
-          <RouterLink to="/productionReceiving/situation" class="none-line" active-class="active">
-            <b-dropdown-item>생산입고 현황</b-dropdown-item>
-          </RouterLink>
-          <RouterLink to="" class="none-line" active-class="active">
-            <b-dropdown-item>기타 현황</b-dropdown-item>
-          </RouterLink>
-        </b-nav-item-dropdown>
-      </b-navbar-nav>
-    </b-collapse>
-    <!-- Right aligned nav items -->
-    <b-navbar-nav class="ml-auto">
-      <b-nav-item href="#"><chatbotIcon class="icon-right" /></b-nav-item>
-      <b-nav-item href="#"><notificationIcon class="icon-right" /></b-nav-item>
-      <b-nav-item href="#"><loginIcon class="icon-right" /></b-nav-item>
-    </b-navbar-nav>
-  </b-navbar>
+  <nav class="navbar header">
+    <div class="container-fluid">
+      <RouterLink to="/" class="navbar-brand">
+        <img src="@/images/logo.png" alt="OrderBridge Logo" class="logo-img" />
+      </RouterLink>
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0 d-flex flex-row left-item">
+          <li class="nav-item dropdown">
+            <a class="nav-link" href="" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <basicIcon class="icon"/>기본등록
+            </a>
+            <ul class="dropdown-menu">
+              <li><RouterLink to="warehouse" class="dropdown-item">창고 관리</RouterLink></li>
+              <li><RouterLink to="" class="dropdown-item">거래처 관리</RouterLink></li>
+              <li><RouterLink to="/item" class="dropdown-item">품목 관리</RouterLink></li>
+            </ul>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link" href="" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <salesIcon class="icon"/>영업관리
+            </a>
+            <ul class="dropdown-menu">
+              <li><RouterLink to="/quotation" class="dropdown-item">견적 관리</RouterLink></li>
+              <li><RouterLink to="" class="dropdown-item">주문서 관리</RouterLink></li>
+              <li><RouterLink to="" class="dropdown-item">판매 관리</RouterLink></li>
+              <li><RouterLink to="/shipping-instruction" class="dropdown-item">출하지시서 관리</RouterLink></li>
+              <li><RouterLink to="/shipping-slip" class="dropdown-item">출하 관리</RouterLink></li>
+            </ul>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link" href="" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <orderIcon class="icon"/>주문관리
+            </a>
+            <ul class="dropdown-menu">
+              <li><RouterLink to="/purchaseOrder" class="dropdown-item">발주서 관리</RouterLink></li>
+              <li><RouterLink to="/purchase" class="dropdown-item">구매서 관리</RouterLink></li>
+            </ul>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link" href="" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <productionIcon class="icon"/>생산관리
+            </a>
+            <ul class="dropdown-menu">
+              <li><RouterLink to="/workOrder" class="dropdown-item">작업지시서 관리</RouterLink></li>
+              <li><RouterLink to="" class="dropdown-item">생산불출 관리</RouterLink></li>
+              <li><RouterLink to="/productionReceiving" class="dropdown-item">생산입고 관리</RouterLink></li>
+            </ul>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link" href="" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <statisticsIcon class="icon"/>통계
+            </a>
+            <ul class="dropdown-menu">
+              <li><RouterLink to="" class="dropdown-item">재고관리 현황</RouterLink></li>
+              <li><RouterLink to="" class="dropdown-item">영업관리 현황</RouterLink></li>
+              <li><RouterLink to="" class="dropdown-item">구매관리 현황</RouterLink></li>
+              <li><RouterLink to="/productionReceiving/situation" class="dropdown-item">생산입고 현황</RouterLink></li>
+              <li><RouterLink to="" class="dropdown-item">기타 현황</RouterLink></li>
+            </ul>
+          </li>
+        </ul>
+        <ul class="navbar-nav mb-lg-0 d-flex flex-row">
+          <li class="nav-item"><RouterLink to="#" class="nav-link"><chatbotIcon class="icon-right"/></RouterLink></li>
+          <li class="nav-item"><RouterLink to="#" class="nav-link"><notificationIcon class="icon-right"/></RouterLink></li>
+          <li class="nav-item"><RouterLink to="#" class="nav-link"><loginIcon class="icon-right"/></RouterLink></li>
+        </ul>
+      </div>
+  </nav>
 </template>
 <style scoped>
+@media (max-width: 768px) {
+  .left-item {
+    display: none !important;
+  }
+}
+
+.dropdown {
+  padding-left: 20px;
+}
+
+.dropdown-menu {
+  position: absolute;
+}
+
 .logo-img {
-  height: 50px; /* 로고 크기 */
+  height: 36px; /* 로고 크기 */
 }
 
 .icon {
@@ -117,10 +114,10 @@ import statisticsIcon from '@/assets/statisticsIcon.svg'
 
 .header {
   background-color: #FFF9EA;
-  z-index: 999;
-}
-
-.none-line {
-  text-decoration: none;
+  border-bottom: solid 1px silver;
+  width: 100%;
+  position: fixed;
+  top: 0px;
+  z-index: 6;
 }
 </style>

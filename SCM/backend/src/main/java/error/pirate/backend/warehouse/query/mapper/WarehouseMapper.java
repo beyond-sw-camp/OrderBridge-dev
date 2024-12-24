@@ -8,8 +8,6 @@ import java.util.List;
 
 @Mapper
 public interface WarehouseMapper {
-
-    // 페이징 데이터 조회
     List<WarehouseResponse> findWarehouseListByFilter(
             @Param("warehouseName") String warehouseName,
             @Param("warehouseType") String warehouseType,
@@ -17,7 +15,16 @@ public interface WarehouseMapper {
             @Param("size") int size
     );
 
+    // 전체 개수를 가져오는 메서드 추가
+    int countWarehousesByFilter(
+            @Param("warehouseName") String warehouseName,
+            @Param("warehouseType") String warehouseType
+    );
+
     // 모든 데이터 조회
     List<WarehouseResponse> findAllWarehouses();
+
+    WarehouseResponse findWarehouseDetail(
+            @Param("warehouseSeq") Long warehouseSeq);
 }
 

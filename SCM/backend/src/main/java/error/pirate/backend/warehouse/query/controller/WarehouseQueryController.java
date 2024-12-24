@@ -2,12 +2,14 @@ package error.pirate.backend.warehouse.query.controller;
 
 import error.pirate.backend.warehouse.query.dto.WarehouseFilterRequest;
 import error.pirate.backend.warehouse.query.dto.WarehouseResponse;
+import error.pirate.backend.warehouse.query.dto.WarehouseListResponse;
 import error.pirate.backend.warehouse.query.service.WarehouseQueryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -23,15 +25,19 @@ public class WarehouseQueryController {
 
     @GetMapping
     @Operation(summary = "창고 조회", description = "창고를 조회한다.")
-    public ResponseEntity<List<WarehouseResponse>> readWarehouseList(WarehouseFilterRequest warehouseFilterRequest) {
-        List<WarehouseResponse> warehouseList = warehouseQueryService.readWarehouseList(warehouseFilterRequest);
-        return ResponseEntity.ok(warehouseList);
+    public ResponseEntity<WarehouseListResponse> readWarehouseList(WarehouseFilterRequest warehouseFilterRequest) {
+        WarehouseListResponse response = warehouseQueryService.readWarehouseList(warehouseFilterRequest);
+        return ResponseEntity.ok(response);
     }
-    // 모든 데이터 반환
-    @GetMapping("/all")
-    @Operation(summary = "창고 목록 조회", description = "창고 목록을 조회한다.")
-    public ResponseEntity<List<WarehouseResponse>> readAllWarehouses() {
-        List<WarehouseResponse> warehouseList = warehouseQueryService.readAllWarehouses();
-        return ResponseEntity.ok(warehouseList);
+
+    @GetMapping("/{warehouseSeq}")
+    @Operation(summary = "창고 상세 조회", description = "창고를 상세 조회한다.")
+    public ResponseEntity<WarehouseResponse> readWarehouseList(
+            @PathVariable Long warehouseSeq
+    ) {
+
+        WarehouseResponse response = warehouseQueryService.findWareHouseDetail(warehouseSeq);
+
+        return ResponseEntity.ok(response);
     }
 }

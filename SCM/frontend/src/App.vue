@@ -27,7 +27,7 @@ watch(() => route.path, (newPath) => {
 <style scoped>
 
 section {
-  margin-top: 40px;
+  margin-top: 100px;
 }
 
 </style>

@@ -1,6 +1,9 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue';
 import searchIcon from "@/assets/searchIcon.svg"
+import trashIcon from "@/assets/trashIcon.svg";
+import editIcon from "@/assets/editIcon.svg";
+import printIcon from "@/assets/printIcon.svg";
 import axios from "@/axios"
 import dayjs from 'dayjs';
 
@@ -101,6 +104,19 @@ const excelDown = async () => {
     window.URL.revokeObjectURL(url);
 }
 
+// 견적서 삭제 요청
+const deleteQuotation = async (quotationSeq) => {
+    try {
+        const deleteConfirm = confirm(`선택한 견적서를 삭제하시겠습니까?`);
+        if (deleteConfirm) {
+            const response = await axios.delete(`quotation/${quotationSeq}`);
+            fetchQuotationList();
+        }
+    } catch (error) {
+        console.log(`견적서 삭제 요청 실패 ${error}`);
+    }
+}
+
 onMounted(() => {
     fetchQuotationList();
     fetchQuotationStatus();
@@ -183,7 +199,7 @@ function numberThree(number) {
             </div>
         </div>
         <div class="col-md-9">
-            <div style="width: 90%;">
+            <div>
                 <div class="d-flex justify-content-between">
                     <div>검색결과: {{ totalQuotation }}개</div>
                     <div class="d-flex justify-content-end mt-3">
@@ -218,20 +234,26 @@ function numberThree(number) {
                                 <b>비고</b>: {{ quotationDetail[quotation.quotationSeq].quotationNote }}<br>
                                 <div style="display:flex; flex-wrap: wrap;">
                                 <template v-for="quotationItem in quotationDetail[quotation.quotationSeq].quotationItem">
-                                        <div class="card item-card">
-                                            <img :src=quotationItem.itemImageUrl class="card-img-top">
-                                            <div style="margin: 5px;">
-                                                <small>{{ findStatusValue(itemDivisionList, quotationItem.itemDivision) }}</small>
-                                                <div style="display: flex; justify-content: space-between;">
-                                                    <b style="font-size: medium;">{{ quotationItem.itemName }}</b>
-                                                    <small>{{ numberThree(quotationItem.quotationItemQuantity * quotationItem.quotationItemPrice) }} 원</small>
-                                                </div>
-                                                <small>{{ numberThree(quotationItem.quotationItemQuantity) }}개 / 개당 {{ numberThree(quotationItem.quotationItemPrice) }}원</small><br><br>
-                                                <small style="margin-top: 20px;">비고: {{ quotationItem.quotationItemNote }}</small>
+                                    <div class="card item-card">
+                                        <img :src=quotationItem.itemImageUrl class="card-img-top">
+                                        <div style="margin: 5px;">
+                                            <small>{{ findStatusValue(itemDivisionList, quotationItem.itemDivision) }}</small>
+                                            <div style="display: flex; justify-content: space-between;">
+                                                <b style="font-size: medium;">{{ quotationItem.itemName }}</b>
+                                                <small>{{ numberThree(quotationItem.quotationItemQuantity * quotationItem.quotationItemPrice) }} 원</small>
                                             </div>
+                                            <small>{{ numberThree(quotationItem.quotationItemQuantity) }}개 / 개당 {{ numberThree(quotationItem.quotationItemPrice) }}원</small><br><br>
+                                            <small style="margin-top: 20px;">비고: {{ quotationItem.quotationItemNote }}</small>
                                         </div>
+                                    </div>
                                 </template>
-                            </div>
+                                </div>
+                                
+                                <div class="d-flex justify-content-end align-items-center">
+                                    <printIcon class="me-3 icon" @click.stop="printQuotation(quotation.quotationSeq)"/>
+                                    <editIcon class="me-3 icon" @click.stop="modifyQuotation(quotation.quotationSeq)"/>
+                                    <trashIcon class="icon" @click.stop="deleteQuotation(quotation.quotationSeq)"/>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -312,6 +334,10 @@ div {
 .icon {
   width: 20px;
   height: 20px;
+}
+
+.icon:hover {
+    cursor: pointer;
 }
 
 .item-card {
