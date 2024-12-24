@@ -19,7 +19,7 @@
         FROM tb_invoice
         JOIN tb_sales_order USING (sales_order_seq)
         JOIN tb_client USING (client_seq)
-        WHERE TRUE
+        WHERE tb_invoice.invoice_status NOT IN ("DELETE")
         <if test="startDate != null"><![CDATA[
             AND #{startDate} <= tb_invoice.invoice_sale_date
         ]]></if>
@@ -29,6 +29,11 @@
         <if test="clientName != null">
             AND tb_client.client_name LIKE CONCAT('%', #{clientName}, '%')
         </if>
+        <if test="invoiceStatus != null">
+            AND tb_invoice.invoice_status IN
+            <foreach collection="invoiceStatus" item="item" open="(" separator="," close=")">#{item}</foreach>
+        </if>
+        ORDER BY tb_invoice.invoice_reg_date DESC
         LIMIT #{limit} OFFSET #{offset}
     </select>
 
@@ -39,7 +44,7 @@
         FROM tb_invoice
         JOIN tb_sales_order USING (sales_order_seq)
         JOIN tb_client USING (client_seq)
-        WHERE TRUE
+        WHERE tb_invoice.invoice_status NOT IN ("DELETE")
         <if test="startDate != null"><![CDATA[
             AND #{startDate} <= tb_invoice.invoice_sale_date
         ]]></if>
@@ -48,6 +53,10 @@
         ]]></if>
         <if test="clientName != null">
             AND tb_client.client_name LIKE CONCAT('%', #{clientName}, '%')
+        </if>
+        <if test="invoiceStatus != null">
+            AND tb_invoice.invoice_status IN
+            <foreach collection="invoiceStatus" item="item" open="(" separator="," close=")">#{item}</foreach>
         </if>
     </select>
 

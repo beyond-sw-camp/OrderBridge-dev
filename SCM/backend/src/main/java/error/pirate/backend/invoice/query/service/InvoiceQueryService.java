@@ -1,5 +1,6 @@
 package error.pirate.backend.invoice.query.service;
 
+import error.pirate.backend.invoice.command.domain.aggregate.entity.InvoiceStatus;
 import error.pirate.backend.invoice.query.dto.*;
 import error.pirate.backend.invoice.query.mapper.InvoiceMapper;
 import lombok.RequiredArgsConstructor;
@@ -18,13 +19,14 @@ public class InvoiceQueryService {
 
     // 거래 명세서 목록 조회
     public InvoiceListResponse readInvoiceList(
-            Integer page, Integer size, LocalDate startDate, LocalDate endDate, String clientName) {
+            Integer page, Integer size, LocalDate startDate, LocalDate endDate, String clientName,
+            List<InvoiceStatus> invoiceStatus) {
 
         // 거래 명세서 목록 조회
         List<InvoiceListItemDTO> invoiceList = invoiceMapper.selectInvoiceList(
-                (page - 1) * size, size, startDate, endDate, clientName);
+                (page - 1) * size, size, startDate, endDate, clientName, invoiceStatus);
 
-        int totalInvoice = invoiceMapper.countInvoiceList(startDate, endDate, clientName);
+        int totalInvoice = invoiceMapper.countInvoiceList(startDate, endDate, clientName, invoiceStatus);
 
         return new InvoiceListResponse(invoiceList, page, (int) Math.ceil((double) totalInvoice / size), totalInvoice);
     }
