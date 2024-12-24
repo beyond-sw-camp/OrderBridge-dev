@@ -15,8 +15,14 @@ const warehouses = ref([]);
 const salesOrderStatusList = ref([]);
 const salesOrderIndicatedDate = ref('');
 
-const itemList = ref([]); // 주문서 물품 목록
-const selectedItem = ref(null); // 선택된 물품
+const stockStatusList = ref([]);
+const selectedItem = ref({
+  salesOrderItemSeq: null,
+  isRegistered: false, // 등록 여부 초기화
+});
+
+const itemList = ref([]); // 주문서 품목 목록
+// const selectedItem = ref(null); // 선택된 품목
 const selectedSalesOrder = ref(false); // 주문서 선택 여부
 
 // 폼 데이터
@@ -54,7 +60,6 @@ const fetchSalesOrderList = async () => {
     salesOrderList.value = response.data.salesOrder;
     totalCount.value = response.data.totalSalesOrder;
   } catch (error) {
-    if(404)
     console.error('주문서 불러오기 실패:', error);
   }
 };
@@ -84,19 +89,25 @@ const fetchSalesOrderStatusList = async () => {
   }
 };
 
-// 주문납기일
+// 주문서 정보 채우기
 const addDueDate = (index) => {
   const selectedOrder = salesOrderList.value[index];
+
+  // 주문서 정보 채우기
   formData.value.salesOrderSeq = selectedOrder.salesOrderSeq;
   formData.value.salesOrder = selectedOrder.salesOrderName;
-  salesOrderIndicatedDate.value = selectedOrder.workOrderDueDate;
 
   if (selectedOrder && selectedOrder.salesOrderDueDate) {
-    salesOrderIndicatedDate.value = selectedOrder.salesOrderDueDate; // 납기일 설정
+    salesOrderIndicatedDate.value = selectedOrder.salesOrderDueDate || ''; // 납기일 설정
+    console.log('납기일:', selectedOrder.salesOrderDueDate); // 납기일 확인
   } else {
-    console.warn('선택된 주문서에 납기일이 없습니다.');
+    console.log('선택된 주문서에 납기일이 없습니다.');
+
   }
-  console.log('납기일:', selectedOrder.salesOrderDueDate); // 납기일 확인
+  console.log('선택된 주문서:', selectedOrder);
+
+  // 선택된 주문서의 재고 정보 가져오기
+  fetchSalesOrderItemStock(selectedOrder.salesOrderSeq);
 }
 
 const openSalesOrderModal = async () => {
@@ -114,6 +125,7 @@ onMounted(() => {
   fetchSalesOrderList();
   fetchWarehouses();
   fetchSalesOrderStatusList();
+  fetchSalesOrderItemStock();
 });
 
 // 상태 키로 값 반환
@@ -125,11 +137,73 @@ function findStatusValue(array, key) {
   }
 }
 
-// 선택한 주문서 품목 저장
-const selectItem = (index) => {
-  selectedItem.value = itemList.value[index]; // 선택된 물품 저장
-  console.log('선택된 물품:', selectedItem.value);
+// 선택한 주문서의 품목 재고 조회
+const fetchSalesOrderItemStock = async (salesOrderSeq) => {
+  try {
+    const response = await axios.get(`sales-order/${salesOrderSeq}/available-quantity`);
+
+    stockStatusList.value = response.data;
+    console.log('품목 재고 상태 목록:', stockStatusList.value);
+
+  } catch (error) {
+    console.error('품목 재고 조회 실패:', error);
+    if (error.response.data.errorCode === 'SALES_ORDER_ITEM_ERROR_001') {
+      alert(error.response.data.message);
+    }
+  }
 };
+
+// 발주서 작성으로 이동
+const goToOrderPage = () => {
+  router.push('/purchaseOrder/input');
+};
+
+// 선택한 주문서 품목 저장
+const selectItem = async (index) => {
+  console.log(index)
+  const item = stockStatusList.value[index]; // 선택된 품목 저장
+  console.log(item)
+
+  selectedItem.value = {
+    ...item,
+    isRegistered: false, // 기본값
+  };
+
+  console.log('선택된 품목:', selectedItem.value);
+  await fetchRegisteredItems();
+};
+
+// 주문서 품목의 작업지시서 등록여부 조회
+const fetchRegisteredItems = async (salesOrderSeq) => {
+  try {
+    const response = await axios.get(`sales-order/${salesOrderSeq}/registered-items`);
+    console.log(response.data);
+
+    const registeredItemSeqs = response.data;
+    stockStatusList.value = stockStatusList.value.map(item => ({
+      ...item,
+      isRegistered: registeredItemSeqs.includes(item.salesOrderItemSeq)
+    }));
+
+    console.log('등록 여부 조회된 품목 목록:', stockStatusList.value);
+
+  } catch (error) {
+    console.error('등록여부 조회 실패:', error);
+  }
+};
+
+const writeWorkOrder = (item) => {
+  if (selectedItem.value.isRegistered) {
+    console.log(`이미 등록된 작업지시서입니다. 작업지시서를 수정합니다: ${item.itemName}`);
+    // 수정 페이지로 이동하거나 수정 API 호출
+
+  } else {
+    console.log(`작업지시서를 등록합니다: ${item.itemName}`);
+    // 등록 페이지로 이동하거나 등록 API 호출
+
+  }
+};
+
 
 </script>
 
@@ -187,7 +261,53 @@ const selectItem = (index) => {
     <hr class="col-md-10 d-flex flex-column">
   </div>
 
-<!--  <div v-if="checkWorkOrderList.length > 0" class="d-flex justify-content-center">-->
+  <!-- 주문서 품목 표시-->
+  <div v-if="stockStatusList.length > 0" class="d-flex justify-content-center">
+    <div class="col-md-10 d-flex flex-column">
+      <h5 class="px-4">주문서 품목</h5>
+      <!-- 품목 반복 -->
+      <div v-for="item in stockStatusList" :key="item.salesOrderItemSeq" class="mx-5 my-3">
+        <div class="d-flex flex-row border border-secondary rounded p-3 position-relative">
+          <div class="col-md-8">
+            <ul class="d-flex flex-wrap align-items-start">
+              <li class="mb-3 col-md-12 d-flex align-items-center">· 품목명 : {{ item.itemName }}</li>
+              <li class="mb-3 col-md-12 d-flex align-items-center">
+                <span class="me-3 text-nowrap">· 품목 비고 : {{item.salesOrderItemNote}}</span>
+              </li>
+              <li class="mb-3 col-md-6">· 주문 수량 : {{ item.requiredQuantity }}</li>
+              <li class="mb-3 col-md-6">· 생산가능 수량 : {{ item.availableQuantity }}</li>
+              <li class="mb-3 col-md-6" v-if="!item.isStockEnough">· <span style="color: red">[재고 부족!]</span> 부족한 수량: {{ item.insufficientQuantity }}</li>
+              <li class="mb-3 col-md-6">
+                <b-button v-if="!item.isStockEnough" @click="goToOrderPage" variant="light" size="sm" class="button ms-2 mb-3" style="top: 10px; right: 10px;">발주하러 가기</b-button>
+              </li>
+            </ul>
+          </div>
+          <!-- 이미지 -->
+<!--          <div class="col-md-4 d-flex justify-content-center align-items-center">-->
+          <div class="col-md-4 d-flex flex-column justify-content-around align-items-center">
+            <img :src="item.itemImageUrl" alt="Item Image" class="img-fluid border border-secondary rounded" style="max-width: 150px; height: auto;">
+            <div>
+<!--              <b-button @click="writeWorkOrder(item)" variant="light" size="sm" class="button ms-2 mb-3" style="top: 10px; right: 10px;">-->
+              <b-button @click="selectItem(item)" variant="light" size="sm" class="button ms-2 mb-3" style="top: 10px; right: 10px;">
+<!--                작업지시서 등록-->
+<!--                {{ selectedItem.salesOrderItemSeq === item.salesOrderItemSeq && selectedItem.isRegistered ? '작업지시서 수정' : '작업지시서 등록' }}-->
+                {{ item.isRegistered ? '작업지시서 수정' : '작업지시서 등록' }}
+              </b-button>
+            </div>
+          </div>
+          <!-- x 버튼 -->
+<!--          <b-button @click="checkWorkOrder(workOrder.workOrderSeq)" variant="light" size="sm" class="position-absolute btn-close" style="top: 10px; right: 10px;"></b-button>-->
+        </div>
+      </div>
+      <!-- 확인 버튼 -->
+      <div class="mx-5 my-3 d-flex justify-content-end">
+<!--        <b-button v-if="props" @click="updateProductionReceiving" variant="light" size="sm" class="button ms-2">수정</b-button>-->
+<!--        <b-button v-else @click="createProductionReceiving" variant="light" size="sm" class="button ms-2">등록</b-button>-->
+      </div>
+    </div>
+  </div>
+
+<!--  <div v-if="stockStatusList.length > 0" class="d-flex justify-content-center">-->
 <!--    <div class="col-md-10 d-flex flex-column">-->
 <!--      <h5 class="px-4">작업지시서 등록</h5>-->
 <!--      &lt;!&ndash; 작업 지시서 반복 &ndash;&gt;-->
@@ -283,40 +403,40 @@ const selectItem = (index) => {
     </div>
   </div>
 
-  <div class="col-md-10 d-flex flex-column">
-    <h5 class="px-4">품목 목록</h5>
-      <div style="max-height: 250px; overflow-y: auto;">
-        <div style="max-height: 200px;" v-for="(item, index) in itemList" :key="item.salesOrderItemSeq"
-             class="mx-5 my-3 d-flex flex-row border border-secondary rounded">
-          <img :src=item.itemImageUrl class="p-2 col-md-4 card-img-top">
-          <div class="p-2 col-md-8">
-            <div class="mb-4 d-flex justify-content-between">
-              <span class="fw-bold">{{ item.itemName }}</span>
-              <trashIcon class="icon" @click="deleteItem(index)"/>
-            </div>
-            <div class="d-flex">
-              <ul class="col-md-6 p-0">
-                <li class="mb-3 ">
-                  · 품목 구분 : {{ findStatusValue(itemDivisionList, item.itemDivision) }}
-                </li>
-                <li class="mb-3 d-flex flex-row">
-                  · 수량 :
-                  <b-form-input class="ms-2 me-2 w-25" type="text" v-model="itemData[index].quantity"
-                                size="sm"></b-form-input>
-                  개 (최대 : {{ numberThree(itemData[index].originalQuantity) }} 개)
-                </li>
-              </ul>
-              <ul class="col-md-6 p-0 d-flex flex-column justify-content-between">
-                <li class="mb-3 d-flex flex-row">
-                  · 비고 :
-                  <b-form-input class="ms-2 w-75" type="text" v-model="itemData[index].note" size="sm"></b-form-input>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </div>
-  </div>
+<!--  <div class="col-md-10 d-flex flex-column">-->
+<!--    <h5 class="px-4">품목 목록</h5>-->
+<!--      <div style="max-height: 250px; overflow-y: auto;">-->
+<!--        <div style="max-height: 200px;" v-for="(item, index) in itemList" :key="item.salesOrderItemSeq"-->
+<!--             class="mx-5 my-3 d-flex flex-row border border-secondary rounded">-->
+<!--          <img :src=item.itemImageUrl class="p-2 col-md-4 card-img-top">-->
+<!--          <div class="p-2 col-md-8">-->
+<!--            <div class="mb-4 d-flex justify-content-between">-->
+<!--              <span class="fw-bold">{{ item.itemName }}</span>-->
+<!--              <trashIcon class="icon" @click="deleteItem(index)"/>-->
+<!--            </div>-->
+<!--            <div class="d-flex">-->
+<!--              <ul class="col-md-6 p-0">-->
+<!--                <li class="mb-3 ">-->
+<!--                  · 품목 구분 : {{ findStatusValue(itemDivisionList, item.itemDivision) }}-->
+<!--                </li>-->
+<!--                <li class="mb-3 d-flex flex-row">-->
+<!--                  · 수량 :-->
+<!--                  <b-form-input class="ms-2 me-2 w-25" type="text" v-model="itemData[index].quantity"-->
+<!--                                size="sm"></b-form-input>-->
+<!--                  개 (최대 : {{ numberThree(itemData[index].originalQuantity) }} 개)-->
+<!--                </li>-->
+<!--              </ul>-->
+<!--              <ul class="col-md-6 p-0 d-flex flex-column justify-content-between">-->
+<!--                <li class="mb-3 d-flex flex-row">-->
+<!--                  · 비고 :-->
+<!--                  <b-form-input class="ms-2 w-75" type="text" v-model="itemData[index].note" size="sm"></b-form-input>-->
+<!--                </li>-->
+<!--              </ul>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--      </div>-->
+<!--  </div>-->
 
 </template>
 

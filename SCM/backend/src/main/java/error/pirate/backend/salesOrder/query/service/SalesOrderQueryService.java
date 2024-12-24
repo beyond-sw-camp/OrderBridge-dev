@@ -1,5 +1,8 @@
 package error.pirate.backend.salesOrder.query.service;
 
+import error.pirate.backend.exception.CustomException;
+import error.pirate.backend.exception.ErrorCodeType;
+import error.pirate.backend.salesOrder.command.domain.aggregate.entity.SalesOrderItem;
 import error.pirate.backend.salesOrder.query.dto.*;
 import error.pirate.backend.salesOrder.query.mapper.SalesOrderMapper;
 import lombok.RequiredArgsConstructor;
@@ -7,6 +10,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -66,6 +70,25 @@ public class SalesOrderQueryService {
 
     // 작업지시가 등록된 주문서 물품 조회
     public List<Long> readRegisteredItems(Long salesOrderSeq) {
-        return salesOrderMapper.findRegisteredItemSeqsBySalesOrderSeq(salesOrderSeq);
+        return salesOrderMapper.selectRegisteredItemSeqsBySalesOrderSeq(salesOrderSeq);
+    }
+
+    // 주문서(품목)에 대한 재고 상태 조회
+    public List<SalesOrderItemStockStatusResponse> readSalesOrderItemStock(Long salesOrderSeq) {
+
+        // 현재 시간 기준으로 만료되지 않은 재고 확인
+        LocalDateTime currentDateTime = LocalDateTime.now();
+
+        // 주문서에 품목이 있는지 확인
+        List<SalesOrderItem> salesOrderItems = salesOrderMapper.findItemsBySalesOrderSeq(salesOrderSeq);
+        if (salesOrderItems.isEmpty()) {
+            throw new CustomException(ErrorCodeType.SALES_ORDER_ITEM_NOT_FOUND);
+        }
+
+        // 품목이 있다면 재고 상태 조회
+        List<SalesOrderItemStockStatusResponse> stockStatusList =
+                salesOrderMapper.selectSalesOrderItemStockStatus(salesOrderSeq, currentDateTime);
+
+        return stockStatusList;
     }
 }
