@@ -10,7 +10,7 @@ spring:
     name: orderBridge
   config:
     import:
-      optional:file:env.properties
+      optional:file:.env
   datasource:
     url: jdbc:log4jdbc:mariadb://${MARIADB_HOST}:${MARIADB_PORT}/${MARIADB_DATABASE}?serverTimezone=Asia/Seoul
     username: ${MARIADB_USER}

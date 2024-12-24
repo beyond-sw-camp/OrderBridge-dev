@@ -2,26 +2,15 @@ package error.pirate.backend.security;
 
 import error.pirate.backend.user.command.domain.aggregate.entity.RefreshToken;
 import error.pirate.backend.user.command.domain.repository.RefreshTokenRepository;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.env.Environment;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
-import javax.crypto.SecretKey;
 import java.io.IOException;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
 
 @RequiredArgsConstructor
 @Slf4j
