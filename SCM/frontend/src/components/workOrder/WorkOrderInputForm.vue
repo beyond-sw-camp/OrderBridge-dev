@@ -54,6 +54,7 @@ const fetchSalesOrderList = async () => {
     salesOrderList.value = response.data.salesOrder;
     totalCount.value = response.data.totalSalesOrder;
   } catch (error) {
+    if(404)
     console.error('주문서 불러오기 실패:', error);
   }
 };
