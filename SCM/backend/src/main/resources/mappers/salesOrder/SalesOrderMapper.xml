@@ -19,7 +19,7 @@
             tb_sales_order.sales_order_status
         FROM tb_sales_order
         JOIN tb_client USING (client_seq)
-        WHERE TRUE
+        WHERE tb_sales_order.sales_order_status NOT IN ("DELETE")
         <if test="startDate != null"><![CDATA[
             AND #{startDate} <= tb_sales_order.sales_order_order_date
         ]]></if>
@@ -30,8 +30,10 @@
             AND tb_client.client_name LIKE CONCAT('%', #{clientName}, '%')
         </if>
         <if test="salesOrderStatus != null">
-            AND tb_sales_order.sales_order_status LIKE #{salesOrderStatus}
+            AND tb_sales_order.sales_order_status IN
+            <foreach collection="salesOrderStatus" item="item" open="(" separator="," close=")">#{item}</foreach>
         </if>
+        ORDER BY tb_sales_order.sales_order_reg_date DESC
         LIMIT #{limit} OFFSET #{offset}
     </select>
 
@@ -41,7 +43,7 @@
             COUNT(*)
         FROM tb_sales_order
         JOIN tb_client USING (client_seq)
-        WHERE TRUE
+        WHERE tb_sales_order.sales_order_status NOT IN ("DELETE")
         <if test="startDate != null"><![CDATA[
             AND #{startDate} <= tb_sales_order.sales_order_order_date
         ]]></if>
@@ -52,7 +54,8 @@
             AND tb_client.client_name LIKE CONCAT('%', #{clientName}, '%')
         </if>
         <if test="salesOrderStatus != null">
-            AND tb_sales_order.sales_order_status LIKE #{salesOrderStatus}
+            AND tb_sales_order.sales_order_status IN
+            <foreach collection="salesOrderStatus" item="item" open="(" separator="," close=")">#{item}</foreach>
         </if>
     </select>
     
