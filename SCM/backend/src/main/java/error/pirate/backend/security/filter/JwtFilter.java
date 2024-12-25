@@ -35,32 +35,35 @@ public class JwtFilter extends OncePerRequestFilter {
             // AccessToken 추출
             String accessToken = authorization.substring(7);
 
-            String authorizationRefresh = request.getHeader(env.getProperty("jwt.refresh.header"));
-            if(authorizationRefresh != null && authorizationRefresh.startsWith("Bearer ")) {
+            if(jwtUtil.validateAccessToken(accessToken)) {
+                String authorizationRefresh = request.getHeader(env.getProperty("jwt.refresh.header"));
 
-                String userEmployeeNo = jwtUtil.getUserEmployeeNo(accessToken);
-                log.info("userEmployeeNo : {}", userEmployeeNo);
-                String refreshToken = authorizationRefresh.substring(7);
-                log.info("refreshToken : {}", refreshToken);
-                RefreshToken redisRefreshToken =  refreshTokenRepository.findByUserEmployeeNoAndRefreshToken(userEmployeeNo, refreshToken)
-                        .orElseThrow(() -> new CustomException(ErrorCodeType.SECURITY_TOKEN_ERROR));
-
-                // accessToken이 유효하고 refreshToken이 DB에 저장되어 있는 값과 동일한 지 여부 체크
-                if(jwtUtil.validateAccessToken(accessToken) && refreshToken.equals(redisRefreshToken.getRefreshToken())) {
+                if(authorizationRefresh != null && authorizationRefresh.startsWith("Bearer ")) {
+                    // refreshToken 추출
+                    String refreshToken = authorizationRefresh.substring(7);
+                    log.info("refreshToken : {}", refreshToken);
                     // accessToken, refreshToken 만료 여부 체크
                     Pair<String, String> pair = jwtUtil.validateExpiredAccessToken(accessToken, refreshToken);
 
                     if(!"ACCESS_FAIL".equals(pair.getLeft())) {
-                        if("ACCESS_EXPIRED".equals(pair.getLeft())) {
+                        if ("ACCESS_EXPIRED".equals(pair.getLeft())) {
                             jwtUtil.setAccessTokenHeader(response, pair.getRight());
-                        } else if("REFRESH_EXPIRED".equals(pair.getLeft())) {
+                        } else if ("REFRESH_EXPIRED".equals(pair.getLeft())) {
                             jwtUtil.setRefreshTokenHeader(response, pair.getRight());
                         }
-                        Authentication authentication = jwtUtil.getAuthentication(accessToken);
 
-                        // 인증이 완료된 후 Security에서 관리하는 ContextHolder에 Authentication 값을 저장한다.
-                        // 인증이 완료되면 이후 인증 필터는 건너 뛰게 된다.
-                        SecurityContextHolder.getContext().setAuthentication(authentication);
+                        String userEmployeeNo = jwtUtil.getUserEmployeeNo(accessToken);
+                        // refreshToken이 DB에 저장되어 있는 값과 동일한 지 여부 체크
+                        RefreshToken redisRefreshToken =  refreshTokenRepository.findById(userEmployeeNo)
+                                .orElseThrow(() -> new CustomException(ErrorCodeType.SECURITY_TOKEN_ERROR));
+                        if(refreshToken.equals(redisRefreshToken.getRefreshToken())) {
+
+                            Authentication authentication = jwtUtil.getAuthentication(accessToken);
+
+                            // 인증이 완료된 후 Security에서 관리하는 ContextHolder에 Authentication 값을 저장한다.
+                            // 인증이 완료되면 이후 인증 필터는 건너 뛰게 된다.
+                            SecurityContextHolder.getContext().setAuthentication(authentication);
+                        }
                     }
                 }
             }

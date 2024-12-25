@@ -6,9 +6,6 @@ const instance = axios.create({
     common: {
       'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
       'Refresh-Token': `Bearer ${localStorage.getItem('refreshToken')}`
-    },
-    post: {
-      'Content-Type': 'application/x-www-form-urlencoded'
     }
   }
 });

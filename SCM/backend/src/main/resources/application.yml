@@ -6,8 +6,6 @@ server:
       charset: UTF-8
 
 spring:
-  profiles:
-    active: oauth
   application:
     name: orderBridge
   config:
@@ -63,7 +61,7 @@ mybatis:
 jwt:
   secretKey: ${SECRET_KEY}
   access:
-    expiration: 360000 # 1시간
+    expiration: 3600000 # 1시간
     header: Authorization
   refresh:
     expiration: 1209600000 # 2주

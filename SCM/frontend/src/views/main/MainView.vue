@@ -1,9 +1,6 @@
 <script setup>
 
-function tryDemo() {
-  // 데모 버튼 클릭 시 처리할 로직
-  alert("Demo 버튼 클릭");
-}
+import router from "@/router/index.js";
 
 </script>
 
@@ -31,7 +28,7 @@ function tryDemo() {
           오더브릿지 주문 관리 시스템은 <br />
           안전하고 차별적인 서비스를 제공합니다.
         </p>
-        <button class="hero-button" @click="tryDemo">TRY DEMO</button>
+        <button class="hero-button" @click="router.push('/login')">로그인</button>
       </div>
     </div>
 </template>

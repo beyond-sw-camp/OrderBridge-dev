@@ -57,6 +57,9 @@ public class JwtUtil {
             log.error("Unsupported Jwt Token {}", e.getMessage()); // 지원하지 않는 Jwt Token
         } catch (IllegalArgumentException e) {
             log.error("Jwt Token claims empty {}", e.getMessage());
+        } catch (ExpiredJwtException e) {
+            log.info("Jwt Token Expired");
+            return true;
         }
 
         return false;
@@ -96,6 +99,7 @@ public class JwtUtil {
 
             return "REFRESH_SUCCESS";
         } catch (ExpiredJwtException e) {
+            // Refresh Token은 만료가 아니면 오류 throw하도록 설정
             log.info("AccessToken is Valid But Jwt RefreshToken is Expired new Jwt RefreshToken");
         }
         return "REFRESH_EXPIRED";
