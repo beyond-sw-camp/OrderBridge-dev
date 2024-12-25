@@ -8,6 +8,7 @@ public class ClientUpdateRequest {
     private String clientPhoneNo;
     private String clientEmail;
     private String clientRegistrationNo;
+    private String clientRepresentative;
 
     public ClientUpdateRequest(String s, String s1, String mail, String s2) {
     }
