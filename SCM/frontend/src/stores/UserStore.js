@@ -27,6 +27,7 @@ export const useUserStore = defineStore('user', {
           // JWT 토큰 로컬 스토리지에 저장
           localStorage.setItem('accessToken', accessToken);
           localStorage.setItem('refreshToken', refreshToken);
+
         } else {
           this.error = 'Token not found';
         }
@@ -38,17 +39,18 @@ export const useUserStore = defineStore('user', {
     async logout() {
       this.error = null;
       try {
-        const response = await customAxios.post(`logout`);
+        await customAxios.post(`user/logout`);
 
+        this.isAuthenticated = false;
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+
+        await router.push("/");
+
+        location.reload();
       } catch (error) {
         alert(`로그아웃 실패하였습니다.`);
       }
-
-      this.isAuthenticated = false;
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
-
-      await router.push("/");
     },
   },
 });

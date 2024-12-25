@@ -41,7 +41,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 if(authorizationRefresh != null && authorizationRefresh.startsWith("Bearer ")) {
                     // refreshToken 추출
                     String refreshToken = authorizationRefresh.substring(7);
-                    log.info("refreshToken : {}", refreshToken);
+
                     // accessToken, refreshToken 만료 여부 체크
                     Pair<String, String> pair = jwtUtil.validateExpiredAccessToken(accessToken, refreshToken);
 

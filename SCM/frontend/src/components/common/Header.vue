@@ -78,7 +78,7 @@ const userStore = useUserStore();
           <li class="nav-item"><RouterLink to="#" class="nav-link"><chatbotIcon class="icon-right"/></RouterLink></li>
           <li class="nav-item"><RouterLink to="#" class="nav-link"><notificationIcon class="icon-right"/></RouterLink></li>
           <li class="nav-item"><RouterLink to="#" class="nav-link"><myPageIcon class="icon-right"/></RouterLink></li>
-          <li class="nav-item"><RouterLink to="#" class="nav-link"><logoutIcon class="icon-right" @click="userStore.logout()"/></RouterLink></li>
+          <li class="nav-item" @click="userStore.logout()"><RouterLink to="#" class="nav-link"><!--<logoutIcon class="icon-right"/>-->로그아웃</RouterLink></li>
         </ul>
       </div>
   </nav>

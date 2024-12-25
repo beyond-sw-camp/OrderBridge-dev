@@ -1,22 +1,27 @@
 <script setup>
-import {ref} from "vue";
+import {onMounted, ref} from "vue";
 import { useUserStore } from "@/stores/UserStore.js";
-import { useRouter } from 'vue-router'; // Vue Router 사용
+import { useRoute, useRouter } from 'vue-router'; // Vue Router 사용
 
 const userEmployeeNo = ref("");
 const userPwd = ref("");
 const userStore = useUserStore();
 const router = useRouter(); // useRouter로 라우터 객체 사용
+const route = useRoute();
 
 const handleLogin = async() => {
   await userStore.login(userEmployeeNo.value, userPwd.value)
 
   if(userStore.isAuthenticated) {
-    await router.push('/');
+    const redirect = route.query.redirect || '/'; // 리다이렉트 경로가 없으면 홈으로 이동
+    await router.push(redirect);
+
+    location.reload();
   } else {
     alert(userStore.error)
   }
 }
+
 </script>
 
 <template>

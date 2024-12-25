@@ -2,6 +2,7 @@
 
 import router from "@/router/index.js";
 
+const isLogin = localStorage.getItem('accessToken');
 </script>
 
 <template>
@@ -28,7 +29,7 @@ import router from "@/router/index.js";
           오더브릿지 주문 관리 시스템은 <br />
           안전하고 차별적인 서비스를 제공합니다.
         </p>
-        <button class="hero-button" @click="router.push('/login')">로그인</button>
+        <button v-if="!isLogin" class="hero-button" @click="router.push('/login')">로그인</button>
       </div>
     </div>
 </template>
