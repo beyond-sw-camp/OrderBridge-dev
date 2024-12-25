@@ -31,7 +31,6 @@ const handleLogin = () => {
   </div>
 </template>
 
-
 <style scoped>
 
 .button {

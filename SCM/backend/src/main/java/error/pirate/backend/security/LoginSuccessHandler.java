@@ -29,6 +29,7 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
         String refreshToken = jwtUtil.createRefreshToken();
 
         RefreshToken redisRefreshToken = new RefreshToken(authentication.getName(), refreshToken);
+
         refreshTokenRepository.save(redisRefreshToken);
 
         jwtUtil.setAccessTokenHeader(response, accessToken);
