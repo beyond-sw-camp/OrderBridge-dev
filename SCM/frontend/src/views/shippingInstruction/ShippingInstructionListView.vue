@@ -155,6 +155,38 @@ const excelDown = async () => {
   }
 }
 
+// 출하전표 등록 요청
+const createShippingSlip = async (seq) => {
+  try {
+    const response = await axios.post('shipping-slip',
+        {
+          shippingSlipShippingDate: expandShippingInstruction.value[seq].shippingInstructionScheduledShipmentDate,
+          shippingInstructionSeq: expandShippingInstruction.value[seq].shippingInstructionSeq,
+          shippingSlipNote: expandShippingInstruction.value[seq].shippingInstructionNote,
+          shippingSlipItems: expandItemList.value[seq].map(item => ({
+            itemSeq: item.itemSeq,
+            shippingSlipItemQuantity: item.shippingInstructionItemQuantity,
+            shippingSlipItemNote: item.shippingInstructionItemNote,
+          })),
+        }, {});
+
+    alert('출하전표가 등록되었습니다!');
+    // 조회 페이지 이동
+    await router.push("/shipping-instruction");
+
+  } catch (error) {
+    if (error.response) {
+      // 서버에서 반환된 상태 코드에 따른 처리
+      if (error.response.status === 400) {
+        console.error(`출하전표 등록 실패 : ${error.response.data.message}`);
+        alert(`${error.response.data.message}`);
+      } else {
+        console.error(`출하전표 등록 실패 : 상태 코드 ${error.response.status}`);
+      }
+    }
+  }
+};
+
 onMounted(async () => {
   await fetchShippingInstructionList();
 
@@ -191,7 +223,7 @@ const handleStatus = (payload) => {
 
 // 수정 페이지로 이동
 const handleEdit = (seq) => {
-  if (seq != null){
+  if (seq != null) {
     router.push(`/shipping-instruction/edit/${seq}`);
   }
 }
@@ -203,6 +235,11 @@ const handleDelete = async (seq) => {
   }
   await fetchShippingInstructionList();
 };
+
+// 출하전표 등록 수행
+const handleShippingSlip = (seq) => {
+  createShippingSlip(seq);
+}
 
 function search() {
   pageNumber.value = 1;
@@ -245,6 +282,7 @@ const handleExtendItem = (seq) => {
                            @itemEditEvent="handleEdit"
                            @itemDeleteEvent="handleDelete"
                            @excelEvent="excelDown"
+                           @shippingSlipRegisterEvent="handleShippingSlip"
   />
 </template>
 

@@ -1,5 +1,6 @@
 package error.pirate.backend.salesOrder.query.service;
 
+import error.pirate.backend.salesOrder.command.domain.aggregate.entity.SalesOrderStatus;
 import error.pirate.backend.salesOrder.query.dto.*;
 import error.pirate.backend.salesOrder.query.mapper.SalesOrderMapper;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +21,7 @@ public class SalesOrderQueryService {
     public SalesOrderListResponse readSalesOrderList(
             Integer page, Integer size,
             LocalDate startDate, LocalDate endDate,
-            String clientName, String salesOrderStatus) {
+            String clientName, List<SalesOrderStatus> salesOrderStatus) {
 
         // 주문서 목록 조회
         List<SalesOrderListItemDTO> salesOrderList = salesOrderMapper.selectSalesOrderList(

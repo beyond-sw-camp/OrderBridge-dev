@@ -17,6 +17,7 @@ import error.pirate.backend.salesOrder.command.domain.aggregate.entity.SalesOrde
 import error.pirate.backend.salesOrder.command.domain.repository.SalesOrderCommandRepository;
 import error.pirate.backend.salesOrder.command.domain.repository.SalesOrderItemRepository;
 import error.pirate.backend.salesOrder.command.domain.service.SalesOrderDomainService;
+import error.pirate.backend.salesOrder.query.dto.SalesOrderItemDTO;
 import error.pirate.backend.user.command.domain.aggregate.entity.User;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
@@ -45,16 +46,29 @@ public class SalesOrderCommandService {
         // 불러온 견적서가 있으면 견적서 확인 절차
         validateItem(createSalesOrderRequest.getQuotationSeq(), createSalesOrderRequest.getSalesOrderItemList());
 
-        // 주문서 등록
+        // 엔티티 요구 변수 작성
         Quotation quotation = entityManager.getReference(Quotation.class, createSalesOrderRequest.getQuotationSeq());
         Client client = entityManager.getReference(Client.class, createSalesOrderRequest.getClientSeq());
         User user = entityManager.getReference(User.class, 1L);
         String name = nameGenerator.nameGenerator(SalesOrder.class);
 
+        // 주문서 합계 계산
+        int salesOrderExtendedPrice = 0;
+        int salesOrderTotalQuantity = 0;
+
+        for (SalesOrderItemRequest salesOrderItemRequest : createSalesOrderRequest.getSalesOrderItemList()) {
+            salesOrderExtendedPrice +=
+                    salesOrderItemRequest.getSalesOrderItemQuantity() * salesOrderItemRequest.getSalesOrderItemPrice();
+            salesOrderTotalQuantity +=
+                    salesOrderItemRequest.getSalesOrderItemQuantity();
+        }
+
+        // 주문서 등록
         SalesOrder salesOrder = new SalesOrder(quotation, user, client, name,
                 createSalesOrderRequest.getSalesOrderOrderDate(),
                 createSalesOrderRequest.getSalesOrderDueDate(),
-                createSalesOrderRequest.getSalesOrderNote());
+                createSalesOrderRequest.getSalesOrderNote(),
+                salesOrderExtendedPrice, salesOrderTotalQuantity);
 
         salesOrderCommandRepository.save(salesOrder);
 

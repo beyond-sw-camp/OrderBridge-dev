@@ -6,6 +6,8 @@ import workOrderRoutes from "@/router/work-order.js";
 import shippingSlipRoutes from "@/router/shipping-slip.js";
 import warehouse from "@/router/warehouse.js";
 import quotationRoutes from "@/router/quotation.js";
+import salesOrder from '@/router/salesOrder.js';
+import invoice from '@/router/invoice.js'
 
 const routes = [
     {
@@ -61,6 +63,8 @@ const routes = [
     ...shippingSlipRoutes,
     ...warehouse,
     ...quotationRoutes,
+    ...salesOrder,
+    ...invoice
 ];
 
 const router = createRouter({
