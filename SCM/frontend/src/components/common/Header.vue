@@ -22,7 +22,7 @@ import statisticsIcon from '@/assets/statisticsIcon.svg'
           <RouterLink to="warehouse" class="none-line" active-class="active">
             <b-dropdown-item>창고 관리</b-dropdown-item>
           </RouterLink>
-          <RouterLink to="/" class="none-line" active-class="active">
+          <RouterLink to="/client" class="none-line" active-class="active">
             <b-dropdown-item>거래처 관리</b-dropdown-item>
           </RouterLink>
           <RouterLink to="/item" class="none-line" active-class="active">
