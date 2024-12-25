@@ -16,5 +16,6 @@ public class ClientCreateRequest {
     private String clientName; // 거래처 이름
     private String clientPhoneNo; // 거래처 전화번호
     private String clientEmail; // 거래처 이메일
+    private String clientRepresentative; //대표자
 }
 

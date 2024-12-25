@@ -33,6 +33,7 @@ public class Client {
 
     private String clientEmail; // 거래처 이메일
 
+    private String clientRepresentative; //대표자
     @CreatedDate
     private LocalDateTime clientRegDate; // 거래처 등록일
 
@@ -55,6 +56,9 @@ public class Client {
         }
         if (request.getClientRegistrationNo() != null) {
             this.clientRegistrationNo = request.getClientRegistrationNo();
+        }
+        if (request.getClientRepresentative() != null) {
+            this.clientRepresentative = request.getClientRepresentative();
         }
     }
     public void delete() {
