@@ -2,10 +2,8 @@ package error.pirate.backend.user.command.domain.aggregate.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @Entity
@@ -22,13 +20,8 @@ public class User {
 
     private String userProfileImgUrl;
 
-    private Integer userAge;
-
     @Enumerated(EnumType.STRING)
     private UserRole userRole;
-
-    @Enumerated(EnumType.STRING)
-    private UserSocialType userSocialType;
 
     private String userName; // 회원 이름
 
@@ -36,13 +29,33 @@ public class User {
 
     private String userEmail; // 회원 이메일
 
-    private String userSocialId;
-
     public void authorizeUser() {
         this.userRole = UserRole.MEMBER;
     }
 
     public void passwordEncode(BCryptPasswordEncoder passwordEncoder) {
         this.userPwd = passwordEncoder.encode(this.userPwd);
+    }
+
+    public static User createUser(String userEmployeeNo,
+                                  String userPwd,
+                                  String userProfileImgUrl,
+                                  UserRole userRole,
+                                  String userName,
+                                  String userPhoneNo,
+                                  String userEmail) {
+
+        return new User(userEmployeeNo, userPwd, userProfileImgUrl,
+                userRole, userName, userPhoneNo, userEmail);
+    }
+
+    protected User(String userEmployeeNo, String userPwd, String userProfileImgUrl, UserRole userRole, String userName, String userPhoneNo, String userEmail) {
+        this.userEmployeeNo = userEmployeeNo;
+        this.userPwd = userPwd;
+        this.userProfileImgUrl = userProfileImgUrl;
+        this.userRole = userRole;
+        this.userName = userName;
+        this.userPhoneNo = userPhoneNo;
+        this.userEmail = userEmail;
     }
 }
