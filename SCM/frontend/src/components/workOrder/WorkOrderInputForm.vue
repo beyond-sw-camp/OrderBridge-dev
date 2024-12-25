@@ -160,9 +160,10 @@ const goToOrderPage = () => {
 
 // 선택한 주문서 품목 저장
 const selectItem = async (index) => {
-  console.log(index)
-  const item = stockStatusList.value[index]; // 선택된 품목 저장
-  console.log(item)
+  console.log('Index:', index);
+
+  const item = stockStatusList.value[index];
+  console.log('선택된 아이템:', item);
 
   selectedItem.value = {
     ...item,
@@ -170,26 +171,45 @@ const selectItem = async (index) => {
   };
 
   console.log('선택된 품목:', selectedItem.value);
-  await fetchRegisteredItems();
+  await fetchRegisteredItems(formData.value.salesOrderSeq);
 };
 
 // 주문서 품목의 작업지시서 등록여부 조회
 const fetchRegisteredItems = async (salesOrderSeq) => {
+  if (!salesOrderSeq) {
+    console.warn('salesOrderSeq 가 존재하지 않습니다.');
+    return;
+  }
+
   try {
     const response = await axios.get(`sales-order/${salesOrderSeq}/registered-items`);
     console.log(response.data);
 
-    const registeredItemSeqs = response.data;
+    const registeredItemSeqs = response.data.map(Number); // 강제 변환
+
     stockStatusList.value = stockStatusList.value.map(item => ({
       ...item,
-      isRegistered: registeredItemSeqs.includes(item.salesOrderItemSeq)
+      isRegistered: registeredItemSeqs.includes(Number(item.salesOrderItemSeq))
     }));
 
     console.log('등록 여부 조회된 품목 목록:', stockStatusList.value);
 
+    // selectedItem 업데이트
+    selectedItem.value = stockStatusList.value.find(item =>
+        item.salesOrderItemSeq === selectedItem.value.salesOrderItemSeq
+    );
+
+    // const registeredItemSeqs = response.data;
+    // stockStatusList.value = stockStatusList.value.map(item => ({
+    //   ...item,
+    //   isRegistered: registeredItemSeqs.includes(item.salesOrderItemSeq)
+    // }));
+    //
+    // console.log('등록 여부 조회된 품목 목록:', stockStatusList.value);
   } catch (error) {
     console.error('등록여부 조회 실패:', error);
   }
+  console.log('isRegistered:', selectedItem.value?.isRegistered);
 };
 
 const writeWorkOrder = (item) => {
@@ -266,7 +286,7 @@ const writeWorkOrder = (item) => {
     <div class="col-md-10 d-flex flex-column">
       <h5 class="px-4">주문서 품목</h5>
       <!-- 품목 반복 -->
-      <div v-for="item in stockStatusList" :key="item.salesOrderItemSeq" class="mx-5 my-3">
+      <div v-for="(item, index) in stockStatusList" :key="item.salesOrderItemSeq" class="mx-5 my-3">
         <div class="d-flex flex-row border border-secondary rounded p-3 position-relative">
           <div class="col-md-8">
             <ul class="d-flex flex-wrap align-items-start">
@@ -288,7 +308,7 @@ const writeWorkOrder = (item) => {
             <img :src="item.itemImageUrl" alt="Item Image" class="img-fluid border border-secondary rounded" style="max-width: 150px; height: auto;">
             <div>
 <!--              <b-button @click="writeWorkOrder(item)" variant="light" size="sm" class="button ms-2 mb-3" style="top: 10px; right: 10px;">-->
-              <b-button @click="selectItem(item)" variant="light" size="sm" class="button ms-2 mb-3" style="top: 10px; right: 10px;">
+              <b-button @click="selectItem(index)" variant="light" size="sm" class="button ms-2 mb-3" style="top: 10px; right: 10px;">
 <!--                작업지시서 등록-->
 <!--                {{ selectedItem.salesOrderItemSeq === item.salesOrderItemSeq && selectedItem.isRegistered ? '작업지시서 수정' : '작업지시서 등록' }}-->
                 {{ item.isRegistered ? '작업지시서 수정' : '작업지시서 등록' }}
