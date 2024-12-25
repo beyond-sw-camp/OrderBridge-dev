@@ -1,29 +1,38 @@
 <script setup>
-import { ref } from "vue";
+import {ref} from "vue";
+import { useUserStore } from "@/stores/UserStore.js";
+import { useRouter } from 'vue-router'; // Vue Router 사용
 
-const email = ref("");
-const password = ref("");
+const userEmployeeNo = ref("");
+const userPwd = ref("");
+const userStore = useUserStore();
+const router = useRouter(); // useRouter로 라우터 객체 사용
 
-const handleLogin = () => {
-  console.log("Login with:", email.value, password.value);
-  // 로그인 처리 로직 추가
-};
+const handleLogin = async() => {
+  await userStore.login(userEmployeeNo.value, userPwd.value)
+
+  if(userStore.isAuthenticated) {
+    await router.push('/');
+  } else {
+    alert(userStore.error)
+  }
+}
 </script>
 
 <template>
-  <div class="d-flex justify-content-center" style="padding-top: 50px">
+  <div class="d-flex justify-content-center" style="padding-top: 150px">
     <div class="card login-card p-4">
       <div class="text-center mb-4">
         <h4 class="fw-bold">로그인</h4>
       </div>
       <form @submit.prevent="handleLogin">
         <div class="mb-3">
-          <label for="email" class="form-label">사원번호</label>
-          <input type="email" id="email" class="form-control" v-model="email" placeholder="사원번호를 입력하세요." required/>
+          <label for="employeeNo" class="form-label">사원번호</label>
+          <input type="text" id="employeeNo" class="form-control" v-model="userEmployeeNo" placeholder="사원번호를 입력하세요." required/>
         </div>
         <div class="mb-3">
           <label for="password" class="form-label">비밀번호</label>
-          <input type="password" id="password" class="form-control" v-model="password" placeholder="비밀번호를 입력하세요." required/>
+          <input type="password" id="password" class="form-control" v-model="userPwd" placeholder="비밀번호를 입력하세요." required/>
         </div>
         <b-button type="submit"  variant="light" size="sm" class="btn btn custom-btn button w-100 mb-2">로그인</b-button>
       </form>

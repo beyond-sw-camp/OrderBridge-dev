@@ -10,6 +10,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.core.env.Environment;
 import org.springframework.security.core.Authentication;
@@ -20,6 +21,7 @@ import java.io.IOException;
 import java.util.Map;
 
 @RequiredArgsConstructor
+@Slf4j
 public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
@@ -37,8 +39,9 @@ public class JwtFilter extends OncePerRequestFilter {
             if(authorizationRefresh != null && authorizationRefresh.startsWith("Bearer ")) {
 
                 String userEmployeeNo = jwtUtil.getUserEmployeeNo(accessToken);
+                log.info("userEmployeeNo : {}", userEmployeeNo);
                 String refreshToken = authorizationRefresh.substring(7);
-
+                log.info("refreshToken : {}", refreshToken);
                 RefreshToken redisRefreshToken =  refreshTokenRepository.findByUserEmployeeNoAndRefreshToken(userEmployeeNo, refreshToken)
                         .orElseThrow(() -> new CustomException(ErrorCodeType.SECURITY_TOKEN_ERROR));
 

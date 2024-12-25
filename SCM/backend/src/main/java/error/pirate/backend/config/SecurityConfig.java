@@ -97,7 +97,8 @@ public class SecurityConfig {
         config.addAllowedHeader("*"); // 모든 헤더 허용
         config.addAllowedMethod("*"); // 모든 HTTP 메소드 허용
 
-        config.addExposedHeader("token");
+        config.addExposedHeader("Authorization");
+        config.addExposedHeader("Refresh-Token");
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
