@@ -1,14 +1,13 @@
 <script setup>
 import { onMounted, ref, watch } from 'vue';
-import axios from 'axios';
-import { BInputGroup, BFormInput, BFormCheckbox, BButton } from 'bootstrap-vue-3';
-import { useRouter } from "vue-router";
+import axios from "@/axios";
+import { BInputGroup, BFormInput, BButton } from 'bootstrap-vue-3';
 import dayjs from "dayjs";
+import searchIcon from "@/assets/searchIcon.svg"
 import trashIcon from "@/assets/trashIcon.svg";
 import editIcon from "@/assets/editIcon.svg";
 
 const searchBusinessNumber = ref("");
-const router = useRouter();
 const clients = ref([]);
 const searchName = ref("");
 const currentPage = ref(1);
@@ -18,7 +17,7 @@ const selectedClient = ref(null);
 
 const findClientsByFilter = async () => {
   try {
-    const response = await axios.get("http://localhost:8090/api/v1/client", {
+    const response = await axios.get("client", {
       params: {
         page: currentPage.value,
         size: perPage.value,
@@ -27,7 +26,7 @@ const findClientsByFilter = async () => {
       }
     });
 
-    console.log("API Response:", response.data);  // 응답 데이터 확인
+    console.log("API Response:", response.data);
 
     if (response.data.clients) {
       clients.value = response.data.clients;
@@ -61,15 +60,13 @@ const toggleDetail = async (client) => {
   }
 };
 
-
-
 const deleteClient = async (seq) => {
   const result = confirm("정말 삭제하시겠습니까?");
   if (result) {
     try {
-      await axios.delete(`http://localhost:8090/api/v1/client/${seq}`);
+      await axios.delete(`client/${seq}`);
       alert('거래처가 삭제되었습니다.');
-      findClientsByFilter(); // 목록 갱신
+      findClientsByFilter();
     } catch (error) {
       console.error("삭제 실패:", error);
       alert('삭제에 실패했습니다.');
@@ -81,43 +78,33 @@ const deleteClient = async (seq) => {
 <template>
   <h4 class="title">거래처관리 > 거래처조회</h4>
   <div class="row">
-      <!-- 거래처명 검색 -->
-      <div class="col-md-3">
-        <div class="side-box card">
-          <div class="card-body">
-            <p class="card-title">거래처명</p>
-            <b-input-group class="mt-3">
-              <b-form-input v-model="searchName" placeholder="거래처명을 입력하세요"></b-form-input>
-              <b-button variant="light" class="button" @click="findClientsByFilter">
-                <svg width="1em" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M344.5,298c15-23.6,23.8-51.6,23.8-81.7c0-84.1-68.1-152.3-152.1-152.3C132.1,64,64,132.2,64,216.3
-              c0,84.1,68.1,152.3,152.1,152.3c30.5,0,58.9-9,82.7-24.4l6.9-4.8L414.3,448l33.7-34.3L339.5,305.1L344.5,298z
-              M301.4,131.2  c22.7,22.7,35.2,52.9,35.2,85c0,32.1-12.5,62.3-35.2,85c-22.7,22.7-52.9,35.2-85,35.2c-32.1,0-62.3-12.5-85-35.2
-              c-22.7-22.7-35.2-52.9-35.2-85c0-32.1,12.5-62.3,35.2-85c22.7-22.7,52.9-35.2,85-35.2C248.5,96,278.7,108.5,301.4,131.2z" />
-                </svg>
-              </b-button>
-            </b-input-group>
-          </div>
-        </div>
-
-        <!-- 사업자등록번호 검색 -->
-        <div class="side-box card">
-          <div class="card-body">
-            <p class="card-title">사업자등록번호</p>
-            <b-input-group class="mt-3">
-              <b-form-input v-model="searchBusinessNumber" placeholder="사업자등록번호를 입력하세요"></b-form-input>
-              <b-button variant="light" class="button" @click="findClientsByFilter">
-                <svg width="1em" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M344.5,298c15-23.6,23.8-51.6,23.8-81.7c0-84.1-68.1-152.3-152.1-152.3C132.1,64,64,132.2,64,216.3
-              c0,84.1,68.1,152.3,152.1,152.3c30.5,0,58.9-9,82.7-24.4l6.9-4.8L414.3,448l33.7-34.3L339.5,305.1L344.5,298z
-              M301.4,131.2  c22.7,22.7,35.2,52.9,35.2,85c0,32.1-12.5,62.3-35.2,85c-22.7,22.7-52.9,35.2-85,35.2c-32.1,0-62.3-12.5-85-35.2
-              c-22.7-22.7-35.2-52.9-35.2-85c0-32.1,12.5-62.3,35.2-85c22.7-22.7,52.9-35.2,85-35.2C248.5,96,278.7,108.5,301.4,131.2z" />
-                </svg>
-              </b-button>
-            </b-input-group>
-          </div>
+    <!-- 거래처명 검색 -->
+    <div class="col-md-3">
+      <div class="side-box card">
+        <div class="card-body">
+          <p class="card-title">거래처명</p>
+          <b-input-group class="mt-3">
+            <b-form-input v-model="searchName" placeholder="거래처명을 입력하세요"></b-form-input>
+            <b-button variant="light" class="button" @click="findClientsByFilter">
+              <searchIcon class="icon"/>
+            </b-button>
+          </b-input-group>
         </div>
       </div>
+
+      <!-- 사업자등록번호 검색 -->
+      <div class="side-box card">
+        <div class="card-body">
+          <p class="card-title">사업자등록번호</p>
+          <b-input-group class="mt-3">
+            <b-form-input v-model="searchBusinessNumber" placeholder="사업자등록번호를 입력하세요"></b-form-input>
+            <b-button variant="light" class="button" @click="findClientsByFilter">
+              <searchIcon class="icon"/>
+            </b-button>
+          </b-input-group>
+        </div>
+      </div>
+    </div>
     <div class="col-md-9">
       <div style="width: 90%;">
         <div class="d-flex justify-content-between">
@@ -266,11 +253,11 @@ div {
   margin: 0;
 }
 
- .icon {
-   width: 20px;
-   height: 20px;
-   cursor: pointer;
- }
+.icon {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+}
 
 .detail-list li {
   margin-bottom: 5px;

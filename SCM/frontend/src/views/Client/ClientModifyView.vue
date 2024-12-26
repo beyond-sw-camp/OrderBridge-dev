@@ -1,7 +1,8 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useRouter, useRoute } from "vue-router";
-import axios from 'axios';
+import axios from '@/axios';
+import { BInputGroup, BFormInput, BFormGroup, BButton } from 'bootstrap-vue-3';
 
 const router = useRouter();
 const route = useRoute();
@@ -18,7 +19,7 @@ const formData = ref({
 
 const fetchClientData = async () => {
   try {
-    const response = await axios.get(`http://localhost:8090/api/v1/client/${clientSeq}`);
+    const response = await axios.get(`client/${clientSeq}`);
     formData.value = {
       clientName: response.data.clientName,
       clientRegistrationNo: response.data.clientRegistrationNo,
@@ -45,7 +46,7 @@ const updateClient = async () => {
   }
 
   try {
-    await axios.put(`http://localhost:8090/api/v1/client/${clientSeq}`, formData.value);
+    await axios.put(`client/${clientSeq}`, formData.value);
     alert('거래처가 수정되었습니다.');
     router.push('/client');
   } catch (error) {

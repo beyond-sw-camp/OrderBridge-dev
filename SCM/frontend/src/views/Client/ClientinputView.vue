@@ -1,8 +1,8 @@
 <script setup>
 import { ref } from 'vue';
-import {createRouter as $router, useRouter} from "vue-router";
-import axios from 'axios';
-import {BButton} from "bootstrap-vue-3";
+import { useRouter } from "vue-router";
+import axios from '@/axios';
+import { BButton, BFormGroup, BFormInput } from 'bootstrap-vue-3';
 
 const router = useRouter();
 const formData = ref({
@@ -25,7 +25,7 @@ const registerClient = async () => {
   }
 
   try {
-    await axios.post('http://localhost:8090/api/v1/client', formData.value);
+    await axios.post('client', formData.value);
     alert('거래처가 등록되었습니다.');
     router.push('/client');
   } catch (error) {
@@ -97,7 +97,7 @@ const registerClient = async () => {
         </b-form-group>
 
         <div class="d-flex justify-content-center mt-4">
-          <b-button variant="light" class="me-2 button" @click="$router.push('/client')">
+          <b-button variant="light" class="me-2 button" @click="router.push('/client')">
             취소
           </b-button>
           <b-button variant="light" class="button" @click="registerClient">
