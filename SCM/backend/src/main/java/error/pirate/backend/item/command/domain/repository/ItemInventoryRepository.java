@@ -15,6 +15,12 @@ public interface ItemInventoryRepository extends JpaRepository<ItemInventory, Lo
 
     int countByItemAndItemInventoryExpirationDateAfter(Item item, LocalDateTime itemInventoryExpirationDate);
 
+    // item_seq와 유효기간 기준으로 정렬된 재고 조회
+    @Query("SELECT ii FROM ItemInventory ii WHERE ii.item.itemSeq = :itemSeq " +
+            "AND ii.itemInventoryExpirationDate >= CURRENT_DATE " +
+            "ORDER BY ii.itemInventoryExpirationDate ASC")
+    List<ItemInventory> findValidInventoriesByItemSeq(Long itemSeq);
+
     @Query("SELECT COALESCE(SUM(ii.itemInventoryRemainAmount), 0) " +
             "FROM ItemInventory ii " +
             "WHERE ii.item = :item AND ii.itemInventoryExpirationDate > :expirationDate")

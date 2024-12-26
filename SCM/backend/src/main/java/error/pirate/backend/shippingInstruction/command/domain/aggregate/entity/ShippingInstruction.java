@@ -33,6 +33,7 @@ public class ShippingInstruction {
     private String shippingInstructionName; // 출하지시서 명
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "shippingInstructionAddress")
     private ShippingAddress shippingAddress; // 출하지시서 주소
 
     @Enumerated(EnumType.STRING)

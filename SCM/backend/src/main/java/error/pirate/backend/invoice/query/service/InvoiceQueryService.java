@@ -1,5 +1,6 @@
 package error.pirate.backend.invoice.query.service;
 
+import error.pirate.backend.invoice.command.domain.aggregate.entity.InvoiceStatus;
 import error.pirate.backend.invoice.query.dto.*;
 import error.pirate.backend.invoice.query.mapper.InvoiceMapper;
 import lombok.RequiredArgsConstructor;

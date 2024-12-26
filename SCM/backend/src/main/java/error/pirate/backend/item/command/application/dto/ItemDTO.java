@@ -3,6 +3,7 @@ package error.pirate.backend.item.command.application.dto;
 import error.pirate.backend.item.command.domain.aggregate.entity.ItemDivision;
 import error.pirate.backend.item.command.domain.aggregate.entity.ItemUnit;
 import error.pirate.backend.user.command.domain.aggregate.entity.User;
+import error.pirate.backend.warehouse.command.domain.aggregate.entity.Warehouse;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,4 +28,5 @@ public class ItemDTO {
     private String itemImageUrl; // 품목 이미지 주소
     private Integer itemPrice; // 품목 단가
     private Long warehouseSeq; //창고
+    private Warehouse warehouse;
 }

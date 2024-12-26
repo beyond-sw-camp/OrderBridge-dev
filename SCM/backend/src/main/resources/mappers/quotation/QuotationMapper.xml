@@ -33,6 +33,7 @@
             AND tb_quotation.quotation_status IN 
             <foreach collection="quotationStatus" item="item" open="(" separator="," close=")">#{item}</foreach>
         </if>
+        ORDER BY tb_quotation.quotation_reg_date DESC
         LIMIT #{limit} OFFSET #{offset}
     </select>
 

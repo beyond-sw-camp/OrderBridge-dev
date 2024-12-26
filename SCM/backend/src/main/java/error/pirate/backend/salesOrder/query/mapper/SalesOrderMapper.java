@@ -1,6 +1,7 @@
 package error.pirate.backend.salesOrder.query.mapper;
 
 import error.pirate.backend.salesOrder.command.domain.aggregate.entity.SalesOrderItem;
+import error.pirate.backend.salesOrder.command.domain.aggregate.entity.SalesOrderStatus;
 import error.pirate.backend.salesOrder.query.dto.*;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -18,14 +19,14 @@ public interface SalesOrderMapper {
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate,
             @Param("clientName") String clientName,
-            @Param("salesOrderStatus") String salesOrderStatus);
+            @Param("salesOrderStatus") List<SalesOrderStatus> salesOrderStatus);
 
     // 주문서 목록 개수 조회
     int countSalesOrderList(
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate,
             @Param("clientName") String clientName,
-            @Param("salesOrderStatus") String salesOrderStatus);
+            @Param("salesOrderStatus") List<SalesOrderStatus> salesOrderStatus);
 
     // 주문서 상세 조회
     SalesOrderDTO selectSalesOrder(

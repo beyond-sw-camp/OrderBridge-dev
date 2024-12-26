@@ -58,6 +58,31 @@ const printTable = () => {
   location.reload(); // 상태를 새로고침하여 업데이트
 }
 
+// 작업지시서 현황 엑셀 다운로드
+const excelDown = async () => {
+  const response = await axios.get(`workOrder/situation/excelDownload`, {
+    params: {
+      startDate: searchStartDate.value,
+      endDate: searchEndDate.value,
+      warehouseName: searchFactory.value,
+      clientName: searchClient.value,
+    }, responseType: "blob"
+  });
+  const blob = new Blob([response.data], {
+    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+  });
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = decodeURIComponent(response.headers["content-disposition"].split('filename=')[1]);
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  window.URL.revokeObjectURL(url);
+}
+
+
+
 onMounted(() => {
   fetchWorkOrderSituationList();
 });
@@ -111,9 +136,9 @@ watch([searchStartDate, searchEndDate], () => {
               <th>번호</th>
               <th>작업지시서명</th>
               <th>작업지시일</th>
-              <th>품목</th>
+              <th>품목명</th>
               <th>지시수량</th>
-              <th>생산공장</th>
+              <th>생산공장명</th>
               <th>납품처명</th>
               <th>비고</th>
             </tr>

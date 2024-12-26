@@ -106,7 +106,7 @@ const excelDown = async () => {
     <div class="col-md-3">
       <div class="side-box card">
         <div class="card-body">
-          <p class="card-title">발주일자</p>
+          <p class="card-title">구매일자</p>
           <input type="date" v-model="searchStartDate"/> ~ <input type="date" v-model="searchEndDate"/>
         </div>
       </div>
@@ -160,7 +160,6 @@ const excelDown = async () => {
                 <td> -</td>
                 <td>{{ purchaseSituation.purchaseMonthQuantity.toLocaleString() }}</td>
                 <td> ￦ {{ purchaseSituation.purchaseMonthPrice.toLocaleString() }}</td>
-                <td> -</td>
                 <td> -</td>
                 <td> -</td>
               </tr>

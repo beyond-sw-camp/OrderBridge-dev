@@ -1,5 +1,6 @@
 package error.pirate.backend.invoice.query.controller;
 
+import error.pirate.backend.invoice.command.domain.aggregate.entity.InvoiceStatus;
 import error.pirate.backend.invoice.query.dto.InvoiceListResponse;
 import error.pirate.backend.invoice.query.dto.InvoiceResponse;
 import error.pirate.backend.invoice.query.dto.InvoiceSituationResponse;
@@ -12,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -51,5 +53,11 @@ public class InvoiceQueryController {
 
         return ResponseEntity.ok(invoiceQueryService.readInvoiceSituation(
                 startDate, endDate, clientName));
+    }
+
+    @GetMapping("/status")
+    @Operation(summary = "거래 명세서 상태 분류 조회")
+    public ResponseEntity<List<InvoiceStatus.InvoiceStatusResponse>> readInvoiceStatus() {
+        return ResponseEntity.ok(InvoiceStatus.readInvoiceStatusList());
     }
 }

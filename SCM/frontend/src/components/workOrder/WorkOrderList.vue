@@ -55,7 +55,6 @@ const fetchWorkOrderList = async () => {
     if (error.response.data.errorCode === 'COMMON_ERROR_002') {
       alert(error.response.data.message);
     }
-
     console.log("작업지시서 불러오기 실패: ", error);
   }
 };
@@ -124,6 +123,29 @@ const workOrderDetailPrint = (workOrderSeq) => {
   // Vue 리렌더링 방지
   location.reload();
 };
+
+// 작업지시서 목록 엑셀 다운로드
+const excelDown = async () => {
+  const response = await axios.get(`workOrder/excelDownload`, {
+    params: {
+      startDate: searchStartDate.value,
+      endDate: searchEndDate.value,
+      warehouseName: searchFactory.value,
+      workOrderStatus: searchStatus.value.size === 0 ? null : Array.from(searchStatus.value),
+    }, responseType: "blob"
+  });
+  const blob = new Blob([response.data], {
+    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+  });
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = decodeURIComponent(response.headers["content-disposition"].split('filename=')[1]);
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  window.URL.revokeObjectURL(url);
+}
 
 // 삭제
 const deleteWorkOrder = async (workOrderSeq) => {
@@ -228,7 +250,7 @@ function search() {
           </div>
         </div>
         <div class="list-headline row">
-          <div class="list-head col-5">작업지시서</div>
+          <div class="list-head col-5">작업지시서명</div>
           <div class="list-head col-2">생산공장명</div>
           <div class="list-head col-3">작업지시일</div>
           <div class="list-head col-2">상태</div>
@@ -255,11 +277,11 @@ function search() {
                     <p>작업완료 수량 : {{ (workOrderDetail[workOrder.workOrderSeq].workOrderWorkQuantity)}} </p>
                     <p>담당자 : {{ workOrderDetail[workOrder.workOrderSeq].userName }} </p>
                     <p>납품처명 : {{ workOrderDetail[workOrder.workOrderSeq].clientName}} </p>
-                    <p>작업 지시일 : {{ workOrderDetail[workOrder.workOrderSeq].workOrderIndicatedDate}}</p>
-                    <p v-if ="workOrderDetail[workOrder.workOrderSeq].workOrderEndDate != null">작업 완료일 : {{ workOrderDetail[workOrder.workOrderSeq].workOrderEndDate}}</p>
-                    <p v-else>작업 완료일 : 없음</p>
+                    <p>작업지시일 : {{ workOrderDetail[workOrder.workOrderSeq].workOrderIndicatedDate}}</p>
+                    <p v-if ="workOrderDetail[workOrder.workOrderSeq].workOrderEndDate != null">작업완료일 : {{ workOrderDetail[workOrder.workOrderSeq].workOrderEndDate}}</p>
+                    <p v-else>작업완료일 : 없음</p>
                     <p>작업 납기일 : {{ workOrderDetail[workOrder.workOrderSeq].workOrderDueDate}}</p>
-                    <p>생산창고 : {{ workOrderDetail[workOrder.workOrderSeq].warehouseName}}</p>
+                    <p>생산창고명 : {{ workOrderDetail[workOrder.workOrderSeq].warehouseName}}</p>
                     <p>작업지시서 비고 : {{ workOrderDetail[workOrder.workOrderSeq].workOrderNote}}</p>
                     <div class="container">
                       <div class="row">
@@ -273,8 +295,8 @@ function search() {
                                 alt="Responsive image"
                             ></b-img>
                             <div class="card-body">
-                              <p class="card-text">· 품목 : {{ workOrderItem.itemName }}</p>
-                              <p class="card-text">· 수량 : {{ workOrderDetail[workOrder.workOrderSeq].workOrderIndicatedQuantity }} 개</p>
+                              <p class="card-text">· 품목명 : {{ workOrderItem.itemName }}</p>
+                              <p class="card-text">· 지시수량 : {{ workOrderDetail[workOrder.workOrderSeq].workOrderIndicatedQuantity }} 개</p>
                               <p class="card-text">· 가격 : {{ Number(workOrderItem.itemPrice).toLocaleString() }} ₩</p>
                               <p class="card-text">· 보관창고 : {{ workOrderItem.ingredientWarehouseName }}</p>
                               <p v-if="workOrderItem.itemNote !== ''" class="card-text">· 비고 : {{ workOrderItem.itemNote }}</p>

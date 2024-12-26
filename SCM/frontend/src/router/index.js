@@ -4,6 +4,10 @@ import productionReceivingRoutes from './production-receiving.js'
 import item from "@/router/item.js";
 import workOrderRoutes from "@/router/work-order.js";
 import shippingSlipRoutes from "@/router/shipping-slip.js";
+import warehouse from "@/router/warehouse.js";
+import quotationRoutes from "@/router/quotation.js";
+import salesOrder from '@/router/salesOrder.js';
+import invoice from '@/router/invoice.js'
 
 const routes = [
     {
@@ -14,11 +18,6 @@ const routes = [
         path: "/print",
         name: 'PrintView',
         component: () => import("@/views/print/PrintView.vue")
-    },
-    {
-        path: "/quotation",
-        name: "Quotation",
-        component: () => import("@/views/quotation/QuotationListView.vue")
     },
     {
         path: "/currentSituation",
@@ -35,6 +34,10 @@ const routes = [
     {
         path: "/purchaseOrder/situation",
         component: () => import("@/views/purchaseOrder/PurchaseOrderSituationView.vue")
+    },
+    {
+        path: "/purchaseOrder/stock/situation",
+        component: () => import("@/views/purchaseOrder/PurchaseOrderStockSituationView.vue")
     },
     {
         path: "/purchase",
@@ -54,6 +57,10 @@ const routes = [
     ...item,
     ...workOrderRoutes,
     ...shippingSlipRoutes,
+    ...warehouse,
+    ...quotationRoutes,
+    ...salesOrder,
+    ...invoice
 ];
 
 const router = createRouter({
