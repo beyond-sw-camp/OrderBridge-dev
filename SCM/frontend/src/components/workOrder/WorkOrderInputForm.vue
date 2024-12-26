@@ -1,10 +1,13 @@
 <script setup>
 import {ref, onMounted, watch, defineProps} from 'vue';
 import axios from '@/axios';
-import router from '@/router/index.js';
+// import router from '@/router/index.js';
 import searchIcon from '@/assets/searchIcon.svg';
 import dayjs from 'dayjs';
 import { Modal } from 'bootstrap';
+import {useRouter} from "vue-router";
+
+const router = useRouter();
 
 const props = defineProps({
   workOrderDetail: {type: Object, required: false},       // 출하지시서 목록
@@ -189,6 +192,20 @@ const fetchSalesOrderItemStock = async (salesOrderSeq) => {
 // 발주서 작성으로 이동
 const goToOrderPage = () => {
   router.push('/purchaseOrder/input');
+};
+
+watch(() => stockStatusList.value, (newList) => {
+  console.log('🔍 stockStatusList 업데이트됨:', newList);
+  newList.forEach((item, index) => {
+    console.log(`🔍 Item ${index} isRegistered:`, item.isRegistered);
+  });
+}, { deep: true });
+
+// 등록페이지에서 수정 구분
+const handleItemSelection = (index) => {
+  // props.isEditMode가 false(수정모드가 아니)고 이미 등록된 품목일 때
+    alert('이미 작업지시서가 등록된 주문서입니다. \n 상세보기에서 수정 버튼을 눌러주세요.');
+    router.push('/workOrder'); // 목록 페이지로 이동
 };
 
 // 선택한 주문서 품목 저장
@@ -447,8 +464,15 @@ const validateFormData = () => {
           <div class="col-md-4 d-flex flex-column justify-content-around align-items-center">
             <img :src="item.itemImageUrl" alt="Item Image" class="img-fluid border border-secondary rounded" style="max-width: 150px; height: auto;">
             <div>
-              <b-button @click="selectItem(index)" variant="light" size="sm" class="button ms-2 mb-3" style="top: 10px; right: 10px;">
-                {{ item.isRegistered ? '작업지시서 수정' : '작업지시서 등록' }}
+              <b-button v-if="item?.isRegistered && !props?.isEditMode"
+                  @click="handleItemSelection(index)"
+                        variant="light" size="sm" class="button ms-2 mb-3" style="top: 10px; right: 10px;">
+                {{ '목록에서 수정하기' }}
+              </b-button>
+              <b-button v-else
+                        @click="selectItem(index)"
+                        variant="light" size="sm" class="button ms-2 mb-3" style="top: 10px; right: 10px;">
+                {{ item.isRegistered ? '작업지시서 수정' : '품목선택 & 등록' }}
               </b-button>
             </div>
           </div>
@@ -460,7 +484,7 @@ const validateFormData = () => {
   <!-- 작업지시서 등록폼 -->
   <div class="d-flex justify-content-center">
     <div class="col-6 d-flex flex-column">
-            <h5 v-if="props.isEditMode || selectedItem?.isRegistered" class="px-4">작업지시서 수정</h5>
+            <h5 v-if="props.isEditMode " class="px-4">작업지시서 수정</h5>
             <h5 v-else class="px-4">작업지시서 등록</h5>
           <!-- 작업지시서명 -->
           <b-form-group v-if="props.isEditMode" label-cols="4" label-cols-lg="2" label="작업지시서명" label-for="workOrderName">
@@ -504,7 +528,7 @@ const validateFormData = () => {
 
       <div class="mx-5 my-3 d-flex justify-content-end">
         <b-button @click="submitWorkOrder" variant="light" size="sm" class="button ms-2">
-          {{ props.isEditMode || selectedItem?.isRegistered ? '작업지시서 수정' : '작업지시서 등록' }}
+          {{ props.isEditMode  ? '작업지시서 수정' : '작업지시서 등록' }}
         </b-button>
       </div>
 
