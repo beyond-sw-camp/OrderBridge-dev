@@ -1,5 +1,5 @@
 <script setup>
-import {onMounted, ref} from "vue";
+import { ref } from "vue";
 import { useUserStore } from "@/stores/UserStore.js";
 import { useRoute, useRouter } from 'vue-router'; // Vue Router 사용
 
@@ -25,7 +25,7 @@ const handleLogin = async() => {
 </script>
 
 <template>
-  <div class="d-flex justify-content-center" style="padding-top: 150px">
+  <div class="d-flex justify-content-center align-items-center vh-100 m-0">
     <div class="card login-card p-4">
       <div class="text-center mb-4">
         <h4 class="fw-bold">로그인</h4>
@@ -59,16 +59,6 @@ const handleLogin = async() => {
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
-.btn-primary {
-  background-color: #004a9f;
-  border-color: #004a9f;
-}
-
-.btn-primary:hover {
-  background-color: #00397c;
-  border-color: #00397c;
-}
-
 .text-muted a {
   color: #004a9f;
 }
@@ -87,33 +77,4 @@ const handleLogin = async() => {
   border-radius: 5px; /* 라운드 처리 */
 }
 
-/* 아이콘 스타일 */
-.btn-icon {
-  height: 24px;
-  width: 24px;
-  margin-right: 10px; /* 아이콘과 텍스트 간 간격 */
-}
-
-/* 색상별 버튼 스타일 */
-.btn-yellow {
-  background-color: #ffcc00;
-  color: #000;
-  border: none;
-}
-
-.btn-yellow:hover {
-  background-color: #e6b800;
-  color: #000;
-}
-
-.btn-green {
-  background-color: #28a745;
-  color: #fff;
-  border: none;
-}
-
-.btn-green:hover {
-  background-color: #218838;
-  color: #fff;
-}
 </style>
