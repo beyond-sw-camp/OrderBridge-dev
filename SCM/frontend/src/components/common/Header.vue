@@ -1,13 +1,16 @@
 <script setup>
 import chatbotIcon from '@/assets/chatbotIcon.svg';
 import notificationIcon from '@/assets/notificationIcon.svg';
-import loginIcon from '@/assets/loginIcon.svg';
+import myPageIcon from '@/assets/myPageIcon.svg';
 import basicIcon from '@/assets/basicIcon.svg';
 import salesIcon from '@/assets/salesIcon.svg';
 import productionIcon from '@/assets/productionIcon.svg';
 import orderIcon from '@/assets/orderIcon.svg';
 import statisticsIcon from '@/assets/statisticsIcon.svg'
+import logoutIcon from '@/assets/logoutIcon.svg';
+import {useUserStore} from "@/stores/UserStore.js";
 
+const userStore = useUserStore();
 </script>
 
 <template>
@@ -74,7 +77,8 @@ import statisticsIcon from '@/assets/statisticsIcon.svg'
         <ul class="navbar-nav mb-lg-0 d-flex flex-row">
           <li class="nav-item"><RouterLink to="#" class="nav-link"><chatbotIcon class="icon-right"/></RouterLink></li>
           <li class="nav-item"><RouterLink to="#" class="nav-link"><notificationIcon class="icon-right"/></RouterLink></li>
-          <li class="nav-item"><RouterLink to="#" class="nav-link"><loginIcon class="icon-right"/></RouterLink></li>
+          <li class="nav-item"><RouterLink to="#" class="nav-link"><myPageIcon class="icon-right"/></RouterLink></li>
+          <li class="nav-item" @click="userStore.logout()"><RouterLink to="#" class="nav-link"><!--<logoutIcon class="icon-right"/>-->로그아웃</RouterLink></li>
         </ul>
       </div>
   </nav>

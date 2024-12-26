@@ -8,20 +8,22 @@ import { useRoute } from 'vue-router';
 const route = useRoute();
 const isMainPage = ref(route.path === '/');
 
+const isLogin = localStorage.getItem('accessToken');
+
 watch(() => route.path, (newPath) => {
   isMainPage.value = newPath === '/';
 });
 </script>
 
 <template>
-  <Header />
+  <Header v-if="isLogin"/>
   <Main v-if="isMainPage" />
   <section class="flex-shrink-0" v-else>
     <b-container>
       <router-view />
     </b-container>
   </section>
-  <SideMenuBar />
+  <SideMenuBar v-if="isLogin"/>
 </template>
 
 <style scoped>
