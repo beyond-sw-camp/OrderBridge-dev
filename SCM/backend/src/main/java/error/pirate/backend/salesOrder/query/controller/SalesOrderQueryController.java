@@ -30,7 +30,7 @@ public class SalesOrderQueryController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
             @RequestParam(required = false) String clientName,
-            @RequestParam(required = false) String salesOrderStatus) {
+            @RequestParam(required = false) List<SalesOrderStatus> salesOrderStatus) {
 
         return ResponseEntity.ok(salesOrderQueryService.readSalesOrderList(
                 page, size, startDate, endDate, clientName, salesOrderStatus));

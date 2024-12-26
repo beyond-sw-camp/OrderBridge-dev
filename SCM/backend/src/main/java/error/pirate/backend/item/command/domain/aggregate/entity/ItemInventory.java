@@ -1,13 +1,11 @@
 package error.pirate.backend.item.command.domain.aggregate.entity;
 
-import error.pirate.backend.warehouse.command.domain.aggregate.entity.Warehouse;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -50,5 +48,11 @@ public class ItemInventory {
 
     private void specifyItem(Item item) {
         this.item = item;
+    }
+
+    public void updateItemInventoryRemainAmount(Integer itemInventoryRemainAmount) {
+        if(itemInventoryRemainAmount != null) {
+            this.itemInventoryRemainAmount = itemInventoryRemainAmount;
+        }
     }
 }

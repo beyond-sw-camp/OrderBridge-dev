@@ -6,6 +6,9 @@ import workOrderRoutes from "@/router/work-order.js";
 import shippingSlipRoutes from "@/router/shipping-slip.js";
 import warehouse from "@/router/warehouse.js";
 import client from "@/router/client.js";
+import quotationRoutes from "@/router/quotation.js";
+import salesOrder from '@/router/salesOrder.js';
+import invoice from '@/router/invoice.js'
 
 const routes = [
     {
@@ -16,11 +19,6 @@ const routes = [
         path: "/print",
         name: 'PrintView',
         component: () => import("@/views/print/PrintView.vue")
-    },
-    {
-        path: "/quotation",
-        name: "Quotation",
-        component: () => import("@/views/quotation/QuotationListView.vue")
     },
     {
         path: "/currentSituation",
@@ -62,6 +60,9 @@ const routes = [
     ...shippingSlipRoutes,
     ...warehouse,
     ...client,
+    ...quotationRoutes,
+    ...salesOrder,
+    ...invoice
 ];
 
 const router = createRouter({

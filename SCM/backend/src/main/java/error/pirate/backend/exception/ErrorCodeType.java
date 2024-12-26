@@ -40,6 +40,8 @@ public enum ErrorCodeType {
     // 출하전표 관련 오류
     SHIPPING_SLIP_NOT_FOUND(HttpStatus.NOT_FOUND, "SHIPPING_SLIP_ERROR_001", "출하전표를 찾을 수 없습니다."),
     SHIPPING_SLIP_DELETE_STATE(HttpStatus.BAD_REQUEST, "SHIPPING_SLIP_ERROR_002", "이미 삭제된 출하전표입니다."),
+    SHIPPING_SLIP_ITEM_NOT_MATCH(HttpStatus.BAD_REQUEST, "SHIPPING_SLIP_ERROR_003", "출하전표의 아이템이 출하지시서와 다릅니다."),
+    SHIPPING_SLIP_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "SHIPPING_SLIP_ERROR_004", "해당하는 출하전표가 이미 존재합니다."),
 
     // 공통 오류
     COMMON_ERROR(HttpStatus.BAD_REQUEST, "COMMON_ERROR", "오류가 발생하였습니다. 관리자에게 문의 바랍니다."),

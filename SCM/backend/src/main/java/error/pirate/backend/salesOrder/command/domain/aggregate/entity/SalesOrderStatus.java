@@ -9,12 +9,12 @@ import java.util.List;
 @Getter
 @RequiredArgsConstructor
 public enum SalesOrderStatus {
-    BEFORE("결재 전"), // 결재전
-    AFTER("결재 후"), // 결재후
-    PRODUCTION("생산중"), // 생산중
-    PRODUCTION_COMPLETE("생산완료"),   // 생산완료
-    SHIPMENT_COMPLETE("출하완료"),
-    DELETE("삭제"); // 출하완료
+    BEFORE("결재 전"),
+    AFTER("결재 후"),
+    PRODUCTION("생산 중"),
+    PRODUCTION_COMPLETE("생산 완료"),
+    SHIPMENT_COMPLETE("출하 완료"),
+    DELETE("삭제");
 
     private final String value;
 

@@ -4,7 +4,6 @@ import error.pirate.backend.common.NameGenerator;
 import error.pirate.backend.item.command.application.service.ItemService;
 import error.pirate.backend.item.command.domain.aggregate.entity.Item;
 import error.pirate.backend.salesOrder.command.domain.aggregate.entity.SalesOrder;
-import error.pirate.backend.salesOrder.command.domain.service.SalesOrderDomainService;
 import error.pirate.backend.shippingInstruction.command.application.dto.ShippingInstructionItemRequest;
 import error.pirate.backend.shippingInstruction.command.application.dto.ShippingInstructionRequest;
 import error.pirate.backend.shippingInstruction.command.domain.aggregate.entity.ShippingInstruction;
@@ -28,7 +27,6 @@ public class ShippingInstructionApplicationService {
 
     private final ShippingInstructionDomainService shippingInstructionDomainService;
     private final ShippingInstructionItemDomainService shippingInstructionItemDomainService;
-    private final SalesOrderDomainService salesOrderDomainService;
     private final ItemService itemService;
     private final EntityManager entityManager;
     private final NameGenerator nameGenerator;

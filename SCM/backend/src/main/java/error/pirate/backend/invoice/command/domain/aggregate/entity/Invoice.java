@@ -54,6 +54,7 @@ public class Invoice {
         this.salesOrder = salesOrder;
         this.user = user;
         this.invoiceName = invoiceName;
+        this.invoiceStatus = InvoiceStatus.CREATED;
         this.invoiceSaleDate = invoiceSaleDate;
         this.invoiceExtendedPrice = invoiceExtendedPrice;
         this.invoiceTotalQuantity = invoiceTotalQuantity;

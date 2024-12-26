@@ -66,7 +66,8 @@ public class SalesOrder {
     }
 
     public SalesOrder(Quotation quotation, User user, Client client, String salesOrderName,
-                      LocalDateTime salesOrderOrderDate, LocalDateTime salesOrderDueDate, String salesOrderNote) {
+                      LocalDateTime salesOrderOrderDate, LocalDateTime salesOrderDueDate, String salesOrderNote,
+                      int salesOrderExtendedPrice, int salesOrderTotalQuantity) {
         this.quotation = quotation;
         this.user = user;
         this.client = client;
@@ -75,6 +76,8 @@ public class SalesOrder {
         this.salesOrderOrderDate = salesOrderOrderDate;
         this.salesOrderDueDate = salesOrderDueDate;
         this.salesOrderNote = salesOrderNote;
+        this.salesOrderExtendedPrice = salesOrderExtendedPrice;
+        this.salesOrderTotalQuantity = salesOrderTotalQuantity;
     }
 
     public void updateSalesOrder(LocalDateTime salesOrderOrderDate, LocalDateTime salesOrderDueDate,
