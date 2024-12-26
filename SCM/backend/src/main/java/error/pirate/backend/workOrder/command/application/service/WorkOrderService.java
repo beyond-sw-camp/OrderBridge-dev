@@ -74,7 +74,7 @@ public class WorkOrderService {
 
         // 유효성 검사
         if (workOrderIndicatedQuantity <= 0) {
-            throw new CustomException(ErrorCodeType.WORK_ORDER_REQUIRED_INFORMATION);
+            throw new CustomException(ErrorCodeType.WORK_ORDER_INVALID_QUANTITY);
         }
 
         // 주문서번호와 품목번호로(같은 주문서에서는 같은 품목 주문이 여러 개 들어오지 않는다는 가정) 중복체크 및 BOM 재고 검증

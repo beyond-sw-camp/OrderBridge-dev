@@ -1,43 +1,80 @@
 <script setup>
-import { ref, onMounted, watch } from 'vue';
+import {ref, onMounted, watch, defineProps} from 'vue';
 import axios from '@/axios';
 import router from '@/router/index.js';
 import searchIcon from '@/assets/searchIcon.svg';
 import dayjs from 'dayjs';
 import { Modal } from 'bootstrap';
 
-const salesOrderList = ref([]);
-const totalCount = ref(0);
-const pageSize = ref(10);
-const pageNumber = ref(1);
-
-const warehouses = ref([]);
-const salesOrderStatusList = ref([]);
-const salesOrderIndicatedDate = ref('');
-
-const stockStatusList = ref([]);
-const selectedItem = ref({
-  salesOrderItemSeq: null,
-  isRegistered: false, // 등록 여부 초기화
+const props = defineProps({
+  workOrderDetail: {type: Object, required: false},       // 출하지시서 목록
+  workOrderItem: {type: Object, required: false},       // 출하지시서 목록
+  salesOrder: { type: Object, required: false },      // 주문서 정보
+  stockStatusList: { type: Array, required: false },  // 주문서 품목 목록
+  isEditMode: {type: Boolean, required: false},       // 검색 결과 총 개수
 });
 
-const itemList = ref([]); // 주문서 품목 목록
-// const selectedItem = ref(null); // 선택된 품목
-const selectedSalesOrder = ref(false); // 주문서 선택 여부
+const salesOrderList = ref([]); // 주문서 목록
+const totalCount = ref(0); // 총 주문서 수
+const pageSize = ref(10); // 페이지 크기
+const pageNumber = ref(1); // 페이지 번호
+
+const warehouses = ref([]); // 창고 목록
+const salesOrderStatusList = ref([]); // 주문서 상태 목록
+const salesOrderDueDate = ref(''); // 주문서 납기일
+
+const stockStatusList = ref([]); // 주문서 품목 재고 상태 목록
+
+const selectedSalesOrder = ref(null); // 선택된 주문서
+const selectedItem = ref(null); // 선택된 품목
+const isWorkOrderFormVisible = ref(false);
 
 // 폼 데이터
 const formData = ref({
   salesOrder: '',
+  salesOrderSeq: '',
   salesOrderItemSeq: '',
   warehouseSeq: '',
+  workOrderName: '',
   workOrderIndicatedDate: '',
   workOrderDueDate: '',
+  workOrderIndicatedQuantity: '',
+  workOrderWorkQuantity: '',
   workOrderNote: '',
 });
 
 watch(pageNumber, () => {
   fetchSalesOrderList();
 })
+
+watch(props, () => {
+
+  formData.value.salesOrder = props.salesOrder.salesOrderName;
+  formData.value.salesOrderSeq = props.salesOrder.salesOrderSeq;
+  salesOrderDueDate.value = props.salesOrder.salesOrderDueDate;
+  formData.value.workOrderIndicatedQuantity = props.workOrderDetail.workOrderIndicatedQuantity;
+  formData.value.warehouseSeq = props.workOrderDetail.warehouseSeq;
+  formData.value.workOrderIndicatedDate = props.workOrderDetail.workOrderIndicatedDate;
+  formData.value.workOrderDueDate = props.workOrderDetail.workOrderDueDate;
+  formData.value.workOrderIndicatedQuantity = props.workOrderDetail.workOrderIndicatedQuantity;
+  formData.value.workOrderWorkQuantity = props.workOrderDetail.workOrderWorkQuantity;
+  formData.value.workOrderNote = props.workOrderDetail.workOrderNote;
+  formData.value.workOrderName = props.workOrderDetail.workOrderName;
+
+  // salesOrderItemSeq 자동 매칭
+  if (props.workOrderItem?.itemName && props.salesOrder?.salesOrderItem) {
+    const matchedItem = props.salesOrder.salesOrderItem.find(
+        item => item.itemName === props.workOrderItem.itemName
+    );
+
+    if (matchedItem) {
+      formData.value.salesOrderItemSeq = matchedItem.salesOrderItemSeq;
+      console.log('매칭된 salesOrderItemSeq:', matchedItem.salesOrderItemSeq);
+    } else {
+      console.warn('해당하는 salesOrderItemSeq를 찾을 수 없습니다.');
+    }
+  }
+});
 
 // 주문서 목록 조회
 const fetchSalesOrderList = async () => {
@@ -85,30 +122,27 @@ const fetchSalesOrderStatusList = async () => {
     salesOrderStatusList.value = response.data;
 
   } catch (error) {
-    console.error("출하지시서 상태 목록 불러오기 실패 :", error);
+    console.error("주문서 상태 목록 불러오기 실패 :", error);
   }
 };
 
-// 주문서 정보 채우기
-const addDueDate = (index) => {
-  const selectedOrder = salesOrderList.value[index];
+const selectSalesOrder = (salesOrder) => {
+  selectedSalesOrder.value = salesOrder;
 
-  // 주문서 정보 채우기
-  formData.value.salesOrderSeq = selectedOrder.salesOrderSeq;
-  formData.value.salesOrder = selectedOrder.salesOrderName;
-
-  if (selectedOrder && selectedOrder.salesOrderDueDate) {
-    salesOrderIndicatedDate.value = selectedOrder.salesOrderDueDate || ''; // 납기일 설정
-    console.log('납기일:', selectedOrder.salesOrderDueDate); // 납기일 확인
+  // 폼 데이터에 주문서 정보 저장
+  formData.value.salesOrderSeq = salesOrder.salesOrderSeq;
+  formData.value.salesOrder = salesOrder.salesOrderName;
+  if (salesOrder && salesOrder.salesOrderDueDate) {
+    salesOrderDueDate.value = salesOrder.salesOrderDueDate || ''; // 납기일 설정
+    console.log('납기일:', salesOrder.salesOrderDueDate); // 납기일 확인
   } else {
     console.log('선택된 주문서에 납기일이 없습니다.');
-
   }
-  console.log('선택된 주문서:', selectedOrder);
 
-  // 선택된 주문서의 재고 정보 가져오기
-  fetchSalesOrderItemStock(selectedOrder.salesOrderSeq);
-}
+  console.log('선택된 주문서:', selectedSalesOrder.value);
+
+  fetchSalesOrderItemStock(salesOrder.salesOrderSeq); // 재고 상태 조회
+};
 
 const openSalesOrderModal = async () => {
   await fetchSalesOrderList(); // 주문서 목록 불러오기
@@ -160,8 +194,6 @@ const goToOrderPage = () => {
 
 // 선택한 주문서 품목 저장
 const selectItem = async (index) => {
-  console.log('Index:', index);
-
   const item = stockStatusList.value[index];
   console.log('선택된 아이템:', item);
 
@@ -170,8 +202,19 @@ const selectItem = async (index) => {
     isRegistered: false, // 기본값
   };
 
+  formData.value.salesOrderSeq = selectedSalesOrder.value?.salesOrderSeq || ''; // 주문서 시퀀스
+  formData.value.salesOrderItemSeq = item.salesOrderItemSeq || ''; // 품목 시퀀스
+  formData.value.warehouseSeq = '';
+  formData.value.workOrderIndicatedDate = '';
+  formData.value.workOrderDueDate = '';
+  formData.value.workOrderNote = '';
+  console.log('폼 데이터 초기화 완료:', formData.value);
+
   console.log('선택된 품목:', selectedItem.value);
-  await fetchRegisteredItems(formData.value.salesOrderSeq);
+  await fetchRegisteredItems(selectedSalesOrder.value.salesOrderSeq);
+
+  isWorkOrderFormVisible.value = true;
+  createOrUpdateWorkOrder(selectedItem.value);
 };
 
 // 주문서 품목의 작업지시서 등록여부 조회
@@ -185,7 +228,7 @@ const fetchRegisteredItems = async (salesOrderSeq) => {
     const response = await axios.get(`sales-order/${salesOrderSeq}/registered-items`);
     console.log(response.data);
 
-    const registeredItemSeqs = response.data.map(Number); // 강제 변환
+    const registeredItemSeqs = response.data.map(Number);
 
     stockStatusList.value = stockStatusList.value.map(item => ({
       ...item,
@@ -194,39 +237,165 @@ const fetchRegisteredItems = async (salesOrderSeq) => {
 
     console.log('등록 여부 조회된 품목 목록:', stockStatusList.value);
 
-    // selectedItem 업데이트
-    selectedItem.value = stockStatusList.value.find(item =>
-        item.salesOrderItemSeq === selectedItem.value.salesOrderItemSeq
-    );
+    if (selectedItem.value) {
+      const updatedItem = stockStatusList.value.find(item =>
+          item.salesOrderItemSeq === selectedItem.value.salesOrderItemSeq
+      );
 
-    // const registeredItemSeqs = response.data;
-    // stockStatusList.value = stockStatusList.value.map(item => ({
-    //   ...item,
-    //   isRegistered: registeredItemSeqs.includes(item.salesOrderItemSeq)
-    // }));
-    //
-    // console.log('등록 여부 조회된 품목 목록:', stockStatusList.value);
+      if (updatedItem) {
+        selectedItem.value = updatedItem;
+        createOrUpdateWorkOrder(updatedItem);
+      } else {
+        console.warn('선택된 품목을 stockStatusList 에서 찾을 수 없습니다.');
+      }
+    }
+
+
   } catch (error) {
     console.error('등록여부 조회 실패:', error);
   }
-  console.log('isRegistered:', selectedItem.value?.isRegistered);
+
 };
 
-const writeWorkOrder = (item) => {
-  if (selectedItem.value.isRegistered) {
-    console.log(`이미 등록된 작업지시서입니다. 작업지시서를 수정합니다: ${item.itemName}`);
-    // 수정 페이지로 이동하거나 수정 API 호출
+const createOrUpdateWorkOrder = (item) => {
+  if (!item) {
+    console.warn('writeWorkOrder: item이 존재하지 않습니다.');
+    return;
+  }
 
+  if (item.isRegistered) {
+    console.log(`이미 등록된 작업지시서입니다. 작업지시서를 수정합니다: ${item.itemName}`);
   } else {
     console.log(`작업지시서를 등록합니다: ${item.itemName}`);
-    // 등록 페이지로 이동하거나 등록 API 호출
+  }
+
+};
+
+// 작업지시서 수정
+const updateWorkOrder = async (workOrderSeq) => {
+  if (!workOrderSeq) {
+    console.warn('workOrderSeq 값이 존재하지 않습니다.');
+    return;
+  }
+
+  try {
+    const response = await axios.put(`workOrder/${workOrderSeq}`, {
+      warehouseSeq: formData.value.warehouseSeq,
+      workOrderIndicatedDate: formData.value.workOrderIndicatedDate,
+      workOrderDueDate: formData.value.workOrderDueDate,
+      workOrderNote: formData.value.workOrderNote,
+    });
+    console.log(response.data);
+    alert('작업지시서가 수정되었습니다!');
+    await router.push('/workOrder')
+
+  } catch (error) {
+    console.error("작업지시서 수정 실패 :", error);
+    if (error.response.data.errorCode === 'WORK_ORDER_ERROR_001') {
+      alert(error.response.data.message);
+    } else if (error.response.data.errorCode === 'WORK_ORDER_ERROR_005') {
+      alert('작업지시서의 상태가 결재 전이거나 진행중일때만 수정 가능합니다.');
+    } else if (error.response.data.errorCode === 'COMMON_ERROR_002') {
+      alert('작업납기일은 현재보다 이전일 수 없습니다.');
+    } else if (error.response.data.errorCode === 'WORK_ORDER_ERROR_006') {
+      alert('지시수량은 이미 완료된 수량보다 적을 수 없습니다.');
+    } else if (error.response.data.errorCode === 'SALES_ORDER_ERROR_001') {
+      alert(error.response.data.message);
+    } else if (error.response.data.errorCode === 'SALES_ORDER_ERROR_002') {
+      alert('주문서의 상태가 결재 후일때만 수정 가능합니다.');
+    } else if (error.response.data.errorCode === 'SALES_ORDER_ITEM_ERROR_001') {
+      alert(error.response.data.message);
+    } else if (error.response.data.errorCode === 'ITEM_ERROR_001') {
+      alert(error.response.data.message);
+    } else if (error.response.data.errorCode === 'WORK_ORDER_ERROR_004') {
+      alert(error.response.data.message);
+    } else if (error.response.data.errorCode === 'ITEM_ERROR_003') {
+      alert('하위품목 정보가 존재하지 않습니다.');
+    } else if (error.response.data.errorCode === 'STOCK_ERROR_001') {
+      alert(error.response.data.message);
+    } else if (error.response.data.errorCode === 'WAREHOUSE_ERROR_001') {
+      alert(error.response.data.message);
+    } else {
+      alert('수정에 실패했습니다. 다시 시도해주세요.');
+    }
+  }
+};
+
+// 작업지시서 등록
+const createWorkOrder = async () => {
+  try {
+    console.log('폼 데이터:', formData.value);
+
+    const response = await axios.post(`workOrder`, {
+      salesOrderSeq: formData.value.salesOrderSeq,
+      salesOrderItemSeq: formData.value.salesOrderItemSeq,
+      warehouseSeq: formData.value.warehouseSeq,
+      workOrderIndicatedDate: formData.value.workOrderIndicatedDate,
+      workOrderDueDate: formData.value.workOrderDueDate,
+      workOrderNote: formData.value.workOrderNote,
+    });
+      console.log(response.data);
+      alert('작업지시서가 등록되었습니다!');
+      await router.push('/workOrder')
+
+  } catch (error) {
+    console.error("작업지시서 등록 실패 :", error);
+
+    if (error.response.data.errorCode === 'SALES_ORDER_ITEM_NOT_FOUND') {
+      alert(error.response.data.message);
+    } else if (error.response.data.errorCode === 'SALES_ORDER_ERROR_001') {
+      alert(error.response.data.message);
+    } else if (error.response.data.errorCode === 'SALES_ORDER_ERROR_002') {
+      alert('주문서의 상태가 결재 후일때만 등록 가능합니다.');
+    } else if (error.response.data.errorCode === 'WAREHOUSE_ERROR_001') {
+      alert(error.response.data.message);
+    } else if (error.response.data.errorCode === 'WORK_ORDER_ERROR_006') {
+      alert(error.response.data.message);
+    } else if (error.response.data.errorCode === 'ITEM_ERROR_001') {
+      alert(error.response.data.message);
+    } else if (error.response.data.errorCode === 'WORK_ORDER_ERROR_004') {
+      alert(error.response.data.message);
+    } else if (error.response.data.errorCode === 'ITEM_ERROR_003') {
+      alert(error.response.data.message);
+    }  else if (error.response.data.errorCode === 'STOCK_ERROR_001') {
+      alert('재료가 부족해 작업지시가 불가능합니다.\n 발주서를 작성해 재료를 먼저 구매해주세요.');
+    } else if (error.response.data.errorCode === 'WORK_ORDER_ERROR_003') {
+      alert('작업지시일과 납기일을 설정해주세요');
+    } else if (error.response.data.errorCode === 'COMMON_ERROR_002') {
+      alert(error.response.data.message);
+    } else {
+      alert('등록에 실패했습니다. 다시 시도해주세요.');
+    }
 
   }
 };
 
+// 작업지시서 제출
+const submitWorkOrder = async () => {
+  if (!validateFormData()) {
+    console.warn('폼 데이터가 완전하지 않습니다.');
+    return;
+  }
+
+  if (props.isEditMode) {
+    await updateWorkOrder(props.workOrderDetail.workOrderSeq);
+    console.log(props.workOrderDetail.workOrderSeq)
+  } else {
+    await createWorkOrder();
+  }
+};
+
+// 폼 데이터 검증
+const validateFormData = () => {
+  if (!formData.value.salesOrderSeq || !formData.value.salesOrderItemSeq || !formData.value.warehouseSeq) {
+    console.warn('필수 항목이 누락되었습니다.', formData.value);
+    alert('생산공장을 선택해주세요.')
+    return false;
+  }
+  return true;
+};
 
 </script>
-
 
 <template>
   <div class="d-flex justify-content-end mt-3">
@@ -243,37 +412,11 @@ const writeWorkOrder = (item) => {
           </b-input-group-text>
         </b-input-group>
       </b-form-group>
-<!--      &lt;!&ndash; 작업지시일자 &ndash;&gt;-->
-<!--      <b-form-group label-cols="4" label-cols-lg="2" label="작업지시일" label-for="workOrderIndicatedDate">-->
-<!--        &lt;!&ndash;   b-form-input 에서  datetime-local 을 사용할 수 없음  &ndash;&gt;-->
-<!--        <input class="form-control form-control-sm w-75" type="datetime-local" id="workOrderIndicatedDate"-->
-<!--               v-model="formData.workOrderIndicatedDate" placeholder="작업지시일자를 선택해 주세요."/>-->
-<!--      </b-form-group>-->
       <!-- 주문납기일자 -->
-      <b-form-group label-cols="4" label-cols-lg="2" label="주문납기일" label-for="salesOrderIndicatedDate">
-        <!--   b-form-input 에서  datetime-local 을 사용할 수 없음  -->
-        <input class="form-control form-control-sm w-75" type="date" id="salesOrderIndicatedDate"
-               v-model="salesOrderIndicatedDate" readonly=""/>
+      <b-form-group label-cols="4" label-cols-lg="2" label="주문납기일" label-for="salesOrderDueDate">
+        <input class="form-control form-control-sm w-75" type="date" id="salesOrderDueDate"
+               v-model="salesOrderDueDate" readonly=""/>
       </b-form-group>
-<!--      &lt;!&ndash; 작업 납기일자 &ndash;&gt;-->
-<!--      <b-form-group label-cols="4" label-cols-lg="2" label="작업납기일" label-for="workOrderDueDate">-->
-<!--        &lt;!&ndash;   b-form-input 에서  datetime-local 을 사용할 수 없음  &ndash;&gt;-->
-<!--        <input class="form-control form-control-sm w-75" type="datetime-local" id="workOrderDueDate"-->
-<!--               v-model="formData.workOrderDueDate" placeholder="목표납기일자를 선택해 주세요."/>-->
-<!--      </b-form-group>-->
-
-<!--      <b-form-group label-cols="4"  label-cols-lg="2" label-size="default" label="생산공장" label-for="warehouseSeq">-->
-<!--        <b-form-select class="w-75" size="sm" id="warehouseSeq" v-model="formData.warehouseSeq">-->
-<!--          <option value="">선택하세요</option>-->
-<!--          <option v-for="warehouse in warehouses" :key="warehouse.warehouseSeq"-->
-<!--                  :value="warehouse.warehouseSeq">{{ warehouse.warehouseName }}</option>-->
-<!--        </b-form-select>-->
-<!--      </b-form-group>-->
-
-<!--      &lt;!&ndash; 작업지시서 비고 &ndash;&gt;-->
-<!--      <b-form-group label-cols="4" label-cols-lg="2" label-size="default" label="작업지시서 비고" label-for="workOrderNote">-->
-<!--        <b-form-input class="w-75" size="sm" type="text" id="workOrderNote" v-model="formData.workOrderNote" placeholder="작업지시서 비고를 입력해주세요."/>-->
-<!--      </b-form-group>-->
     </div>
   </div>
 
@@ -303,71 +446,72 @@ const writeWorkOrder = (item) => {
             </ul>
           </div>
           <!-- 이미지 -->
-<!--          <div class="col-md-4 d-flex justify-content-center align-items-center">-->
           <div class="col-md-4 d-flex flex-column justify-content-around align-items-center">
             <img :src="item.itemImageUrl" alt="Item Image" class="img-fluid border border-secondary rounded" style="max-width: 150px; height: auto;">
             <div>
-<!--              <b-button @click="writeWorkOrder(item)" variant="light" size="sm" class="button ms-2 mb-3" style="top: 10px; right: 10px;">-->
               <b-button @click="selectItem(index)" variant="light" size="sm" class="button ms-2 mb-3" style="top: 10px; right: 10px;">
-<!--                작업지시서 등록-->
-<!--                {{ selectedItem.salesOrderItemSeq === item.salesOrderItemSeq && selectedItem.isRegistered ? '작업지시서 수정' : '작업지시서 등록' }}-->
                 {{ item.isRegistered ? '작업지시서 수정' : '작업지시서 등록' }}
               </b-button>
             </div>
           </div>
-          <!-- x 버튼 -->
-<!--          <b-button @click="checkWorkOrder(workOrder.workOrderSeq)" variant="light" size="sm" class="position-absolute btn-close" style="top: 10px; right: 10px;"></b-button>-->
         </div>
-      </div>
-      <!-- 확인 버튼 -->
-      <div class="mx-5 my-3 d-flex justify-content-end">
-<!--        <b-button v-if="props" @click="updateProductionReceiving" variant="light" size="sm" class="button ms-2">수정</b-button>-->
-<!--        <b-button v-else @click="createProductionReceiving" variant="light" size="sm" class="button ms-2">등록</b-button>-->
       </div>
     </div>
   </div>
 
-<!--  <div v-if="stockStatusList.length > 0" class="d-flex justify-content-center">-->
-<!--    <div class="col-md-10 d-flex flex-column">-->
-<!--      <h5 class="px-4">작업지시서 등록</h5>-->
-<!--      &lt;!&ndash; 작업 지시서 반복 &ndash;&gt;-->
-<!--      <div v-for="workOrder in checkWorkOrderList" :key="workOrder.workOrderSeq" class="mx-5 my-3">-->
-<!--        <div class="d-flex flex-row border border-secondary rounded p-3 position-relative">-->
-<!--          &lt;!&ndash; 텍스트 정보 &ndash;&gt;-->
-<!--          <div class="col-md-8">-->
-<!--            <div class="d-flex justify-content-between align-items-center mb-4">-->
-<!--              <h6 class="fw-bold">{{ workOrder.workOrderName }}</h6>-->
-<!--            </div>-->
-<!--            <ul class="d-flex flex-wrap align-items-start">-->
-<!--              <li class="mb-3 col-md-6">· 납품처 : {{ workOrder.clientName }}</li>-->
-<!--              <li class="mb-3 col-md-6">· 담당자명 : {{ workOrder.userName }}</li>-->
-<!--              <li class="mb-3 col-md-6">· 생산창고명 : {{ workOrder.warehouseName }}</li>-->
-<!--              <li class="mb-3 col-md-6">· 입고창고명 : {{ workOrder.warehouseName }}</li>-->
-<!--              <li class="mb-3 col-md-6">· 품목명 : {{ workOrder.itemName }}</li>-->
-<!--              <li class="mb-3 col-md-6">· 품목 가격 : {{ workOrder.itemPrice.toLocaleString() }} ₩</li>-->
-<!--              <li class="mb-3 col-md-6">· 주문 개수 : {{ workOrder.workOrderIndicatedQuantity.toLocaleString() }}</li>-->
-<!--              <li class="mb-3 col-md-6">· 주문 총액 : {{ workOrder.workOrderPrice }} ₩</li>-->
-<!--              <li class="mb-3 col-md-12 d-flex align-items-center">-->
-<!--                <span class="me-3 text-nowrap">· 품목 비고 : {{workOrder.itemNote}}</span>-->
-<!--              </li>-->
-<!--            </ul>-->
-<!--          </div>-->
-<!--          &lt;!&ndash; 이미지 &ndash;&gt;-->
-<!--          <div class="col-md-4 d-flex justify-content-center align-items-center">-->
-<!--            <img :src="workOrder.itemImageUrl" alt="Item Image" class="img-fluid border border-secondary rounded" style="max-width: 150px; height: auto;">-->
-<!--          </div>-->
-<!--          &lt;!&ndash; x 버튼 &ndash;&gt;-->
-<!--          <b-button @click="checkWorkOrder(workOrder.workOrderSeq)" variant="light" size="sm" class="position-absolute btn-close" style="top: 10px; right: 10px;"></b-button>-->
-<!--        </div>-->
-<!--      </div>-->
-<!--      &lt;!&ndash; 확인 버튼 &ndash;&gt;-->
-<!--      <div class="mx-5 my-3 d-flex justify-content-end">-->
-<!--        <b-button v-if="props" @click="updateProductionReceiving" variant="light" size="sm" class="button ms-2">수정</b-button>-->
-<!--        <b-button v-else @click="createProductionReceiving" variant="light" size="sm" class="button ms-2">등록</b-button>-->
+  <!-- 작업지시서 등록폼 -->
+  <div class="d-flex justify-content-center">
+    <div class="col-6 d-flex flex-column">
+            <h5 v-if="props.isEditMode || selectedItem?.isRegistered" class="px-4">작업지시서 수정</h5>
+            <h5 v-else class="px-4">작업지시서 등록</h5>
+          <!-- 작업지시서명 -->
+          <b-form-group v-if="props.isEditMode" label-cols="4" label-cols-lg="2" label="작업지시서명" label-for="workOrderName">
+            <input class="form-control form-control-sm w-75" type="text" id="workOrderName"
+                   v-model="formData.workOrderName" readonly="readonly"/>
+          </b-form-group>
+          <!-- 작업지시일자 -->
+          <b-form-group label-cols="4" label-cols-lg="2" label="작업지시일" label-for="workOrderIndicatedDate">
+            <!--   b-form-input 에서  datetime-local 을 사용할 수 없음  -->
+            <input class="form-control form-control-sm w-75" type="datetime-local" id="workOrderIndicatedDate"
+                   v-model="formData.workOrderIndicatedDate" placeholder="작업지시일자를 선택해 주세요."/>
+          </b-form-group>
+          <!-- 작업 납기일자 -->
+          <b-form-group label-cols="4" label-cols-lg="2" label="작업납기일" label-for="workOrderDueDate">
+            <!--   b-form-input 에서  datetime-local 을 사용할 수 없음  -->
+            <input class="form-control form-control-sm w-75" type="datetime-local" id="workOrderDueDate"
+                   v-model="formData.workOrderDueDate" placeholder="목표납기일자를 선택해 주세요."/>
+          </b-form-group>
+          <!-- 생산공장 -->
+          <b-form-group label-cols="4"  label-cols-lg="2" label-size="default" label="생산공장" label-for="warehouseSeq">
+            <b-form-select class="w-75" size="sm" id="warehouseSeq" v-model="formData.warehouseSeq">
+              <option value="">선택하세요</option>
+              <option v-for="warehouse in warehouses" :key="warehouse.warehouseSeq"
+                      :value="warehouse.warehouseSeq">{{ warehouse.warehouseName }}</option>
+            </b-form-select>
+          </b-form-group>
+          <!-- 작업 지시수량 -->
+          <b-form-group v-if="props.isEditMode" label-cols="4" label-cols-lg="2" label="작업지시수량" label-for="workOrderIndicatedQuantity">
+            <input class="form-control form-control-sm w-75" type="number" id="workOrderIndicatedQuantity"
+                   v-model="formData.workOrderIndicatedQuantity" placeholder="작업지시수량을 입력해 주세요."/>
+          </b-form-group>
+          <!-- 작업 지시수량 -->
+          <b-form-group v-if="props.isEditMode" label-cols="4" label-cols-lg="2" label="작업완료수량" label-for="workOrderWorkQuantity">
+            <input class="form-control form-control-sm w-75" type="number" id="workOrderWorkQuantity"
+                   v-model="formData.workOrderWorkQuantity" readonly="readonly"/>
+          </b-form-group>
+          <!-- 작업지시서 비고 -->
+          <b-form-group label-cols="4" label-cols-lg="2" label-size="default" label="작업지시서 비고" label-for="workOrderNote">
+            <b-form-input class="w-75" size="sm" type="text" id="workOrderNote" v-model="formData.workOrderNote" placeholder="작업지시서 비고를 입력해주세요."/>
+          </b-form-group>
 
-<!--      </div>-->
-<!--    </div>-->
-<!--  </div>-->
+      <div class="mx-5 my-3 d-flex justify-content-end">
+        <b-button @click="submitWorkOrder" variant="light" size="sm" class="button ms-2">
+          {{ props.isEditMode || selectedItem?.isRegistered ? '작업지시서 수정' : '작업지시서 등록' }}
+        </b-button>
+      </div>
+
+    </div>
+  </div>
 
   <!-- 주문서 Modal -->
   <div class="modal fade" id="SalesOrderModal" tabindex="-1" aria-labelledby="SalesOrderModalLabel" aria-hidden="true">
@@ -388,9 +532,9 @@ const writeWorkOrder = (item) => {
               <div class="list-head col-md-2">상태</div>
             </div>
             <template v-if="salesOrderList.length > 0">
-              <div v-for="(salesOrder, index) in salesOrderList"
+              <div v-for="(salesOrder) in salesOrderList"
                    :key="salesOrder.salesOrderSeq"
-                   class="list-line row" data-bs-dismiss="modal" @click="addDueDate(index)">
+                   class="list-line row" data-bs-dismiss="modal" @click="selectSalesOrder(salesOrder)">
                 <div class="list-body col-md-6 left">
                   {{ salesOrder.salesOrderName }}
                   <br>
@@ -422,41 +566,6 @@ const writeWorkOrder = (item) => {
       </div>
     </div>
   </div>
-
-<!--  <div class="col-md-10 d-flex flex-column">-->
-<!--    <h5 class="px-4">품목 목록</h5>-->
-<!--      <div style="max-height: 250px; overflow-y: auto;">-->
-<!--        <div style="max-height: 200px;" v-for="(item, index) in itemList" :key="item.salesOrderItemSeq"-->
-<!--             class="mx-5 my-3 d-flex flex-row border border-secondary rounded">-->
-<!--          <img :src=item.itemImageUrl class="p-2 col-md-4 card-img-top">-->
-<!--          <div class="p-2 col-md-8">-->
-<!--            <div class="mb-4 d-flex justify-content-between">-->
-<!--              <span class="fw-bold">{{ item.itemName }}</span>-->
-<!--              <trashIcon class="icon" @click="deleteItem(index)"/>-->
-<!--            </div>-->
-<!--            <div class="d-flex">-->
-<!--              <ul class="col-md-6 p-0">-->
-<!--                <li class="mb-3 ">-->
-<!--                  · 품목 구분 : {{ findStatusValue(itemDivisionList, item.itemDivision) }}-->
-<!--                </li>-->
-<!--                <li class="mb-3 d-flex flex-row">-->
-<!--                  · 수량 :-->
-<!--                  <b-form-input class="ms-2 me-2 w-25" type="text" v-model="itemData[index].quantity"-->
-<!--                                size="sm"></b-form-input>-->
-<!--                  개 (최대 : {{ numberThree(itemData[index].originalQuantity) }} 개)-->
-<!--                </li>-->
-<!--              </ul>-->
-<!--              <ul class="col-md-6 p-0 d-flex flex-column justify-content-between">-->
-<!--                <li class="mb-3 d-flex flex-row">-->
-<!--                  · 비고 :-->
-<!--                  <b-form-input class="ms-2 w-75" type="text" v-model="itemData[index].note" size="sm"></b-form-input>-->
-<!--                </li>-->
-<!--              </ul>-->
-<!--            </div>-->
-<!--          </div>-->
-<!--        </div>-->
-<!--      </div>-->
-<!--  </div>-->
 
 </template>
 
