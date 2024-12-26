@@ -27,7 +27,6 @@ const stockStatusList = ref([]); // 주문서 품목 재고 상태 목록
 
 const selectedSalesOrder = ref(null); // 선택된 주문서
 const selectedItem = ref(null); // 선택된 품목
-const isWorkOrderFormVisible = ref(false);
 
 // 폼 데이터
 const formData = ref({
@@ -213,7 +212,6 @@ const selectItem = async (index) => {
   console.log('선택된 품목:', selectedItem.value);
   await fetchRegisteredItems(selectedSalesOrder.value.salesOrderSeq);
 
-  isWorkOrderFormVisible.value = true;
   createOrUpdateWorkOrder(selectedItem.value);
 };
 
