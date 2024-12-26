@@ -4,7 +4,6 @@ import searchIcon from '@/assets/searchIcon.svg'
 import dayjs from "dayjs";
 import axios from "@/axios.js";
 import router from "@/router/index.js";
-import PurchaseList from "@/components/purchase/PurchaseList.vue";
 
 const pageSize = ref(10);
 const pageNumber = ref(1);
@@ -24,9 +23,9 @@ const formData = ref({
   purchaseOrderItemList: {}
 });
 
-const fetchPurchaseList = async () => {
+const fetchPurchaseOrderList = async () => {
   try {
-    const response = await axios.get(`purchase`, {
+    const response = await axios.get(`purchaseOrder`, {
       params: {
         startDate: null,
         endDate: null,
@@ -129,7 +128,7 @@ function validationCheck() {
 const createPurchaseOrder = async () => {
   if (validationCheck()) {
     try {
-      const response = await axios.post('productionReceiving',
+      const response = await axios.post('purchase',
           {
             purchaseOrderDueDate: formData.value.purchaseOrderDueDate,
             purchaseOrderTargetDueDate: formData.value.purchaseOrderTargetDueDate,
@@ -139,9 +138,9 @@ const createPurchaseOrder = async () => {
           });
 
       console.log(response);
-      alert('발주서가 등록되었습니다!');
+      alert('구매서가 등록되었습니다!');
       // 조회 페이지 이동
-      await router.push('/purchaseOrder')
+      await router.push('/purchase')
 
     } catch (error) {
       console.error('발주서 등록 실패', error);
@@ -184,9 +183,6 @@ const createPurchaseOrder = async () => {
   <div class="d-flex justify-content-center">
     <div class="col-md-10 d-flex flex-column">
       <h5 class="px-4">구매서 품목
-        <!--        <span class="w-75" size="sm" @click="openOrderModal" data-bs-toggle="modal" data-bs-target="#openOrderModal">
-                <b-button variant="light" size="sm" class="button ms-2" style="float: right">주문서 불러오기</b-button>
-                </span>-->
       </h5>
       <div v-for="purchaseOrder in purchaseOrderItemList" :key="purchaseOrder.itemSeq" class="mx-5 my-3">
         <div class="d-flex flex-row border border-secondary rounded p-3 position-relative">
@@ -227,7 +223,7 @@ const createPurchaseOrder = async () => {
     <div class="modal-dialog modal-xl">
       <div class="modal-content">
         <div class="modal-header">
-          <h1 class="modal-title fs-5">발주서 선택</h1>
+          <h1 class="modal-title fs-5">구매서 선택</h1>
           <div class="ms-5">검색결과: {{ totalCount }}개</div>
           <button type="button" @click="closeModal" class="button btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>

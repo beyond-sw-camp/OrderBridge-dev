@@ -1,7 +1,6 @@
 <script setup>
-import {defineProps, onMounted, ref, computed} from "vue";
+import {onMounted, ref, computed, watch} from "vue";
 import plusIcon from '@/assets/plus.svg'
-import dayjs from "dayjs";
 import axios from "@/axios.js";
 import router from "@/router/index.js";
 import { Modal } from 'bootstrap';
@@ -42,29 +41,29 @@ const fetchItems = async (filters = {}) => {
       },
     });
 
-    console.log(response.data.content);
+    console.log(response.data);
     purchaseItemList.value = Array.isArray(response.data.content) ? response.data.content : [];
+    totalCount.value =response.data.totalElements;
+
     openItemModal();
   } catch (error) {
     console.error("Failed to fetch items:", error);
   }
 };
 
+watch(pageNumber, async (newPage) => {
+  await fetchItems({ page: newPage, size: pageSize.value })
+});
+
 const formatStatus = (status) => {
-  if (status === 'PRODUCTION_COMPLETE') {
-    return '생산완료';
-  } else if (status === 'BEFORE') {
-    return '결재전'
-  }  else if (status === 'AFTER') {
-    return '결재후'
-  } else if (status === 'PRODUCTION') {
-    return '생산중'
-  } else if (status === 'SHIPMENT_COMPLETE') {
-    return '출하완료'
-  } else if (status === 'DELETE') {
-    return '삭제'
+  if (status === 'PART') {
+    return '부재료';
+  } else if (status === 'SUB') {
+    return '원재료'
+  }  else if (status === 'FINISHED') {
+    return '완제품'
   }
-  return status; // 상태가 다른 경우 그대로 반환
+  return status;
 };
 
 onMounted(() => {
@@ -247,8 +246,8 @@ const createPurchaseOrder = async () => {
       </span>
 
       <div class="mx-5 my-3 d-flex justify-content-end">
-        <b-button v-if="props" @click="updatePurchaseOrder" variant="light" size="sm" class="button ms-2">수정</b-button>
-        <b-button v-else @click="createPurchaseOrder" variant="light" size="sm" class="button ms-2">등록</b-button>
+<!--        <b-button v-if="props" @click="updatePurchaseOrder" variant="light" size="sm" class="button ms-2">수정</b-button>-->
+        <b-button @click="createPurchaseOrder" variant="light" size="sm" class="button ms-2">등록</b-button>
 
       </div>
     </div>
@@ -269,13 +268,15 @@ const createPurchaseOrder = async () => {
             <div class="list-headline row">
               <div class="list-head col-5">품목명</div>
               <div class="list-head col-2">가격</div>
+              <div class="list-head col-3">유효기간</div>
               <div class="list-head col-2">품목 단위</div>
             </div>
             <template v-if="purchaseItemList.length > 0">
               <div v-for="purchaseItem in purchaseItemList" :key="purchaseItem.itemSeq" class="list-line row" @click="addToOrderList(purchaseItem)">
                 <div class="list-body col-5 left">{{ purchaseItem.itemName }}</div>
-                <div class="list-body col-2">{{ dayjs(purchaseItem.itemPrice).format('YYYY/MM/DD') }}</div>
-                <div class="list-body col-2">{{ purchaseItem.itemUnitTitle }}</div>
+                <div class="list-body col-2 left">{{ purchaseItem.itemPrice.toLocaleString() }} 원</div>
+                <div class="list-body col-3 left">{{ purchaseItem.itemExpirationHour }} 시간</div>
+                <div class="list-body col-2">{{ formatStatus(purchaseItem.itemDivision) }}</div>
               </div>
             </template>
             <template v-else>
