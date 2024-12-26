@@ -133,7 +133,7 @@ const itemDelete = async (seq) => {
   if (result) {
     try {
       const response = await axios.delete(`http://localhost:8090/api/v1/purchaseOrder/${seq}`);
-      alert('발주서의 상태가 변경되었습니다.');
+      alert('발주서가 삭제되었습니다.');
 
       search(); // 삭제 후 목록 갱신
     } catch (error) {

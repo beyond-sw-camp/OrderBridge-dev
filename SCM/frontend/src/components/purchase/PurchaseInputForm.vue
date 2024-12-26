@@ -110,7 +110,7 @@ const addToOrderList = (selectedOrder) => {
   } else {
     alert("This order has already been added.");
   }
-  closeItemModal();
+  closeModal();
 };
 
 function validationCheck() {
@@ -227,7 +227,7 @@ const createPurchaseOrder = async () => {
     <div class="modal-dialog modal-xl">
       <div class="modal-content">
         <div class="modal-header">
-          <h1 class="modal-title fs-5">작업 지시서 선택</h1>
+          <h1 class="modal-title fs-5">발주서 선택</h1>
           <div class="ms-5">검색결과: {{ totalCount }}개</div>
           <button type="button" @click="closeModal" class="button btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
@@ -235,7 +235,7 @@ const createPurchaseOrder = async () => {
           <div style="max-height: 500px; overflow-y: scroll" class="d-flex row justify-content-center align-items-center">
 
             <div class="list-headline row">
-              <div class="list-head col-5">작업지시서명</div>
+              <div class="list-head col-5">발주서명</div>
               <div class="list-head col-2">생산공장명</div>
               <div class="list-head col-2">작업지시일</div>
               <div class="list-head col-2">상태</div>
@@ -249,7 +249,7 @@ const createPurchaseOrder = async () => {
               </div>
             </template>
             <template v-else>
-              <b-card-text class="no-list-text">해당 검색조건에 부합한 작업지시서가 존재하지 않습니다.</b-card-text>
+              <b-card-text class="no-list-text">해당 검색조건에 부합한 발주서가 존재하지 않습니다.</b-card-text>
             </template>
           </div>
         </div>

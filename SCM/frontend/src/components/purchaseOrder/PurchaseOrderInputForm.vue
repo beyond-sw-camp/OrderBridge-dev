@@ -1,16 +1,24 @@
 <script setup>
-import {defineProps, onMounted, ref, watch} from "vue";
+import {defineProps, onMounted, ref, computed} from "vue";
 import plusIcon from '@/assets/plus.svg'
 import dayjs from "dayjs";
 import axios from "@/axios.js";
 import router from "@/router/index.js";
+import { Modal } from 'bootstrap';
+
 
 const pageSize = ref(10);
 const pageNumber = ref(1);
 const purchaseItemList = ref([]);
 
-const purchaseOrderItemList = ref([]);
+const addPurchaseOrderItemList = ref([]);
 const totalCount = ref(null);
+
+const calculatePrice = computed(() => {
+  return addPurchaseOrderItemList.value.reduce((total, item) => {
+    return total + (item.purchaseOrderItemPrice || 0) * (item.purchaseOrderItemQuantity || 1);
+  }, 0);
+});
 
 const formData = ref({
   salesOrderSeq: 0,
@@ -19,22 +27,23 @@ const formData = ref({
   purchaseOrderTargetDueDate: '',
   purchaseOrderExtendedPrice: '',
   purchaseOrderTotalQuantity: '',
-  purchaseOrderNote: '',
-  purchaseOrderItemList: {}
+  purchaseOrderNote: ''
 });
 
-const fetchItems = async () => {
+const fetchItems = async (filters = {}) => {
   try {
-    const response = axios.get(`item`, {
-      paramsSerializer: (salesOrderSeq) => {
+    const response = await axios.get(`item`, {
+      params: filters,
+      paramsSerializer: (params) => {
         const filteredParams = Object.fromEntries(
-            Object.entries(salesOrderSeq).filter(([_, value]) => value !== null && value !== undefined)
+            Object.entries(params).filter(([_, value]) => value !== null && value !== undefined)
         );
         return new URLSearchParams(filteredParams).toString();
-      }
+      },
     });
 
-    purchaseItemList.value = Array.isArray(response.data.items) ? response.data.items : [];
+    console.log(response.data.content);
+    purchaseItemList.value = Array.isArray(response.data.content) ? response.data.content : [];
     openItemModal();
   } catch (error) {
     console.error("Failed to fetch items:", error);
@@ -59,45 +68,65 @@ const formatStatus = (status) => {
 };
 
 onMounted(() => {
-  console.log()
   fetchItems();
 });
 
+const updatePrice = (itemSeq) => {
+  const item = addPurchaseOrderItemList.value.find((order) => order.itemSeq === itemSeq);
+  if (item) {
+    item.calculatePrice = (item.purchaseOrderItemPrice || 0) * (item.purchaseOrderItemQuantity || 1);
+    calculatePrice.value = item.calculatePrice;
+  }
+};
+
 function openItemModal() {
-  const modal = document.getElementById('workItemModal');
-  modal.removeAttribute('aria-hidden'); // 모달 활성화 시 aria-hidden 제거
-  modal.style.display = 'block';
-  modal.focus(); // 포커스를 모달로 이동
+  const modal = document.getElementById('openItemModal');
+  if (modal) {
+    const bootstrapModal = new bootstrap.Modal(modal);
+    bootstrapModal.show();
+  } else {
+    console.error("Modal not found.");
+  }
 }
 
 function closeItemModal() {
-  const modal = document.getElementById('workItemModal');
-  modal.setAttribute('aria-hidden', 'true'); // 모달 비활성화 시 aria-hidden 추가
-  modal.style.display = 'none';
+  const modal = document.getElementById('openItemModal');
+  if (modal) {
+    const bootstrapModal = Modal.getInstance(modal);
+    if (bootstrapModal) {
+      bootstrapModal.hide();
+    } else {
+      console.error("Bootstrap Modal instance not found.");
+    }
+  } else {
+    console.error("Modal not found.");
+  }
 }
 
-const removeItem = (salesOrderSeq) => {
-  purchaseOrderItemList.value = purchaseOrderItemList.value.filter(
-      (item) => item.itemSeq !== salesOrderSeq
+const removeItem = (itemSeq) => {
+  addPurchaseOrderItemList.value = addPurchaseOrderItemList.value.filter(
+      (item) => item.itemSeq !== itemSeq
   );
-
-  delete purchaseOrderItemList.value[itemSeq];
 };
 
 const addToOrderList = (selectedOrder) => {
-  const existingItem = purchaseOrderItemList.value.find(
+  console.log("itemSeq : " + selectedOrder.itemSeq);
+  const existingItem = addPurchaseOrderItemList.value.find(
       (item) => item.itemSeq === selectedOrder.itemSeq
   );
   if (!existingItem) {
-    purchaseOrderItemList.value.push({
+    addPurchaseOrderItemList.value.push({
+      itemSeq: selectedOrder.itemSeq,
       itemName: selectedOrder.itemName,
-      salesOrderItemPrice: selectedOrder.salesOrderItemPrice || 0,
-      salesOrderItemQuantity: selectedOrder.salesOrderItemQuantity || 0,
-      salesOrderItemNote: selectedOrder.salesOrderItemNote || ""
+      itemImageUrl: selectedOrder.itemImageUrl,
+      purchaseOrderItemPrice: selectedOrder.itemPrice || 0,
+      purchaseOrderItemQuantity: selectedOrder.salesOrderItemQuantity || 1,
+      calculatePrice: (selectedOrder.itemPrice || 0) * (selectedOrder.salesOrderItemQuantity || 1) ,
     });
   } else {
-    alert("This order has already been added.");
+    alert("이미 추가된 품목입니다.");
   }
+
   closeItemModal();
 };
 
@@ -117,17 +146,19 @@ function validationCheck() {
 const createPurchaseOrder = async () => {
   if (validationCheck()) {
     try {
-      const response = await axios.post('productionReceiving',
+      const response = await axios.post('purchaseOrder',
           {
+            userSeq: 1,
+            clientSeq:1,
             purchaseOrderDueDate: formData.value.purchaseOrderDueDate,
             purchaseOrderTargetDueDate: formData.value.purchaseOrderTargetDueDate,
-            purchaseOrderExtendedPrice: formData.value.purchaseOrderExtendedPrice,
+            purchaseOrderExtendedPrice: calculatePrice.value,
             purchaseOrderNote: formData.value.purchaseOrderNote,
-            purchaseOrderItemDtoList: formData.value.purchaseOrderItemList
+            purchaseOrderItemDtoList: addPurchaseOrderItemList.value
           });
 
       console.log(response);
-      alert('발주서가 등록되었습니다!');
+      alert('발주서가 등록되었습니다');
       // 조회 페이지 이동
       await router.push('/purchaseOrder')
 
@@ -168,7 +199,7 @@ const createPurchaseOrder = async () => {
         <b-button variant="light" size="sm" class="button ms-2" style="float: right">주문서 불러오기</b-button>
         </span>-->
       </h5>
-      <div v-for="purchaseOrder in purchaseOrderItemList" :key="purchaseOrder.itemSeq" class="mx-5 my-3">
+      <div v-for="purchaseOrder in addPurchaseOrderItemList" :key="purchaseOrder.itemSeq" class="mx-5 my-3">
         <div class="d-flex flex-row border border-secondary rounded p-3 position-relative">
           <div class="col-md-8">
             <div class="d-flex justify-content-between align-items-center mb-4">
@@ -176,9 +207,16 @@ const createPurchaseOrder = async () => {
             </div>
             <ul class="d-flex flex-wrap align-items-start">
               <li class="mb-3 col-md-6">· 품목명 : {{ purchaseOrder.itemName }}</li>
-              <li class="mb-3 col-md-6">· 품목 가격 : ₩ {{ purchaseOrder.salesOrderItemPrice != null ? purchaseOrder.salesOrderItemPrice.toLocaleString() : 0 }} </li>
-              <li class="mb-3 col-md-6">· 주문 개수 : {{ purchaseOrder.salesOrderItemQuantity!= null ? purchaseOrder.salesOrderItemQuantity.toLocaleString() : 0 }}</li>
-              <li class="mb-3 col-md-6">· 비고 : {{ purchaseOrder.salesOrderItemNote }} </li>
+              <li class="mb-3 col-md-6">· 품목 단가 : ₩ {{ purchaseOrder.purchaseOrderItemPrice != null ? purchaseOrder.purchaseOrderItemPrice.toLocaleString() : 0 }} </li>
+              <li class="mb-3 col-md-6 d-flex align-items-center">· 주문 개수 :<input
+                  type="number"
+                  class="form-control form-control-sm ms-2" style="width: 70px;"
+                  v-model.number="purchaseOrder.purchaseOrderItemQuantity"
+                  @input="updatePrice(purchaseOrder.itemSeq)"
+                  :placeholder="purchaseOrder.purchaseOrderItemQuantity ? '' : '수량 입력'"
+                  :min="1"
+              /></li>
+              <li class="mb-3 col-md-6">· 품목 총 가격 : ₩ {{ purchaseOrder.calculatePrice != null ? purchaseOrder.calculatePrice.toLocaleString() : purchaseOrder.purchaseOrderItemPrice }} </li>
             </ul>
           </div>
           <div class="col-md-4 d-flex justify-content-center align-items-center">
@@ -186,7 +224,7 @@ const createPurchaseOrder = async () => {
           </div>
 
           <b-button
-              @click="removeItem(purchaseOrder.salesOrderSeq)"
+              @click="removeItem(purchaseOrder.itemSeq)"
               variant="light"
               size="sm"
               class="position-absolute btn-close"
@@ -194,7 +232,14 @@ const createPurchaseOrder = async () => {
           ></b-button>
         </div>
       </div>
-      <span @click="openItemModal" data-bs-toggle="modal" data-bs-target="#openItemModal">
+
+      <div v-if="calculatePrice != 0" class="line-container mx-5">
+        <div class="custom-line d-flex justify-content-end">
+            <h6 class="fw-bold" style="margin-top: 17px; float:right;">총 가격 : ₩ {{ calculatePrice }}</h6>
+        </div>
+      </div> <br />
+
+      <span data-bs-toggle="modal" data-bs-target="#openItemModal">
       <b-input-group-text class="mx-5 my-3 d-flex justify-content-center align-items-center border border-secondary rounded p-3"
                           style="cursor: pointer;">
         <plusIcon class="icon"/>
@@ -210,13 +255,13 @@ const createPurchaseOrder = async () => {
   </div>
 
   <!-- Modal -->
-  <div class="modal fade" id="openItemModal" tabindex="-1" aria-labelledby="workOrderModalLabel" aria-hidden="true">
+  <div class="modal fade" id="openItemModal" tabindex="-1" aria-labelledby="OrderModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl">
       <div class="modal-content">
         <div class="modal-header">
           <h1 class="modal-title fs-5">품목 선택</h1>
           <div class="ms-5">검색결과: {{ totalCount }}개</div>
-          <button type="button" @click="closeItemModal" class="button btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <button type="button" class="button btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
           <div style="max-height: 500px; overflow-y: scroll" class="d-flex row justify-content-center align-items-center">
@@ -227,7 +272,7 @@ const createPurchaseOrder = async () => {
               <div class="list-head col-2">품목 단위</div>
             </div>
             <template v-if="purchaseItemList.length > 0">
-              <div v-for="purchaseItem in purchaseItemList" :key="purchaseItem.itemSeq" class="list-line row" @click="addToOrderList(purchaseItem.itemSeq)">
+              <div v-for="purchaseItem in purchaseItemList" :key="purchaseItem.itemSeq" class="list-line row" @click="addToOrderList(purchaseItem)">
                 <div class="list-body col-5 left">{{ purchaseItem.itemName }}</div>
                 <div class="list-body col-2">{{ dayjs(purchaseItem.itemPrice).format('YYYY/MM/DD') }}</div>
                 <div class="list-body col-2">{{ purchaseItem.itemUnitTitle }}</div>
@@ -300,6 +345,19 @@ div {
 
 li {
   list-style: none;
+}
+
+.line-container {
+  display: flex;
+  justify-content: center;
+  margin: 20px 0;
+}
+
+.custom-line {
+  width: 100%;
+  height: 1px;
+  background-color: #828282;
+  border-radius: 1px;
 }
 
 </style>

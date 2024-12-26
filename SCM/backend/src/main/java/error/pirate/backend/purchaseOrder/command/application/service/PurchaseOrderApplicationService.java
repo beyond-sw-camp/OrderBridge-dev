@@ -52,40 +52,35 @@ public class PurchaseOrderApplicationService {
     public void createPurchaseOrder(PurchaseOrderCreateRequest request) {
         //TODO 아영 - 로그인이 완료되면 userSeq 정보 넣기
 
-        SalesOrder salesOrder = salesOrderDomainService.findById(request.getSalesOrderSeq());
-        if(salesOrder.getSalesOrderStatus() == SalesOrderStatus.AFTER) {
-            PurchaseOrder purchaseOrder = modelMapper.map(request, PurchaseOrder.class);
+        PurchaseOrder purchaseOrder = modelMapper.map(request, PurchaseOrder.class);
 
-            User user = userRepository.findById(request.getUserSeq())
-                    .orElseThrow(() -> new CustomException(ErrorCodeType.USER_NOT_FOUND));
+        User user = userRepository.findById(request.getUserSeq())
+                .orElseThrow(() -> new CustomException(ErrorCodeType.USER_NOT_FOUND));
 
-            Client client = clientRepository.findById(request.getClientSeq())
-                    .orElseThrow(() -> new CustomException(ErrorCodeType.CLIENT_NOT_FOUND));
+        Client client = clientRepository.findById(request.getClientSeq())
+                .orElseThrow(() -> new CustomException(ErrorCodeType.CLIENT_NOT_FOUND));
 
-            purchaseOrder.objectInjection(user, client, salesOrder);
-            purchaseOrder.changePurchaseOrderTotalQuantity(
-                    request.getPurchaseOrderItemDtoList().stream().mapToInt(PurchaseOrderItemDto::getPurchaseOrderItemQuantity).sum()
-            );
-            PurchaseOrder purchaseOrderResponse = purchaseOrderDomainService.createPurchaseOrder(purchaseOrder);
+        purchaseOrder.objectInjection(user, client);
+        purchaseOrder.changePurchaseOrderTotalQuantity(
+                request.getPurchaseOrderItemDtoList().stream().mapToInt(PurchaseOrderItemDto::getPurchaseOrderItemQuantity).sum()
+        );
+        PurchaseOrder purchaseOrderResponse = purchaseOrderDomainService.createPurchaseOrder(purchaseOrder);
 
-            List<PurchaseOrderItem> items = new ArrayList<>();
-            if(ObjectUtils.isNotEmpty(request.getPurchaseOrderItemDtoList())) {
-                for(PurchaseOrderItemDto purchaseOrderItemDto : request.getPurchaseOrderItemDtoList()) {
-                    PurchaseOrderItem purchaseOrderItem = modelMapper.map(purchaseOrderItemDto, PurchaseOrderItem.class);
+        List<PurchaseOrderItem> items = new ArrayList<>();
+        if (ObjectUtils.isNotEmpty(request.getPurchaseOrderItemDtoList())) {
+            for (PurchaseOrderItemDto purchaseOrderItemDto : request.getPurchaseOrderItemDtoList()) {
+                PurchaseOrderItem purchaseOrderItem = modelMapper.map(purchaseOrderItemDto, PurchaseOrderItem.class);
 
-                    purchaseOrderItem.insertPurchase(purchaseOrderResponse);
+                purchaseOrderItem.insertPurchase(purchaseOrderResponse);
 
-                    Item item = itemRepository.findById(purchaseOrderItemDto.getItemSeq())
-                            .orElseThrow(() -> new CustomException(ErrorCodeType.ITEM_NOT_FOUND));
-                    purchaseOrderItem.insertItem(item);
+                Item item = itemRepository.findById(purchaseOrderItemDto.getItemSeq())
+                        .orElseThrow(() -> new CustomException(ErrorCodeType.ITEM_NOT_FOUND));
+                purchaseOrderItem.insertItem(item);
 
-                    items.add(purchaseOrderItem);
-                }
+                items.add(purchaseOrderItem);
             }
-            purchaseOrderItemDomainService.createPurchaseOrderItem(items);
-        } else {
-            throw new CustomException(ErrorCodeType.SALES_ORDER_STATE_BAD_REQUEST);
         }
+        purchaseOrderItemDomainService.createPurchaseOrderItem(items);
     }
 
     @Transactional
