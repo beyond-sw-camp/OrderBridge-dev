@@ -8,7 +8,18 @@ public class ClientUpdateRequest {
     private String clientPhoneNo;
     private String clientEmail;
     private String clientRegistrationNo;
+    private String clientRepresentative;
 
-    public ClientUpdateRequest(String s, String s1, String mail, String s2) {
+    public ClientUpdateRequest(String clientName, String clientPhoneNo, String clientEmail,
+                               String clientRegistrationNo, String clientRepresentative) {
+        this.clientName = clientName;
+        this.clientPhoneNo = clientPhoneNo;
+        this.clientEmail = clientEmail;
+        this.clientRegistrationNo = clientRegistrationNo;
+        this.clientRepresentative = clientRepresentative;
     }
 }
+
+
+
+

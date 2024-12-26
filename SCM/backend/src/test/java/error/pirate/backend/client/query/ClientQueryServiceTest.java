@@ -37,17 +37,12 @@ class ClientQueryServiceTest {
     @ParameterizedTest
     @MethodSource("clientFilterParams")
     void readClientListTest(String clientName, String clientRegistrationNo, String sortBy, String sortDirection) {
-        // Given
         ClientFilterRequest filterRequest = new ClientFilterRequest();
         filterRequest.setClientName(clientName);
         filterRequest.setClientRegistrationNo(clientRegistrationNo);
-        filterRequest.setSortBy(sortBy);
-        filterRequest.setSortDirection(sortDirection);
 
-        // When
-        List<ClientResponse> clientResponses = clientQueryService.readClientList(filterRequest);
+        List<ClientResponse> clientResponses = clientQueryService.readClientList(filterRequest).getClients();
 
-        // Then
         assertThat(clientResponses).isNotNull();
         assertThat(clientResponses).allMatch(client ->
                 (clientName.isEmpty() || client.getClientName().contains(clientName)) &&

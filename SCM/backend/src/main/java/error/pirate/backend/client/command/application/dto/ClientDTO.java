@@ -13,4 +13,5 @@ public class ClientDTO {
     private String clientName;
     private String clientPhoneNo;
     private String clientEmail;
+    private String clientRepresentative;
 }
