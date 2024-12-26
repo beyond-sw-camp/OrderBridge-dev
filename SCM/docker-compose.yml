@@ -1,0 +1,16 @@
+version: '3.8'
+services:
+  redis:
+    image: redis:latest
+    restart: always
+    container_name: redis
+    hostname: ${REDIS_HOSTNAME}
+    ports:
+      - "${REDIS_PORT}:6379"
+    networks:
+      - springboot-network
+    command: redis-server --requirepass ${REDIS_PASSWORD}
+
+networks:
+  springboot-network:
+    driver: bridge
