@@ -23,6 +23,10 @@ const pageSize = ref(10); // 페이지 크기
 const pageNumber = ref(1); // 페이지 번호
 
 const warehouses = ref([]); // 창고 목록
+const warehouseTotalCount = ref(0);
+const warehousePageSize = ref(20);
+const warehousePageNumber = ref(1);
+
 const salesOrderStatusList = ref([]); // 주문서 상태 목록
 const salesOrderDueDate = ref(''); // 주문서 납기일
 
@@ -105,12 +109,35 @@ const fetchSalesOrderList = async () => {
 
 // 셀렉트박스로 창고목록 불러오기
 const fetchWarehouses = async () => {
-  try {
-    const response = await axios.get('warehouse/all');
+  // try {
+    // const response = await axios.get('warehouse');
+    // const response = await axios.get('warehouse?warehouseType=FACTORY');
+    // console.log(response.data)
+    // warehouses.value = response.data.warehouses;
 
-    const factory = response.data.filter(warehouse => warehouse.warehouseType === 'FACTORY');
-    console.log(factory);
-    warehouses.value = factory;
+    // const factory = response.data.filter(warehouse => warehouse.warehouseType === 'FACTORY');
+    // console.log(factory);
+    // warehouses.value = factory;
+  try {
+    const response = await axios.get('warehouse', {
+      params: {
+        warehouseType: 'FACTORY',
+        page: warehousePageNumber.value,
+        size: warehousePageSize.value,
+      }, paramsSerializer: (params) => {
+        // null이나 undefined 값을 필터링
+        const filteredParams = Object.fromEntries(
+            Object.entries(params).filter(([_, value]) => value !== null && value !== undefined)
+        );
+        return new URLSearchParams(filteredParams).toString();
+      }
+    });
+
+    console.log(response.data)
+
+    warehouses.value = response.data.warehouses;
+    warehouseTotalCount.value = response.data.totalCount;
+
   } catch (error) {
     console.error('창고 목록 불러오기 실패:', error);
   }
@@ -161,7 +188,7 @@ onMounted(() => {
   fetchSalesOrderList();
   fetchWarehouses();
   fetchSalesOrderStatusList();
-  fetchSalesOrderItemStock();
+  // fetchSalesOrderItemStock();
 });
 
 // 상태 키로 값 반환
@@ -193,13 +220,6 @@ const fetchSalesOrderItemStock = async (salesOrderSeq) => {
 const goToOrderPage = () => {
   router.push('/purchaseOrder/input');
 };
-
-watch(() => stockStatusList.value, (newList) => {
-  console.log('🔍 stockStatusList 업데이트됨:', newList);
-  newList.forEach((item, index) => {
-    console.log(`🔍 Item ${index} isRegistered:`, item.isRegistered);
-  });
-}, { deep: true });
 
 // 등록페이지에서 수정 구분
 const handleItemSelection = (index) => {
@@ -377,7 +397,7 @@ const createWorkOrder = async () => {
     } else if (error.response.data.errorCode === 'WORK_ORDER_ERROR_003') {
       alert('작업지시일과 납기일을 설정해주세요');
     } else if (error.response.data.errorCode === 'COMMON_ERROR_002') {
-      alert(error.response.data.message);
+      alert('작업납기일은 현재보다 이전일 수 없고 주문납기일보다 전이어야 합니다.');
     } else {
       alert('등록에 실패했습니다. 다시 시도해주세요.');
     }
@@ -472,7 +492,7 @@ const validateFormData = () => {
               <b-button v-else
                         @click="selectItem(index)"
                         variant="light" size="sm" class="button ms-2 mb-3" style="top: 10px; right: 10px;">
-                {{ item.isRegistered ? '작업지시서 수정' : '품목선택 & 등록' }}
+                {{ item.isRegistered ? '작업지시서 수정' : '품목선택하기' }}
               </b-button>
             </div>
           </div>

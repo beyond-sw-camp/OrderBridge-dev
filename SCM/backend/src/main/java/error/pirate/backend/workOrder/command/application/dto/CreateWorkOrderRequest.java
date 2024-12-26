@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -18,8 +18,8 @@ public class CreateWorkOrderRequest {
     private Long salesOrderSeq; // 주문서 번호
     private Long salesOrderItemSeq; // 주문서 품목 번호
     private Long warehouseSeq;  // 생산공장
-    private LocalDate workOrderIndicatedDate;   // 작업지시서 지시일
-    private LocalDate workOrderDueDate; // 작업지시서 납기일
+    private LocalDateTime workOrderIndicatedDate;   // 작업지시서 지시일
+    private LocalDateTime workOrderDueDate; // 작업지시서 납기일
     private String workOrderNote;   // 작업지시서 비고
 
 }

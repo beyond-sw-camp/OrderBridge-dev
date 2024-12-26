@@ -13,7 +13,8 @@ public interface WorkOrderRepository extends JpaRepository<WorkOrder, Long> {
 @Query("SELECT CASE WHEN COUNT(*) > 0 THEN TRUE ELSE FALSE END " +
         "FROM WorkOrder w " +
         "WHERE w.salesOrder.salesOrderSeq = :salesOrderSeq " +
-        "AND w.item.itemSeq = :itemSeq")
+        "AND w.item.itemSeq = :itemSeq " +
+        "AND w.workOrderStatus != 'DELETE'")
     boolean existsBySalesOrderSeqAndItemSeq(@Param("salesOrderSeq")Long salesOrderSeq,
                                             @Param("itemSeq")Long itemSeq);
 

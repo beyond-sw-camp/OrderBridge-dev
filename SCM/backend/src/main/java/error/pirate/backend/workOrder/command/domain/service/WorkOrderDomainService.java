@@ -93,21 +93,18 @@ public class WorkOrderDomainService {
     }
 
     // 작업지시일 시간 처리
-    public LocalDateTime convertIndicatedDate(LocalDate indicatedDate) {
-        LocalDateTime regDate = LocalDateTime.now();
+    public LocalDateTime convertIndicatedDate(LocalDateTime indicatedDate) {
 
-        if (indicatedDate.isEqual(regDate.toLocalDate())) {
-            // 등록일과 같으면 등록 시간 + 1시간
-            return regDate.plusHours(1);
-        } else {
-            // 등록일과 다르면 오전 9시로 설정
-            return indicatedDate.atTime(LocalTime.of(9, 0));
-        }
+        ZonedDateTime systemZonedDateTime = indicatedDate.atZone(ZoneId.systemDefault());
+        ZonedDateTime seoulZonedDateTime = systemZonedDateTime.withZoneSameInstant(ZoneId.of("Asia/Seoul"));
+        return seoulZonedDateTime.toLocalDateTime();
     }
 
     // 납기일 시간 처리
-    public LocalDateTime convertDueDate(LocalDate dueDate) {
-        return dueDate.atTime(LocalTime.of(23, 59, 59));
+    public LocalDateTime convertDueDate(LocalDateTime dueDate) {
+        ZonedDateTime systemZonedDateTime = dueDate.atZone(ZoneId.systemDefault());
+        ZonedDateTime seoulZonedDateTime = systemZonedDateTime.withZoneSameInstant(ZoneId.of("Asia/Seoul"));
+        return seoulZonedDateTime.toLocalDateTime();
     }
 
     // 작업지시서 수정

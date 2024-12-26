@@ -146,6 +146,7 @@
                  FROM tb_work_order wo
                 WHERE wo.sales_order_seq = soi.sales_order_seq
                   AND wo.item_seq = soi.item_seq
+                  AND wo.work_order_status != 'DELETE'
         )
     </select>
 
