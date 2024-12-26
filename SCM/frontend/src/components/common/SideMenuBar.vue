@@ -51,9 +51,8 @@ const toggleSubMenu = (subMenu) => {
             <span @click="toggleSubMenu('client')">거래처</span>
             <ul v-if="activeSubMenu === 'client'">
               <li>
-                <RouterLink class="content-item" to="">
-                  거래처 관리
-                </RouterLink>
+                <RouterLink class="content-item" to="/client">거래처 조회</RouterLink>
+                <RouterLink class="content-item" to="/client/input">거래처 등록</RouterLink>
               </li>
             </ul>
           </li>
@@ -159,7 +158,7 @@ const toggleSubMenu = (subMenu) => {
             <ul v-if="activeSubMenu === 'item'">
               <li>
                 <RouterLink class="content-item" to="/workOrder" active-class="active" replace>작업지시서 조회</RouterLink>
-                <RouterLink class="content-item" to="">작업지시서 등록</RouterLink>
+                <RouterLink class="content-item" to="/workOrder/write">작업지시서 등록</RouterLink>
                 <RouterLink class="content-item" to="">작업지시서 작업처리</RouterLink>
                 <RouterLink class="content-item" to="/workOrder/situation">작업지시서 현황</RouterLink>
               </li>

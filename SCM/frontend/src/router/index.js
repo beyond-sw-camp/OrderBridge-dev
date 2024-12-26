@@ -5,6 +5,7 @@ import item from "@/router/item.js";
 import workOrderRoutes from "@/router/work-order.js";
 import shippingSlipRoutes from "@/router/shipping-slip.js";
 import warehouse from "@/router/warehouse.js";
+import client from "@/router/client.js";
 import quotationRoutes from "@/router/quotation.js";
 import salesOrder from '@/router/salesOrder.js';
 import invoice from '@/router/invoice.js'
@@ -62,6 +63,7 @@ const routes = [
     ...workOrderRoutes,
     ...shippingSlipRoutes,
     ...warehouse,
+    ...client,
     ...quotationRoutes,
     ...salesOrder,
     ...invoice
