@@ -1,11 +1,13 @@
 package error.pirate.backend.salesOrder.query.mapper;
 
+import error.pirate.backend.salesOrder.command.domain.aggregate.entity.SalesOrderItem;
 import error.pirate.backend.salesOrder.command.domain.aggregate.entity.SalesOrderStatus;
 import error.pirate.backend.salesOrder.query.dto.*;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Mapper
@@ -43,4 +45,16 @@ public interface SalesOrderMapper {
     // 주문서 품목 값 확인
     List<SalesOrderItemCheckDTO> sumSalesOrderItemValue(
             @Param("quotationSeq") Long quotationSeq);
+
+    // 작업지시서가 등록된 주문서 품목 조회
+    List<Long> selectRegisteredItemSeqsBySalesOrderSeq(@Param("salesOrderSeq") Long salesOrderSeq);
+
+    // 주문서 번호로 품목들 조회
+    List<SalesOrderItem> findItemsBySalesOrderSeq(@Param("salesOrderSeq") Long salesOrderSeq);
+
+    // 주문서(품목)에 대한 재고 상태 조회
+    List<SalesOrderItemStockStatusResponse> selectSalesOrderItemStockStatus(
+            @Param("salesOrderSeq") Long salesOrderSeq,
+            @Param("currentDateTime") LocalDateTime currentDateTime);
+
 }

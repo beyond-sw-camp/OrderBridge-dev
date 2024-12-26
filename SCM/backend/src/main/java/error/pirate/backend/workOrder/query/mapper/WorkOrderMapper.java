@@ -35,8 +35,8 @@ public interface WorkOrderMapper {
 
     /* 작업지시서 현황 조회 */
     List<WorkOrderSituationDTO> readWorkOrderSituations(
-            @Param("startDate") LocalDate startDate,
-            @Param("endDate") LocalDate endDate,
+            @Param("startDate") LocalDateTime startDateTime,
+            @Param("endDate") LocalDateTime EndDateTime,
             @Param("clientName") String clientName,
             @Param("warehouseName") String warehouseName);
 
