@@ -28,7 +28,7 @@ watch(props, () => {
   formData.value.productionReceivingNote = props.productionReceivingDetail.productionReceivingNote;
 
   for(const workOrder of props.workOrderList) {
-    checkWorkOrder(workOrder.workOrderSeq, );
+    checkWorkOrder(workOrder.workOrderSeq);
   }
 })
 
