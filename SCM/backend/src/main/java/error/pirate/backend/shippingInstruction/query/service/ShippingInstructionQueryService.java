@@ -1,7 +1,10 @@
 package error.pirate.backend.shippingInstruction.query.service;
 
 import error.pirate.backend.common.ExcelDownLoad;
-import error.pirate.backend.productionReceiving.query.dto.ProductionReceivingSituationResponse;
+import error.pirate.backend.common.RemainingQuantity;
+import error.pirate.backend.salesOrder.command.domain.aggregate.entity.SalesOrder;
+import error.pirate.backend.shippingInstruction.command.domain.aggregate.entity.ShippingInstruction;
+import error.pirate.backend.shippingInstruction.command.domain.aggregate.entity.ShippingInstructionStatus;
 import error.pirate.backend.shippingInstruction.query.dto.*;
 import error.pirate.backend.shippingInstruction.query.mapper.ShippingInstructionMapper;
 import lombok.RequiredArgsConstructor;
@@ -9,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -18,29 +20,25 @@ public class ShippingInstructionQueryService {
 
     private final ShippingInstructionMapper shippingInstructionMapper;
     private final ExcelDownLoad excelDownBody;
+    private final RemainingQuantity remainingQuantity;
 
     /* 출하지시서 리스트 조회 */
     @Transactional(readOnly = true)
     public ShippingInstructionListResponse readShippingInstructionList(ShippingInstructionListRequest request) {
         int offset = (request.getPage() - 1) * request.getSize();
+        if(request.getEndDate() != null){
+            request.setEndDate(request.getEndDate().plusDays(1));   // 하루 추가
+        }
         List<ShippingInstructionStatus> statusList = request.getShippingInstructionStatus();   // 상태 리스트
 
         // 리스트 응답 및 상태를 value로 변경
         List<ShippingInstructionListDTO> shippingInstructionList
                 = shippingInstructionMapper.selectShippingInstructionList(offset, request, statusList);
 
-        // enum 상태 리스트 응답
-        List<ShippingInstructionStatus.ShippingInstructionStatusResponse> shippingInstructionStatusResponse
-                = Arrays.stream(ShippingInstructionStatus.class.getEnumConstants()).map(key ->
-                new ShippingInstructionStatus.ShippingInstructionStatusResponse(
-                        key.toString(), ShippingInstructionStatus.valueOf(key.toString())
-                )).toList();
-
         long totalItems = shippingInstructionMapper.countShippingInstruction(request, statusList);
 
         return ShippingInstructionListResponse.builder()
                 .shippingInstructionList(shippingInstructionList)
-                .shippingInstructionStatusList(shippingInstructionStatusResponse)
                 .currentPage(request.getPage())
                 .totalPages((int) Math.ceil((double) totalItems / request.getSize()))
                 .totalItems(totalItems)
@@ -125,11 +123,21 @@ public class ShippingInstructionQueryService {
                 excel[i][2] = dto.getShippingInstructionName();       // 출하지시서명
                 excel[i][3] = dto.getShippingInstructionTotalQuantity() + " 개";  // 총수량
                 excel[i][4] = dto.getClientName(); // 거래처명
-                excel[i][5] = dto.getShippingInstructionAddress(); // 주소
+                excel[i][5] = dto.getShippingAddress().getValue(); // 주소
                 excel[i][6] = dto.getShippingInstructionNote(); // 비고
             }
         }
 
         return excelDownBody.excelDownBody(excel, headers, "출하지시서 현황");
+    }
+
+    // 출하지시서 품목 값 확인
+    public List<ShippingInstructionItemCheckDTO> shippingInstructionItemCheck(long salesOrderSeq) {
+        return shippingInstructionMapper.sumShippingInstructionItemValue(salesOrderSeq);
+    }
+
+    // 출하지시서 등록 시 남아있는 주문서 품목 값 리턴
+    public List<Integer> readRemainingQuantity(long salesOrderSeq) {
+        return remainingQuantity.remainingQuantity(SalesOrder.class, ShippingInstruction.class, salesOrderSeq);
     }
 }

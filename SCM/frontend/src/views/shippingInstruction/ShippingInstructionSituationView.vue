@@ -1,6 +1,6 @@
 <script setup>
 import ShippingInstructionSituation from "@/components/shippingInstruction/ShippingInstructionSituation.vue";
-import axios from "axios";
+import axios from "@/axios"
 import {onMounted, ref} from "vue";
 
 const searchStartDate = ref(null);
@@ -8,10 +8,12 @@ const searchEndDate = ref(null);
 const searchName = ref(null);
 const shippingInstructionSituationList = ref([]);
 const shippingInstructionSituationTotal = ref(null);
+const shippingAddressList = ref([]);
 
+// 출하지시서 현황 요청
 const fetchShippingInstructionSituationList = async () => {
   try {
-    const response = await axios.get(`http://localhost:8090/api/v1/shipping-instruction/situation`, {
+    const response = await axios.get(`shipping-instruction/situation`, {
       params: {
         startDate: searchStartDate.value,
         endDate: searchEndDate.value,
@@ -33,14 +35,23 @@ const fetchShippingInstructionSituationList = async () => {
   }
 };
 
-onMounted(() => {
-  fetchShippingInstructionSituationList();
-});
+// 출하주소 목록 요청
+const fetchShippingAddressList = async () => {
+  try {
+    const response = await axios.get(`shipping-instruction/address`, {});
 
+    shippingAddressList.value = response.data;
+
+  } catch (error) {
+    console.error("출하주소 목록 불러오기 실패 :", error);
+  }
+};
+
+// 현황 엑셀 다운 요청
 const excelDown = async () => {
   const excelName = "출하지시서현황_" + new Date().getFullYear() + (new Date().getMonth() + 1) + new Date().getDay();
   try {
-    const response = await axios.get(`http://localhost:8090/api/v1/shipping-instruction/situation/excelDown`, {
+    const response = await axios.get(`shipping-instruction/situation/excelDown`, {
       params: {
         startDate: searchStartDate.value,
         endDate: searchEndDate.value,
@@ -72,6 +83,11 @@ const excelDown = async () => {
   }
 }
 
+onMounted(async () => {
+  await fetchShippingInstructionSituationList();
+  await fetchShippingAddressList()
+});
+
 // 검색
 const handleSearch = (payload) => {
   searchStartDate.value = payload.startDate;
@@ -93,6 +109,7 @@ function search() {
                                 :searchName="searchName"
                                 :shippingInstructionSituationList="shippingInstructionSituationList"
                                 :shippingInstructionSituationTotal="shippingInstructionSituationTotal"
+                                :shippingAddressList="shippingAddressList"
                                 @searchEvent="handleSearch"
                                 @excelEvent="excelDown"/>
 </template>

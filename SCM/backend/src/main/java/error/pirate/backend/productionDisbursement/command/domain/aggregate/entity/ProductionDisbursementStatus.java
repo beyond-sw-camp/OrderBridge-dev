@@ -2,5 +2,6 @@ package error.pirate.backend.productionDisbursement.command.domain.aggregate.ent
 
 public enum ProductionDisbursementStatus {
     BEFORE, // 불출전
-    AFTER   // 불출후
+    AFTER,   // 불출후
+    DELETE  // 삭제
 }

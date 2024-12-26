@@ -1,5 +1,6 @@
 package error.pirate.backend.shippingInstruction.query.dto;
 
+import error.pirate.backend.shippingInstruction.command.domain.aggregate.entity.ShippingAddress;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -14,7 +15,7 @@ public class ShippingInstructionSituationResponse {
     private String shippingInstructionName; // 출하지시서명
     private String shippingInstructionTotalQuantity;   // 출하지시서 총수량
     private String clientName;  // 거래처명
-    private String shippingInstructionAddress;  // 출하지시서 주소
+    private ShippingAddress shippingAddress;  // 출하지시서 주소
     private String shippingInstructionNote; // 출하지시서 비고
     private String shippingInstructionTotalQuantitySum;  // 출하지시서 총수량 월합계 총합계
 }

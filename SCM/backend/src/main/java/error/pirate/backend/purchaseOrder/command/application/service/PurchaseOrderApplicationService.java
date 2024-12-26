@@ -61,6 +61,9 @@ public class PurchaseOrderApplicationService {
                     .orElseThrow(() -> new CustomException(ErrorCodeType.CLIENT_NOT_FOUND));
 
             purchaseOrder.objectInjection(user, client, salesOrder);
+            purchaseOrder.changePurchaseOrderTotalQuantity(
+                    request.getPurchaseOrderItemDtoList().stream().mapToInt(PurchaseOrderItemDto::getPurchaseOrderItemQuantity).sum()
+            );
             PurchaseOrder purchaseOrderResponse = purchaseOrderDomainService.createPurchaseOrder(purchaseOrder);
 
             List<PurchaseOrderItem> items = new ArrayList<>();
@@ -115,14 +118,8 @@ public class PurchaseOrderApplicationService {
     }
 
     @Transactional
-    public void deletePurchaseOrder(Long purchaseOrderSeq, Long salesOrderSeq) {
-        SalesOrder salesOrder = salesOrderDomainService.findById(salesOrderSeq);
-        // 생산 중이 아닐 때만 삭제 가능
-        if(salesOrder.getSalesOrderStatus() != SalesOrderStatus.PRODUCTION) {
-            purchaseOrderDomainService.updatePurchaseStatus(purchaseOrderSeq, PurchaseOrderStatus.DELETE);
-        } else {
-            throw new CustomException(ErrorCodeType.SALES_ORDER_STATE_BAD_REQUEST);
-        }
+    public void deletePurchaseOrder(Long purchaseOrderSeq) {
+        purchaseOrderDomainService.updatePurchaseStatus(purchaseOrderSeq, PurchaseOrderStatus.DELETE);
     }
 
     @Transactional

@@ -2,6 +2,7 @@ package error.pirate.backend.shippingInstruction.query.service;
 
 import error.pirate.backend.shippingInstruction.query.dto.ShippingInstructionListRequest;
 import error.pirate.backend.shippingInstruction.query.dto.ShippingInstructionSituationRequest;
+import error.pirate.backend.shippingInstruction.command.domain.aggregate.entity.ShippingInstructionStatus;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -29,8 +31,9 @@ class ShippingInstructionQueryServiceTest {
                 arguments(new ShippingInstructionListRequest(1, 10, null, LocalDate.of(2024, 12, 25), null, null)),
                 arguments(new ShippingInstructionListRequest(1, 10, LocalDate.of(2024, 12, 20), LocalDate.of(2024, 12, 25), null, null)),
                 arguments(new ShippingInstructionListRequest(1, 10, null, null, "대한항공", null)),
-                arguments(new ShippingInstructionListRequest(1, 10, null, null, null, "BEFORE")),
-                arguments(new ShippingInstructionListRequest(1, 10, null, null, null, "AFTER"))
+                arguments(new ShippingInstructionListRequest(1, 10, null, null, null, List.of(ShippingInstructionStatus.BEFORE))),
+                arguments(new ShippingInstructionListRequest(1, 10, null, null, null, List.of(ShippingInstructionStatus.AFTER))),
+                arguments(new ShippingInstructionListRequest(1, 10, null, null, null, List.of(ShippingInstructionStatus.BEFORE, ShippingInstructionStatus.AFTER)))
         );
     }
 
@@ -91,5 +94,15 @@ class ShippingInstructionQueryServiceTest {
     ) {
         assertDoesNotThrow(
                 () -> shippingInstructionQueryService.readShippingInstructionSituation(request));
+    }
+
+    @DisplayName("출하지시서 현황 엑셀 다운")
+    @ParameterizedTest(autoCloseArguments = true)
+    @MethodSource("readShippingInstructionSituationArguments")
+    void shippingInstructionSituationExcelDownTest(
+            ShippingInstructionSituationRequest request
+    ) {
+        assertDoesNotThrow(
+                () -> shippingInstructionQueryService.shippingInstructionSituationExcelDown(request));
     }
 }

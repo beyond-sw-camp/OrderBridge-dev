@@ -2,6 +2,7 @@ package error.pirate.backend.purchase.query.controller;
 
 import error.pirate.backend.purchase.query.dto.PurchaseRequest;
 import error.pirate.backend.purchase.query.dto.PurchaseResponsePagination;
+import error.pirate.backend.purchase.query.dto.PurchaseSituationResponse;
 import error.pirate.backend.purchase.query.service.PurchaseService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -18,6 +19,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -45,6 +47,26 @@ public class PurchaseQueryController {
                 .headers(headersResponse)
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(purchaseService.purchaseExcelDown(request));
+    }
+
+    @GetMapping("/situation")
+    @Operation(summary = "구매서 현황")
+    public ResponseEntity<List<PurchaseSituationResponse>> purchaseOrderSituation(PurchaseRequest request) {
+        return ResponseEntity.ok(purchaseService.readPurchaseOrderSituationList(request));
+    }
+
+    @GetMapping("/situation/excelDown")
+    @Operation(summary = "구매서 현황 엑셀다운")
+    public ResponseEntity<byte[]> purchaseOrderSituationExcel(PurchaseRequest request) {
+        HttpHeaders headersResponse = new HttpHeaders();
+        String fileName = URLEncoder.encode("구매서_현황[" + new SimpleDateFormat("yyyyMMdd").format(new Date()) + "].xlsx", StandardCharsets.UTF_8);
+        headersResponse.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileName);
+
+        return ResponseEntity.ok()
+                .headers(headersResponse)
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(purchaseService.purchaseOrderSituationExcelDown(request));
+
     }
 
 }

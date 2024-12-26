@@ -1,6 +1,5 @@
 <script setup>
-import {defineProps, onMounted, ref, watch} from 'vue';
-import axios from "axios";
+import {defineProps, ref, watch} from 'vue';
 import dayjs from "dayjs";
 import searchIcon from "@/assets/searchIcon.svg";
 
@@ -10,6 +9,7 @@ const props = defineProps({
   searchName: {type: String, required: false},      // 검색 조건 이름
   shippingInstructionSituationList: {type: Array, required: true},       // 출하지시서 현황 목록
   shippingInstructionSituationTotal: {type: Number, required: true},       // 출하지시서 총수량 총합계
+  shippingAddressList: {type: Array, required: true},       // 출하주소 목록
 });
 
 const emit = defineEmits(['searchEvent', 'excelEvent']);
@@ -32,6 +32,15 @@ const search = () => {
 
 const excel = () => {
   emit('excelEvent');
+}
+
+// 상태 키로 값 반환
+function findStatusValue(array, key) {
+  for (const item of array) {
+    if (item.key === key) {
+      return item.value
+    }
+  }
 }
 
 // 인쇄
@@ -102,7 +111,7 @@ const printTable = () => {
                   <td>{{ shippingInstructionSituation.shippingInstructionName }}</td>
                   <td>{{ shippingInstructionSituation.shippingInstructionTotalQuantity }} 개</td>
                   <td>{{ shippingInstructionSituation.clientName}}</td>
-                  <td>{{ shippingInstructionSituation.shippingInstructionAddress}}</td>
+                  <td>{{ findStatusValue(shippingAddressList, shippingInstructionSituation.shippingAddress) }}</td>
                   <td>{{ shippingInstructionSituation.shippingInstructionNote }}</td>
                 </tr>
                 <tr v-else class="monthly-total">
@@ -119,7 +128,7 @@ const printTable = () => {
             </tbody>
             <tbody v-else>
               <tr>
-                <td colspan="7">해당 검색조건에 부합한 생산입고가 존재하지 않습니다</td>
+                <td colspan="7">해당 검색조건에 부합한 출하지시서가 존재하지 않습니다</td>
               </tr>
             </tbody>
             <!-- 총합 -->

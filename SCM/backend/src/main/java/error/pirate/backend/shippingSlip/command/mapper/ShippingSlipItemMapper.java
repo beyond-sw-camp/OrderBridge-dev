@@ -3,7 +3,7 @@ package error.pirate.backend.shippingSlip.command.mapper;
 import error.pirate.backend.exception.CustomException;
 import error.pirate.backend.exception.ErrorCodeType;
 import error.pirate.backend.item.command.domain.aggregate.entity.Item;
-import error.pirate.backend.shippingSlip.command.application.dto.ShippingSlipItemDTO;
+import error.pirate.backend.shippingSlip.command.application.dto.ShippingSlipItemRequest;
 import error.pirate.backend.shippingSlip.command.application.dto.ShippingSlipRequest;
 import error.pirate.backend.shippingSlip.command.domain.aggregate.entity.ShippingSlip;
 import error.pirate.backend.shippingSlip.command.domain.aggregate.entity.ShippingSlipItem;
@@ -22,14 +22,14 @@ public class ShippingSlipItemMapper {
         List<ShippingSlipItem> shippingSlipItemList = new ArrayList<>();
 
         // shippingSlipRequest에서 shippingSlipItems 가져오기
-        List<ShippingSlipItemDTO> itemDTOList  = shippingSlipRequest.getShippingSlipItems();
+        List<ShippingSlipItemRequest> itemDTOList  = shippingSlipRequest.getShippingSlipItems();
 
         // itemList를 Map으로 변환하여 매핑 속도 향상
         Map<Long, Item> itemMap = itemList.stream()
                 .collect(Collectors.toMap(Item::getItemSeq, item -> item));
 
         // DTO 리스트를 순회하며 ShippingInstructionItem 생성
-        for (ShippingSlipItemDTO itemDTO : itemDTOList) {
+        for (ShippingSlipItemRequest itemDTO : itemDTOList) {
             Item item = itemMap.get(itemDTO.getItemSeq()); // itemSeq으로 Item 매핑
 
             if (item == null) {

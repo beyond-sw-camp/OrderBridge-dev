@@ -1,9 +1,9 @@
 package error.pirate.backend.shippingInstruction.command.application.dto;
 
+import error.pirate.backend.shippingInstruction.command.domain.aggregate.entity.ShippingAddress;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -14,7 +14,7 @@ import java.util.List;
 public class ShippingInstructionRequest {
     private LocalDateTime shippingInstructionScheduledShipmentDate; // 출하예정일
     private long salesOrderSeq;  // 주문서 시퀀스
-    private String shippingInstructionAddress;  // 출하 주소
+    private ShippingAddress shippingAddress;  // 출하 주소
     private String shippingInstructionNote; // 출하 지시서 비고
-    private List<ShippingInstructionItemDTO> shippingInstructionItems; // 물품 리스트
+    private List<ShippingInstructionItemRequest> shippingInstructionItems; // 물품 리스트
 }

@@ -25,6 +25,7 @@ public class ItemCreateRequest {
     private String itemImageUrl;         // 이미지 URL
     private Integer itemPrice;           // 품목 가격
     private String itemNote;             // 품목 비고
+    private Long warehouseSeq;           //창고
 
     private List<BomItemDTO> bomItemList = new ArrayList<>(); // Bom 품목
 }

@@ -2,6 +2,7 @@ package error.pirate.backend.item.command.domain.aggregate.entity;
 
 import error.pirate.backend.item.command.application.dto.ItemUpdateRequest;
 import error.pirate.backend.user.command.domain.aggregate.entity.User;
+import error.pirate.backend.warehouse.command.domain.aggregate.entity.Warehouse;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -29,6 +30,10 @@ public class Item {
     @JoinColumn(name = "itemUnitSeq")
     private ItemUnit itemUnit; // 품목 단위
 
+    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    @JoinColumn(name = "warehouseSeq")
+    private Warehouse warehouse; // 창고
+
     private String itemName; // 품목명
 
     @Enumerated(EnumType.STRING)
@@ -52,9 +57,12 @@ public class Item {
     @Enumerated(EnumType.STRING)
     private ItemStatus itemStatus = ItemStatus.ACTIVE;
 
-    public void updateItem(ItemUnit itemUnit, ItemUpdateRequest request) {
+    public void updateItem(ItemUnit itemUnit, Warehouse warehouse, ItemUpdateRequest request) {
         if(itemUnit != null) {
             this.itemUnit = itemUnit;
+        }
+        if(warehouse != null) {
+            this.warehouse = warehouse;
         }
         if(request.getItemName() != null) {
             this.itemName = request.getItemName();

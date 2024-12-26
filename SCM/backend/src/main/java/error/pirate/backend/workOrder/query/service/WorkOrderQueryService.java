@@ -1,7 +1,9 @@
 package error.pirate.backend.workOrder.query.service;
 
+import error.pirate.backend.common.ExcelDownLoad;
 import error.pirate.backend.exception.CustomException;
 import error.pirate.backend.exception.ErrorCodeType;
+import error.pirate.backend.workOrder.command.domain.aggregate.entity.WorkOrderStatus;
 import error.pirate.backend.workOrder.query.dto.*;
 import error.pirate.backend.workOrder.query.mapper.WorkOrderMapper;
 import lombok.RequiredArgsConstructor;
@@ -10,7 +12,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -21,15 +25,20 @@ import java.util.stream.Collectors;
 public class WorkOrderQueryService {
 
     private final WorkOrderMapper workOrderMapper;
+    private final ExcelDownLoad excelDownBody;
 
     /* 작업지시서 목록 조회 */
     @Transactional
     public WorkOrderListResponse readWorkOrderList(WorkOrderFilterDTO filter) {
         log.info("-------------- 작업지시서 목록조회 서비스 진입 :목록조회 필터링 조건 - filter: {} --------------", filter);
 
+        // 날짜 변환
+        LocalDateTime startDateTime = filter.getStartDateTime(); // 00:00:00
+        LocalDateTime endDateTime = filter.getEndDateTime();     // 23:59:59
+
         // null 체크 및 날짜 유효성 검증
-        if (filter.getStartDate() != null && filter.getEndDate() != null) {
-            if (filter.getStartDate().isAfter(filter.getEndDate())) {
+        if (startDateTime != null && endDateTime != null) {
+            if (startDateTime.isAfter(endDateTime)) {
                 throw new CustomException(ErrorCodeType.INVALID_DATE_RANGE);
             }
         }
@@ -37,19 +46,32 @@ public class WorkOrderQueryService {
         // 페이지 설정
         int offset = (filter.getPage() - 1) * filter.getSize();
 
+        // 상태 목록
+        List<WorkOrderStatus> statusList = filter.getWorkOrderStatus();
+        log.info("상태: {}",statusList);
+
+        // 작업지시서 목록 조회
+        List<WorkOrderListDTO> workOrderList = workOrderMapper.readWorkOrderList(startDateTime, endDateTime, statusList, offset, filter);
+
+        // enum 상태와 함께 응답
+        List<WorkOrderStatus.WorkOrderStatusResponse> workOrderStatusResponse
+                = Arrays.stream(WorkOrderStatus.class.getEnumConstants())
+                .map(key -> new WorkOrderStatus.WorkOrderStatusResponse(
+                        key.toString(), WorkOrderStatus.valueOf(key.toString())
+                )).toList();
+
         // 총 개수
-        long totalItems = workOrderMapper.readWorkOrderListCount(filter);
+        long totalItems = workOrderMapper.readWorkOrderListCount(startDateTime, endDateTime, statusList, filter);
         // 총 페이지 수
         int totalPages = (int) Math.ceil((double) totalItems / filter.getSize());
 
-        // 작업지시서 목록 조회
-        List<WorkOrderListDTO> workOrderList = workOrderMapper.readWorkOrderList(filter, offset);
 
         log.info("-------------- readWorkOrderList 완료 - 페이지에 조회된 작업지시서 수 : {}, 총 작업지시서 수 : {}, 총 페이지 수 : {} --------------",
                                                                             workOrderList.size(), totalItems, totalPages);
 
         return WorkOrderListResponse.builder()
                 .workOrderList(workOrderList)
+                .workOrderStatusList(workOrderStatusResponse)
                 .currentPage(filter.getPage())
                 .totalPages(totalPages)
                 .totalItems(totalItems)
@@ -82,13 +104,20 @@ public class WorkOrderQueryService {
         log.info("-------------- 작업지시서 현황조회 서비스 진입 필터링 조건- startDate: {}, endDate: {}, clientName: {}, warehouseName: {} --------------"
                 , startDate, endDate, clientName, warehouseName);
 
+        // 날짜 변환 로직 추가
+        LocalDateTime startDateTime = startDate != null ? startDate.atStartOfDay() : null;
+        LocalDateTime endDateTime = endDate != null ? endDate.atTime(23, 59, 59) : null;
+
+
         // 시작일이 종료일보다 나중인 경우 에러처리
-        if (startDate.isAfter(endDate)) {
-            throw new CustomException(ErrorCodeType.INVALID_DATE_RANGE);
+        if(startDateTime != null && endDateTime != null) {
+            if (startDateTime.isAfter(endDateTime)) {
+                throw new CustomException(ErrorCodeType.INVALID_DATE_RANGE);
+            }
         }
 
         // 데이터 조회
-        List<WorkOrderSituationDTO> situations = workOrderMapper.readWorkOrderSituations(startDate, endDate, clientName, warehouseName);
+        List<WorkOrderSituationDTO> situations = workOrderMapper.readWorkOrderSituations(startDateTime, endDateTime, clientName, warehouseName);
 
         // 월별 그룹화
         Map<String, List<WorkOrderSituationDTO>> groupedByMonth = situations.stream()
@@ -142,5 +171,21 @@ public class WorkOrderQueryService {
                 .slipDTO(workOrderSlip)
                 .items(bomItems)
                 .build();
+    }
+
+    // 목록조회 엑셀
+    public byte[] readWorkOrderExcel(LocalDate startDate, LocalDate endDate, String warehouseName, List<WorkOrderStatus> workOrderStatus) {
+        return excelDownBody.writeCells(
+                new String[] {"작업지시서명", "품목명", "지시수량", "생산공장명", "작업지시일", "상태"},
+                workOrderMapper.readWorkOrderExcel(startDate, endDate, warehouseName, workOrderStatus)
+        );
+    }
+
+    // 현황조회 엑셀
+    public byte[] readWorkOrderSituationExcel(LocalDate startDate, LocalDate endDate, String warehouseName, String clientName) {
+        return excelDownBody.writeCells(
+                new String[] {"번호", "작업지시서명", "작업지시일", "품목명", "지시수량", "생산공장명", "납품처명", "비고"},
+                workOrderMapper.readWorkOrderSituationExcel(startDate, endDate, warehouseName, clientName)
+        );
     }
 }

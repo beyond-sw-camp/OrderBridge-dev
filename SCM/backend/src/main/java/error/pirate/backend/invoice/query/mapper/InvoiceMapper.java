@@ -1,5 +1,6 @@
 package error.pirate.backend.invoice.query.mapper;
 
+import error.pirate.backend.invoice.command.domain.aggregate.entity.InvoiceStatus;
 import error.pirate.backend.invoice.query.dto.*;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;

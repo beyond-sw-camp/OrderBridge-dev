@@ -1,6 +1,6 @@
 package error.pirate.backend.shippingSlip.command.application.service;
 
-import error.pirate.backend.shippingSlip.command.application.dto.ShippingSlipItemDTO;
+import error.pirate.backend.shippingSlip.command.application.dto.ShippingSlipItemRequest;
 import error.pirate.backend.shippingSlip.command.application.dto.ShippingSlipRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -30,9 +30,9 @@ class ShippingSlipApplicationServiceTest {
                                 10L,
                                 "첫번째 출하전표",
                                 List.of(
-                                        new ShippingSlipItemDTO(1L, 100, "출하전표 물품1"),
-                                        new ShippingSlipItemDTO(2L, 500, "출하전표 물품2"),
-                                        new ShippingSlipItemDTO(3L, 5000, "출하전표 물품3")
+                                        new ShippingSlipItemRequest(1L, 100, "출하전표 물품1"),
+                                        new ShippingSlipItemRequest(2L, 500, "출하전표 물품2"),
+                                        new ShippingSlipItemRequest(3L, 5000, "출하전표 물품3")
                                 )
                         )
                 ),
@@ -42,8 +42,8 @@ class ShippingSlipApplicationServiceTest {
                                 20L,
                                 "두번째 출하전표",
                                 List.of(
-                                        new ShippingSlipItemDTO(4L, 100, "출하전표 물품1"),
-                                        new ShippingSlipItemDTO(5L, 500, "출하전표 물품2")
+                                        new ShippingSlipItemRequest(4L, 100, "출하전표 물품1"),
+                                        new ShippingSlipItemRequest(5L, 500, "출하전표 물품2")
                                 )
                         )
                 )
@@ -69,8 +69,8 @@ class ShippingSlipApplicationServiceTest {
                                 20L,
                                 "두번째 출하전표",
                                 List.of(
-                                        new ShippingSlipItemDTO(4L, 100, "출하전표 물품1"),
-                                        new ShippingSlipItemDTO(5L, 500, "출하전표 물품2")
+                                        new ShippingSlipItemRequest(4L, 100, "출하전표 물품1"),
+                                        new ShippingSlipItemRequest(5L, 500, "출하전표 물품2")
                                 )
                         )
                 ),
@@ -81,9 +81,9 @@ class ShippingSlipApplicationServiceTest {
                                 10L,
                                 "첫번째 출하전표",
                                 List.of(
-                                        new ShippingSlipItemDTO(1L, 100, "출하전표 물품1"),
-                                        new ShippingSlipItemDTO(2L, 500, "출하전표 물품2"),
-                                        new ShippingSlipItemDTO(3L, 5000, "출하전표 물품3")
+                                        new ShippingSlipItemRequest(1L, 100, "출하전표 물품1"),
+                                        new ShippingSlipItemRequest(2L, 500, "출하전표 물품2"),
+                                        new ShippingSlipItemRequest(3L, 5000, "출하전표 물품3")
                                 )
                         )
                 )

@@ -1,22 +1,35 @@
 <script setup>
 import Header from '@/components/common/Header.vue';
 import SideMenuBar from "@/components/common/SideMenuBar.vue";
+import Main from "@/views/main/MainView.vue";
+import { ref, watch } from 'vue';
+import { useRoute } from 'vue-router';
+
+const route = useRoute();
+const isMainPage = ref(route.path === '/');
+
+const isLogin = localStorage.getItem('accessToken');
+
+watch(() => route.path, (newPath) => {
+  isMainPage.value = newPath === '/';
+});
 </script>
 
 <template>
-  <Header />
-  <section class="flex-shrink-0">
+  <Header v-if="isLogin"/>
+  <Main v-if="isMainPage" />
+  <section class="flex-shrink-0" v-else>
     <b-container>
       <router-view />
     </b-container>
   </section>
-  <SideMenuBar />
+  <SideMenuBar v-if="isLogin"/>
 </template>
 
 <style scoped>
 
 section {
-  margin-top: 40px;
+  margin-top: 100px;
 }
 
 </style>

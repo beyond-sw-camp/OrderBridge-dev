@@ -20,4 +20,9 @@ public class ItemResponse {
     private Integer itemPrice;
     private LocalDateTime itemRegDate;
     private LocalDateTime itemModDate;
+    private Integer bomChildItemQuantity;
+    private Long itemUnitSeq;
+    private String itemUnitTitle;
+    private String itemNote;
+    private Long warehouseSeq;
 }

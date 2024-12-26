@@ -1,8 +1,12 @@
 <script setup>
 import {onMounted, ref, watch} from 'vue';
-import axios from "axios";
+import axios from "@/axios";
 import searchIcon from "@/assets/searchIcon.svg";
 import dayjs from "dayjs";
+import router from "@/router/index.js";
+import printIcon from "@/assets/printIcon.svg"
+import editIcon from "@/assets/editIcon.svg"
+import trashIcon from "@/assets/trashIcon.svg"
 
 const totalCount = ref(0);
 const pageSize = ref(10);
@@ -14,9 +18,12 @@ const searchEndDate = ref(null);
 const searchName = ref(null);
 const searchStatus = ref(new Set([]));
 
+const detailProductionReceiving = ref([]);
+
 const fetchProductionReceivingList = async () => {
+  detailProductionReceiving.value = [];
   try {
-    const response = await axios.get(`http://localhost:8090/api/v1/productionReceiving`, {
+    const response = await axios.get(`productionReceiving`, {
       params: {
         searchStartDate: searchStartDate.value,
         searchEndDate: searchEndDate.value,
@@ -73,7 +80,7 @@ function search() {
 const excelDown = async () => {
   const excelName = "생산입고_" + new Date().getFullYear() + (new Date().getMonth() + 1) + new Date().getDay();
   try {
-    const response = await axios.get(`http://localhost:8090/api/v1/productionReceiving/excelDown`, {
+    const response = await axios.get(`productionReceiving/excelDown`, {
       params: {
         searchStartDate: searchStartDate.value,
         searchEndDate: searchEndDate.value,
@@ -107,6 +114,62 @@ const excelDown = async () => {
     console.error("생산입고 엑셀다운로드 실패 :", error);
   }
 }
+
+// 등록 페이지 이동
+const handleRegister = () => {
+  router.push("/productionReceiving/register");
+}
+
+// 상태 키로 값 반환
+function findStatusValue(array, key) {
+  for (const item of array) {
+    if (item.key === key) {
+      return item.value
+    }
+  }
+}
+
+const productionReceivingDetail = async (productionReceivingSeq) => {
+  if(detailProductionReceiving.value[productionReceivingSeq] === undefined) {
+    try {
+      const response = await axios.get(`productionReceiving/${productionReceivingSeq}`);
+
+      detailProductionReceiving.value[productionReceivingSeq] = {
+        productionReceivingSeq: response.data.productionReceivingDTO.productionReceivingSeq,
+        productionReceivingExtendedPrice: response.data.productionReceivingDTO.productionReceivingExtendedPrice,
+        productionReceivingName: response.data.productionReceivingDTO.productionReceivingName,
+        productionReceivingNote: response.data.productionReceivingDTO.productionReceivingNote,
+        productionReceivingReceiptDate: response.data.productionReceivingDTO.productionReceivingReceiptDate,
+        productionReceivingStatus: response.data.productionReceivingDTO.productionReceivingStatus,
+        productionReceivingItemList: response.data.productionReceivingItemList
+      };
+    } catch (error) {
+      console.error("생산입고 상세조회 실패 :", error);
+    }
+  } else {
+    detailProductionReceiving.value[productionReceivingSeq] = undefined;
+  }
+
+}
+
+// 수정 페이지로 이동
+const handleModify = (productionReceivingSeq) => {
+  router.push(`/productionReceiving/modify/${productionReceivingSeq}`);
+}
+
+const productionReceivingDelete = async (productionReceivingSeq) => {
+  if(confirm("해당 생산입고를 삭제하시겠습니까?")) {
+    try {
+      await axios.delete(`productionReceiving/${productionReceivingSeq}`);
+
+      alert("삭제가 완료되었습니다.");
+      search();
+    } catch (error) {
+      console.error("생산입고 삭제 실패 :", error);
+    }
+  }
+}
+
 </script>
 
 <template>
@@ -142,20 +205,18 @@ const excelDown = async () => {
                   <div>검색결과: {{ totalCount }}개</div>
                   <div class="d-flex justify-content-end mt-3">
                     <b-button @click="excelDown" variant="light" size="sm" class="button">엑셀 다운로드</b-button>
-                    <b-button variant="light" size="sm" class="button ms-2">생산입고 등록</b-button>
+                    <b-button @click="handleRegister" variant="light" size="sm" class="button ms-2">생산입고 등록</b-button>
                   </div>
               </div>
               <div class="list-headline row">
-                  <div class="list-head col-4">생산입고명</div>
-                  <div class="list-head col-2">생산공장명</div>
-                  <div class="list-head col-2">보관창고명</div>
-                  <div class="list-head col-3">입고일</div>
-                  <div class="list-head col-1">상태</div>
+                  <div class="list-head col-6">생산입고명</div>
+                  <div class="list-head col-4">입고일</div>
+                  <div class="list-head col-2">상태</div>
               </div>
               <template v-if="productionReceivingList.length > 0">
-                <div style="max-height: 600px; overflow-y: auto;">
-                  <div v-for="productionReceiving in productionReceivingList" :key="productionReceiving.productionReceivingSeq" class="list-line row" @click="itemExtend">
-                    <div class="list-body col-4 left">
+                <div style="max-height: 500px; overflow-y: auto;">
+                  <div v-for="productionReceiving in productionReceivingList" :key="productionReceiving.productionReceivingSeq" class="list-line row" @click="productionReceivingDetail(productionReceiving.productionReceivingSeq)">
+                    <div class="list-body col-6 left">
                       {{ productionReceiving.productionReceivingName }}
                       <div v-if="productionReceiving.productionReceivingItemList.length > 0">
                         <template v-for="(productionReceivingItem, index) in productionReceiving.productionReceivingItemList" :key="productionReceivingItem.productionReceivingItemSeq">
@@ -168,10 +229,42 @@ const excelDown = async () => {
                         </template>
                       </div>
                     </div>
-                    <div class="list-body col-2">{{ productionReceiving.productionWarehouseName }}</div>
-                    <div class="list-body col-2">{{ productionReceiving.storeWarehouseName }}</div>
-                    <div class="list-body col-3">{{ dayjs(productionReceiving.productReceivingRegDate).format('YYYY-MM-DD HH:mm:ss') }}</div>
-                    <div class="list-body col-1">{{ productionReceiving.productionReceivingStatus }}</div>
+                    <div class="list-body col-4">{{ dayjs(productionReceiving.productionReceivingReceiptDate).format('YYYY-MM-DD HH:mm:ss') }}</div>
+                    <div class="list-body col-2">{{ findStatusValue(productionReceivingStatusList, productionReceiving.productionReceivingStatus) }}</div>
+                    <!-- 확장된 상세 정보 표시 -->
+                    <div class="d-flex justify-content-center" v-if="detailProductionReceiving[productionReceiving.productionReceivingSeq]">
+                      <div class="col-md-11 mt-3">
+                        <p>총 금액 : {{ detailProductionReceiving[productionReceiving.productionReceivingSeq].productionReceivingExtendedPrice.toLocaleString()}} ₩</p>
+                        <p>생산입고 비고 : {{ detailProductionReceiving[productionReceiving.productionReceivingSeq].productionReceivingNote}}</p>
+                        <div class="container">
+                          <div class="row">
+                            <div v-for="productionReceivingItem in detailProductionReceiving[productionReceiving.productionReceivingSeq].productionReceivingItemList" :key="productionReceivingItem.productionReceivingItemSeq"  class="col-12 col-md-6 col-lg-4 mb-4">
+                              <div class="card h-100">
+                                <b-img
+                                    class="card-img-top"
+                                    style="max-height: 100px;"
+                                    :src="productionReceivingItem.itemImageUrl"
+                                    fluia
+                                    alt="Responsive image"
+                                ></b-img>
+                                <div class="card-body">
+                                  <p class="card-text">· 품목 : {{ productionReceivingItem.itemName }}</p>
+                                  <p class="card-text">· 수량 : {{ productionReceivingItem.productionReceivingItemQuantity }} 개</p>
+                                  <p class="card-text">· 가격 : {{ productionReceivingItem.productionReceivingUnitPrice.toLocaleString() }} ₩</p>
+                                  <p class="card-text">· 보관창고 : {{ productionReceivingItem.warehouseName }}</p>
+                                  <p v-if="productionReceivingItem.productionReceivingItemNote !== ''" class="card-text">· 비고 : {{ productionReceivingItem.productionReceivingItemNote }}</p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="d-flex justify-content-end align-items-center">
+                          <printIcon class="me-3 icon" @click="productionReceivingPrint(productionReceiving.productionReceivingSeq)"/>
+                          <editIcon class="me-3 icon" @click="handleModify(productionReceiving.productionReceivingSeq)"/>
+                          <trashIcon class="icon" @click="productionReceivingDelete(productionReceiving.productionReceivingSeq)"/>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
 

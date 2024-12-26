@@ -30,8 +30,10 @@
             AND tb_client.client_name LIKE CONCAT('%', #{clientName}, '%')
         </if>
         <if test="quotationStatus != null">
-            AND tb_quotation.quotation_status LIKE #{quotationStatus}
+            AND tb_quotation.quotation_status IN 
+            <foreach collection="quotationStatus" item="item" open="(" separator="," close=")">#{item}</foreach>
         </if>
+        ORDER BY tb_quotation.quotation_reg_date DESC
         LIMIT #{limit} OFFSET #{offset}
     </select>
 
@@ -52,7 +54,8 @@
             AND tb_client.client_name LIKE CONCAT('%', #{clientName}, '%')
         </if>
         <if test="quotationStatus != null">
-            AND tb_quotation.quotation_status LIKE #{quotationStatus}
+            AND tb_quotation.quotation_status IN
+            <foreach collection="quotationStatus" item="item" open="(" separator="," close=")">#{item}</foreach>
         </if>
     </select>
 
@@ -130,5 +133,34 @@
             SUM(tb_quotation_item.quotation_item_quantity) AS quotation_total_quantity
         FROM tb_quotation_item
         WHERE tb_quotation_item.quotation_seq = #{quotationSeq}
+    </select>
+
+    <!--  견적서 목록 엑셀 다운로드  -->
+    <select id="selectQuotationExcel" resultType="error.pirate.backend.quotation.query.dto.QuotationExcelDTO">
+        SELECT
+            tb_quotation.quotation_reg_date,
+            tb_quotation.quotation_mod_date,
+            tb_quotation.quotation_name,
+            tb_quotation.quotation_status,
+            tb_quotation.quotation_quotation_date,
+            tb_quotation.quotation_effective_date,
+            tb_quotation.quotation_total_quantity,
+            tb_quotation.quotation_extended_price,
+            tb_quotation.quotation_note
+        FROM tb_quotation
+        WHERE tb_quotation.quotation_status NOT IN ("DELETE")
+        <if test="startDate != null"><![CDATA[
+            AND #{startDate} <= tb_quotation.quotation_quotation_date
+        ]]></if>
+        <if test="endDate != null"><![CDATA[
+            AND #{endDate} >= tb_quotation.quotation_quotation_date
+        ]]></if>
+        <if test="clientName != null">
+            AND tb_client.client_name LIKE CONCAT('%', #{clientName}, '%')
+        </if>
+        <if test="quotationStatus != null">
+            AND tb_quotation.quotation_status IN
+            <foreach collection="quotationStatus" item="item" open="(" separator="," close=")">#{item}</foreach>
+        </if>
     </select>
 </mapper>

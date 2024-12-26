@@ -27,6 +27,8 @@ import error.pirate.backend.workOrder.command.domain.aggregate.entity.WorkOrder;
 import error.pirate.backend.workOrder.command.domain.aggregate.entity.WorkOrderStatus;
 import error.pirate.backend.workOrder.command.domain.repository.WorkOrderRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.hibernate.jdbc.Work;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +36,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ProductionReceivingService {
 
     private final ProductionReceivingRepository productionReceivingRepository;
@@ -49,23 +52,29 @@ public class ProductionReceivingService {
     @Transactional
     public void createProductionReceiving(ProductionReceivingCreateRequest request) {
 
-        Warehouse productionWarehouse = warehouseRepository.findById(request.getProductionWarehouseSeq()).orElseThrow(() -> new CustomException(ErrorCodeType.WAREHOUSE_NOT_FOUND));
-        Warehouse storeWarehouse = warehouseRepository.findById(request.getStoreWarehouseSeq()).orElseThrow(() -> new CustomException(ErrorCodeType.WAREHOUSE_NOT_FOUND));
+        request.setUserSeq(1L);
         User user = userRepository.findById(request.getUserSeq()).orElseThrow(() -> new CustomException(ErrorCodeType.USER_NOT_FOUND));
-        WorkOrder workOrder = workOrderRepository.findById(request.getWorkOrderSeq()).orElseThrow(() -> new CustomException(ErrorCodeType.WORK_ORDER_NOT_FOUND));
-        if(!WorkOrderStatus.COMPLETE.equals(workOrder.getWorkOrderStatus())) {
-            throw new CustomException(ErrorCodeType.WORK_ORDER_STATUS_ERROR);
-        }
+
         request.setProductionReceivingName(nameGenerator.nameGenerator(ProductionReceiving.class));
-        ProductionReceiving productionReceiving = ProductionReceiving.createProductionReceiving(productionWarehouse, storeWarehouse, user, workOrder, request);
+        ProductionReceiving productionReceiving = ProductionReceiving.createProductionReceiving(user, request);
 
         productionReceivingRepository.save(productionReceiving);
+
+        for(Long workOrderSeq : request.getWorkOrderSeqList()) {
+            WorkOrder workOrder = workOrderRepository.findById(workOrderSeq).orElseThrow(() -> new CustomException(ErrorCodeType.WORK_ORDER_NOT_FOUND));
+
+            if(!WorkOrderStatus.ONGOING.equals(workOrder.getWorkOrderStatus())) { // 생산 불출 됐다는 의미
+                throw new CustomException(ErrorCodeType.WORK_ORDER_STATUS_ERROR);
+            }
+            workOrder.createProductionReceiving(productionReceiving);
+        }
 
         if(NullCheck.nullCheck(request.getProductionReceivingItemList())) {
             for(ProductionReceivingItemDTO dto : request.getProductionReceivingItemList()) {
                 Item item = itemRepository.findById(dto.getItemSeq()).orElseThrow(() -> new CustomException(ErrorCodeType.ITEM_NOT_FOUND));
+                Warehouse warehouse = warehouseRepository.findById(item.getWarehouse().getWarehouseSeq()).orElseThrow(() -> new CustomException(ErrorCodeType.WAREHOUSE_NOT_FOUND));
 
-                ProductionReceivingItem productionReceivingItem = ProductionReceivingItem.createProductionReceivingItem(item, productionReceiving, dto);
+                ProductionReceivingItem productionReceivingItem = ProductionReceivingItem.createProductionReceivingItem(item, productionReceiving, warehouse, dto);
                 productionReceivingItemRepository.save(productionReceivingItem);
             }
         }
@@ -77,17 +86,26 @@ public class ProductionReceivingService {
         if(!ProductionReceivingStatus.BEFORE.equals(productionReceiving.getProductionReceivingStatus())) {
             throw new CustomException(ErrorCodeType.PRODUCTION_RECEIVING_UPDATE_ERROR);
         }
-        Warehouse productionWarehouse = null;
-        Warehouse storeWarehouse = null;
-        if(NullCheck.nullOrZeroCheck(request.getProductionWarehouseSeq())) {
-            productionWarehouse = warehouseRepository.findById(request.getProductionWarehouseSeq()).orElseThrow(() -> new CustomException(ErrorCodeType.WAREHOUSE_NOT_FOUND));
+
+        productionReceiving.updateProductionReceiving(request);
+
+        List<WorkOrder> workOrders = workOrderRepository.findByProductionReceiving(productionReceiving);
+
+        // 기존의 작업지시서 상태 값을 원래대로 되돌린다.
+        for(WorkOrder workOrder : workOrders) {
+            if(!WorkOrderStatus.COMPLETE.equals(workOrder.getWorkOrderStatus())) {
+                workOrder.deleteProductionReceiving();
+            }
         }
 
-        if(NullCheck.nullOrZeroCheck(request.getStoreWarehouseSeq())) {
-            storeWarehouse = warehouseRepository.findById(request.getStoreWarehouseSeq()).orElseThrow(() -> new CustomException(ErrorCodeType.WAREHOUSE_NOT_FOUND));
-        }
+        for(Long workOrderSeq : request.getWorkOrderSeqList()) {
+            WorkOrder workOrder = workOrderRepository.findById(workOrderSeq).orElseThrow(() -> new CustomException(ErrorCodeType.WORK_ORDER_NOT_FOUND));
 
-        productionReceiving.updateProductionReceiving(productionWarehouse, storeWarehouse, request);
+            if(!WorkOrderStatus.ONGOING.equals(workOrder.getWorkOrderStatus())) {
+                throw new CustomException(ErrorCodeType.WORK_ORDER_STATUS_ERROR);
+            }
+            workOrder.createProductionReceiving(productionReceiving);
+        }
 
         /* 생산 입고 품목 수정 시 모두 삭제 처리 후 재등록 */
         List<ProductionReceivingItem> productionReceivingItems = productionReceivingItemRepository.findAllByProductionReceiving(productionReceiving);
@@ -96,8 +114,9 @@ public class ProductionReceivingService {
         if(NullCheck.nullCheck(request.getProductionReceivingItemList())) {
             for(ProductionReceivingItemDTO dto : request.getProductionReceivingItemList()) {
                 Item item = itemRepository.findById(dto.getItemSeq()).orElseThrow(() -> new CustomException(ErrorCodeType.ITEM_NOT_FOUND));
+                Warehouse warehouse = warehouseRepository.findById(item.getWarehouse().getWarehouseSeq()).orElseThrow(() -> new CustomException(ErrorCodeType.WAREHOUSE_NOT_FOUND));
 
-                ProductionReceivingItem productionReceivingItem = ProductionReceivingItem.createProductionReceivingItem(item, productionReceiving, dto);
+                ProductionReceivingItem productionReceivingItem = ProductionReceivingItem.createProductionReceivingItem(item, productionReceiving, warehouse,dto);
                 productionReceivingItemRepository.save(productionReceivingItem);
             }
         }
@@ -108,6 +127,12 @@ public class ProductionReceivingService {
         ProductionReceiving productionReceiving = productionReceivingRepository.findById(productionReceivingSeq).orElseThrow(() -> new CustomException(ErrorCodeType.PRODUCTION_RECEIVING_NOT_FOUND));
         if(!ProductionReceivingStatus.BEFORE.equals(productionReceiving.getProductionReceivingStatus())) {
             throw new CustomException(ErrorCodeType.PRODUCTION_RECEIVING_UPDATE_ERROR);
+        }
+
+        // 생산입고 삭제 시 작업지시서 생산입고 값 null로 변경 후 상태 값 변경
+        List<WorkOrder> workOrders = workOrderRepository.findByProductionReceiving(productionReceiving);
+        for(WorkOrder workOrder : workOrders) {
+            workOrder.deleteProductionReceiving();
         }
 
         productionReceivingRepository.delete(productionReceiving);

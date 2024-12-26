@@ -1,53 +1,65 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="error.pirate.backend.item.query.mapper.ItemMapper">
 
-    <!-- 품목 조회 -->
-    <select id="findItemsByFilter" resultType="error.pirate.backend.item.query.dto.ItemResponse">
-        SELECT
-        item_seq,
-        item_name,
-        item_division,
-        item_expiration_hour,
-        item_image_url,
-        item_price,
-        item_reg_date,
-        item_mod_date
-        FROM
-        tb_item
-        WHERE
-        1=1
-        <!-- 조건: 품목명 -->
+    <!-- 전체 데이터 개수 조회 -->
+    <select id="countItemsByFilter" resultType="int">
+        SELECT COUNT(*)
+        FROM tb_item
+        WHERE 1=1
         <if test="itemName != null and itemName != ''">
             AND item_name LIKE CONCAT('%', #{itemName}, '%')
         </if>
-        <!-- 조건: 품목 구분 -->
-        <if test="itemDivision != null and itemDivision != ''">
-            AND item_division = #{itemDivision}
+        <if test="itemDivisions != null and !itemDivisions.isEmpty()">
+            AND item_division IN
+            <foreach item="division" collection="itemDivisions" open="(" separator="," close=")">
+                #{division}
+            </foreach>
         </if>
-        <!-- 조건: 유통기한 -->
-        <if test="itemExpirationHour != null">
-            AND item_expiration_hour &lt;= #{itemExpirationHour}
+        <if test="minExpirationHour != null">
+            AND item_expiration_hour <![CDATA[>=]]> #{minExpirationHour}
         </if>
-        ORDER BY
-        <choose>
-            <when test="sortBy != null and sortBy != ''">
-                ${sortBy}
-            </when>
-            <otherwise>
-                item_reg_date
-            </otherwise>
-        </choose>
-        <choose>
-            <when test="sortDirection == 'desc'">
-                DESC
-            </when>
-            <otherwise>
-                ASC
-            </otherwise>
-        </choose>
-        LIMIT #{offset}, #{size}
+        <if test="maxExpirationHour != null">
+            AND item_expiration_hour <![CDATA[<=]]> #{maxExpirationHour}
+        </if>
+    </select>
+
+    <!-- 품목 목록 조회 -->
+    <select id="findItemListByFilter" resultType="error.pirate.backend.item.query.dto.ItemResponse">
+        SELECT
+            item_seq AS itemSeq,
+            item_name AS itemName,
+            item_division AS itemDivision,
+            item_expiration_hour AS itemExpirationHour,
+            item_image_url AS itemImageUrl,
+            item_price AS itemPrice,
+            item_reg_date AS itemRegDate,
+            item_mod_date AS itemModDate,
+            item_unit_title as itemUnit
+        FROM tb_item i
+        JOIN tb_item_unit iu
+            ON i.item_unit_seq = iu.item_unit_seq
+        WHERE 1=1
+
+        <if test="itemName != null and itemName != ''">
+            AND item_name LIKE CONCAT('%', #{itemName}, '%')
+        </if>
+        <if test="itemDivisions != null and itemDivisions.size() > 0">
+            AND item_division IN
+            <foreach item="division" collection="itemDivisions" open="(" separator="," close=")">
+                #{division}
+            </foreach>
+        </if>
+        <if test="minExpirationHour != null">
+            AND item_expiration_hour <![CDATA[>=]]> #{minExpirationHour}
+        </if>
+        <if test="maxExpirationHour != null">
+            AND item_expiration_hour <![CDATA[<=]]> #{maxExpirationHour}
+        </if>
+        ORDER BY item_seq ASC
+        LIMIT #{size} OFFSET #{offset}
     </select>
 
 </mapper>
