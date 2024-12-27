@@ -25,8 +25,8 @@ const userStore = useUserStore();
               <basicIcon class="icon"/>기본등록
             </a>
             <ul class="dropdown-menu">
-              <li><RouterLink to="warehouse" class="dropdown-item">창고 관리</RouterLink></li>
-              <li><RouterLink to="client" class="dropdown-item">거래처 관리</RouterLink></li>
+              <li><RouterLink to="/warehouse" class="dropdown-item">창고 관리</RouterLink></li>
+              <li><RouterLink to="/client" class="dropdown-item">거래처 관리</RouterLink></li>
               <li><RouterLink to="/item" class="dropdown-item">품목 관리</RouterLink></li>
             </ul>
           </li>
@@ -35,9 +35,9 @@ const userStore = useUserStore();
               <salesIcon class="icon"/>영업관리
             </a>
             <ul class="dropdown-menu">
-              <li><RouterLink to="quotation" class="dropdown-item">견적 관리</RouterLink></li>
-              <li><RouterLink to="sales-order" class="dropdown-item">주문서 관리</RouterLink></li>
-              <li><RouterLink to="invoice" class="dropdown-item">판매 관리</RouterLink></li>
+              <li><RouterLink to="/quotation" class="dropdown-item">견적 관리</RouterLink></li>
+              <li><RouterLink to="/sales-order" class="dropdown-item">주문서 관리</RouterLink></li>
+              <li><RouterLink to="/invoice" class="dropdown-item">판매 관리</RouterLink></li>
               <li><RouterLink to="/shipping-instruction" class="dropdown-item">출하지시서 관리</RouterLink></li>
               <li><RouterLink to="/shipping-slip" class="dropdown-item">출하 관리</RouterLink></li>
             </ul>

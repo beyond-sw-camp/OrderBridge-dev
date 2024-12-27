@@ -112,9 +112,9 @@ const fetchClientHint = async (clientName) => {
         clientHintList.value = null;
     } else {
         try {
-            const response = await axios.get(`client`, {
+            const response = await axios.get(`client/hint`, {
                 params: {
-                    clientName: clientName.value
+                    keyword: clientName.value
                 }
             });
             if (response.data.length > 0) {
@@ -128,7 +128,7 @@ const fetchClientHint = async (clientName) => {
         }
     }
     if (clientHintList.value) {
-        if (clientHintList.value.length === 1 && clientHintList.value[0].clientName === searchClient.value) {
+        if (clientHintList.value.length === 1 && clientHintList.value[0] === searchClient.value) {
             clientHintList.value = null;
         }
     }
@@ -201,10 +201,10 @@ function numberThree(number) {
                         <b-form-input v-model="searchClient"></b-form-input>
                         <b-button variant="light" class="button" @click="search()"><searchIcon class="icon"/></b-button>
                     </b-input-group>
-                    <div class="clientHint" style="position: absolute;">
+                    <div class="clientHint" style="position: absolute; z-index: 5;">
                         <ul class="list-group">
                             <template v-for="hint in clientHintList">
-                                <li class="list-group-item list-group-item-action" @click="searchClient = hint.clientName">{{ hint.clientName }}</li>
+                                <li class="list-group-item list-group-item-action" @click="searchClient = hint">{{ hint }}</li>
                             </template>
                         </ul>
                     </div>

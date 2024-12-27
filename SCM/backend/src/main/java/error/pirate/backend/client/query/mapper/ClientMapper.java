@@ -20,4 +20,8 @@ public interface ClientMapper {
             @Param("clientRegistrationNo") String clientRegistrationNo
     );
     ClientResponse findClientSeq(@Param("clientSeq") Long clientSeq);
+
+    // 거래처 힌트 조회
+    List<String> readClientHint(
+            @Param("keyword") String keyword);
 }

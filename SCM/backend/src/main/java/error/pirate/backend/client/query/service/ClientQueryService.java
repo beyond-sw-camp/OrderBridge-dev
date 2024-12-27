@@ -35,4 +35,9 @@ public class ClientQueryService {
     public ClientResponse getClient(Long clientSeq) {
         return clientMapper.findClientSeq(clientSeq);
     }
+
+    // 거래처 힌트 조회
+    public List<String> readClientHint(String keyword) {
+        return clientMapper.readClientHint(keyword);
+    }
 }
