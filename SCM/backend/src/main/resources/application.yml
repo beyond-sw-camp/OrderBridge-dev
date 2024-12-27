@@ -68,3 +68,9 @@ jwt:
     header: Refresh-Token
 
 frontend: http://localhost:5173
+
+gemini:
+  baseurl: ${GEMINI_URL}
+googleai:
+  api:
+    key: ${GEMINI_KEY}

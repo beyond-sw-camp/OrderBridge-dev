@@ -9,6 +9,7 @@ import orderIcon from '@/assets/orderIcon.svg';
 import statisticsIcon from '@/assets/statisticsIcon.svg'
 import logoutIcon from '@/assets/logoutIcon.svg';
 import {useUserStore} from "@/stores/UserStore.js";
+import Chatbot from "@/components/common/Chatbot.vue";
 
 const userStore = useUserStore();
 </script>
@@ -80,6 +81,9 @@ const userStore = useUserStore();
           <li class="nav-item"><RouterLink to="#" class="nav-link"><myPageIcon class="icon-right"/></RouterLink></li>
           <li class="nav-item" @click="userStore.logout()"><RouterLink to="#" class="nav-link"><!--<logoutIcon class="icon-right"/>-->로그아웃</RouterLink></li>
         </ul>
+        <div style="position: absolute; padding: 10px; top: 100px; right: 5px; width: 400px; height: 300px;">
+          <chatbot />
+        </div>
       </div>
   </nav>
 </template>
