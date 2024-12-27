@@ -52,5 +52,17 @@ export const useUserStore = defineStore('user', {
         alert(`로그아웃 실패하였습니다.`);
       }
     },
+
+    initialize() {
+      const token = localStorage.getItem('authToken');
+      if (token) {
+        try {
+          this.isAuthenticated = true;
+        } catch (error) {
+          console.error('Token parsing error:', error);
+          this.logout(); // 토큰이 유효하지 않으면 로그아웃 처리
+        }
+      }
+    },
   },
 });

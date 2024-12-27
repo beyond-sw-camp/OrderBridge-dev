@@ -8,6 +8,7 @@ import error.pirate.backend.user.command.domain.aggregate.entity.User;
 import error.pirate.backend.user.command.domain.repository.RefreshTokenRepository;
 import error.pirate.backend.user.command.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,6 +22,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
@@ -44,6 +46,7 @@ public class UserService implements UserDetailsService {
         String userEmployeeNo = securityUtil.getCurrentUserEmployeeNo();
 
         RefreshToken refreshToken = refreshTokenRepository.findById(userEmployeeNo).orElseThrow(() -> new CustomException(ErrorCodeType.SECURITY_TOKEN_ERROR));
+        log.info("logout issue delete refreshToken : {}", refreshToken);
         refreshTokenRepository.delete(refreshToken);
     }
 }
