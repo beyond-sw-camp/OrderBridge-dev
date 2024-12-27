@@ -28,6 +28,7 @@ jobs:
 
       - name: Grant execute permission for Gradle Wrapper
         run: chmod +x ./gradlew
+        working-directory: ./SCM/backend
 
       - name: Build with Gradle Wrapper
         run: ./gradlew build
