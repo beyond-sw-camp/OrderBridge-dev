@@ -64,6 +64,9 @@ public enum ErrorCodeType {
     WORK_ORDER_STATE_BAD_REQUEST(HttpStatus.BAD_REQUEST, "WORK_ORDER_ERROR_005", "작업지시서의 상태를 확인해주세요"),
     WORK_ORDER_INVALID_QUANTITY(HttpStatus.BAD_REQUEST, "WORK_ORDER_ERROR_006", "지시수량을 확인해주세요."),
 
+    // 생산불출 오류
+    PRODUCTION_DISBURSEMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "PRODUCTION_DISBURSEMENT_ERROR_001", "생산불출을 찾을 수 없습니다."),
+    PRODUCTION_DISBURSEMENT_STATE_BAD_REQUEST(HttpStatus.BAD_REQUEST, "PRODUCTION_DISBURSEMENT_ERROR_002", "생산불출의 상태를 확인해주세요"),
     // 회원 오류
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "USER_ERROR_001", "회원을 찾을 수 없습니다."),
 

@@ -9,6 +9,7 @@ import client from "@/router/client.js";
 import quotationRoutes from "@/router/quotation.js";
 import salesOrder from '@/router/salesOrder.js';
 import invoice from '@/router/invoice.js'
+import productionDisbursementRoutes from "@/router/production-disbursement.js";
 
 const routes = [
     {
@@ -66,7 +67,8 @@ const routes = [
     ...client,
     ...quotationRoutes,
     ...salesOrder,
-    ...invoice
+    ...invoice,
+    ...productionDisbursementRoutes
 ];
 
 const router = createRouter({

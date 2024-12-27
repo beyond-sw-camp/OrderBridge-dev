@@ -5,8 +5,181 @@
 
 <mapper namespace="error.pirate.backend.productionDisbursement.query.mapper.ProductionDisbursementMapper">
 
-<!--    <select id="" resultType="">-->
+    <!-- 목록조회 -->
+    <select id="readProductionDisbursementList" resultType="error.pirate.backend.productionDisbursement.query.dto.ProductionDisbursementListDTO">
+        SELECT DISTINCT pd.production_disbursement_seq
+             , pd.work_order_seq
+             , pd.production_disbursement_name
+             , wo.warehouse_seq AS factory_seq
+             , w1.warehouse_name AS factory_name
+             , pd.production_disbursement_departure_date
+             , pd.production_disbursement_status
+             ,  (
+                SELECT
+                GROUP_CONCAT(i.item_name SEPARATOR ", ")
+                FROM tb_production_disbursement_item pdi
+                JOIN tb_item i ON i.item_seq = pdi.item_seq
+                WHERE pd.production_disbursement_seq = pdi.production_disbursement_seq
+             ) AS item_name
+          FROM tb_production_disbursement pd
+          LEFT JOIN tb_production_disbursement_item pdi
+            ON pd.production_disbursement_seq = pdi.production_disbursement_seq
+          LEFT JOIN tb_work_order wo ON wo.work_order_seq = pd.work_order_seq
+          JOIN tb_warehouse w1 ON wo.warehouse_seq = w1.warehouse_seq
+         WHERE pd.production_disbursement_status NOT IN ('DELETE')
+        <if test="startDate != null">
+            <![CDATA[
+                AND pd.production_disbursement_departure_date >= #{startDate}
+            ]]>
+        </if>
+        <if test="endDate != null">
+            <![CDATA[
+                AND pd.production_disbursement_departure_date <= #{endDate}
+            ]]>
+        </if>
+        <if test="factoryName != '' and factoryName != null">
+            AND w1.warehouse_name LIKE CONCAT('%', #{factoryName}, '%')
+        </if>
+        <if test="statusList != null and !statusList.isEmpty()">
+            AND pd.production_disbursement_status IN
+            <foreach item="status" collection="statusList" open="(" separator="," close=")">
+                #{status}
+            </foreach>
+        </if>
+        ORDER BY pd.production_disbursement_reg_date DESC
+            , pd.production_disbursement_name
+        LIMIT #{size} OFFSET #{offset}
+    </select>
 
-<!--    </select>-->
+    <!-- 목록 개수 조회 -->
+    <select id="countProductionDisbursementList" resultType="long">
+        SELECT COUNT(DISTINCT pd.production_disbursement_seq)
+          FROM tb_production_disbursement pd
+          LEFT JOIN tb_production_disbursement_item pdi
+            ON pd.production_disbursement_seq = pdi.production_disbursement_seq
+          LEFT JOIN tb_work_order wo ON wo.work_order_seq = pd.work_order_seq
+          JOIN tb_warehouse w1 ON wo.warehouse_seq = w1.warehouse_seq
+<!--          JOIN tb_warehouse w2 ON pdi.ingredients_warehouse_seq = w2.warehouse_seq-->
+         WHERE pd.production_disbursement_status NOT IN ('DELETE')
+        <if test="startDate != null">
+            <![CDATA[
+                AND pd.production_disbursement_departure_date >= #{startDate}
+            ]]>
+        </if>
+        <if test="endDate != null">
+            <![CDATA[
+                AND pd.production_disbursement_departure_date <= #{endDate}
+            ]]>
+        </if>
+        <if test="factoryName != '' and factoryName != null">
+            AND w1.warehouse_name LIKE CONCAT('%', #{factoryName}, '%')
+        </if>
+        <if test="statusList != null and !statusList.isEmpty()">
+            AND pd.production_disbursement_status IN
+            <foreach item="status" collection="statusList" open="(" separator="," close=")">
+                #{status}
+            </foreach>
+        </if>
+    </select>
+
+    <!-- 목록 엑셀 다운로드 -->
+    <select id="downloadProductionDisbursementListExcel" resultType="error.pirate.backend.productionDisbursement.query.dto.ProductionDisbursementListExcel">
+        SELECT pd.production_disbursement_name
+            ,  (
+                SELECT
+                  GROUP_CONCAT(i.item_name SEPARATOR ", ")
+                  FROM tb_production_disbursement_item pdi
+                  JOIN tb_item i ON i.item_seq = pdi.item_seq
+                 WHERE pd.production_disbursement_seq = pdi.production_disbursement_seq
+                ) AS item_name
+             , pdi.production_disbursement_quantity
+             , (
+                SELECT
+                  GROUP_CONCAT(w.warehouse_name SEPARATOR ", ")
+                  FROM tb_production_disbursement_item pdi
+                  JOIN tb_warehouse w ON w.warehouse_seq = pdi.ingredients_warehouse_seq
+                 WHERE pd.production_disbursement_seq = pdi.production_disbursement_seq
+                ) AS store_name
+             , w1.warehouse_name AS factory_name
+             , pd.production_disbursement_departure_date
+             , pd.production_disbursement_status
+          FROM tb_production_disbursement pd
+          LEFT JOIN tb_production_disbursement_item pdi
+                ON pd.production_disbursement_seq = pdi.production_disbursement_seq
+          LEFT JOIN tb_work_order wo ON wo.work_order_seq = pd.work_order_seq
+          LEFT JOIN tb_warehouse w1 ON wo.warehouse_seq = w1.warehouse_seq
+          LEFT JOIN tb_warehouse w2 ON pdi.ingredients_warehouse_seq = w2.warehouse_seq
+        WHERE pd.production_disbursement_status NOT IN ('DELETE')
+        <if test="startDate != null">
+            <![CDATA[
+                AND pd.production_disbursement_departure_date >= #{startDate}
+            ]]>
+        </if>
+        <if test="endDate != null">
+            <![CDATA[
+                AND pd.production_disbursement_departure_date <= #{endDate}
+            ]]>
+        </if>
+        <if test="factoryName != '' and factoryName != null">
+            AND w2.warehouse_name LIKE CONCAT('%', #{factoryName}, '%')
+        </if>
+        <if test="productionDisbursementStatus != null and !productionDisbursementStatus.isEmpty()">
+            AND pd.production_disbursement_status IN
+            <foreach item="status" collection="productionDisbursementStatus" open="(" separator="," close=")">
+                #{status}
+            </foreach>
+        </if>
+        ORDER BY pd.production_disbursement_reg_date DESC
+        , pd.production_disbursement_name
+    </select>
+
+    <!-- 상세조회 -->
+    <select id="readProductionDisbursement" resultType="error.pirate.backend.productionDisbursement.query.dto.ProductionDisbursementDetailDTO">
+        SELECT pd.production_disbursement_seq
+             , wo.work_order_seq
+             , wo.work_order_name
+             , wo.work_order_due_date
+             , pd.production_disbursement_name
+             , pd.production_disbursement_departure_date
+             , pd.production_disbursement_total_quantity
+             , pd.production_disbursement_status
+             , pd.production_disbursement_note
+             , wo.warehouse_seq AS factory_seq
+             , w.warehouse_name AS factory_name
+             , u.user_name
+          FROM tb_production_disbursement pd
+          LEFT JOIN tb_work_order wo ON pd.work_order_seq = wo.work_order_seq
+          LEFT JOIN tb_warehouse w ON wo.warehouse_seq = w.warehouse_seq
+          LEFT JOIN tb_user u ON pd.user_seq =u.user_seq
+         WHERE pd.production_disbursement_seq = #{productionDisbursementSeq}
+    </select>
+
+    <!-- 상세 품목조회 -->
+    <select id="readProductionDisbursementItem" resultType="error.pirate.backend.productionDisbursement.query.dto.ProductionDisbursementItemDTO">
+        SELECT pdi.production_disbursement_item_seq
+             , pdi.item_seq
+             , i.item_image_url
+             , i.item_name
+             , i.item_division
+             , iu.item_unit_title
+             , pdi.ingredients_warehouse_seq AS store_seq
+             , w.warehouse_name AS store_name
+             , MIN(ii.item_inventory_expiration_date) AS item_inventory_expiration_date
+             , SUM(pdi.production_disbursement_quantity) AS production_disbursement_quantity
+             , pdi.production_disbursement_note
+          FROM tb_production_disbursement_item pdi
+          LEFT JOIN tb_item i ON pdi.item_seq = i.item_seq
+          LEFT JOIN tb_item_unit iu ON i.item_unit_seq = iu.item_unit_seq
+          LEFT JOIN tb_warehouse w ON pdi.ingredients_warehouse_seq = w.warehouse_seq
+          LEFT JOIN tb_item_inventory ii ON pdi.item_seq = ii.item_seq
+         WHERE pdi.production_disbursement_seq = #{productionDisbursementSeq}
+         GROUP BY pdi.production_disbursement_item_seq, pdi.item_seq
+    </select>
+
+    <!-- 현황조회 -->
+
+
+    <!-- 전표조회 -->
+
 
 </mapper>
