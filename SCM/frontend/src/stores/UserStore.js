@@ -6,6 +6,7 @@ import router from "@/router/index.js";
 export const useUserStore = defineStore('user', {
   state: () => ({
     isAuthenticated: false,
+    isLoggingOut: false,
     error: null,
   }),
 
@@ -27,7 +28,6 @@ export const useUserStore = defineStore('user', {
           // JWT 토큰 로컬 스토리지에 저장
           localStorage.setItem('accessToken', accessToken);
           localStorage.setItem('refreshToken', refreshToken);
-
         } else {
           this.error = 'Token not found';
         }
@@ -38,18 +38,31 @@ export const useUserStore = defineStore('user', {
 
     async logout() {
       this.error = null;
+      this.isLoggingOut = true;
       try {
         await customAxios.post(`user/logout`);
 
         this.isAuthenticated = false;
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
-
         await router.push("/");
 
-        location.reload();
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
       } catch (error) {
         alert(`로그아웃 실패하였습니다.`);
+      } finally {
+        this.isLoggingOut = false; // 로그아웃 상태 해제
+      }
+    },
+    initialize() {
+      const token = localStorage.getItem('accessToken');
+
+      if (token) {
+        try {
+          this.isAuthenticated = true;
+        } catch (error) {
+          console.error('Token parsing error:', error);
+          this.logout(); // 토큰이 유효하지 않으면 로그아웃 처리
+        }
       }
     },
   },
