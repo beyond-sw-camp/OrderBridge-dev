@@ -61,4 +61,16 @@
             AND client_registration_no LIKE CONCAT('%', #{clientRegistrationNo}, '%')
         </if>
     </select>
+
+    <select id="readClientHint" resultType="String">
+        SELECT
+            client_name
+        FROM tb_client
+        WHERE TRUE
+        <if test="keyword != null">
+            AND client_name LIKE CONCAT("%", #{keyword}, "%")
+        </if>
+        ORDER BY client_name
+        LIMIT 10
+    </select>
 </mapper>
