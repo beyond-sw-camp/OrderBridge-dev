@@ -31,8 +31,9 @@ public class WorkOrderDomainService {
 
     // 작업지시서 생성
     public WorkOrder createWorkOrder(CreateWorkOrderRequest request, SalesOrder salesOrder, SalesOrderItem salesOrderItem, Warehouse warehouse, User user,
-                                     LocalDateTime seoulDueDate, LocalDateTime seoulIndicatedDate) {
-        return WorkOrder.createWorkOrder(request, salesOrder, salesOrderItem, warehouse, user, seoulIndicatedDate, seoulDueDate);
+                                     String workOrderName,  int workOrderIndicatedQuantity, LocalDateTime seoulDueDate, LocalDateTime seoulIndicatedDate) {
+        return WorkOrder.createWorkOrder(request, salesOrder, salesOrderItem, warehouse, user,
+                workOrderName, workOrderIndicatedQuantity, seoulIndicatedDate, seoulDueDate);
     }
 
     // 작업지시서 저장
@@ -56,16 +57,28 @@ public class WorkOrderDomainService {
     }
 
     // 중복 및 BOM 검증 로직
-    public void validateAndCheckForDuplicates(SalesOrder salesOrder, SalesOrderItem salesOrderItem, Integer workOrderIndicatedQuantity) {
+    public void validateAndCheckForDuplicates(SalesOrder salesOrder, SalesOrderItem salesOrderItem, int workOrderIndicatedQuantity) {
+        // 품목 확인
+        if (salesOrderItem.getItem() == null) {
+            throw new CustomException(ErrorCodeType.ITEM_NOT_FOUND);
+        }
+        log.info("ItemSeq: {}", salesOrderItem.getItem().getItemSeq());
+
+        // 중복체크
         if (existsBySalesOrderAndItem(salesOrder.getSalesOrderSeq(), salesOrderItem.getItem().getItemSeq())) {
             throw new CustomException(ErrorCodeType.WORK_ORDER_DUPLICATE);
         }
         log.info("중복 작업지시서 확인 완료 - 주문서 번호: {}, 품목 번호: {}", salesOrder.getSalesOrderSeq(), salesOrderItem.getItem().getItemSeq());
 
-        // BOM 품목 및 재고 검증
+        // BOM 품목 확인
         List<BomItem> bomItems = bomItemDomainService.findAllByParentItem(salesOrderItem.getItem());
-        itemInventoryDomainService.checkInventoryForBomItems(bomItems, workOrderIndicatedQuantity);
-        log.info("BOM 및 재고 검증 완료 - 품목 번호: {}", salesOrderItem.getItem().getItemSeq());
+        if (bomItems == null || bomItems.isEmpty()) {
+            throw new CustomException(ErrorCodeType.BOM_ITEM_NOT_FOUND);
+        }
+
+        // BOM 및 재고 검증
+        itemInventoryDomainService.checkInventoryStockForBomItems(bomItems, workOrderIndicatedQuantity);
+        log.info("BOM 및 재고 검증 완료 - 품목 번호: {}, 필요한 수량: {},", salesOrderItem.getItem().getItemSeq(),workOrderIndicatedQuantity);
     }
 
     // 중복체크
@@ -79,22 +92,19 @@ public class WorkOrderDomainService {
                 .orElseThrow(() -> new CustomException(ErrorCodeType.WORK_ORDER_NOT_FOUND));
     }
 
-       // 작업지시일 시간 처리
-    public LocalDateTime convertIndicatedDate(LocalDate indicatedDate) {
-        LocalDateTime regDate = LocalDateTime.now();
+    // 작업지시일 시간 처리
+    public LocalDateTime convertIndicatedDate(LocalDateTime indicatedDate) {
 
-        if (indicatedDate.isEqual(regDate.toLocalDate())) {
-            // 등록일과 같으면 등록 시간 + 1시간
-            return regDate.plusHours(1);
-        } else {
-            // 등록일과 다르면 오전 9시로 설정
-            return indicatedDate.atTime(LocalTime.of(9, 0));
-        }
+        ZonedDateTime systemZonedDateTime = indicatedDate.atZone(ZoneId.systemDefault());
+        ZonedDateTime seoulZonedDateTime = systemZonedDateTime.withZoneSameInstant(ZoneId.of("Asia/Seoul"));
+        return seoulZonedDateTime.toLocalDateTime();
     }
 
     // 납기일 시간 처리
-    public LocalDateTime convertDueDate(LocalDate dueDate) {
-        return dueDate.atTime(LocalTime.of(23, 59, 59));
+    public LocalDateTime convertDueDate(LocalDateTime dueDate) {
+        ZonedDateTime systemZonedDateTime = dueDate.atZone(ZoneId.systemDefault());
+        ZonedDateTime seoulZonedDateTime = systemZonedDateTime.withZoneSameInstant(ZoneId.of("Asia/Seoul"));
+        return seoulZonedDateTime.toLocalDateTime();
     }
 
     // 작업지시서 수정

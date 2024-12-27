@@ -23,7 +23,8 @@ public enum ErrorCodeType {
     SALES_ORDER_ITEM_NOT_MATCH(HttpStatus.BAD_REQUEST, "SALES_ORDER_ERROR_003", "주문서의 아이템이 견적서와 다릅니다."),
 
     // 주문서 품목 관련 오류
-    SALES_ORDER_ITEM_NOT_FOUND(HttpStatus.NOT_FOUND, "SALES_ORDER_ITEM_ERROR_001", "주문서 품목을 찾을 수 없습니다."),
+    SALES_ORDER_ITEM_NOT_FOUND(HttpStatus.NOT_FOUND, "SALES_ORDER_ITEM_ERROR_001", "주문서의 품목을 찾을 수 없습니다."),
+    SALES_ORDER_ITEM_QUANTITY_REQUIRED(HttpStatus.BAD_REQUEST, "SALES_ORDER_ITEM_ERROR_002", "주문 품목 수량이 설정되어 있지 않습니다."),
 
     // 거래 명세서 관련 오류
     INVOICE_ITEM_NOT_MATCH(HttpStatus.BAD_REQUEST, "INVOICE_ITEM_ERROR_001", "거래 명세서의 품목이 주문서와 다릅니다."),
@@ -40,6 +41,8 @@ public enum ErrorCodeType {
     // 출하전표 관련 오류
     SHIPPING_SLIP_NOT_FOUND(HttpStatus.NOT_FOUND, "SHIPPING_SLIP_ERROR_001", "출하전표를 찾을 수 없습니다."),
     SHIPPING_SLIP_DELETE_STATE(HttpStatus.BAD_REQUEST, "SHIPPING_SLIP_ERROR_002", "이미 삭제된 출하전표입니다."),
+    SHIPPING_SLIP_ITEM_NOT_MATCH(HttpStatus.BAD_REQUEST, "SHIPPING_SLIP_ERROR_003", "출하전표의 아이템이 출하지시서와 다릅니다."),
+    SHIPPING_SLIP_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "SHIPPING_SLIP_ERROR_004", "해당하는 출하전표가 이미 존재합니다."),
 
     // 공통 오류
     COMMON_ERROR(HttpStatus.BAD_REQUEST, "COMMON_ERROR", "오류가 발생하였습니다. 관리자에게 문의 바랍니다."),
@@ -59,7 +62,7 @@ public enum ErrorCodeType {
     WORK_ORDER_REQUIRED_INFORMATION(HttpStatus.BAD_REQUEST, "WORK_ORDER_ERROR_003", "필수 입력 항목입니다."),
     WORK_ORDER_DUPLICATE(HttpStatus.CONFLICT, "WORK_ORDER_ERROR_004", "이미 작업지시서가 생성된 주문서입니다."),
     WORK_ORDER_STATE_BAD_REQUEST(HttpStatus.BAD_REQUEST, "WORK_ORDER_ERROR_005", "작업지시서의 상태를 확인해주세요"),
-    WORK_ORDER_INVALID_QUANTITY(HttpStatus.BAD_REQUEST, "WORK_ORDER_ERROR_006", "수정된 지시수량은 이미 완료된 작업량보다 작을 수 없습니다."),
+    WORK_ORDER_INVALID_QUANTITY(HttpStatus.BAD_REQUEST, "WORK_ORDER_ERROR_006", "지시수량을 확인해주세요."),
 
     // 회원 오류
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "USER_ERROR_001", "회원을 찾을 수 없습니다."),
@@ -71,6 +74,7 @@ public enum ErrorCodeType {
     // 물품 오류
     ITEM_NOT_FOUND(HttpStatus.NOT_FOUND, "ITEM_ERROR_001", "물품을 찾을 수 없습니다."),
     ITEM_STATUS_ERROR(HttpStatus.BAD_REQUEST, "ITEM_ERROR_002", "이미 삭제된 상품입니다."),
+    BOM_ITEM_NOT_FOUND(HttpStatus.NOT_FOUND, "ITEM_ERROR_003", "BOM 품목이 존재하지 않습니다."),
 
     // 물품 재고 오류
     OUT_OF_STOCK_ERROR(HttpStatus.BAD_REQUEST, "STOCK_ERROR_001", "재고가 부족합니다."),

@@ -37,9 +37,9 @@
                 AND work_order_indicated_date >= #{startDateTime}
                 ]]>
         </if>
-        <if test="EndDateTime != null">
+        <if test="endDateTime != null">
             <![CDATA[
-                AND work_order_indicated_date <= #{EndDateTime}
+                AND work_order_indicated_date <= #{endDateTime}
                 ]]>
         </if>
         ORDER BY wo.work_order_indicated_date DESC
@@ -62,14 +62,14 @@
         <if test="filter.warehouseName != null">
             AND warehouse_name like concat('%', #{filter.warehouseName}, '%')
         </if>
-        <if test="filter.startDate != null">
+        <if test="startDateTime != null">
             <![CDATA[
-                AND work_order_indicated_date >= #{filter.startDate}
+                AND work_order_indicated_date >= #{startDateTime}
                 ]]>
         </if>
-        <if test="filter.endDate != null">
+        <if test="endDateTime != null">
             <![CDATA[
-                AND work_order_indicated_date <= #{filter.endDate}
+                AND work_order_indicated_date <= #{endDateTime}
                 ]]>
         </if>
     </select>
@@ -77,6 +77,7 @@
     <!-- 작업지시서 상세조회 -->
     <select id="readWorkOrder" resultType="error.pirate.backend.workOrder.query.dto.WorkOrderDetailDTO">
         SELECT wo.work_order_seq
+             , so.sales_order_seq
              , wo.work_order_name
              , w.warehouse_seq
              , w.warehouse_name
@@ -190,5 +191,80 @@
           LEFT JOIN tb_item ci ON bi.child_item_seq = ci.item_seq
          WHERE wo.work_order_seq = #{workOrderSeq};
     </select>
+
+    <!-- 목록 엑셀 다운로드 -->
+    <select id="readWorkOrderExcel" resultType="error.pirate.backend.workOrder.query.dto.WorkOrderListExcelDTO">
+        SELECT wo.work_order_name
+            , (SELECT i.item_name
+                 FROM tb_item i
+                WHERE i.item_seq = wo.item_seq
+               )   AS item_name
+             , FORMAT(wo.work_order_indicated_quantity, 0) work_order_indicated_quantity
+             , w.warehouse_name
+             , wo.work_order_indicated_date
+             , wo.work_order_status
+          FROM tb_work_order wo
+          LEFT JOIN tb_warehouse w ON wo.warehouse_seq = w.warehouse_seq
+         WHERE wo.work_order_status NOT IN ('DELETE')
+        <if test="startDate != null">
+            <![CDATA[
+                AND work_order_indicated_date >= #{startDate}
+                ]]>
+        </if>
+        <if test="endDate != null">
+            <![CDATA[
+                AND work_order_indicated_date <= #{endDate}
+                ]]>
+        </if>
+        <if test="warehouseName != null">
+            AND warehouse_name like concat('%', #{warehouseName}, '%')
+        </if>
+        <if test="workOrderStatus != null and !workOrderStatus.isEmpty()">
+            AND wo.work_order_status IN
+            <foreach item="status" collection="workOrderStatus" open="(" separator="," close=")">
+                #{status}
+            </foreach>
+        </if>
+        ORDER BY wo.work_order_indicated_date DESC
+            , wo.work_order_name
+    </select>
+
+    <select id="readWorkOrderSituationExcel" resultType="error.pirate.backend.workOrder.query.dto.WorkOrderSituationDTO">
+        SELECT i.item_name
+        , c.client_name
+        , wo.work_order_seq
+        , wo.work_order_name
+        , w.warehouse_name
+        , wo.work_order_indicated_quantity
+        , wo.work_order_indicated_date
+        , wo.work_order_due_date
+        , wo.work_order_note
+        FROM tb_work_order wo
+        LEFT JOIN tb_item i ON wo.item_seq = i.item_seq
+        LEFT JOIN tb_client c ON wo.client_seq = c.client_seq
+        LEFT JOIN tb_warehouse w ON w.warehouse_seq = wo.warehouse_seq
+        WHERE wo.work_order_status NOT IN ('DELETE')
+        <!-- 작업지시일 검색 필터링 -->
+        <if test="startDate != null">
+            <![CDATA[
+                AND wo.work_order_indicated_date >= #{startDate}
+                ]]>
+        </if>
+        <if test="endDate != null">
+            <![CDATA[
+                AND wo.work_order_indicated_date <= #{endDate}
+                ]]>
+        </if>
+        <!-- 거래처명 필터링 -->
+        <if test="clientName != null">
+            AND c.client_name LIKE CONCAT('%', #{clientName}, '%')
+        </if>
+        <!-- 생산창고 필터링 -->
+        <if test="warehouseName != null">
+            AND w.warehouse_name LIKE CONCAT('%', #{warehouseName}, '%')
+        </if>
+        ORDER BY wo.work_order_indicated_date
+    </select>
+
 
 </mapper>

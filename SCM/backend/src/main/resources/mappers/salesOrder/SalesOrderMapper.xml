@@ -16,10 +16,11 @@
             WHERE tb_sales_order.sales_order_seq = tb_sales_order_item.sales_order_seq) AS item_name,
             tb_client.client_name,
             tb_sales_order.sales_order_order_date,
+            tb_sales_order.sales_order_due_date,
             tb_sales_order.sales_order_status
         FROM tb_sales_order
         JOIN tb_client USING (client_seq)
-        WHERE TRUE
+        WHERE tb_sales_order.sales_order_status NOT IN ("DELETE")
         <if test="startDate != null"><![CDATA[
             AND #{startDate} <= tb_sales_order.sales_order_order_date
         ]]></if>
@@ -30,8 +31,10 @@
             AND tb_client.client_name LIKE CONCAT('%', #{clientName}, '%')
         </if>
         <if test="salesOrderStatus != null">
-            AND tb_sales_order.sales_order_status LIKE #{salesOrderStatus}
+            AND tb_sales_order.sales_order_status IN
+            <foreach collection="salesOrderStatus" item="item" open="(" separator="," close=")">#{item}</foreach>
         </if>
+        ORDER BY tb_sales_order.sales_order_reg_date DESC
         LIMIT #{limit} OFFSET #{offset}
     </select>
 
@@ -41,7 +44,7 @@
             COUNT(*)
         FROM tb_sales_order
         JOIN tb_client USING (client_seq)
-        WHERE TRUE
+        WHERE tb_sales_order.sales_order_status NOT IN ("DELETE")
         <if test="startDate != null"><![CDATA[
             AND #{startDate} <= tb_sales_order.sales_order_order_date
         ]]></if>
@@ -52,7 +55,8 @@
             AND tb_client.client_name LIKE CONCAT('%', #{clientName}, '%')
         </if>
         <if test="salesOrderStatus != null">
-            AND tb_sales_order.sales_order_status LIKE #{salesOrderStatus}
+            AND tb_sales_order.sales_order_status IN
+            <foreach collection="salesOrderStatus" item="item" open="(" separator="," close=")">#{item}</foreach>
         </if>
     </select>
     
@@ -131,4 +135,138 @@
         JOIN tb_quotation_item USING (quotation_seq)
         WHERE tb_quotation.quotation_seq = #{quotationSeq}
     </select>
+
+    <!-- 작업지시서가 등록된 주문서 물품 조회 -->
+    <select id="selectRegisteredItemSeqsBySalesOrderSeq" resultType="Long">
+        SELECT soi.sales_order_item_seq
+          FROM tb_sales_order_item soi
+         WHERE soi.sales_order_seq = #{salesOrderSeq}
+           AND EXISTS (
+               SELECT 1
+                 FROM tb_work_order wo
+                WHERE wo.sales_order_seq = soi.sales_order_seq
+                  AND wo.item_seq = soi.item_seq
+                  AND wo.work_order_status != 'DELETE'
+        )
+    </select>
+
+    <!-- 주문서번호로 주문서 물품 조회 -->
+    <select id="findItemsBySalesOrderSeq" resultType="error.pirate.backend.salesOrder.command.domain.aggregate.entity.SalesOrderItem">
+        SELECT *
+          FROM tb_sales_order_item
+         WHERE sales_order_seq = #{salesOrderSeq}
+    </select>
+
+    <select id="selectSalesOrderItemStockStatus" resultType="error.pirate.backend.salesOrder.query.dto.SalesOrderItemStockStatusResponse">
+        SELECT
+            soi.sales_order_item_seq,
+            soi.item_seq,
+            (SELECT i.item_name
+            FROM tb_item i
+            WHERE i.item_seq = soi.item_seq) AS item_name,
+            i.item_image_url,
+            soi.sales_order_item_quantity AS required_quantity,
+<!--         모든 하위 항목이 충족될 때만 available_quantity 계산-->
+        CASE
+            WHEN EXISTS (
+            SELECT 1
+            FROM tb_bom_item bi
+            LEFT JOIN tb_item_inventory ii
+            ON bi.child_item_seq = ii.item_seq
+        <![CDATA[
+            AND ii.item_inventory_expiration_date > CURRENT_TIMESTAMP()
+        ]]>
+            WHERE bi.parent_item_seq = soi.item_seq
+        AND (ii.item_inventory_remain_amount IS NULL
+        <![CDATA[
+            OR ii.item_inventory_remain_amount < bi.bom_child_item_quantity)
+        ]]>
+        ) THEN 0
+        ELSE FLOOR(
+            (SELECT MIN(subquery.calculated_quantity_per_child)
+            FROM (
+            SELECT
+            bi.parent_item_seq,
+            bi.child_item_seq,
+            bi.bom_child_item_quantity,
+            SUM(ii.item_inventory_remain_amount) AS total_remain_amount,
+            SUM(ii.item_inventory_remain_amount) / bi.bom_child_item_quantity AS calculated_quantity_per_child
+            FROM tb_bom_item bi
+            LEFT JOIN tb_item_inventory ii
+            ON bi.child_item_seq = ii.item_seq
+            AND ii.item_inventory_expiration_date > CURRENT_TIMESTAMP()
+            GROUP BY bi.parent_item_seq, bi.child_item_seq, bi.bom_child_item_quantity
+            ) AS subquery
+            WHERE subquery.parent_item_seq = soi.item_seq)
+            )
+        END AS available_quantity,
+<!--         부족 수량 계산-->
+        GREATEST(
+            CASE
+            WHEN EXISTS (
+                SELECT 1
+                FROM tb_bom_item bi
+                LEFT JOIN tb_item_inventory ii
+                ON bi.child_item_seq = ii.item_seq
+            <![CDATA[
+                AND ii.item_inventory_expiration_date > CURRENT_TIMESTAMP()
+                ]]>
+                WHERE bi.parent_item_seq = soi.item_seq
+                AND (ii.item_inventory_remain_amount IS NULL
+            <![CDATA[
+                OR ii.item_inventory_remain_amount < bi.bom_child_item_quantity)
+                ]]>
+            ) THEN soi.sales_order_item_quantity
+            ELSE soi.sales_order_item_quantity - FLOOR(
+                (SELECT MIN(subquery.calculated_quantity_per_child)
+                FROM (
+                SELECT
+                bi.parent_item_seq,
+                bi.child_item_seq,
+                bi.bom_child_item_quantity,
+                SUM(ii.item_inventory_remain_amount) AS total_remain_amount,
+                SUM(ii.item_inventory_remain_amount) / bi.bom_child_item_quantity AS calculated_quantity_per_child
+                FROM tb_bom_item bi
+                LEFT JOIN tb_item_inventory ii
+                ON bi.child_item_seq = ii.item_seq
+            <![CDATA[
+                AND ii.item_inventory_expiration_date > CURRENT_TIMESTAMP()
+                ]]>
+                GROUP BY bi.parent_item_seq, bi.child_item_seq, bi.bom_child_item_quantity
+                ) AS subquery
+            WHERE subquery.parent_item_seq = soi.item_seq)
+            )
+            END,
+            0
+        ) AS insufficient_quantity,
+        <!-- 재고 충분 여부-->
+            CASE
+            WHEN EXISTS (
+                SELECT 1
+                FROM tb_bom_item bi
+                LEFT JOIN tb_item_inventory ii
+                ON bi.child_item_seq = ii.item_seq
+                <![CDATA[
+                AND ii.item_inventory_expiration_date > CURRENT_TIMESTAMP()
+                ]]>
+                WHERE bi.parent_item_seq = soi.item_seq
+                AND (ii.item_inventory_remain_amount IS NULL
+            <![CDATA[
+                OR ii.item_inventory_remain_amount < bi.bom_child_item_quantity * soi.sales_order_item_quantity)
+                ]]>
+            ) THEN false  <!--재고 부족 또는 만료-->
+            ELSE true <!--충분한 재고-->
+            END AS is_stock_enough,
+            soi.sales_order_item_note
+        FROM tb_sales_order_item soi
+        LEFT JOIN tb_bom_item bi ON soi.item_seq = bi.parent_item_seq
+        LEFT JOIN tb_item_inventory ii ON bi.child_item_seq = ii.item_seq
+        LEFT JOIN tb_item i ON soi.item_seq = i.item_seq
+        WHERE soi.sales_order_seq = #{salesOrderSeq}
+        GROUP BY
+            soi.sales_order_item_seq,
+            soi.item_seq,
+            soi.sales_order_item_quantity
+    </select>
+
 </mapper>

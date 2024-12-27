@@ -53,8 +53,8 @@ public class WorkOrder {
     private Item item; // 품목
 
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
-    @JoinColumn(name = "productionReceivingSeq")
-    private ProductionReceiving productionReceiving; // 생산입고
+    @JoinColumn(name = "productionReceivingSeq", nullable = true)
+    private ProductionReceiving productionReceiving; // 생산입고  (NULL 허용)
 
     private String workOrderName; // 작업지시서 명
 
@@ -83,29 +83,35 @@ public class WorkOrder {
     private String workOrderNote; // 작업지시서 비고
 
     public static WorkOrder createWorkOrder(CreateWorkOrderRequest request, SalesOrder salesOrder, SalesOrderItem salesOrderItem,
-                                            Warehouse warehouse, User user,
+                                            Warehouse warehouse, User user, String workOrderName,  int workOrderIndicatedQuantity,
                                             LocalDateTime seoulIndicatedDate, LocalDateTime seoulDueDate) {
         if (seoulDueDate.isBefore(seoulIndicatedDate)) {
             throw new CustomException(ErrorCodeType.INVALID_DATE_RANGE);
         }
         WorkOrder workOrder = new WorkOrder();
 
+        if (salesOrderItem.getSalesOrderItemQuantity() <= 0) {
+            throw new CustomException(ErrorCodeType.SALES_ORDER_ITEM_QUANTITY_REQUIRED);
+        }
+
         // SalesOrder 기반 설정
         workOrder.salesOrder = salesOrder;
         workOrder.client = salesOrder.getClient(); // 클라이언트 설정
-//        workOrder.workOrderIndicatedQuantity = salesOrder.getSalesOrderTotalQuantity(); // 지시 수량 설정
-        workOrder.workOrderIndicatedQuantity = salesOrderItem.getSalesOrderItemQuantity(); // 지시 수량 설정
+
         workOrder.workOrderPrice = salesOrder.getSalesOrderExtendedPrice(); // 금액 설정
         workOrder.specifyItem(salesOrderItem.getItem()); // 품목 설정
 
         workOrder.warehouse = warehouse;
         workOrder.user = user;
-        workOrder.workOrderName = request.getWorkOrderName();
+        workOrder.workOrderName = workOrderName;
         workOrder.workOrderStatus = WorkOrderStatus.valueOf("BEFORE");
+        workOrder.workOrderIndicatedQuantity = workOrderIndicatedQuantity;
         workOrder.workOrderWorkQuantity = 0;
         workOrder.workOrderIndicatedDate = seoulIndicatedDate;
         workOrder.workOrderDueDate = seoulDueDate;
         workOrder.workOrderNote = request.getWorkOrderNote();
+
+        workOrder.productionReceiving = null; // 생산입고번호는 NULL로 설정
         return workOrder;
     }
 

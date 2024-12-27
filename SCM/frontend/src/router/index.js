@@ -4,6 +4,12 @@ import productionReceivingRoutes from './production-receiving.js'
 import item from "@/router/item.js";
 import workOrderRoutes from "@/router/work-order.js";
 import shippingSlipRoutes from "@/router/shipping-slip.js";
+import warehouse from "@/router/warehouse.js";
+import client from "@/router/client.js";
+import quotationRoutes from "@/router/quotation.js";
+import salesOrder from '@/router/salesOrder.js';
+import invoice from '@/router/invoice.js'
+import {useUserStore} from "@/stores/UserStore.js";
 
 const routes = [
     {
@@ -11,14 +17,13 @@ const routes = [
         component: () => import("@/views/main/MainView.vue")
     },
     {
+        path: "/login",
+        component: () => import("@/views/user/LoginView.vue")
+    },
+    {
         path: "/print",
         name: 'PrintView',
         component: () => import("@/views/print/PrintView.vue")
-    },
-    {
-        path: "/quotation",
-        name: "Quotation",
-        component: () => import("@/views/quotation/QuotationListView.vue")
     },
     {
         path: "/currentSituation",
@@ -58,11 +63,33 @@ const routes = [
     ...item,
     ...workOrderRoutes,
     ...shippingSlipRoutes,
+    ...warehouse,
+    ...client,
+    ...quotationRoutes,
+    ...salesOrder,
+    ...invoice
 ];
 
 const router = createRouter({
     history: createWebHistory(),
     routes,
 });
+
+router.beforeEach((to, from, next) => {
+    const token = localStorage.getItem('accessToken');
+
+    if (useUserStore().isLoggingOut) {
+        // 로그아웃 중일 때는 검증을 생략
+        next();
+        return;
+    }
+
+    if(!token && (to.path !== '/' && to.path !== '/login')) {
+        alert('로그인 이후 이용할 수 있습니다.');
+        next('/login');
+    } else {
+        next();
+    }
+})
 
 export default router;

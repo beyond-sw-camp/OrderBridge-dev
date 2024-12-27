@@ -8,4 +8,6 @@ import java.util.List;
 
 public interface ShippingInstructionItemRepository extends JpaRepository<ShippingInstructionItem, Long> {
     void deleteByShippingInstruction(ShippingInstruction newShippingInstruction);
+
+    List<ShippingInstructionItem> findByShippingInstructionShippingInstructionSeq(long shippingInstructionSeq);
 }

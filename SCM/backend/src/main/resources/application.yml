@@ -26,7 +26,12 @@ spring:
       hibernate:
         format_sql: true
       hibernate.dialect: org.hibernate.dialect.MariaDBDialect
-
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      username: ${REDIS_HOSTNAME}
+      password: ${REDIS_PASSWORD}
 springdoc:
   packages-to-scan: error.pirate.backend
   default-consumes-media-type: application/json;charset=UTF-8
@@ -52,3 +57,14 @@ mybatis:
   configuration:
     map-underscore-to-camel-case: true
   mapper-locations: mappers/**/*.xml
+
+jwt:
+  secretKey: ${SECRET_KEY}
+  access:
+    expiration: 3600000 # 1시간
+    header: Authorization
+  refresh:
+    expiration: 1209600000 # 2주
+    header: Refresh-Token
+
+frontend: http://localhost:5173

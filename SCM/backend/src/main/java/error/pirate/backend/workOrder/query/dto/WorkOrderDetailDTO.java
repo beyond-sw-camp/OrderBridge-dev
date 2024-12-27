@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 public class WorkOrderDetailDTO {
 
     private Long workOrderSeq;
+    private Long salesOrderSeq;
     private String workOrderName;
     private Long warehouseSeq;
     private String warehouseName;

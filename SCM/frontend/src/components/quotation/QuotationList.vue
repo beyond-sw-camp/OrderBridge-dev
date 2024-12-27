@@ -1,6 +1,9 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue';
 import searchIcon from "@/assets/searchIcon.svg"
+import trashIcon from "@/assets/trashIcon.svg";
+import editIcon from "@/assets/editIcon.svg";
+import printIcon from "@/assets/printIcon.svg";
 import axios from "@/axios"
 import dayjs from 'dayjs';
 
@@ -50,7 +53,7 @@ const fetchQuotation = async (quotationSeq) => {
         quotationDetail.value[quotationSeq] = response.data;
         quotationExtended.value[quotationSeq] = true;
     } catch (error) {
-        console.error(`견적서 상세 요청 실패 ${error}`);
+        console.log(`견적서 상세 요청 실패 ${error}`);
     }
 }
 
@@ -101,6 +104,50 @@ const excelDown = async () => {
     window.URL.revokeObjectURL(url);
 }
 
+// 견적서 삭제 요청
+const deleteQuotation = async (quotationSeq) => {
+    try {
+        const deleteConfirm = confirm(`선택한 견적서를 삭제하시겠습니까?`);
+        if (deleteConfirm) {
+            const response = await axios.delete(`quotation/${quotationSeq}`);
+            fetchQuotationList();
+        }
+    } catch (error) {
+        console.log(`견적서 삭제 요청 실패 ${error}`);
+    }
+}
+
+// 거래처 힌트 요청
+const clientHintList = ref(null);
+let clientSearchCount = 0;
+
+const fetchClientHint = async (clientName) => {
+    if (clientName.value === "") {
+        clientHintList.value = null;
+    } else {
+        try {
+            const response = await axios.get(`client/hint`, {
+                params: {
+                    keyword: clientName.value
+                }
+            });
+            if (response.data.length > 0) {
+                clientHintList.value = response.data;
+                clientSearchCount = 0;
+            } else if (clientSearchCount > 2) {
+                clientHintList.value = null;
+            } else { clientSearchCount++; }
+        } catch (error) {
+            console.log(`거래처 힌트 요청 실패 ${error}`)
+        }
+    }
+    if (clientHintList.value) {
+        if (clientHintList.value.length === 1 && clientHintList.value[0] === searchClient.value) {
+            clientHintList.value = null;
+        }
+    }
+}
+
 onMounted(() => {
     fetchQuotationList();
     fetchQuotationStatus();
@@ -114,6 +161,10 @@ watch([searchStartDate, searchEndDate, searchStatus.value], () => {
 watch(searchPage, () => {
 
     fetchQuotationList();
+});
+
+watch(searchClient, () => {
+    fetchClientHint(searchClient);
 });
 
 // 상태 체크박스
@@ -171,6 +222,13 @@ function numberThree(number) {
                         <b-form-input v-model="searchClient"></b-form-input>
                         <b-button variant="light" class="button" @click="search()"><searchIcon class="icon"/></b-button>
                     </b-input-group>
+                    <div class="clientHint" style="position: absolute; z-index: 5;">
+                        <ul class="list-group">
+                            <template v-for="hint in clientHintList">
+                                <li class="list-group-item list-group-item-action" @click="searchClient = hint">{{ hint }}</li>
+                            </template>
+                        </ul>
+                    </div>
                 </div>
             </div>
             <div class="side-box card">
@@ -183,7 +241,7 @@ function numberThree(number) {
             </div>
         </div>
         <div class="col-md-9">
-            <div style="width: 90%;">
+            <div>
                 <div class="d-flex justify-content-between">
                     <div>검색결과: {{ totalQuotation }}개</div>
                     <div class="d-flex justify-content-end mt-3">
@@ -211,27 +269,33 @@ function numberThree(number) {
                         <div class="d-flex justify-content-center">
                             <div v-if="quotationExtended[quotation.quotationSeq]" class="col-md-11 mt-3">
                                 <b>총 수량</b>: {{ numberThree(quotationDetail[quotation.quotationSeq].quotationTotalQuantity) }} 개<br>
-                                <b>총 금액</b>: {{ `\\ ` + numberThree(quotationDetail[quotation.quotationSeq].quotationExtendedPrice) }}<br>
+                                <b>총 금액</b>: {{ `₩ ` + numberThree(quotationDetail[quotation.quotationSeq].quotationExtendedPrice) }}<br>
                                 <b>담당자</b>: {{ quotationDetail[quotation.quotationSeq].userName }}<br>
                                 <b>견적일시</b>: {{ dayjs(quotationDetail[quotation.quotationSeq].quotationQuotationDate).format(`YYYY/MM/DD HH:mm:ss`) }}<br>
                                 <b>유효일시</b>: {{ dayjs(quotationDetail[quotation.quotationSeq].quotationEffectiveDate).format(`YYYY/MM/DD HH:mm:ss`) }}<br>
                                 <b>비고</b>: {{ quotationDetail[quotation.quotationSeq].quotationNote }}<br>
                                 <div style="display:flex; flex-wrap: wrap;">
                                 <template v-for="quotationItem in quotationDetail[quotation.quotationSeq].quotationItem">
-                                        <div class="card item-card">
-                                            <img :src=quotationItem.itemImageUrl class="card-img-top">
-                                            <div style="margin: 5px;">
-                                                <small>{{ findStatusValue(itemDivisionList, quotationItem.itemDivision) }}</small>
-                                                <div style="display: flex; justify-content: space-between;">
-                                                    <b style="font-size: medium;">{{ quotationItem.itemName }}</b>
-                                                    <small>{{ numberThree(quotationItem.quotationItemQuantity * quotationItem.quotationItemPrice) }} 원</small>
-                                                </div>
-                                                <small>{{ numberThree(quotationItem.quotationItemQuantity) }}개 / 개당 {{ numberThree(quotationItem.quotationItemPrice) }}원</small><br><br>
-                                                <small style="margin-top: 20px;">비고: {{ quotationItem.quotationItemNote }}</small>
+                                    <div class="card item-card">
+                                        <img :src=quotationItem.itemImageUrl class="card-img-top">
+                                        <div style="margin: 5px;">
+                                            <small>{{ findStatusValue(itemDivisionList, quotationItem.itemDivision) }}</small>
+                                            <div style="display: flex; justify-content: space-between;">
+                                                <b style="font-size: medium;">{{ quotationItem.itemName }}</b>
+                                                <small>{{ numberThree(quotationItem.quotationItemQuantity * quotationItem.quotationItemPrice) }} 원</small>
                                             </div>
+                                            <small>{{ numberThree(quotationItem.quotationItemQuantity) }}개 / 개당 {{ numberThree(quotationItem.quotationItemPrice) }}원</small><br><br>
+                                            <small style="margin-top: 20px;">비고: {{ quotationItem.quotationItemNote }}</small>
                                         </div>
+                                    </div>
                                 </template>
-                            </div>
+                                </div>
+                                
+                                <div class="d-flex justify-content-end align-items-center">
+                                    <printIcon class="me-3 icon" @click.stop="printQuotation(quotation.quotationSeq)"/>
+                                    <editIcon class="me-3 icon" @click.stop="modifyQuotation(quotation.quotationSeq)"/>
+                                    <trashIcon class="icon" @click.stop="deleteQuotation(quotation.quotationSeq)"/>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -312,6 +376,10 @@ div {
 .icon {
   width: 20px;
   height: 20px;
+}
+
+.icon:hover {
+    cursor: pointer;
 }
 
 .item-card {

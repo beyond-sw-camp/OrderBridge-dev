@@ -7,52 +7,70 @@
 
     <select id="findClientListByFilter" resultType="error.pirate.backend.client.query.dto.ClientResponse">
         <![CDATA[
-        SELECT
-            client_seq AS clientSeq,
-            client_name AS clientName,
-            client_phone_no AS clientPhoneNo,
-            client_email AS clientEmail,
-            client_registration_no AS clientRegistrationNo
-        FROM tb_client
-        WHERE 1=1
-        ]]>
+   SELECT
+       client_seq AS clientSeq,
+       client_name AS clientName,
+       client_phone_no AS clientPhoneNo,
+       client_email AS clientEmail,
+       client_registration_no AS clientRegistrationNo,
+       client_representative AS clientRepresentative,
+       client_reg_date AS clientRegDate,
+       client_mod_date AS clientModDate
+   FROM tb_client
+   WHERE 1=1
+   AND client_status = 'ACTIVE'
+   ]]>
         <if test="clientName != null and clientName != ''">
             <![CDATA[
-            AND client_name LIKE CONCAT('%', #{clientName}, '%')
-            ]]>
+       AND client_name LIKE CONCAT('%', #{clientName}, '%')
+       ]]>
         </if>
         <if test="clientRegistrationNo != null and clientRegistrationNo != ''">
             <![CDATA[
-            AND client_registration_no LIKE CONCAT('%', #{clientRegistrationNo}, '%')
-            ]]>
+       AND client_registration_no LIKE CONCAT('%', #{clientRegistrationNo}, '%')
+       ]]>
         </if>
         <![CDATA[
-        ORDER BY
-        ]]>
-        <choose>
-            <when test="sortBy != null and sortDirection != null">
-                <if test="sortBy == 'clientName'">
-                    <![CDATA[ client_name ]]>
-                </if>
-                <if test="sortBy == 'clientSeq'">
-                    <![CDATA[ client_seq ]]>
-                </if>
-                <if test="sortDirection == 'ASC'">
-                    <![CDATA[ ASC ]]>
-                </if>
-                <if test="sortDirection == 'DESC'">
-                    <![CDATA[ DESC ]]>
-                </if>
-            </when>
-            <otherwise>
-                <![CDATA[
-                client_seq ASC
-                ]]>
-            </otherwise>
-        </choose>
-        <![CDATA[
-        LIMIT #{offset}, #{size}
-        ]]>
+   ORDER BY client_seq DESC
+   LIMIT #{offset}, #{size}
+   ]]>
     </select>
 
+    <select id="findClientSeq" resultType="error.pirate.backend.client.query.dto.ClientResponse">
+        SELECT
+        client_seq AS clientSeq,
+        client_name AS clientName,
+        client_phone_no AS clientPhoneNo,
+        client_email AS clientEmail,
+        client_registration_no AS clientRegistrationNo,
+        client_representative AS clientRepresentative,
+        client_reg_date AS clientRegDate,
+        client_mod_date AS clientModDate
+        FROM tb_client
+        WHERE client_seq = #{clientSeq}
+        AND client_status = 'ACTIVE'
+    </select>
+    <select id="countClientsByFilter" resultType="int">
+        SELECT COUNT(*)
+        FROM tb_client
+        WHERE 1=1 AND client_status = 'ACTIVE'
+        <if test="clientName != null and clientName != ''">
+            AND client_name LIKE CONCAT('%', #{clientName}, '%')
+        </if>
+        <if test="clientRegistrationNo != null and clientRegistrationNo != ''">
+            AND client_registration_no LIKE CONCAT('%', #{clientRegistrationNo}, '%')
+        </if>
+    </select>
+
+    <select id="readClientHint" resultType="String">
+        SELECT
+            client_name
+        FROM tb_client
+        WHERE TRUE
+        <if test="keyword != null">
+            AND client_name LIKE CONCAT("%", #{keyword}, "%")
+        </if>
+        ORDER BY client_name
+        LIMIT 10
+    </select>
 </mapper>

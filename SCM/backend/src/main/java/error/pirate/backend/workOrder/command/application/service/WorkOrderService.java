@@ -4,14 +4,11 @@ import error.pirate.backend.common.NameGenerator;
 import error.pirate.backend.common.NullCheck;
 import error.pirate.backend.exception.CustomException;
 import error.pirate.backend.exception.ErrorCodeType;
-import error.pirate.backend.item.command.domain.service.BomItemDomainService;
-import error.pirate.backend.item.command.domain.service.ItemInventoryDomainService;
 import error.pirate.backend.salesOrder.command.domain.aggregate.entity.SalesOrder;
 import error.pirate.backend.salesOrder.command.domain.aggregate.entity.SalesOrderItem;
 import error.pirate.backend.salesOrder.command.domain.service.SalesOrderDomainService;
 import error.pirate.backend.salesOrder.command.domain.service.SalesOrderItemDomainService;
 import error.pirate.backend.user.command.domain.aggregate.entity.User;
-import error.pirate.backend.user.command.domain.service.UserDomainService;
 import error.pirate.backend.warehouse.command.domain.aggregate.entity.Warehouse;
 import error.pirate.backend.warehouse.command.domain.service.WarehouseDomainService;
 import error.pirate.backend.workOrder.command.application.dto.CreateWorkOrderRequest;
@@ -24,7 +21,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Service
@@ -35,9 +31,6 @@ public class WorkOrderService {
     private final WorkOrderDomainService workOrderDomainService;
     private final SalesOrderDomainService salesOrderDomainService;
     private final SalesOrderItemDomainService salesOrderItemDomainService;
-    private final ItemInventoryDomainService itemInventoryDomainService;
-    private final BomItemDomainService bomItemDomainService;
-    private final UserDomainService userDomainService;
     private final WarehouseDomainService warehouseDomainService;
     private final NameGenerator nameGenerator;
 
@@ -61,17 +54,30 @@ public class WorkOrderService {
         // 생산공장 확인
         Warehouse warehouse = warehouseDomainService.findById(request.getWarehouseSeq());
 
-        // 사용자 설정
-        User user = userDomainService.findById(request.getUserSeq());
+        // 사용자 설정 - 주문서 작성 유저
+        User user = salesOrder.getUser();
 
         // 작업지시서명 설정
-        request.setWorkOrderName(nameGenerator.nameGenerator(WorkOrder.class));
+        String workOrderName = nameGenerator.nameGenerator(WorkOrder.class);
+        log.info("Generated WorkOrderName: {}", workOrderName);
+
+        // 주문서 품목 수량 확인
+        int orderItemQuantity = salesOrderItem.getSalesOrderItemQuantity();
+        log.info("SalesOrderItem Quantity: {}", orderItemQuantity);
+
+        // workOrderIndicatedQuantity를 주문서 품목 수량으로 설정
+        int workOrderIndicatedQuantity = orderItemQuantity;
+
+        // 유효성 검사
+        if (workOrderIndicatedQuantity <= 0) {
+            throw new CustomException(ErrorCodeType.WORK_ORDER_INVALID_QUANTITY);
+        }
 
         // 주문서번호와 품목번호로(같은 주문서에서는 같은 품목 주문이 여러 개 들어오지 않는다는 가정) 중복체크 및 BOM 재고 검증
-        workOrderDomainService.validateAndCheckForDuplicates(salesOrder, salesOrderItem, request.getWorkOrderIndicatedQuantity());
+        workOrderDomainService.validateAndCheckForDuplicates(salesOrder, salesOrderItem, workOrderIndicatedQuantity);
 
         // 작업지시일 시간대 변경
-        LocalDate indicatedDate = request.getWorkOrderIndicatedDate();
+        LocalDateTime indicatedDate = request.getWorkOrderIndicatedDate();
         if (indicatedDate == null) {
             throw new CustomException(ErrorCodeType.WORK_ORDER_REQUIRED_INFORMATION);
         }
@@ -79,12 +85,17 @@ public class WorkOrderService {
         log.info("-------------- 작업지시일 시간대 변경 완료 : {} --------------", seoulIndicatedDate);
 
         //제품 납기일 시간대 변경
-        LocalDate dueDate = request.getWorkOrderDueDate();
+        LocalDateTime dueDate = request.getWorkOrderDueDate();
         if (dueDate == null) {
             throw new CustomException(ErrorCodeType.WORK_ORDER_REQUIRED_INFORMATION);
         }
         LocalDateTime seoulDueDate =  workOrderDomainService.convertDueDate(dueDate);
         log.info("-------------- 작업지시일 시간대 변경 완료 : {} --------------", seoulIndicatedDate);
+
+        // 납기일이 주문서 납기일보다 전이어야 함.
+        if (dueDate.isAfter(salesOrder.getSalesOrderDueDate())) {
+            throw new CustomException(ErrorCodeType.INVALID_DATE_RANGE);
+        }
 
         // 작업지시서 생성
         WorkOrder workOrder = workOrderDomainService.createWorkOrder(
@@ -93,6 +104,8 @@ public class WorkOrderService {
                 salesOrderItem,
                 warehouse,
                 user,
+                workOrderName,
+                workOrderIndicatedQuantity,
                 seoulDueDate,
                 seoulIndicatedDate
         );
@@ -133,12 +146,12 @@ public class WorkOrderService {
         log.info("진행 중 상태 - 제한된 필드 수정 진행");
 
         // 제품 납기일 시간대 변경
-        LocalDate dueDate = request.getWorkOrderDueDate();
+        LocalDateTime dueDate = request.getWorkOrderDueDate();
         if (dueDate == null) {
-            dueDate = workOrder.getWorkOrderDueDate().toLocalDate(); // 기존 값 유지
+            dueDate = workOrder.getWorkOrderDueDate(); // 기존 값 유지
             log.info("납기일이 입력되지 않아 기존 값 유지: {}", dueDate);
         }
-        if (dueDate.isBefore(LocalDate.now())) {
+        if (dueDate.isBefore(LocalDateTime.now())) {
             throw new CustomException(ErrorCodeType.INVALID_DATE_RANGE);
         }
         log.info("납기일 유효성 검증 완료 - 납기일: {}", dueDate);
@@ -206,21 +219,22 @@ public class WorkOrderService {
         }
 
         // 작업지시일 시간대 변경
-        LocalDate indicatedDate = request.getWorkOrderIndicatedDate();
+//        LocalDate indicatedDate = request.getWorkOrderIndicatedDate();
+        LocalDateTime indicatedDate = request.getWorkOrderIndicatedDate();
         if (indicatedDate == null) {
-            indicatedDate = workOrder.getWorkOrderIndicatedDate().toLocalDate(); // 기존 값 유지
+            indicatedDate = workOrder.getWorkOrderIndicatedDate(); // 기존 값 유지
             log.info("지시일이 입력되지 않아 기존 값 유지: {}", indicatedDate);
         }
         LocalDateTime seoulIndicatedDate = workOrderDomainService.convertIndicatedDate(indicatedDate);
         log.info("-------------- 작업지시일 시간대 변경 완료 : {} --------------", seoulIndicatedDate);
 
         // 제품 납기일 시간대 변경
-        LocalDate dueDate = request.getWorkOrderDueDate();
+        LocalDateTime dueDate = request.getWorkOrderDueDate();
         if (dueDate == null) {
-            dueDate = workOrder.getWorkOrderDueDate().toLocalDate(); // 기존 값 유지
+            dueDate = workOrder.getWorkOrderDueDate(); // 기존 값 유지
             log.info("납기일이 입력되지 않아 기존 값 유지: {}", dueDate);
         }
-        if (dueDate.isBefore(LocalDate.now())) {
+        if (dueDate.isBefore(LocalDateTime.now())) {
             throw new CustomException(ErrorCodeType.INVALID_DATE_RANGE);
         }
         log.info("납기일 유효성 검증 완료 - 납기일: {}", dueDate);
