@@ -4,6 +4,7 @@ import error.pirate.backend.exception.CustomException;
 import error.pirate.backend.exception.ErrorCodeType;
 import error.pirate.backend.item.command.domain.aggregate.entity.Item;
 import error.pirate.backend.item.command.domain.repository.ItemRepository;
+import error.pirate.backend.item.command.domain.service.ItemInventoryDomainService;
 import error.pirate.backend.purchase.command.application.dto.PurchaseCreateRequest;
 import error.pirate.backend.purchase.command.application.dto.PurchaseItemDto;
 import error.pirate.backend.purchase.command.application.dto.PurchaseUpdateRequest;
@@ -17,7 +18,6 @@ import error.pirate.backend.purchaseOrder.command.domain.aggregate.entity.Purcha
 import error.pirate.backend.purchaseOrder.command.domain.service.PurchaseOrderDomainService;
 import error.pirate.backend.user.command.domain.aggregate.entity.User;
 import error.pirate.backend.user.command.domain.service.UserDomainService;
-import error.pirate.backend.warehouse.command.domain.aggregate.entity.Warehouse;
 import error.pirate.backend.warehouse.command.domain.service.WarehouseDomainService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,6 +44,8 @@ public class PurchaseApplicationService {
 
     private final UserDomainService userDomainService;
 
+    private final ItemInventoryDomainService itemInventoryDomainService;
+
     private final ModelMapper modelMapper;
 
     private final ItemRepository itemRepository;
@@ -55,15 +57,15 @@ public class PurchaseApplicationService {
             Purchase purchase = modelMapper.map(request, Purchase.class);
 
             User user = userDomainService.findById(request.getUserSeq());
-            Warehouse warehouse = warehouseDomainService.findById(request.getWarehouseSeq());
-            purchase.objectInjection(user, warehouse, purchaseOrder);
+            purchase.objectInjection(user, purchaseOrder);
             purchase.changePurchaseTotalQuantity(
                     request.getPurchaseItemDtoList().stream().mapToInt(PurchaseItemDto::getPurchaseItemQuantity).sum()
             );
 
             Purchase purchaseResponse = purchaseDomainService.createPurchase(purchase);
 
-            List<PurchaseItem> items = new ArrayList<>();
+            List<PurchaseItem> purchaseItems = new ArrayList<>();
+            List<Item> items = new ArrayList<>();
             if(ObjectUtils.isNotEmpty(request.getPurchaseItemDtoList())) {
                 for(PurchaseItemDto purchaseItemDto : request.getPurchaseItemDtoList()) {
                     PurchaseItem purchaseItem = modelMapper.map(purchaseItemDto, PurchaseItem.class);
@@ -74,10 +76,12 @@ public class PurchaseApplicationService {
                             .orElseThrow(() -> new CustomException(ErrorCodeType.ITEM_NOT_FOUND));
                     purchaseItem.insertItem(item);
 
-                    items.add(purchaseItem);
+                    purchaseItems.add(purchaseItem);
+                    items.add(item);
                 }
             }
-            purchaseItemDomainService.createPurchaseItem(items);
+            purchaseItemDomainService.createPurchaseItem(purchaseItems);
+            itemInventoryDomainService.createPurchaseItem(items, request);
         } else {
             throw new CustomException(ErrorCodeType.PURCHASE_NOT_FOUND);
         }

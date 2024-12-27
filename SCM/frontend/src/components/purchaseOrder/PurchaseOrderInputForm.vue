@@ -81,7 +81,7 @@ const updatePrice = (itemSeq) => {
 function openItemModal() {
   const modal = document.getElementById('openItemModal');
   if (modal) {
-    const bootstrapModal = new bootstrap.Modal(modal);
+    const bootstrapModal = Modal.getInstance(modal);
     bootstrapModal.show();
   } else {
     console.error("Modal not found.");
@@ -109,7 +109,6 @@ const removeItem = (itemSeq) => {
 };
 
 const addToOrderList = (selectedOrder) => {
-  console.log("itemSeq : " + selectedOrder.itemSeq);
   const existingItem = addPurchaseOrderItemList.value.find(
       (item) => item.itemSeq === selectedOrder.itemSeq
   );
@@ -234,7 +233,7 @@ const createPurchaseOrder = async () => {
 
       <div v-if="calculatePrice != 0" class="line-container mx-5">
         <div class="custom-line d-flex justify-content-end">
-            <h6 class="fw-bold" style="margin-top: 17px; float:right;">총 가격 : ₩ {{ calculatePrice }}</h6>
+            <h6 class="fw-bold" style="margin-top: 17px; float:right;">총 가격 : ₩ {{ calculatePrice.toLocaleString() }}</h6>
         </div>
       </div> <br />
 
@@ -260,7 +259,7 @@ const createPurchaseOrder = async () => {
         <div class="modal-header">
           <h1 class="modal-title fs-5">품목 선택</h1>
           <div class="ms-5">검색결과: {{ totalCount }}개</div>
-          <button type="button" class="button btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <button type="button" @click="closeItemModal" class="button btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
           <div style="max-height: 500px; overflow-y: scroll" class="d-flex row justify-content-center align-items-center">
