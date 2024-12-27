@@ -138,43 +138,46 @@ const workOrderDetailPrint = (workOrderSeq) => {
 
 // 작업지시서 목록 엑셀 다운로드
 const excelDown = async () => {
-  const response = await axios.get(`workOrder/excelDownload`, {
-    params: {
-      startDate: searchStartDate.value,
-      endDate: searchEndDate.value,
-      warehouseName: searchFactory.value,
-      workOrderStatus: searchStatus.value.size === 0 ? null : Array.from(searchStatus.value),
-    }, responseType: "blob"
-  });
-  const blob = new Blob([response.data], {
-    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-  });
-  const url = window.URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
+  try {
+    const response = await axios.get(`workOrder/excelDownload`, {
+      params: {
+        startDate: searchStartDate.value,
+        endDate: searchEndDate.value,
+        warehouseName: searchFactory.value,
+        workOrderStatus: searchStatus.value.size === 0 ? null : Array.from(searchStatus.value),
+      }, responseType: "blob"
+    });
+    const blob = new Blob([response.data], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
 
-  // 헤더 인식이 안될때 대비
-  let fileName = '작업지시서 download.xlsx';
-  const disposition = response.headers['content-disposition'];
+    // 헤더 인식이 안될때 대비
+    let fileName = '작업지시서 download.xlsx';
+    const disposition = response.headers['content-disposition'];
 
-  if (disposition) {
-    const fileNameMatch = disposition.match(/filename="?([^"]+)"?/);
-    if (fileNameMatch) {
-      fileName = decodeURIComponent(fileNameMatch[1]);
+    if (disposition) {
+      const fileNameMatch = disposition.match(/filename="?([^"]+)"?/);
+      if (fileNameMatch) {
+        fileName = decodeURIComponent(fileNameMatch[1]);
+      }
+    }
+
+    a.download = fileName;
+    // a.download = decodeURIComponent(response.headers["content-disposition"].split('filename=')[1]);
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.URL.revokeObjectURL(url);
+  } catch (error) {
+        console.error('Excel 다운로드 실패:', error);
+    if (error.response.data.errorCode === 'EXCEL_DOWN_ERROR_001') {
+      alert(error.response.data.message);
     }
   }
-
-  a.download = fileName;
-  // a.download = decodeURIComponent(response.headers["content-disposition"].split('filename=')[1]);
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  window.URL.revokeObjectURL(url);
-
-  if (error.response.data.errorCode === 'EXCEL_DOWN_ERROR_001') {
-    alert(error.response.data.message);
-  }
-}
+};
 
 // 삭제
 const deleteWorkOrder = async (workOrderSeq) => {
