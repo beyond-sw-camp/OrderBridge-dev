@@ -1,6 +1,6 @@
 <script setup>
 import {onMounted, ref, watch} from 'vue';
-import axios from "axios";
+import axios from "@/axios";
 import dayjs from "dayjs";
 import searchIcon from "@/assets/searchIcon.svg";
 
@@ -12,7 +12,7 @@ const productionReceivingSituationTotal = ref(null);
 
 const fetchProductionReceivingSituationList = async () => {
   try {
-    const response = await axios.get(`http://localhost:8090/api/v1/productionReceiving/situation`, {
+    const response = await axios.get(`productionReceiving/situation`, {
       params: {
         searchStartDate: searchStartDate.value,
         searchEndDate: searchEndDate.value,
@@ -62,7 +62,7 @@ const printTable = () => {
 const excelDown = async () => {
   const excelName = "생산입고현황_" + new Date().getFullYear() + (new Date().getMonth() + 1) + new Date().getDay();
   try {
-    const response = await axios.get(`http://localhost:8090/api/v1/productionReceiving/situation/excelDown`, {
+    const response = await axios.get(`productionReceiving/situation/excelDown`, {
       params: {
         searchStartDate: searchStartDate.value,
         searchEndDate: searchEndDate.value,
