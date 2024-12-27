@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from "vue";
+import {onMounted, ref} from "vue";
 import { useUserStore } from "@/stores/UserStore.js";
 import { useRoute, useRouter } from 'vue-router'; // Vue Router 사용
 
@@ -15,13 +15,10 @@ const handleLogin = async() => {
   if(userStore.isAuthenticated) {
     const redirect = route.query.redirect || '/'; // 리다이렉트 경로가 없으면 홈으로 이동
     await router.push(redirect);
-
-    location.reload();
   } else {
     alert(userStore.error)
   }
 }
-
 </script>
 
 <template>
