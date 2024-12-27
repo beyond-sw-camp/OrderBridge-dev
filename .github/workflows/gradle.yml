@@ -36,7 +36,7 @@ jobs:
 
       # backend 빌드
       - name: Build with Gradle Wrapper
-        run: ./gradlew build
+        run: ./gradlew build -x test # 테스트 코드 제외 빌드
         working-directory: ./SCM/backend
 
       # backend Test Code 실행
