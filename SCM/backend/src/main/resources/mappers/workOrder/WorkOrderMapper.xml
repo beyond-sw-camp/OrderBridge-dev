@@ -229,6 +229,7 @@
             , wo.work_order_name
     </select>
 
+    <!-- 현황조회 엑셀 다운로드 -->
     <select id="readWorkOrderSituationExcel" resultType="error.pirate.backend.workOrder.query.dto.WorkOrderSituationDTO">
         SELECT i.item_name
         , c.client_name

@@ -56,8 +56,8 @@ const userStore = useUserStore();
               <productionIcon class="icon"/>생산관리
             </a>
             <ul class="dropdown-menu">
-              <li><RouterLink to="/workOrder" class="dropdown-item">작업지시서 관리</RouterLink></li>
-              <li><RouterLink to="" class="dropdown-item">생산불출 관리</RouterLink></li>
+              <li><RouterLink to="/work-order" class="dropdown-item">작업지시서 관리</RouterLink></li>
+              <li><RouterLink to="/production-disbursement" class="dropdown-item">생산불출 관리</RouterLink></li>
               <li><RouterLink to="/productionReceiving" class="dropdown-item">생산입고 관리</RouterLink></li>
             </ul>
           </li>
