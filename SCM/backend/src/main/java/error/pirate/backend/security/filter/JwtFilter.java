@@ -30,7 +30,8 @@ public class JwtFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String authorization = request.getHeader(env.getProperty("jwt.access.header"));
+         String authorization = request.getHeader(env.getProperty("jwt.access.header"));
+         log.info("authorization : {}", authorization);
         if(authorization != null && authorization.startsWith("Bearer ")) {
             // AccessToken 추출
             String accessToken = authorization.substring(7);

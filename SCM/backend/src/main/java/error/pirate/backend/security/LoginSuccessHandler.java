@@ -26,11 +26,12 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
         log.info("로그인 성공 후 security가 관리하는 principal 객체 : {}", authentication);
 
         String accessToken = jwtUtil.createAccessToken(authentication);
-
+        log.info("accessToken : {}", accessToken);
         // 만료기간이 긴 refreshToken은 탈취되더라도 어떠한 정보도 얻을 수 없게끔 만료기한만 갖도록 설정
         String refreshToken = jwtUtil.createRefreshToken();
 
         RefreshToken redisRefreshToken = new RefreshToken(authentication.getName(), refreshToken);
+        log.info("RefreshToken Redis Save : {}", redisRefreshToken);
 
         refreshTokenRepository.save(redisRefreshToken);
 

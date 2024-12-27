@@ -1,6 +1,10 @@
 package error.pirate.backend.security;
 
+import error.pirate.backend.exception.CustomException;
+import error.pirate.backend.exception.ErrorCodeType;
 import error.pirate.backend.user.command.application.service.UserService;
+import error.pirate.backend.user.command.domain.aggregate.entity.RefreshToken;
+import error.pirate.backend.user.command.domain.repository.RefreshTokenRepository;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.tuple.Pair;
 import io.jsonwebtoken.*;
@@ -29,8 +33,10 @@ public class JwtUtil {
     private final Long refreshExpiration;
     private final String accessHeader;
     private final String refreshHeader;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     public JwtUtil(UserService userService,
+                   RefreshTokenRepository refreshTokenRepository,
                    @Value("${jwt.secretKey}") String jwtSecretKey,
                    @Value("${jwt.access.expiration}") Long accessExpiration,
                    @Value("${jwt.refresh.expiration}") Long refreshExpiration,
@@ -39,6 +45,7 @@ public class JwtUtil {
         byte[] keyBytes = Decoders.BASE64.decode(jwtSecretKey);
         this.key = Keys.hmacShaKeyFor(keyBytes);
         this.userService = userService;
+        this.refreshTokenRepository = refreshTokenRepository;
         this.jwtSecretKey = jwtSecretKey;
         this.accessExpiration = accessExpiration;
         this.refreshExpiration = refreshExpiration;
@@ -70,20 +77,17 @@ public class JwtUtil {
         try {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(accessToken); // 백엔드에서 발행한 token이 맞는지 key를 통해 확인
 
-            String refreshStatus = validateRefreshToken(refreshToken);
-            if("REFRESH_SUCCESS".equals(refreshStatus)) {
-                // accessToken과 refreshToken이 유효한 경우
                 pair = Pair.of("ACCESS_SUCCESS", null);
-            } else {
-                // accessToken은 유효하나 refreshToken이 유효하지 않은 경우 new refreshToken 발급
-                pair = Pair.of(refreshStatus, createRefreshToken());
-            }
         } catch (ExpiredJwtException e) {
 
             String refreshStatus = validateRefreshToken(refreshToken);
             if("REFRESH_SUCCESS".equals(refreshStatus)) {
                 // accessToken은 유효하지 않지만 refreshToken이 유효한 경우 accessToken 새로 발급
-                pair = Pair.of("ACCESS_EXPIRED", createAccessToken(getAuthentication(accessToken)));
+                RefreshToken redisRefreshToken = refreshTokenRepository.findByRefreshToken(refreshToken).orElseThrow(() -> new CustomException(ErrorCodeType.SECURITY_TOKEN_ERROR));
+
+                UserDetails user = userService.loadUserByUsername(redisRefreshToken.getUserEmployeeNo());
+
+                pair = Pair.of("ACCESS_EXPIRED", createAccessToken(new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities())));
             } else {
                 // accessToken도 유효하지 않고 refreshToken도 유효하지 않은 경우
                 log.error("Expired Jwt Token {}", e.getMessage()); // Jwt Token이 만료된 경우
