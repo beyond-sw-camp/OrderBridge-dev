@@ -1,6 +1,6 @@
 <script setup>
 import {onMounted, ref, watch} from 'vue';
-import axios from "axios";
+import axios from "@/axios.js";
 import searchIcon from "@/assets/searchIcon.svg";
 import trashIcon from "@/assets/trashIcon.svg";
 import editIcon from "@/assets/editIcon.svg";
@@ -35,7 +35,7 @@ const fetchPurchaseList = async () => {
         Object.entries(params).filter(([_, value]) => value !== null && value !== undefined && value !== '')
     );
 
-    const response = await axios.get(`http://localhost:8090/api/v1/purchase`, {
+    const response = await axios.get(`purchase`, {
       params: filteredParams,
       paramsSerializer: (params) => {
         return new URLSearchParams(params).toString();
@@ -68,7 +68,7 @@ const excelDown = async () => {
         Object.entries(params).filter(([_, value]) => value !== null && value !== undefined && value !== '')
     );
 
-    const response = await axios.get(`http://localhost:8090/api/v1/purchase/excelDown`, {
+    const response = await axios.get(`purchase/excelDown`, {
       params: filteredParams
       , paramsSerializer: (params) => {
         return new URLSearchParams(params).toString();

@@ -18,19 +18,13 @@ public class PurchaseCreateRequest {
 
     private Long userSeq; // 구매서 담당자
 
-    private Long warehouseSeq;  // 입고창고 번호
-
     private PurchaseStatus purchaseStatus = PurchaseStatus.PROGRESS; // 구매서 상태
 
     private LocalDateTime purchaseContractDate; // 구매서 계약일
 
-    private LocalDateTime purchaseRegdate; // 구매서 등록일
-
-    private LocalDateTime purchaseModDate; // 구매서 수정일
-
     private Integer purchaseExtendedPrice; // 구매서 총금액
 
-    private String purchaseNote; // 발주서 비고
+    private String purchaseNote; // 구매서 비고
 
     private List<PurchaseItemDto> purchaseItemDtoList;   // 구매 품목 리스트
 

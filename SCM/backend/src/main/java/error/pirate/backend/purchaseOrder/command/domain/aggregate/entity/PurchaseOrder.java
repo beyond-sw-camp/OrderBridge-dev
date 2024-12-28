@@ -77,10 +77,9 @@ public class PurchaseOrder {
         this.purchaseOrderStatus = status;
     }
 
-    public void objectInjection(User user, Client client, SalesOrder salesOrder) {
+    public void objectInjection(User user, Client client) {
         this.user = user;
         this.client = client;
-        this.salesOrder = salesOrder;
     }
 
 }

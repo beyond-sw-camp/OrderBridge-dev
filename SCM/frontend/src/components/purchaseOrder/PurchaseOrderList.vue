@@ -1,6 +1,6 @@
 <script setup>
 import {onMounted, ref, watch} from 'vue';
-import axios from "axios";
+import axios from "@/axios.js";
 import searchIcon from "@/assets/searchIcon.svg";
 import trashIcon from "@/assets/trashIcon.svg";
 import editIcon from "@/assets/editIcon.svg";
@@ -35,7 +35,7 @@ const fetchPurchaseOrderList = async () => {
         Object.entries(params).filter(([_, value]) => value !== null && value !== undefined && value !== '')
     );
 
-    const response = await axios.get(`http://localhost:8090/api/v1/purchaseOrder`, {
+    const response = await axios.get(`purchaseOrder`, {
       params: filteredParams,
       paramsSerializer: (params) => {
         return new URLSearchParams(params).toString();
@@ -66,7 +66,7 @@ const excelDown = async () => {
         Object.entries(params).filter(([_, value]) => value !== null && value !== undefined && value !== '')
     );
 
-    const response = await axios.get(`http://localhost:8090/api/v1/purchaseOrder/excelDown`, {
+    const response = await axios.get(`purchaseOrder/excelDown`, {
       params: filteredParams
       , paramsSerializer: (params) => {
         return new URLSearchParams(params).toString();
@@ -133,7 +133,7 @@ const itemDelete = async (seq) => {
   if (result) {
     try {
       const response = await axios.delete(`http://localhost:8090/api/v1/purchaseOrder/${seq}`);
-      alert('발주서의 상태가 변경되었습니다.');
+      alert('발주서가 삭제되었습니다.');
 
       search(); // 삭제 후 목록 갱신
     } catch (error) {
