@@ -4,6 +4,7 @@ on:
   push:
     branches: [ main ] # main으로 push하면 workflow 실행
   pull_request:
+    types: [ opened, reopened, synchronize ]  # Pull Request가 열리거나, 다시 열리거나, 동기화될 때 트리거됩니다.
     branches: [ main ] # main으로 pr하면 workflow 실행
 
 jobs:
@@ -33,7 +34,45 @@ jobs:
       - name: Grant execute permission for Gradle Wrapper
         run: chmod +x ./gradlew
         working-directory: ./SCM/backend
-
+      
+      # envsubst 도구 설치
+      - name: Install envsubst
+        # gettext 패키지를 설치하여 envsubst 명령을 사용 가능하게 합니다.
+        run: sudo apt-get install -y gettext
+      # application.yml 템플릿 생성  
+      - name: Create application.yml.template
+        run: |
+          mkdir -p src/main/resources
+          cat > src/main/resources/application.yml.template <<EOL
+          server:
+            port: 5000
+          spring:
+            datasource:
+              driver-class-name: org.mariadb.jdbc.Driver
+              url: jdbc:mariadb://\${RDS_HOSTNAME}:\${RDS_PORT}/\${RDS_DB_NAME}
+              username: \${RDS_USERNAME}
+              password: \${RDS_PASSWORD}
+            jpa:
+              show-sql: true
+              properties:
+                hibernate:
+                  '[format_sql]': true
+                  
+          EOL   
+      
+      # 템플릿 파일에 환경 변수를 대입하여 application.yml 생성
+      - name: Set Yaml
+        run: |
+          envsubst < src/main/resources/application.yml.template > src/main/resources/application.yml
+          echo "Generated application.yml:"
+          cat src/main/resources/application.yml
+        env:
+          RDS_HOSTNAME: ${{ secrets.RDS_HOSTNAME }}
+          RDS_PORT: ${{ secrets.RDS_PORT }}
+          RDS_DB_NAME: ${{ secrets.RDS_DB_NAME }}
+          RDS_USERNAME: ${{ secrets.RDS_USERNAME }}
+          RDS_PASSWORD: ${{ secrets.RDS_PASSWORD }}
+          
       # backend 빌드
       - name: Build with Gradle Wrapper
         run: ./gradlew build -x test # 테스트 코드 제외 빌드
