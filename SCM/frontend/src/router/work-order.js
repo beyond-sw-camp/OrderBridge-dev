@@ -1,18 +1,18 @@
 export default [
     {
-        path: "/workOrder",
+        path: "/work-order",
         component: () => import("@/views/workOrder/WorkOrderListView.vue")
     },
     {
-        path: "/workOrder/situation",
+        path: "/work-order/situation",
         component: () => import("@/views/workOrder/WorkOrderSituationView.vue")
     },
     {
-        path: "/workOrder/write",
+        path: "/work-order/write",
         component: () => import("@/views/workOrder/WorkOrderWriteView.vue")
     },
     {
-        path: "/workOrder/edit/:workOrderSeq",
+        path: "/work-order/edit/:workOrderSeq",
         component: () => import("@/views/workOrder/WorkOrderEditView.vue")
     }
 ]

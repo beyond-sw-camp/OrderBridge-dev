@@ -33,6 +33,8 @@ public class ProductionDisbursement {
 
     private String productionDisbursementName; // 생산불출명
 
+    private String productionDisbursementTotalQuantity;  // 생산불출 총수량
+
     @CreatedDate
     private LocalDateTime productionDisbursementRegDate; // 생산불출 등록일
 
