@@ -54,7 +54,7 @@ class ShippingInstructionQueryServiceTest {
             ShippingInstructionListRequest request
     ) {
         assertDoesNotThrow(
-                () -> shippingInstructionQueryService.shippingInstructionExcelDown(request));
+                () -> shippingInstructionQueryService.shippingInstructionExcel(request));
     }
 
     private static Stream<Arguments> readShippingInstructionArguments() {

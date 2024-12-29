@@ -120,14 +120,12 @@ const fetchItemDivision = async () => {
 const excelDown = async () => {
   const excelName = "출하지시서_" + new Date().getFullYear() + (new Date().getMonth() + 1) + new Date().getDay();
   try {
-    const response = await axios.get(`shipping-instruction/excelDown`, {
+    const response = await axios.get(`shipping-instruction/excel`, {
       params: {
         startDate: searchStartDate.value,
         endDate: searchEndDate.value,
         clientName: searchName.value,
         shippingInstructionStatus: searchStatus.value.size === 0 ? null : Array.from(searchStatus.value),
-        page: pageNumber.value,
-        size: pageSize.value
       }, paramsSerializer: (params) => {
         // null이나 undefined 값을 필터링
         const filteredParams = Object.fromEntries(

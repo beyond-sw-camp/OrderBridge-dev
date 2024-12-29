@@ -47,15 +47,16 @@ const fetchShippingAddressList = async () => {
   }
 };
 
-// 현황 엑셀 다운 요청
+// 엑셀 다운 요청
 const excelDown = async () => {
   const excelName = "출하지시서현황_" + new Date().getFullYear() + (new Date().getMonth() + 1) + new Date().getDay();
   try {
-    const response = await axios.get(`shipping-instruction/situation/excelDown`, {
+    const response = await axios.get(`shipping-instruction/excel`, {
       params: {
         startDate: searchStartDate.value,
         endDate: searchEndDate.value,
-        clientName: searchName.value
+        clientName: searchName.value,
+        shippingInstructionStatus: null,
       }, paramsSerializer: (params) => {
         // null이나 undefined 값을 필터링
         const filteredParams = Object.fromEntries(
