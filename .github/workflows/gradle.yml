@@ -102,31 +102,71 @@ jobs:
           utcOffset: "+09:00"
 
       - name: Show Current Time
-        run: echo "CurrentTime=${{steps.current-time.outputs.formattedTime}}"
+        run: echo "currentTime=${{steps.current-time.outputs.formattedTime}}"
         shell: bash
 
-      - name: Generate deployment package
+      - name: Generate backend deployment package
         run: |
           mkdir -p deploy
           cp SCM/backend/build/libs/*.jar deploy/application.jar
-          cp Procfile deploy/Procfile
+          cp Procfile_back deploy/Procfile
           cp -r .ebextensions deploy/.ebextensions
           cp -r .platform deploy/.platform
           cd deploy && zip -r deploy.zip .
 
-      - name: Beanstalk Deploy
+      - name: Beanstalk backend Deploy
         uses: einaregilsson/beanstalk-deploy@v22
         with:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          application_name: ${{ secrets.AWS_ELASTIC_BEANSTALK_APPLICATION }}
-          environment_name: ${{ secrets.AWS_ELASTIC_BEANSTALK_ENV }}
-          version_label: github-action-${{steps.current-time.outputs.formattedTime}}
+          application_name: ${{ secrets.AWS_ELASTIC_BEANSTALK_BACKEND_APPLICATION }}
+          environment_name: ${{ secrets.AWS_ELASTIC_BEANSTALK_BACKEND_ENV }}
+          version_label: github-action-backend_${{steps.current-time.outputs.formattedTime}}
           region: ${{ secrets.AWS_REGION }}
           deployment_package: deploy/deploy.zip
           use_existing_version_if_available: false
           wait_for_deployment: true
           wait_for_environment_recovery: 300
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+        working-directory: ./SCM/frontend
+
+      - name: Build project
+        run: npm run build
+        working-directory: ./SCM/frontend
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Generate frontend deployment package
+        run: |
+          mkdir -p deploy
+          cp -r SCM/frontend/dist deploy
+          cp SCM/frontend/package.json deploy
+          cp Procfile_front deploy/Procfile
+          cd deploy && zip -r deploy.zip .
+
+      - name: Beanstalk frontend Deploy
+        uses: einaregilsson/beanstalk-deploy@v22
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: ${{ secrets.AWS_ELASTIC_BEANSTALK_FRONTEND_APPLICATION }}
+          environment_name: ${{ secrets.AWS_ELASTIC_BEANSTALK_FRONTEND_ENV }}
+          version_label: github-action-frontend_${{steps.current-time.outputs.formattedTime}}
+          region: ${{ secrets.AWS_REGION }}
+          deployment_package: deploy/deploy.zip
+
   # 프로젝트의 의존성 그래프를 생성 및 제출하여 Github에서 시각적으로 관리하도록 한다.
   dependency-submission:
 
