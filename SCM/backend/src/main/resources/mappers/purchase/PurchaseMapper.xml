@@ -9,6 +9,8 @@
             tp.purchase_seq,
             tp.purchase_name,
             tp.purchase_status,
+            tp.purchase_reg_date,
+            tp.purchase_mod_date,
             tp.purchase_contract_date,
             tp.purchase_extended_price,
             tp.purchase_note,
