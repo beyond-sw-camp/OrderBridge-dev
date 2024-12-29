@@ -116,7 +116,7 @@ watch([searchStartDate, searchEndDate], () => {
     <div class="col-md-3">
       <div class="side-box card">
         <div class="card-body">
-          <p class="card-title">작업지시일</p>
+          <p class="card-title">생산불출일</p>
           <input type="date"  v-model="searchStartDate"/> ~
           <input type="date"  v-model="searchEndDate"/>
         </div>
@@ -164,7 +164,7 @@ watch([searchStartDate, searchEndDate], () => {
             <!-- 필터링된 결과 및 월별 데이터 출력 -->
             <template v-for="(monthData, index) in productionDisbursementSituationList" :key="index">
 
-              <!-- 작업지시서 데이터 -->
+              <!-- 생산불출 데이터 -->
               <tr v-for="(situation, idx) in monthData.situations" :key="idx">
                 <td>{{ idx + 1 }}</td>
                 <td>{{ situation.productionDisbursementName }}</td>
