@@ -11,7 +11,18 @@ import logoutIcon from '@/assets/logoutIcon.svg';
 import {useUserStore} from "@/stores/UserStore.js";
 import Chatbot from "@/components/common/Chatbot.vue";
 
+import { ref } from "vue";
+
 const userStore = useUserStore();
+const chatbot = ref(null);
+
+function chatbotOn() {
+  if (chatbot.value) {
+    chatbot.value = null;
+  } else {
+    chatbot.value = "display: block";
+  }
+}
 </script>
 
 <template>
@@ -76,12 +87,12 @@ const userStore = useUserStore();
           </li>
         </ul>
         <ul class="navbar-nav mb-lg-0 d-flex flex-row">
-          <li class="nav-item"><RouterLink to="#" class="nav-link"><chatbotIcon class="icon-right"/></RouterLink></li>
+          <li class="nav-item" @click="chatbotOn()"><RouterLink to="#" class="nav-link"><chatbotIcon class="icon-right"/></RouterLink></li>
           <li class="nav-item"><RouterLink to="#" class="nav-link"><notificationIcon class="icon-right"/></RouterLink></li>
           <li class="nav-item"><RouterLink to="#" class="nav-link"><myPageIcon class="icon-right"/></RouterLink></li>
           <li class="nav-item" @click="userStore.logout()"><RouterLink to="#" class="nav-link"><!--<logoutIcon class="icon-right"/>-->로그아웃</RouterLink></li>
         </ul>
-        <div style="position: absolute; padding: 10px; top: 100px; right: 5px; width: 400px; height: 300px;">
+        <div id="chatbot" v-bind:style="chatbot">
           <chatbot />
         </div>
       </div>
@@ -127,5 +138,18 @@ const userStore = useUserStore();
   position: fixed;
   top: 0px;
   z-index: 6;
+}
+
+#chatbot {
+  display: none;
+  position: absolute; 
+  padding: 10px; 
+  top: 100px; 
+  right: 5px; 
+  width: 400px; 
+  height: 300px;
+  border: solid 2px silver;
+  border-radius: 10px;
+  backdrop-filter: blur(5px);
 }
 </style>

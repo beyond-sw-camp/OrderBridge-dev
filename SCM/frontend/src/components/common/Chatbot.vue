@@ -30,6 +30,7 @@ const fetchChatbot = async () =>{
     }
 
     console.log(items.value);
+    scrollBar();
   }catch (error) {
     if (error.response) {
       console.error(`챗봇 호출 실패 : 메세지 ${error.response.message}`);
@@ -40,21 +41,35 @@ const fetchChatbot = async () =>{
 // 질문
 function question() {
   items.value.push(questionTest.value);
+  scrollBar();
   fetchChatbot();
+}
+
+// 스크롤바 설정
+function scrollBar() {
+  const chatbotBody = document.getElementById("chatbotBody");
+  console.log(chatbotBody.scrollTop, chatbotBody.offsetHeight);
+  chatbotBody.scrollTop = chatbotBody.scrollHeight;
+  // chatbotBody.scrollTo({top: chatbotBody.scrollHeight, behavior: "smooth"});
 }
 </script>
 
 <template>
-  <div style="width: 100%; height: 200px; overflow-y: auto;">
-    <ul id="chatbotText" >
-      <li v-for="(item, index) in items" :key="index">
-        {{ item }}
-      </li>
+  <div id="chatbotBody">
+    <ul id="chatbotText">
+      <template v-for="(item, index) in items" :key="index">
+        <template v-if="index % 2 === 0">
+          <li><div class="chat" style="justify-self: self-end;">{{ item }}</div></li>
+        </template>
+        <template v-else>
+          <li><div class="chat" style="justify-self: self-start;">{{ item }}</div></li>
+        </template>
+      </template>
     </ul>
   </div>
-  <div style="width: 100%; height: 50px;" >
+  <div style="width: 100%; height: 20%;" >
     <b-input-group class="mt-3">
-      <b-form-input v-model="questionTest" placeholder="질문을 입력하세요."></b-form-input>
+      <b-form-input v-model="questionTest" placeholder="질문을 입력하세요." @keyup.enter="question()"></b-form-input>
       <b-button variant="light" class="button" :disabled="!questionTest.trim()" @click="question()">
         <searchIcon class="icon"/>
       </b-button>
@@ -76,6 +91,29 @@ function question() {
 .icon {
   width: 20px;
   height: 20px;
+}
+
+#chatbotBody {
+  width: 100%; 
+  height: 80%; 
+  overflow-y: auto;
+  border: solid 1px silver;
+  border-radius: 10px;
+}
+
+#chatbotText {
+  list-style: none;
+  padding: 0px 5px 0px 5px;
+}
+
+.chat {
+  width: fit-content;
+  max-width: 300px;
+  margin-top: 10px;
+  padding: 5px;
+  border: solid 1px silver;
+  border-radius: 10px;
+  background-color: white;
 }
 
 </style>
