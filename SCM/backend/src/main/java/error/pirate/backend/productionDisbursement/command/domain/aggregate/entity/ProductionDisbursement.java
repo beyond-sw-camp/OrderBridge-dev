@@ -48,4 +48,9 @@ public class ProductionDisbursement {
     private ProductionDisbursementStatus productionDisbursementStatus; // 생산불출 상태
 
     private String productionDisbursementNote; // 생산불출 비고
+
+
+    public void deleteProductionDisbursement() {
+        this.productionDisbursementStatus = ProductionDisbursementStatus.DELETE;
+    }
 }

@@ -67,6 +67,7 @@ public enum ErrorCodeType {
     // 생산불출 오류
     PRODUCTION_DISBURSEMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "PRODUCTION_DISBURSEMENT_ERROR_001", "생산불출을 찾을 수 없습니다."),
     PRODUCTION_DISBURSEMENT_STATE_BAD_REQUEST(HttpStatus.BAD_REQUEST, "PRODUCTION_DISBURSEMENT_ERROR_002", "생산불출의 상태를 확인해주세요"),
+
     // 회원 오류
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "USER_ERROR_001", "회원을 찾을 수 없습니다."),
 

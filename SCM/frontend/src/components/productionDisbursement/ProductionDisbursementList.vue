@@ -186,6 +186,28 @@ const productionDisbursementDetailPrint = (productionDisbursementSeq) => {
     }
 };
 
+const deleteProductionDisbursement = async (productionDisbursementSeq) => {
+  const result = confirm("이 생산불출서를 삭제하시겠습니까?");
+  console.log("삭제요청 생산불출 번호", productionDisbursementSeq);
+  if (result) {
+    try {
+      const response = await axios.delete(`productionDisbursement/${productionDisbursementSeq}`);
+      alert('삭제가 완료되었습니다.');
+
+      search(); // 삭제 후 목록 갱신
+    } catch (error) {
+      console.error("생산불출서 삭제 요청 실패:", error);
+      if (error.response.data.errorCode === 'PRODUCTION_DISBURSEMENT_ERROR_001') {
+        alert(error.response.data.message);
+      } else if (error.response.data.errorCode === 'PRODUCTION_DISBURSEMENT_ERROR_002') {
+        alert('불출 전 상태만 삭제 가능합니다.');
+      }  else {
+        alert('삭제에 실패했습니다. 다시 시도해주세요.');
+      }
+    }
+  }
+}
+
 // 등록 페이지로 이동
 const goToWriteProductionDisbursement = () => {
   router.push(`/production-disbursement/write`);
@@ -266,7 +288,7 @@ function search() {
           </div>
         </div>
         <div class="list-headline row">
-          <div class="list-head col-5">생산불출명</div>
+          <div class="list-head col-5">생산불출서명</div>
           <div class="list-head col-2">생산공장명</div>
           <div class="list-head col-3">생산불출일</div>
           <div class="list-head col-2">상태</div>

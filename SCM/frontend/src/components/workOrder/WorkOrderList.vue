@@ -195,9 +195,7 @@ const deleteWorkOrder = async (workOrderSeq) => {
         alert(error.response.data.message);
       } else if (error.response.data.errorCode === 'WORK_ORDER_ERROR_005') {
         alert('결재 전이거나 중단된 작업지시서만 삭제 가능합니다.');
-      } else if (error.response.data.errorCode === 'WORK_ORDER_NOT_FOUND') {
-        alert(error.response.data.message);
-      } else {
+      }  else {
         alert('삭제에 실패했습니다. 다시 시도해주세요.');
       }
     }
