@@ -103,7 +103,7 @@ const fetchNotifications = async () => {
     <ul>
       <li v-for="notification in notificationList" :key="notification.notificationSeq">
         <span>{{ notification.notificationTitle }}</span>
-        <span style="float:right;">{{ dayjs(notification.notificationRegDate).format('YYYY/MM/DD HH:mm:ss') }}</span>
+        <span style="float:right;">{{ dayjs(notification.notificationRegDate).format('YYYY/MM/DD HH:mm') }}</span>
         <br/>
         <span v-html="notification.notificationContent"></span>
       </li>
