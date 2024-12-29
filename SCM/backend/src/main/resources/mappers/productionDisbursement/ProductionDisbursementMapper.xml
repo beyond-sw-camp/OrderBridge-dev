@@ -254,7 +254,4 @@
         ORDER BY pd.production_disbursement_departure_date
     </select>
 
-    <!-- 전표조회 -->
-
-
 </mapper>
