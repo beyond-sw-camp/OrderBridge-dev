@@ -9,8 +9,24 @@ import orderIcon from '@/assets/orderIcon.svg';
 import statisticsIcon from '@/assets/statisticsIcon.svg'
 import logoutIcon from '@/assets/logoutIcon.svg';
 import {useUserStore} from "@/stores/UserStore.js";
+import dayjs from 'dayjs';
+import { ref } from "vue";
+import axios from "@/axios.js";
 
 const userStore = useUserStore();
+const notificationList = ref([]);
+const isNotificationOpen = ref(false);
+
+const fetchNotifications = async () => {
+  try {
+    const response = await axios.get("notification");
+
+    notificationList.value = response.data;
+    isNotificationOpen.value = true;
+  } catch (error) {
+    console.error("알림 데이터를 가져오는 중 오류 발생:", error);
+  }
+};
 </script>
 
 <template>
@@ -76,12 +92,25 @@ const userStore = useUserStore();
         </ul>
         <ul class="navbar-nav mb-lg-0 d-flex flex-row">
           <li class="nav-item"><RouterLink to="#" class="nav-link"><chatbotIcon class="icon-right"/></RouterLink></li>
-          <li class="nav-item"><RouterLink to="#" class="nav-link"><notificationIcon class="icon-right"/></RouterLink></li>
+          <li class="nav-item"><RouterLink to="#" class="nav-link" @click.prevent="fetchNotifications"><notificationIcon class="icon-right"/></RouterLink></li>
           <li class="nav-item"><RouterLink to="#" class="nav-link"><myPageIcon class="icon-right"/></RouterLink></li>
           <li class="nav-item" @click="userStore.logout()"><RouterLink to="#" class="nav-link"><!--<logoutIcon class="icon-right"/>-->로그아웃</RouterLink></li>
         </ul>
       </div>
   </nav>
+
+  <div v-if="isNotificationOpen" class="notification-bar">
+    <ul>
+      <li v-for="notification in notificationList" :key="notification.notificationSeq">
+        <span>{{ notification.notificationTitle }}</span>
+        <span style="float:right;">{{ dayjs(notification.notificationRegDate).format('YYYY/MM/DD HH:mm:ss') }}</span>
+        <br/>
+        <span v-html="notification.notificationContent"></span>
+      </li>
+    </ul>
+    <button @click="isNotificationOpen = false">닫기</button>
+  </div>
+
 </template>
 <style scoped>
 @media (max-width: 768px) {
@@ -124,4 +153,37 @@ const userStore = useUserStore();
   top: 0px;
   z-index: 6;
 }
+
+.notification-bar {
+  position: fixed;
+  top: 50px;
+  right: 10px;
+  width: 300px;
+  max-height: 400px;
+  background-color: white;
+  border: 1px solid #ddd;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
+  z-index: 1000;
+  padding: 10px;
+}
+.notification-bar ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.notification-bar li {
+  padding: 8px 10px;
+  border-bottom: 1px solid #f0f0f0;
+}
+.notification-bar button {
+  display: block;
+  margin: 10px auto;
+  padding: 5px 10px;
+  border: none;
+  background-color: #333;
+  color: white;
+  cursor: pointer;
+}
+
 </style>
