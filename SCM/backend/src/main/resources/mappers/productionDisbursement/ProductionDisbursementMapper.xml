@@ -196,6 +196,7 @@
         LEFT JOIN tb_work_order wo ON wo.work_order_seq = pd.work_order_seq
         LEFT JOIN tb_warehouse w1 ON wo.warehouse_seq = w1.warehouse_seq
         LEFT JOIN tb_warehouse w2 ON pdi.ingredients_warehouse_seq = w2.warehouse_seq
+        WHERE pd.production_disbursement_status NOT IN ('DELETE')
         <if test="startDate != null">
             <![CDATA[
                 AND pd.production_disbursement_departure_date >= #{startDate}
@@ -207,10 +208,10 @@
             ]]>
         </if>
         <if test="factoryName != '' and factoryName != null">
-            AND w2.warehouse_name LIKE CONCAT('%', #{factoryName}, '%')
+            AND w1.warehouse_name LIKE CONCAT('%', #{factoryName}, '%')
         </if>
         <if test="storeName != '' and storeName != null">
-            AND w1.store_name LIKE CONCAT('%', #{storeName}, '%')
+            AND w2.warehouse_name LIKE CONCAT('%', #{storeName}, '%')
         </if>
         ORDER BY pd.production_disbursement_departure_date
     </select>
@@ -235,6 +236,7 @@
         LEFT JOIN tb_work_order wo ON wo.work_order_seq = pd.work_order_seq
         LEFT JOIN tb_warehouse w1 ON wo.warehouse_seq = w1.warehouse_seq
         LEFT JOIN tb_warehouse w2 ON pdi.ingredients_warehouse_seq = w2.warehouse_seq
+        WHERE pd.production_disbursement_status NOT IN ('DELETE')
         <if test="startDate != null">
             <![CDATA[
                 AND pd.production_disbursement_departure_date >= #{startDate}
@@ -246,10 +248,10 @@
             ]]>
         </if>
         <if test="factoryName != '' and factoryName != null">
-            AND w2.warehouse_name LIKE CONCAT('%', #{factoryName}, '%')
+            AND w1.warehouse_name LIKE CONCAT('%', #{factoryName}, '%')
         </if>
         <if test="storeName != '' and storeName != null">
-            AND w1.store_name LIKE CONCAT('%', #{storeName}, '%')
+            AND w2.warehouse_name LIKE CONCAT('%', #{storeName}, '%')
         </if>
         ORDER BY pd.production_disbursement_departure_date
     </select>
