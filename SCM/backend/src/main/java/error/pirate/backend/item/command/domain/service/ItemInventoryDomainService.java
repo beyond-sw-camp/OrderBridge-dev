@@ -6,12 +6,17 @@ import error.pirate.backend.item.command.domain.aggregate.entity.BomItem;
 import error.pirate.backend.item.command.domain.aggregate.entity.Item;
 import error.pirate.backend.item.command.domain.aggregate.entity.ItemInventory;
 import error.pirate.backend.item.command.domain.repository.ItemInventoryRepository;
+import error.pirate.backend.item.query.dto.ItemInventoryDTO;
+import error.pirate.backend.purchase.command.application.dto.PurchaseCreateRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -20,6 +25,8 @@ import java.util.List;
 public class ItemInventoryDomainService {
 
     private final ItemInventoryRepository itemInventoryRepository;
+
+    private final ModelMapper modelMapper;
 
     public void checkInventoryForBomItems(List<BomItem> bomItems, int orderQuantity) {
         for (BomItem bomItem : bomItems) {
@@ -86,4 +93,38 @@ public class ItemInventoryDomainService {
             // 변경 사항 저장은 @Transactional에 의해 자동 처리됨
         }
     }
+
+    public void createPurchaseItem(List<Item> items, PurchaseCreateRequest purchaseItems) {
+        List<ItemInventory> itemList = new ArrayList<>();
+
+        if(ObjectUtils.isNotEmpty(items)) {
+            for(Item item : items) {
+                ItemInventoryDTO.createPurchaseItem itemInventoryDTO = ItemInventoryDTO.createPurchaseItem.builder()
+                                .item(item)
+                                .itemInventoryQuantityReceived(
+                                        purchaseItems.getPurchaseItemDtoList().stream()
+                                                .filter(purchaseItem -> purchaseItem.getItemSeq().equals(item.getItemSeq()))
+                                                .findFirst().get().getPurchaseItemQuantity())
+                                .itemInventoryRemainAmount(
+                                        purchaseItems.getPurchaseItemDtoList().stream()
+                                                .filter(purchaseItem -> purchaseItem.getItemSeq().equals(item.getItemSeq()))
+                                                .findFirst().get().getPurchaseItemQuantity())
+                                .itemInventoryReceiptDate(
+                                        purchaseItems.getPurchaseItemDtoList().stream()
+                                                .filter(purchaseItem -> purchaseItem.getItemSeq().equals(item.getItemSeq()))
+                                                .findFirst().get().getPurchaseItemReceiptDate())
+                                .itemInventoryExpirationDate(
+                                        purchaseItems.getPurchaseItemDtoList().stream()
+                                                .filter(purchaseItem -> purchaseItem.getItemSeq().equals(item.getItemSeq()))
+                                                .findFirst().get()
+                                                .getPurchaseItemReceiptDate().plusHours(item.getItemExpirationHour()))
+                                .build();
+
+                ItemInventory newItem = modelMapper.map(itemInventoryDTO, ItemInventory.class);
+                itemList.add(newItem);
+            }
+        }
+        itemInventoryRepository.saveAll(itemList);
+    }
+
 }

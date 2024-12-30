@@ -8,10 +8,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -35,4 +32,10 @@ public class ClientQueryController {
         return ResponseEntity.ok(clientQueryService.getClient(clientSeq));
     }
 
+    @GetMapping("/hint")
+    @Operation(summary = "거래처 힌트 조회", description = "거래처 힌트를 조회합니다.")
+    public ResponseEntity<List<String>> readClientHint(
+            @RequestParam String keyword) {
+        return ResponseEntity.ok(clientQueryService.readClientHint(keyword));
+    }
 }

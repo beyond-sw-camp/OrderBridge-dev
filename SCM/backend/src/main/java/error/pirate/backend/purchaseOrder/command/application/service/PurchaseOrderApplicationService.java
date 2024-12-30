@@ -2,10 +2,13 @@ package error.pirate.backend.purchaseOrder.command.application.service;
 
 import error.pirate.backend.client.command.domain.aggregate.entity.Client;
 import error.pirate.backend.client.command.domain.aggregate.repository.ClientRepository;
+import error.pirate.backend.common.SecurityUtil;
 import error.pirate.backend.exception.CustomException;
 import error.pirate.backend.exception.ErrorCodeType;
 import error.pirate.backend.item.command.domain.aggregate.entity.Item;
 import error.pirate.backend.item.command.domain.repository.ItemRepository;
+import error.pirate.backend.notification.command.domain.aggregate.entity.NotificationType;
+import error.pirate.backend.notification.command.domain.service.NotificationDomainService;
 import error.pirate.backend.purchaseOrder.command.application.dto.PurchaseOrderCreateRequest;
 import error.pirate.backend.purchaseOrder.command.application.dto.PurchaseOrderItemDto;
 import error.pirate.backend.purchaseOrder.command.application.dto.PurchaseOrderUpdateRequest;
@@ -14,9 +17,6 @@ import error.pirate.backend.purchaseOrder.command.domain.aggregate.entity.Purcha
 import error.pirate.backend.purchaseOrder.command.domain.aggregate.entity.PurchaseOrderStatus;
 import error.pirate.backend.purchaseOrder.command.domain.service.PurchaseOrderDomainService;
 import error.pirate.backend.purchaseOrder.command.domain.service.PurchaseOrderItemDomainService;
-import error.pirate.backend.salesOrder.command.domain.aggregate.entity.SalesOrder;
-import error.pirate.backend.salesOrder.command.domain.aggregate.entity.SalesOrderStatus;
-import error.pirate.backend.salesOrder.command.domain.service.SalesOrderDomainService;
 import error.pirate.backend.user.command.domain.aggregate.entity.User;
 import error.pirate.backend.user.command.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +38,7 @@ public class PurchaseOrderApplicationService {
 
     private final PurchaseOrderItemDomainService purchaseOrderItemDomainService;
 
-    private final SalesOrderDomainService salesOrderDomainService;
+    private final NotificationDomainService notificationDomainService;
 
     private final UserRepository userRepository;
 
@@ -48,42 +48,44 @@ public class PurchaseOrderApplicationService {
 
     private final ItemRepository itemRepository;
 
+    private final SecurityUtil securityUtil;
+
     @Transactional
     public void createPurchaseOrder(PurchaseOrderCreateRequest request) {
-        SalesOrder salesOrder = salesOrderDomainService.findById(request.getSalesOrderSeq());
-        if(salesOrder.getSalesOrderStatus() == SalesOrderStatus.AFTER) {
-            PurchaseOrder purchaseOrder = modelMapper.map(request, PurchaseOrder.class);
+        //TODO 아영 - 로그인이 완료되면 userSeq 정보 넣기
 
-            User user = userRepository.findById(request.getUserSeq())
-                    .orElseThrow(() -> new CustomException(ErrorCodeType.USER_NOT_FOUND));
+        PurchaseOrder purchaseOrder = modelMapper.map(request, PurchaseOrder.class);
 
-            Client client = clientRepository.findById(request.getClientSeq())
-                    .orElseThrow(() -> new CustomException(ErrorCodeType.CLIENT_NOT_FOUND));
+        User user = userRepository.findById(request.getUserSeq())
+                .orElseThrow(() -> new CustomException(ErrorCodeType.USER_NOT_FOUND));
 
-            purchaseOrder.objectInjection(user, client, salesOrder);
-            purchaseOrder.changePurchaseOrderTotalQuantity(
-                    request.getPurchaseOrderItemDtoList().stream().mapToInt(PurchaseOrderItemDto::getPurchaseOrderItemQuantity).sum()
-            );
-            PurchaseOrder purchaseOrderResponse = purchaseOrderDomainService.createPurchaseOrder(purchaseOrder);
+        Client client = clientRepository.findById(request.getClientSeq())
+                .orElseThrow(() -> new CustomException(ErrorCodeType.CLIENT_NOT_FOUND));
 
-            List<PurchaseOrderItem> items = new ArrayList<>();
-            if(ObjectUtils.isNotEmpty(request.getPurchaseOrderItemDtoList())) {
-                for(PurchaseOrderItemDto purchaseOrderItemDto : request.getPurchaseOrderItemDtoList()) {
-                    PurchaseOrderItem purchaseOrderItem = modelMapper.map(purchaseOrderItemDto, PurchaseOrderItem.class);
+        purchaseOrder.objectInjection(user, client);
+        purchaseOrder.changePurchaseOrderTotalQuantity(
+                request.getPurchaseOrderItemDtoList().stream().mapToInt(PurchaseOrderItemDto::getPurchaseOrderItemQuantity).sum()
+        );
+        PurchaseOrder purchaseOrderResponse = purchaseOrderDomainService.createPurchaseOrder(purchaseOrder);
 
-                    purchaseOrderItem.insertPurchase(purchaseOrderResponse);
+        List<PurchaseOrderItem> items = new ArrayList<>();
+        if (ObjectUtils.isNotEmpty(request.getPurchaseOrderItemDtoList())) {
+            for (PurchaseOrderItemDto purchaseOrderItemDto : request.getPurchaseOrderItemDtoList()) {
+                PurchaseOrderItem purchaseOrderItem = modelMapper.map(purchaseOrderItemDto, PurchaseOrderItem.class);
 
-                    Item item = itemRepository.findById(purchaseOrderItemDto.getItemSeq())
-                            .orElseThrow(() -> new CustomException(ErrorCodeType.ITEM_NOT_FOUND));
-                    purchaseOrderItem.insertItem(item);
+                purchaseOrderItem.insertPurchase(purchaseOrderResponse);
 
-                    items.add(purchaseOrderItem);
-                }
+                Item item = itemRepository.findById(purchaseOrderItemDto.getItemSeq())
+                        .orElseThrow(() -> new CustomException(ErrorCodeType.ITEM_NOT_FOUND));
+                purchaseOrderItem.insertItem(item);
+
+                items.add(purchaseOrderItem);
             }
-            purchaseOrderItemDomainService.createPurchaseOrderItem(items);
-        } else {
-            throw new CustomException(ErrorCodeType.SALES_ORDER_STATE_BAD_REQUEST);
         }
+        purchaseOrderItemDomainService.createPurchaseOrderItem(items);
+
+        //알림 생성
+        notificationDomainService.createNotificationMessage(NotificationType.PURCHASE_ORDER, purchaseOrderResponse.getPurchaseOrderSeq(), purchaseOrderResponse.getPurchaseOrderName());
     }
 
     @Transactional

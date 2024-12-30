@@ -54,9 +54,6 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
     // https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-jackson
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
-
-    implementation 'org.springframework.security:spring-security-oauth2-authorization-server:1.1.0'
-    implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
 }
 
 tasks.named('test') {

@@ -9,11 +9,27 @@ import orderIcon from '@/assets/orderIcon.svg';
 import statisticsIcon from '@/assets/statisticsIcon.svg'
 import logoutIcon from '@/assets/logoutIcon.svg';
 import {useUserStore} from "@/stores/UserStore.js";
+import dayjs from 'dayjs';
+import { ref } from "vue";
+import axios from "@/axios.js";
 import Chatbot from "@/components/common/Chatbot.vue";
 
 import { ref } from "vue";
 
 const userStore = useUserStore();
+const notificationList = ref([]);
+const isNotificationOpen = ref(false);
+
+const fetchNotifications = async () => {
+  try {
+    const response = await axios.get("notification");
+
+    notificationList.value = response.data;
+    isNotificationOpen.value = true;
+  } catch (error) {
+    console.error("알림 데이터를 가져오는 중 오류 발생:", error);
+  }
+};
 const chatbot = ref(null);
 
 function chatbotOn() {
@@ -37,8 +53,8 @@ function chatbotOn() {
               <basicIcon class="icon"/>기본등록
             </a>
             <ul class="dropdown-menu">
-              <li><RouterLink to="warehouse" class="dropdown-item">창고 관리</RouterLink></li>
-              <li><RouterLink to="client" class="dropdown-item">거래처 관리</RouterLink></li>
+              <li><RouterLink to="/warehouse" class="dropdown-item">창고 관리</RouterLink></li>
+              <li><RouterLink to="/client" class="dropdown-item">거래처 관리</RouterLink></li>
               <li><RouterLink to="/item" class="dropdown-item">품목 관리</RouterLink></li>
             </ul>
           </li>
@@ -47,9 +63,9 @@ function chatbotOn() {
               <salesIcon class="icon"/>영업관리
             </a>
             <ul class="dropdown-menu">
-              <li><RouterLink to="quotation" class="dropdown-item">견적 관리</RouterLink></li>
-              <li><RouterLink to="sales-order" class="dropdown-item">주문서 관리</RouterLink></li>
-              <li><RouterLink to="invoice" class="dropdown-item">판매 관리</RouterLink></li>
+              <li><RouterLink to="/quotation" class="dropdown-item">견적 관리</RouterLink></li>
+              <li><RouterLink to="/sales-order" class="dropdown-item">주문서 관리</RouterLink></li>
+              <li><RouterLink to="/invoice" class="dropdown-item">판매 관리</RouterLink></li>
               <li><RouterLink to="/shipping-instruction" class="dropdown-item">출하지시서 관리</RouterLink></li>
               <li><RouterLink to="/shipping-slip" class="dropdown-item">출하 관리</RouterLink></li>
             </ul>
@@ -68,8 +84,8 @@ function chatbotOn() {
               <productionIcon class="icon"/>생산관리
             </a>
             <ul class="dropdown-menu">
-              <li><RouterLink to="/workOrder" class="dropdown-item">작업지시서 관리</RouterLink></li>
-              <li><RouterLink to="" class="dropdown-item">생산불출 관리</RouterLink></li>
+              <li><RouterLink to="/work-order" class="dropdown-item">작업지시서 관리</RouterLink></li>
+              <li><RouterLink to="/production-disbursement" class="dropdown-item">생산불출 관리</RouterLink></li>
               <li><RouterLink to="/productionReceiving" class="dropdown-item">생산입고 관리</RouterLink></li>
             </ul>
           </li>
@@ -87,6 +103,8 @@ function chatbotOn() {
           </li>
         </ul>
         <ul class="navbar-nav mb-lg-0 d-flex flex-row">
+          <li class="nav-item"><RouterLink to="#" class="nav-link"><chatbotIcon class="icon-right"/></RouterLink></li>
+          <li class="nav-item"><RouterLink to="#" class="nav-link" @click.prevent="fetchNotifications"><notificationIcon class="icon-right"/></RouterLink></li>
           <li class="nav-item" @click="chatbotOn()"><RouterLink to="#" class="nav-link"><chatbotIcon class="icon-right"/></RouterLink></li>
           <li class="nav-item"><RouterLink to="#" class="nav-link"><notificationIcon class="icon-right"/></RouterLink></li>
           <li class="nav-item"><RouterLink to="#" class="nav-link"><myPageIcon class="icon-right"/></RouterLink></li>
@@ -97,6 +115,19 @@ function chatbotOn() {
         </div>
       </div>
   </nav>
+
+  <div v-if="isNotificationOpen" class="notification-bar">
+    <ul>
+      <li v-for="notification in notificationList" :key="notification.notificationSeq">
+        <span>{{ notification.notificationTitle }}</span>
+        <span style="float:right;">{{ dayjs(notification.notificationRegDate).format('YYYY/MM/DD HH:mm') }}</span>
+        <br/>
+        <span v-html="notification.notificationContent"></span>
+      </li>
+    </ul>
+    <button @click="isNotificationOpen = false">닫기</button>
+  </div>
+
 </template>
 <style scoped>
 @media (max-width: 768px) {
@@ -140,13 +171,46 @@ function chatbotOn() {
   z-index: 6;
 }
 
+.notification-bar {
+  position: fixed;
+  top: 50px;
+  right: 10px;
+  width: 300px;
+  max-height: 400px;
+  background-color: white;
+  border: 1px solid #ddd;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
+  z-index: 1000;
+  padding: 10px;
+}
+.notification-bar ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.notification-bar li {
+  padding: 8px 10px;
+  border-bottom: 1px solid #f0f0f0;
+}
+.notification-bar button {
+  display: block;
+  margin: 10px auto;
+  padding: 5px 10px;
+  border: none;
+  background-color: #333;
+  color: white;
+  cursor: pointer;
+}
+
+
 #chatbot {
   display: none;
-  position: absolute; 
-  padding: 10px; 
-  top: 100px; 
-  right: 5px; 
-  width: 400px; 
+  position: absolute;
+  padding: 10px;
+  top: 100px;
+  right: 5px;
+  width: 400px;
   height: 300px;
   border: solid 2px silver;
   border-radius: 10px;

@@ -1,14 +1,14 @@
 export default [
     {
         path: "/client",
-        component: () => import("@/views/Client/ClientListView.vue"),
+        component: () => import("@/views/client/ClientListView.vue"),
     },
     {
         path: "/client/input", // 등록 페이지
-        component: () => import("@/views/Client/ClientInputView.vue"),
+        component: () => import("@/views/client/ClientInputView.vue"),
     },
     {
         path: "/client/update/:clientSeq", // 수정 페이지
-        component: () => import("@/views/Client/ClientModifyView.vue"),
+        component: () => import("@/views/client/ClientModifyView.vue"),
     },
 ];

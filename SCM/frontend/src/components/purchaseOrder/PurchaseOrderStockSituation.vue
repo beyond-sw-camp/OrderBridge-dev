@@ -1,6 +1,6 @@
 <script setup>
 import {onMounted, ref, watch, computed} from 'vue';
-import axios from "axios";
+import axios from "@/axios.js";
 import dayjs from "dayjs";
 import searchIcon from "@/assets/searchIcon.svg";
 
@@ -22,7 +22,7 @@ const fetchPurchaseOrderSituationList = async () => {
         Object.entries(params).filter(([_, value]) => value !== null && value !== undefined && value !== '')
     );
 
-    const response = await axios.get(`http://localhost:8090/api/v1/purchaseOrder/stock/situation`, {
+    const response = await axios.get(`purchaseOrder/stock/situation`, {
       params: filteredParams,
       paramsSerializer: (params) => {
         return new URLSearchParams(params).toString();
@@ -74,7 +74,7 @@ const excelDown = async () => {
         Object.entries(params).filter(([_, value]) => value !== null && value !== undefined && value !== '')
     );
 
-    const response = await axios.get(`http://localhost:8090/api/v1/purchaseOrder/stock/situation/excelDown`, {
+    const response = await axios.get(`purchaseOrder/stock/situation/excelDown`, {
       params: filteredParams,
       paramsSerializer: (params) => {
         return new URLSearchParams(params).toString();

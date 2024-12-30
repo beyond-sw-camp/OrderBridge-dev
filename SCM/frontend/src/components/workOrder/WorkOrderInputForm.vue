@@ -10,8 +10,8 @@ import {useRouter} from "vue-router";
 const router = useRouter();
 
 const props = defineProps({
-  workOrderDetail: {type: Object, required: false},       // 출하지시서 목록
-  workOrderItem: {type: Object, required: false},       // 출하지시서 목록
+  workOrderDetail: {type: Object, required: false},       // 작업지시서 목록
+  workOrderItem: {type: Object, required: false},       // 작업지시서 목록
   salesOrder: { type: Object, required: false },      // 주문서 정보
   stockStatusList: { type: Array, required: false },  // 주문서 품목 목록
   isEditMode: {type: Boolean, required: false},       // 검색 결과 총 개수
@@ -109,15 +109,6 @@ const fetchSalesOrderList = async () => {
 
 // 셀렉트박스로 창고목록 불러오기
 const fetchWarehouses = async () => {
-  // try {
-    // const response = await axios.get('warehouse');
-    // const response = await axios.get('warehouse?warehouseType=FACTORY');
-    // console.log(response.data)
-    // warehouses.value = response.data.warehouses;
-
-    // const factory = response.data.filter(warehouse => warehouse.warehouseType === 'FACTORY');
-    // console.log(factory);
-    // warehouses.value = factory;
   try {
     const response = await axios.get('warehouse', {
       params: {
@@ -225,7 +216,7 @@ const goToOrderPage = () => {
 const handleItemSelection = (index) => {
   // props.isEditMode가 false(수정모드가 아니)고 이미 등록된 품목일 때
     alert('이미 작업지시서가 등록된 주문서입니다. \n 상세보기에서 수정 버튼을 눌러주세요.');
-    router.push('/workOrder'); // 목록 페이지로 이동
+    router.push('/work-order'); // 목록 페이지로 이동
 };
 
 // 선택한 주문서 품목 저장
@@ -322,7 +313,7 @@ const updateWorkOrder = async (workOrderSeq) => {
     });
     console.log(response.data);
     alert('작업지시서가 수정되었습니다!');
-    await router.push('/workOrder')
+    await router.push('/work-order')
 
   } catch (error) {
     console.error("작업지시서 수정 실패 :", error);
@@ -371,7 +362,7 @@ const createWorkOrder = async () => {
     });
       console.log(response.data);
       alert('작업지시서가 등록되었습니다!');
-      await router.push('/workOrder')
+      await router.push('/work-order')
 
   } catch (error) {
     console.error("작업지시서 등록 실패 :", error);
@@ -434,7 +425,7 @@ const validateFormData = () => {
 
 <template>
   <div class="d-flex justify-content-end mt-3">
-    <b-button @click="router.push('/workOrder')" variant="light" size="sm" class="button ms-2">목록</b-button>
+    <b-button @click="router.push('/work-order')" variant="light" size="sm" class="button ms-2">목록</b-button>
   </div>
   <div class="d-flex justify-content-center">
     <div class="col-6 d-flex flex-column">

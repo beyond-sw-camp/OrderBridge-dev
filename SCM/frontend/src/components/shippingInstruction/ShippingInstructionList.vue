@@ -1,5 +1,5 @@
 <script setup>
-import {defineProps, ref, watch} from 'vue';
+import {computed, defineProps, ref, watch} from 'vue';
 import searchIcon from "@/assets/searchIcon.svg";
 import trashIcon from "@/assets/trashIcon.svg";
 import editIcon from "@/assets/editIcon.svg";
@@ -95,22 +95,53 @@ function numberThree(number) {
   return `${number.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}`;
 }
 
-// 인쇄 함수
-const printItem = (index) => {
-  const printContent = document.getElementById(`print-area-${index}`).innerHTML;
-  const originalContent = document.body.innerHTML;
+// 모달에 데이터 전달을 위한 함수
+const printModalData = ref({});
+const extendPrintModalData = ref({});
+const itemPrint = (shippingInstruction) => {
+  printModalData.value = shippingInstruction;
+  extendPrintModalData.value = props.expandShippingInstruction[shippingInstruction.shippingInstructionSeq];
+  console.log(printModalData.value);
+}
 
-  // 선택된 영역만 표시
+// 빈칸을 계산하는 computed 속성
+const emptyRows = computed(() => {
+  const totalRows = 10; // 최소 10행을 유지
+  const currentDataCount = props.expandItemList[printModalData.value.shippingInstructionSeq];
+  // 배열, 객체 여부 확인
+  if (Array.isArray(currentDataCount)) {
+    return currentDataCount.length; // 배열이면 길이를 반환
+  } else if (currentDataCount && typeof currentDataCount === 'object') {
+    return Object.keys(currentDataCount).length; // 객체면 키 개수 반환
+  }
+  return currentDataCount < totalRows ? totalRows - currentDataCount : 0;
+});
+
+// 전체 수량 구하는 computed 속성
+const totalQuantity = computed(() => {
+  const data = props.expandItemList[printModalData.value.shippingInstructionSeq];
+  // 객체 라면
+  if (data && typeof data === 'object') {
+    return Object.values(data).reduce((sum, product) => sum + (product.shippingInstructionItemQuantity || 0), 0);
+  }
+});
+
+const printPage = () => {
+  const printContent = document.getElementById('print-area').innerHTML; // 특정 영역 가져오기
+  const originalContent = document.body.innerHTML; // 현재 페이지 내용 저장
+
+  // 페이지 내용을 특정 영역으로 교체
   document.body.innerHTML = printContent;
 
+  // 인쇄
   window.print();
 
   // 원래 내용 복원
   document.body.innerHTML = originalContent;
 
-  // Vue 리렌더링 방지
-  location.reload();
-};
+  // SPA일 경우 Vue의 리렌더링 강제 호출
+  location.reload(); // 상태를 새로고침하여 업데이트
+}
 </script>
 
 <template>
@@ -145,7 +176,7 @@ const printItem = (index) => {
       </div>
     </div>
     <div class="col-md-9">
-      <div style="width: 90%;">
+      <div>
         <div class="d-flex justify-content-between">
           <div>검색결과: {{ totalCount }}개</div>
           <div class="d-flex justify-content-end mt-3">
@@ -186,18 +217,26 @@ const printItem = (index) => {
                   <div v-if="expandShippingInstruction[shippingInstruction.shippingInstructionSeq]"
                        class="col-md-11 mt-3">
                     <b>총수량 : </b>
-                    {{ expandShippingInstruction[shippingInstruction.shippingInstructionSeq].shippingInstructionTotalQuantity }} 개<br>
+                    {{
+                      expandShippingInstruction[shippingInstruction.shippingInstructionSeq].shippingInstructionTotalQuantity
+                    }} 개<br>
                     <b>출하 주소 : </b>
-                    {{ findStatusValue(shippingAddressList,
-                      expandShippingInstruction[shippingInstruction.shippingInstructionSeq].shippingAddress) }}
-                    {{  }}<br>
+                    {{
+                      findStatusValue(shippingAddressList,
+                          expandShippingInstruction[shippingInstruction.shippingInstructionSeq].shippingAddress)
+                    }}<br>
                     <b>담당자 : </b>
                     {{ expandShippingInstruction[shippingInstruction.shippingInstructionSeq].userName }}<br>
                     <b>출하예정일시 : </b>
-                    {{ dayjs(expandShippingInstruction[shippingInstruction.shippingInstructionSeq].shippingInstructionScheduledShipmentDate).format('YYYY/MM/DD HH:mm:ss') }}<br>
-                    <div v-if="expandShippingInstruction[shippingInstruction.shippingInstructionSeq].shippingInstructionNote">
+                    {{
+                      dayjs(expandShippingInstruction[shippingInstruction.shippingInstructionSeq].shippingInstructionScheduledShipmentDate).format('YYYY/MM/DD HH:mm:ss')
+                    }}<br>
+                    <div
+                        v-if="expandShippingInstruction[shippingInstruction.shippingInstructionSeq].shippingInstructionNote">
                       <b>출하지시서 비고 :</b>
-                      {{ expandShippingInstruction[shippingInstruction.shippingInstructionSeq].shippingInstructionNote }}<br>
+                      {{
+                        expandShippingInstruction[shippingInstruction.shippingInstructionSeq].shippingInstructionNote
+                      }}<br>
                     </div>
                     <div v-else>
                       <b>출하지시서 비고 :</b>없음<br>
@@ -223,9 +262,10 @@ const printItem = (index) => {
                     </div>
                     <div class="d-flex justify-content-end align-items-center">
                       <b-button v-if="shippingInstruction.shippingInstructionStatus === 'AFTER'" variant="light"
-                                class="me-3 button" @click="shippingSlipRegister(shippingInstruction.shippingInstructionSeq)">출하전표 등록
+                                class="me-3 button" size="sm"
+                                @click="shippingSlipRegister(shippingInstruction.shippingInstructionSeq)">출하전표 등록
                       </b-button>
-                      <printIcon class="me-3 icon" @click.stop="printItem(index)"/>
+                      <printIcon class="me-3 icon" data-bs-toggle="modal" data-bs-target="#PrintModal" @click.stop="itemPrint(shippingInstruction)"/>
                       <editIcon v-if="shippingInstruction.shippingInstructionStatus === 'BEFORE'" class="me-3 icon"
                                 @click.stop="itemEdit(shippingInstruction.shippingInstructionSeq)"/>
                       <trashIcon v-if="shippingInstruction.shippingInstructionStatus === 'BEFORE'" class="icon"
@@ -236,7 +276,7 @@ const printItem = (index) => {
               </div>
             </div>
           </div>
-          <div class="pagination">
+          <div class="pagination d-flex justify-content-center">
             <b-pagination
                 v-model="pageNumber"
                 :totalRows="props.totalCount"
@@ -247,6 +287,71 @@ const printItem = (index) => {
         <template v-else>
           <b-card-text class="no-list-text">해당 검색조건에 부합한 출하지시서가 존재하지 않습니다.</b-card-text>
         </template>
+      </div>
+    </div>
+  </div>
+  <!-- print Modal bootstrap -->
+  <div class="modal fade" id="PrintModal" tabindex="-1" aria-labelledby="PrintModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-body" id="print-area">
+          <!-- 인쇄 미리보기 버튼 -->
+          <div class="d-flex justify-content-between">
+            <button class="button" @click="printPage">인쇄 미리보기</button>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="container mt-4">
+            <h2 class="text-center">출하지시서</h2>
+            <br/><br/>
+            <table class="table first-table" style="height: 140px">
+              <tbody>
+              <tr>
+                <td class="align-content-center">출하지시서명</td>
+                <td class="color-column align-content-center">{{ printModalData.shippingInstructionName }}</td>
+              </tr>
+              <tr>
+                <td class="align-content-center">출하예정일</td>
+                <td class="color-column align-content-center">{{ dayjs(printModalData.shippingInstructionScheduledShipmentDate).format('YYYY/MM/DD') }}</td>
+              </tr>
+              <tr>
+                <td class="align-content-center">거래처</td>
+                <td class="color-column align-content-center">{{ printModalData.clientName }}</td>
+                <td class="align-content-center">담당자</td>
+                <td class="color-column align-content-center">{{ extendPrintModalData.userName }}</td>
+              </tr>
+              <tr>
+                <td class="align-content-center">출하주소</td>
+                <td class="color-column align-content-center" colspan="3">
+                  {{ findStatusValue(shippingAddressList, extendPrintModalData.shippingAddress) }}</td>
+              </tr>
+              </tbody>
+            </table>
+            <table class="table table-bordered second-table">
+              <thead>
+              <tr>
+                <th>품목</th>
+                <th>수량</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr v-for="(itemInfo, index) in expandItemList[printModalData.shippingInstructionSeq]" :key="'data-' + index">
+                <td>{{ itemInfo.itemName }}</td>
+                <td>{{ numberThree(itemInfo.shippingInstructionItemQuantity) }}</td>
+              </tr>
+              <tr v-for="index in emptyRows" :key="'empty-' + index">
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+              </tr>
+              </tbody>
+              <tfoot>
+              <tr>
+                <td>합계</td>
+                <td>{{ totalQuantity }}</td>
+              </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -299,7 +404,7 @@ div {
   word-break: keep-all;
 }
 
-.pagenation {
+.pagination {
   justify-items: center;
   margin-top: 20px;
 }
@@ -324,5 +429,34 @@ div {
   object-fit: cover;
 }
 
+.table {
+  text-align: center;
+  border-collapse: collapse;
+}
 
+.color-column {
+  background-color: #f5f5f5;
+  border-radius: 15px;
+}
+
+/* 인쇄 시 적용되는 스타일 */
+@media print {
+  @page {margin:0 1.3cm}
+
+  body {
+    font-family: 'Abhaya Libre', serif;
+    font-size: 12px;
+    color-adjust: exact;
+  }
+
+  .content-to-print {
+    padding: 0;
+    border: none;
+  }
+
+  /* 인쇄 미리보기에서 버튼 숨기기 - 꼭 있어야함!!!! */
+  button {
+    display: none;
+  }
+}
 </style>

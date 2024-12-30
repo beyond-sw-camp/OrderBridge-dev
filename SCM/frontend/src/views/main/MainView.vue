@@ -29,7 +29,7 @@ const userStore = useUserStore();
           오더브릿지 주문 관리 시스템은 <br />
           안전하고 차별적인 서비스를 제공합니다.
         </p>
-        <button v-if="!userStore.isAuthenticated" class="hero-button" @click="router.push('/login')">로그인</button>
+        <button v-if="!userStore.isAuthenticated" class="hero-button" @click="router.push('/login')">Log In</button>
       </div>
     </div>
 </template>
@@ -73,6 +73,10 @@ const userStore = useUserStore();
   font-family: 'Abhaya Libre', serif; /* 글씨체 적용 */
 }
 
+.highlight .char {
+  font-family: 'Abhaya Libre', serif;
+}
+
 .hero-description {
   font-size: 1.2rem;
   color: #555;
@@ -86,6 +90,7 @@ const userStore = useUserStore();
   height: 50px;
   width: 150px;
   border-radius: 20px;
+  font-size: 1.2rem;
 }
 
 .hero-button:hover {

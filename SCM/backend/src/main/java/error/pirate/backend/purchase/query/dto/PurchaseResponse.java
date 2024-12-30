@@ -33,6 +33,8 @@ public class PurchaseResponse {
 
     private Integer purchaseExtendedPrice; // 구매서 총금액
 
+    private Integer purchaseTotalQuantity; // 구매서 총수량
+
     private String purchaseNote; // 구매서 비고
 
     @Setter

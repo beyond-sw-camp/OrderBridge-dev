@@ -38,14 +38,14 @@ public class JwtFilter extends OncePerRequestFilter {
 
             if(jwtUtil.validateAccessToken(accessToken)) {
                 String authorizationRefresh = request.getHeader(env.getProperty("jwt.refresh.header"));
-
+                log.info("authorizationRefresh : {}", authorizationRefresh);
                 if(authorizationRefresh != null && authorizationRefresh.startsWith("Bearer ")) {
                     // refreshToken 추출
                     String refreshToken = authorizationRefresh.substring(7);
 
                     // accessToken, refreshToken 만료 여부 체크
                     Pair<String, String> pair = jwtUtil.validateExpiredAccessToken(accessToken, refreshToken);
-
+                    log.info("pair left : {}", pair.getLeft());
                     if(!"ACCESS_FAIL".equals(pair.getLeft())) {
                         if ("ACCESS_EXPIRED".equals(pair.getLeft())) {
                             jwtUtil.setAccessTokenHeader(response, pair.getRight());
@@ -57,6 +57,7 @@ public class JwtFilter extends OncePerRequestFilter {
                         // refreshToken이 DB에 저장되어 있는 값과 동일한 지 여부 체크
                         RefreshToken redisRefreshToken =  refreshTokenRepository.findById(userEmployeeNo)
                                 .orElseThrow(() -> new CustomException(ErrorCodeType.SECURITY_TOKEN_ERROR));
+                        log.info("redisRefreshToken : {}",redisRefreshToken);
                         if(refreshToken.equals(redisRefreshToken.getRefreshToken())) {
 
                             Authentication authentication = jwtUtil.getAuthentication(accessToken);
