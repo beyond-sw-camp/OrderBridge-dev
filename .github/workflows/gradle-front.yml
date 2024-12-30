@@ -1,4 +1,4 @@
-name: Frontend Workflows
+name: OrderBridge Frontend CI/CD
 
 on:
   push:
@@ -10,9 +10,11 @@ on:
     types: [ opened, reopened, synchronize ]  # Pull Request가 열리거나, 다시 열리거나, 동기화될 때 트리거됩니다.
     branches:
       - main # main으로 pr하면 workflow 실행
+    paths:
+      - 'SCM/frontend/**'
 
 jobs:
-  CI:
+  deploy-ci:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest # 최신 Ubuntu 환경
     permissions:
@@ -26,10 +28,10 @@ jobs:
         with:
           node-version: 20
 
-      - name: Create .env.template
+      - name: Create .env
         run: |
           mkdir -p SCM/frontend
-          cat > SCM/frontend/.env.template <<EOL
+          cat > SCM/frontend/.env <<EOL
 
           VITE_API_URL=https://be.beanteacher.shop/api/v1/
           EOF
@@ -42,8 +44,8 @@ jobs:
         run: npm run build
 
         working-directory: ./SCM/frontend
-          
-  CD:
+
+  deploy-cd:
     if: github.event_name == 'push'
     runs-on: ubuntu-latest # 최신 Ubuntu 환경
     permissions:
@@ -57,10 +59,10 @@ jobs:
         with:
           node-version: 20
 
-      - name: Create .env.template
+      - name: Create .env
         run: |
           mkdir -p SCM/frontend
-          cat > SCM/frontend/.env.template <<EOL
+          cat > SCM/frontend/.env <<EOL
 
           VITE_API_URL=https://be.beanteacher.shop/api/v1/
           EOF
@@ -70,7 +72,7 @@ jobs:
         working-directory: ./SCM/frontend
 
       - name: Build project
-        run: npm run dev
+        run: npm run build
 
         working-directory: ./SCM/frontend
 

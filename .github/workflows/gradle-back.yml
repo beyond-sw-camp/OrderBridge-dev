@@ -113,7 +113,7 @@ jobs:
               expiration: 1209600000 # 2주
               header: Refresh-Token
           
-          frontend: http://localhost:5173
+          frontend: https://fe.beanteacher.shop
           EOL
       
       # 템플릿 파일에 환경 변수를 대입하여 application.yml 생성
@@ -256,7 +256,7 @@ jobs:
               expiration: 1209600000 # 2주
               header: Refresh-Token
 
-          frontend: http://localhost:5173
+          frontend: https://fe.beanteacher.shop
           EOL
 
       # 템플릿 파일에 환경 변수를 대입하여 application.yml 생성

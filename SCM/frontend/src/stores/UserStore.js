@@ -58,6 +58,7 @@ export const useUserStore = defineStore('user', {
         this.isLoggingOut = false; // 로그아웃 상태 해제
       }
     },
+
     initialize() {
       const token = localStorage.getItem('accessToken');
 
