@@ -68,6 +68,7 @@ jobs:
           cp SCM/frontend/package.json deploy/.
           cp SCM/frontend/server.js deploy/.
           cp Procfile_front deploy/Procfile
+          cp -r .platform deploy/.platform
           cd deploy && zip -r deploy.zip .
 
       - name: Beanstalk frontend Deploy

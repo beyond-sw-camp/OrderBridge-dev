@@ -314,7 +314,7 @@ jobs:
           mkdir -p deploy
           cp SCM/backend/build/libs/*.jar deploy/application.jar
           cp Procfile_back deploy/Procfile
-          cp -r .ebextensions deploy/.ebextensions
+          cp -r SCM/backend/.ebextensions deploy/.ebextensions
           cp -r .platform deploy/.platform
           cd deploy && zip -r deploy.zip .
 
