@@ -127,4 +127,31 @@
             DATE_FORMAT(s.shipping_slip_shipping_date, '%Y/%m'),
             s.shipping_slip_shipping_date WITH ROLLUP;
     </select>
+
+    <!--  출하전표 목록 엑셀 다운로드  -->
+    <select id="selectShippingSlipExcel"
+            resultType="error.pirate.backend.shippingSlip.query.dto.ShippingSlipExcelDTO">
+        SELECT
+            s.shipping_slip_reg_date,
+            s.shipping_slip_mod_date,
+            s.shipping_slip_name,
+            s.shipping_slip_shipping_date,
+            s.shipping_slip_total_quantity,
+            s.shipping_slip_address,
+            s.shipping_slip_note
+        FROM tb_shipping_slip s
+        JOIN tb_shipping_instruction si ON (s.shipping_instruction_seq = si.shipping_instruction_seq)
+        JOIN tb_sales_order so ON (si.sales_order_seq = so.sales_order_seq)
+        JOIN tb_client c ON (so.client_seq = c.client_seq)
+        WHERE s.shipping_slip_status IS NULL
+        <if test="request.startDate != null"><![CDATA[
+            AND #{request.startDate} <= s.shipping_slip_shipping_date
+             ]]></if>
+        <if test="request.endDate != null"><![CDATA[
+            AND #{request.endDate} >= s.shipping_slip_shipping_date
+            ]]></if>
+        <if test="request.clientName != '' and request.clientName != null">
+            AND c.client_name LIKE CONCAT('%', #{request.clientName}, '%')
+        </if>
+    </select>
 </mapper>

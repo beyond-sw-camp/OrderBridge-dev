@@ -62,81 +62,31 @@ public class ShippingInstructionQueryService {
                 .build();
     }
 
-    /* 출하지시서 엑셀 다운 */
-    public byte[] shippingInstructionExcelDown(ShippingInstructionListRequest request) {
-        int offset = (request.getPage() - 1) * request.getSize();
-        request.setSize(null);
-        List<ShippingInstructionStatus> statusList = request.getShippingInstructionStatus();   // 상태 리스트
-
-        List<ShippingInstructionListDTO> shippingInstructionList
-                = shippingInstructionMapper.selectShippingInstructionList(offset, request, statusList);
-
-        String[] headers = {"출하지시서명", "출하지시서 품목", "거래처명", "출하예정일", "상태"};
-        String[][] excel = new String[shippingInstructionList.size()][headers.length];
-
-        for (int i = 0; i < shippingInstructionList.size(); i++) {
-            ShippingInstructionListDTO dto = shippingInstructionList.get(i);
-
-            excel[i][0] = dto.getShippingInstructionName();
-            excel[i][1] = dto.getItemName();//  품목
-            excel[i][2] = dto.getClientName();
-            excel[i][3] = dto.getShippingInstructionScheduledShipmentDate() != null
-                    ? dto.getShippingInstructionScheduledShipmentDate().format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss"))
-                    : null;
-            excel[i][4] = ShippingInstructionStatus.statusValue(
-                    String.valueOf(dto.getShippingInstructionStatus()));
-        }
-
-        return excelDownBody.excelDownBody(excel, headers, "출하지시서");
-    }
-
     /* 출하지시서 현황 조회 */
     @Transactional(readOnly = true)
     public List<ShippingInstructionSituationResponse> readShippingInstructionSituation(ShippingInstructionSituationRequest request) {
         return shippingInstructionMapper.selectShippingInstructionSituation(request);
     }
 
-    /* 출하지시서 현황 엑셀 다운 */
-    public byte[] shippingInstructionSituationExcelDown(ShippingInstructionSituationRequest request) {
+    /* 출하지시서 엑셀 다운 */
+    @Transactional(readOnly = true)
+    public byte[] shippingInstructionExcel(ShippingInstructionListRequest request) {
+        List<ShippingInstructionStatus> statusList = request.getShippingInstructionStatus();   // 상태 리스트
 
-        List<ShippingInstructionSituationResponse> shippingInstructionSituationList
-                = shippingInstructionMapper.selectShippingInstructionSituation(request);
-
-        String[] headers = {"번호", "출하예정일", "출하지시서명", "총수량", "거래처명", "출하주소", "출하지시서 비고"};
-        String[][] excel = new String[shippingInstructionSituationList.size()][headers.length];
-
-        for(int i = 0; i < shippingInstructionSituationList.size(); i++) {
-            ShippingInstructionSituationResponse dto = shippingInstructionSituationList.get(i);
-            if(dto.getShippingInstructionScheduledShipmentDate() == null) {
-                boolean isNull = (dto.getShippingInstructionScheduledShipmentMonthDate() == null);
-
-                excel[i][0] = "-";
-                excel[i][1] = isNull ? "" : dto.getShippingInstructionScheduledShipmentMonthDate(); // 출하예정월
-                excel[i][2] = isNull ? "총합" : "-";
-                excel[i][3] = dto.getShippingInstructionTotalQuantitySum() + " 개";  // 총수량
-                excel[i][4] = "-";
-                excel[i][5] = "-";
-                excel[i][6] = "-";
-            } else {
-                excel[i][0] = String.valueOf(i+1); // 번호
-                excel[i][1] = dto.getShippingInstructionScheduledShipmentDate().format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss")); // 출하예정일
-                excel[i][2] = dto.getShippingInstructionName();       // 출하지시서명
-                excel[i][3] = dto.getShippingInstructionTotalQuantity() + " 개";  // 총수량
-                excel[i][4] = dto.getClientName(); // 거래처명
-                excel[i][5] = dto.getShippingAddress().getValue(); // 주소
-                excel[i][6] = dto.getShippingInstructionNote(); // 비고
-            }
-        }
-
-        return excelDownBody.excelDownBody(excel, headers, "출하지시서 현황");
+        return excelDownBody.writeCells(
+                new String[] {"등록일", "수정일", "이름", "상태", "출하예정일", "총 수량", "출하주소", "비고"},
+                shippingInstructionMapper.selectShippingInstructionExcel(request, statusList)
+        );
     }
 
     // 출하지시서 품목 값 확인
+    @Transactional(readOnly = true)
     public List<ShippingInstructionItemCheckDTO> shippingInstructionItemCheck(long salesOrderSeq) {
         return shippingInstructionMapper.sumShippingInstructionItemValue(salesOrderSeq);
     }
 
     // 출하지시서 등록 시 남아있는 주문서 품목 값 리턴
+    @Transactional(readOnly = true)
     public List<Integer> readRemainingQuantity(long salesOrderSeq) {
         return remainingQuantity.remainingQuantity(SalesOrder.class, ShippingInstruction.class, salesOrderSeq);
     }
