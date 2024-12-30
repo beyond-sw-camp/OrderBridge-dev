@@ -10,8 +10,6 @@ on:
     types: [ opened, reopened, synchronize ]  # Pull Request가 열리거나, 다시 열리거나, 동기화될 때 트리거됩니다.
     branches:
       - main # main으로 pr하면 workflow 실행
-    paths:
-      - 'SCM/frontend/**'
 
 jobs:
   CI:
@@ -84,7 +82,7 @@ jobs:
           deployment_package: deploy/deploy.zip
           use_existing_version_if_available: false
           wait_for_deployment: true
-          wait_for_environment_recovery: 300  
+          wait_for_environment_recovery: 300
         
   CD:
     if: github.event_name == 'push'
