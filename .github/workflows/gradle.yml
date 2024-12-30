@@ -106,9 +106,9 @@ jobs:
       # 템플릿 파일에 환경 변수를 대입하여 application.yml 생성
       - name: Set Yaml
         run: |
-          envsubst < src/main/resources/application.yml.template > src/main/resources/application.yml
+          envsubst < SCM/backend/src/main/resources/application.yml.template > SCM/backend/src/main/resources/application.yml
           echo "Generated application.yml:"
-          cat src/main/resources/application.yml
+          cat SCM/backend/src/main/resources/application.yml
         env:
           RDS_HOSTNAME: ${{ secrets.RDS_HOSTNAME }}
           RDS_PORT: ${{ secrets.RDS_PORT }}
