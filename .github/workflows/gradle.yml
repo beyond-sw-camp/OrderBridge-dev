@@ -39,11 +39,12 @@ jobs:
       - name: Install envsubst
         # gettext 패키지를 설치하여 envsubst 명령을 사용 가능하게 합니다.
         run: sudo apt-get install -y gettext
+
       # application.yml 템플릿 생성  
       - name: Create application.yml.template
         run: |
-          mkdir -p src/main/resources
-          cat > src/main/resources/application.yml.template <<EOL
+          mkdir -p SCM/backend/src/main/resources
+          cat > SCM/backend/src/main/resources/application.yml.template <<EOL
           server:
             port: 5000
               servlet:
