@@ -45,6 +45,7 @@ jobs:
         run: |
           mkdir -p SCM/backend/src/main/resources
           cat > SCM/backend/src/main/resources/application.yml.template <<EOL
+          
           server:
             port: 5000
               servlet:
@@ -77,8 +78,8 @@ jobs:
               operations-sorter: method
               doc-expansion: none        
           logging:
-              file:
-                path: /var/app/current
+            file:
+              path: /var/app/current
             level:
               root: info
               org.springframework.web: info
