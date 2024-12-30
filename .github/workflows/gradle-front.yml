@@ -41,7 +41,7 @@ jobs:
         working-directory: ./SCM/frontend
 
       - name: Build project
-        run: npm run dev
+        run: npm run build
 
         working-directory: ./SCM/frontend
           
