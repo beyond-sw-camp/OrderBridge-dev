@@ -18,7 +18,6 @@ instance.interceptors.request.use((config) => {
     if (refreshToken) {
         config.headers['Refresh-Token'] = `Bearer ${refreshToken}`;
     }
-
     return config;
 }, (error) => {
     return Promise.reject(error);

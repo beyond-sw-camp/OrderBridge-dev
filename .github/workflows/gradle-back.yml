@@ -113,7 +113,7 @@ jobs:
               expiration: 1209600000 # 2주
               header: Refresh-Token
           
-          frontend: http://localhost:5173
+          frontend: https://fe.beanteacher.shop
           EOL
       
       # 템플릿 파일에 환경 변수를 대입하여 application.yml 생성
@@ -256,7 +256,12 @@ jobs:
               expiration: 1209600000 # 2주
               header: Refresh-Token
 
-          frontend: http://localhost:5173
+          frontend: https://fe.beanteacher.shop
+          gemini:
+            baseurl: \${GEMINI_URL}
+          googleai:
+            api:
+              key: \${GEMINI_KEY}
           EOL
 
       # 템플릿 파일에 환경 변수를 대입하여 application.yml 생성
@@ -276,6 +281,8 @@ jobs:
           REDIS_HOSTNAME: ${{ secrets.REDIS_HOSTNAME }}
           REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
           REDIS_PORT: ${{ secrets.REDIS_PORT }}
+          GEMINI_URL: ${{ secrets.GEMINI_URL }}
+          GEMINI_KEY: ${{ secrets.GEMINI_KEY }}
 
       # backend 빌드
       - name: Build with Gradle Wrapper
@@ -314,7 +321,7 @@ jobs:
           mkdir -p deploy
           cp SCM/backend/build/libs/*.jar deploy/application.jar
           cp Procfile_back deploy/Procfile
-          cp -r .ebextensions deploy/.ebextensions
+          cp -r SCM/backend/.ebextensions deploy/.ebextensions
           cp -r .platform deploy/.platform
           cd deploy && zip -r deploy.zip .
 
