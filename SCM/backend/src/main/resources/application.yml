@@ -69,4 +69,5 @@ jwt:
     expiration: 1209600000 # 2주
     header: Refresh-Token
 
+
 frontend: http://localhost:5173
