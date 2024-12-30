@@ -4,6 +4,7 @@ on:
   push:
     branches: [ main ] # main으로 push하면 workflow 실행
   pull_request:
+    types: [ opened, reopened, synchronize ]  # Pull Request가 열리거나, 다시 열리거나, 동기화될 때 트리거됩니다.
     branches: [ main ] # main으로 pr하면 workflow 실행
 
 jobs:
@@ -33,7 +34,45 @@ jobs:
       - name: Grant execute permission for Gradle Wrapper
         run: chmod +x ./gradlew
         working-directory: ./SCM/backend
-
+      
+      # envsubst 도구 설치
+      - name: Install envsubst
+        # gettext 패키지를 설치하여 envsubst 명령을 사용 가능하게 합니다.
+        run: sudo apt-get install -y gettext
+      # application.yml 템플릿 생성  
+      - name: Create application.yml.template
+        run: |
+          mkdir -p src/main/resources
+          cat > src/main/resources/application.yml.template <<EOL
+          server:
+            port: 5000
+          spring:
+            datasource:
+              driver-class-name: org.mariadb.jdbc.Driver
+              url: jdbc:mariadb://\${RDS_HOSTNAME}:\${RDS_PORT}/\${RDS_DB_NAME}
+              username: \${RDS_USERNAME}
+              password: \${RDS_PASSWORD}
+            jpa:
+              show-sql: true
+              properties:
+                hibernate:
+                  '[format_sql]': true
+                  
+          EOL   
+      
+      # 템플릿 파일에 환경 변수를 대입하여 application.yml 생성
+      - name: Set Yaml
+        run: |
+          envsubst < src/main/resources/application.yml.template > src/main/resources/application.yml
+          echo "Generated application.yml:"
+          cat src/main/resources/application.yml
+        env:
+          RDS_HOSTNAME: ${{ secrets.RDS_HOSTNAME }}
+          RDS_PORT: ${{ secrets.RDS_PORT }}
+          RDS_DB_NAME: ${{ secrets.RDS_DB_NAME }}
+          RDS_USERNAME: ${{ secrets.RDS_USERNAME }}
+          RDS_PASSWORD: ${{ secrets.RDS_PASSWORD }}
+          
       # backend 빌드
       - name: Build with Gradle Wrapper
         run: ./gradlew build -x test # 테스트 코드 제외 빌드
@@ -54,6 +93,80 @@ jobs:
       #    path: |
       #      ./SCM/backend/build/test-results/test
       #      ./SCM/backend/build/reports/tests/test
+
+      - name: Get current time
+        uses: 1466587594/get-current-time@v2
+        id: current-time
+        with:
+          format: YYYY-MM-DD HH:mm:ss
+          utcOffset: "+09:00"
+
+      - name: Show Current Time
+        run: echo "currentTime=${{steps.current-time.outputs.formattedTime}}"
+        shell: bash
+
+      - name: Generate backend deployment package
+        run: |
+          mkdir -p deploy
+          cp SCM/backend/build/libs/*.jar deploy/application.jar
+          cp Procfile_back deploy/Procfile
+          cp -r .ebextensions deploy/.ebextensions
+          cp -r .platform deploy/.platform
+          cd deploy && zip -r deploy.zip .
+
+      - name: Beanstalk backend Deploy
+        uses: einaregilsson/beanstalk-deploy@v22
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: ${{ secrets.AWS_ELASTIC_BEANSTALK_BACKEND_APPLICATION }}
+          environment_name: ${{ secrets.AWS_ELASTIC_BEANSTALK_BACKEND_ENV }}
+          version_label: github-action-backend_${{steps.current-time.outputs.formattedTime}}
+          region: ${{ secrets.AWS_REGION }}
+          deployment_package: deploy/deploy.zip
+          use_existing_version_if_available: false
+          wait_for_deployment: true
+          wait_for_environment_recovery: 300
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+        working-directory: ./SCM/frontend
+
+      - name: Build project
+        run: npm run build
+        working-directory: ./SCM/frontend
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Generate frontend deployment package
+        run: |
+          mkdir -p deploy
+          cp -r SCM/frontend/dist deploy
+          cp SCM/frontend/package.json deploy
+          cp Procfile_front deploy/Procfile
+          cd deploy && zip -r deploy.zip .
+
+      - name: Beanstalk frontend Deploy
+        uses: einaregilsson/beanstalk-deploy@v22
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: ${{ secrets.AWS_ELASTIC_BEANSTALK_FRONTEND_APPLICATION }}
+          environment_name: ${{ secrets.AWS_ELASTIC_BEANSTALK_FRONTEND_ENV }}
+          version_label: github-action-frontend_${{steps.current-time.outputs.formattedTime}}
+          region: ${{ secrets.AWS_REGION }}
+          deployment_package: deploy/deploy.zip
+
   # 프로젝트의 의존성 그래프를 생성 및 제출하여 Github에서 시각적으로 관리하도록 한다.
   dependency-submission:
 
