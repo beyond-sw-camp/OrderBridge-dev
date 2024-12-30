@@ -47,14 +47,14 @@ class ShippingInstructionQueryServiceTest {
                 () -> shippingInstructionQueryService.readShippingInstructionList(request));
     }
 
-    @DisplayName("출하지시서 엑셀 다운")
+    @DisplayName("출하지시서 엑셀")
     @ParameterizedTest(autoCloseArguments = true)
     @MethodSource("readShippingInstructionListArguments")
-    void shippingInstructionExcelDownTest(
+    void shippingInstructionExcelTest(
             ShippingInstructionListRequest request
     ) {
         assertDoesNotThrow(
-                () -> shippingInstructionQueryService.shippingInstructionExcelDown(request));
+                () -> shippingInstructionQueryService.shippingInstructionExcel(request));
     }
 
     private static Stream<Arguments> readShippingInstructionArguments() {
@@ -96,13 +96,4 @@ class ShippingInstructionQueryServiceTest {
                 () -> shippingInstructionQueryService.readShippingInstructionSituation(request));
     }
 
-    @DisplayName("출하지시서 현황 엑셀 다운")
-    @ParameterizedTest(autoCloseArguments = true)
-    @MethodSource("readShippingInstructionSituationArguments")
-    void shippingInstructionSituationExcelDownTest(
-            ShippingInstructionSituationRequest request
-    ) {
-        assertDoesNotThrow(
-                () -> shippingInstructionQueryService.shippingInstructionSituationExcelDown(request));
-    }
 }

@@ -80,6 +80,7 @@
             si.shipping_instruction_scheduled_shipment_date,
             si.shipping_instruction_total_quantity,
             si.shipping_instruction_address AS shipping_address,
+            u.user_employee_no,
             u.user_name,
             si.shipping_instruction_note
         FROM tb_shipping_instruction si
@@ -154,5 +155,38 @@
         FROM tb_sales_order so
         JOIN tb_sales_order_item soi ON (so.sales_order_seq = soi.sales_order_seq)
         WHERE so.sales_order_seq = #{salesOrderSeq}
+    </select>
+
+    <!--  출하지시서 목록 엑셀 다운로드  -->
+    <select id="selectShippingInstructionExcel"
+            resultType="error.pirate.backend.shippingInstruction.query.dto.ShippingInstructionExcelDTO">
+        SELECT
+            si.shipping_instruction_reg_date,
+            si.shipping_instruction_mod_date,
+            si.shipping_instruction_name,
+            si.shipping_instruction_status,
+            si.shipping_instruction_scheduled_shipment_date,
+            si.shipping_instruction_total_quantity,
+            si.shipping_instruction_address,
+            si.shipping_instruction_note
+        FROM tb_shipping_instruction si
+        JOIN tb_sales_order so ON (si.sales_order_seq = so.sales_order_seq)
+        JOIN tb_client c ON (so.client_seq = c.client_seq)
+        WHERE si.shipping_instruction_status NOT IN ('DELETE')
+        <if test="request.startDate != null"><![CDATA[
+            AND #{request.startDate} <= si.shipping_instruction_scheduled_shipment_date
+             ]]></if>
+        <if test="request.endDate != null"><![CDATA[
+            AND #{request.endDate} >= si.shipping_instruction_scheduled_shipment_date
+            ]]></if>
+        <if test="request.clientName != '' and request.clientName != null">
+            AND c.client_name LIKE CONCAT('%', #{request.clientName}, '%')
+        </if>
+        <if test="statusList != null and !statusList.isEmpty()">
+            AND si.shipping_instruction_status IN
+            <foreach item="status" collection="statusList" open="(" separator="," close=")">
+                #{status}
+            </foreach>
+        </if>
     </select>
 </mapper>

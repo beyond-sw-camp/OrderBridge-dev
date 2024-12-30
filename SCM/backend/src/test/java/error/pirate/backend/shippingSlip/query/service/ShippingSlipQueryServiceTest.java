@@ -49,7 +49,7 @@ class ShippingSlipQueryServiceTest {
             ShippingSlipListRequest request
     ) {
         assertDoesNotThrow(
-                () -> shippingSlipQueryService.shippingSlipExcelDown(request));
+                () -> shippingSlipQueryService.shippingSlipExcel(request));
     }
 
     private static Stream<Arguments> readShippingSlipArguments() {

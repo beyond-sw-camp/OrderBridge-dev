@@ -14,6 +14,7 @@ import error.pirate.backend.shippingSlip.command.domain.aggregate.entity.Shippin
 import error.pirate.backend.shippingSlip.command.domain.service.ShippingSlipDomainService;
 import error.pirate.backend.shippingSlip.command.domain.service.ShippingSlipItemDomainService;
 import error.pirate.backend.user.command.domain.aggregate.entity.User;
+import error.pirate.backend.user.command.domain.service.UserDomainService;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,13 +34,14 @@ public class ShippingSlipApplicationService {
     private final SalesOrderDomainService salesOrderDomainService;
     private final ShippingInstructionDomainService shippingInstructionDomainService;
     private final ItemService itemService;
+    private final UserDomainService userDomainService;
     private final ItemInventoryDomainService itemInventoryDomainService;
     private final EntityManager entityManager;
     private final NameGenerator nameGenerator;
 
     /* 출하전표 등록 */
     @Transactional
-    public void createShippingSlip(ShippingSlipRequest shippingSlipRequest) {
+    public void createShippingSlip(ShippingSlipRequest shippingSlipRequest, String userNo) {
         // 불러온 출하지시서가 있으면 출하지시서 확인 절차
         shippingSlipItemDomainService.validateItem(
                 shippingSlipRequest.getShippingInstructionSeq(), shippingSlipRequest.getShippingSlipItems());
@@ -49,10 +51,11 @@ public class ShippingSlipApplicationService {
 
         ShippingInstruction shippingInstruction
                 = entityManager.getReference(ShippingInstruction.class, shippingSlipRequest.getShippingInstructionSeq());
+
         // 출하지시서가 결재후 상태인지 체크
         shippingSlipDomainService.checkShippingInstructionStatus(shippingInstruction);
-        // 출하전표 유저는 출하지시서 작성 유저
-        User user = shippingInstruction.getUser();
+        // 출하전표 유저는 현재 로그인한 유저
+        User user = userDomainService.findByUserEmployeeNo(userNo);
         /* 등록일 설정 공통코드 */
         String shippingSlipName = nameGenerator.nameGenerator(ShippingSlip.class);
 

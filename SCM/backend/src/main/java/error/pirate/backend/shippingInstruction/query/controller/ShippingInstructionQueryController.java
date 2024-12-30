@@ -9,9 +9,14 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 @Tag(name = "출하지시서")
@@ -44,21 +49,6 @@ public class ShippingInstructionQueryController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/excelDown")
-    @Operation(summary = "출하지시서 엑셀 다운")
-    public ResponseEntity<byte[]> shippingInstructionExcelDown(
-            @ModelAttribute ShippingInstructionListRequest request) {
-
-        byte[] excelData = shippingInstructionQueryService.shippingInstructionExcelDown(request);
-
-        HttpHeaders headersResponse = new HttpHeaders();
-        headersResponse.setContentLength(excelData.length);
-
-        return ResponseEntity.ok()
-                .headers(headersResponse)
-                .body(excelData);
-    }
-
     @Operation(summary = "출하지시서 현황 조회", description = "출하지시서 현황 조회")
     @GetMapping("/situation")
     public ResponseEntity<List<ShippingInstructionSituationResponse>> readShippingInstructionSituation(
@@ -70,18 +60,21 @@ public class ShippingInstructionQueryController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/situation/excelDown")
-    @Operation(summary = "출하지시서 현황 엑셀 다운")
-    public ResponseEntity<byte[]> shippingInstructionSituationExcelDown(
-            @ModelAttribute ShippingInstructionSituationRequest request) {
+    @GetMapping("/excel")
+    @Operation(summary = "출하지시서 엑셀")
+    public ResponseEntity<byte[]> shippingInstructionExcel(
+            @ModelAttribute ShippingInstructionListRequest request) {
 
-        byte[] excelData = shippingInstructionQueryService.shippingInstructionSituationExcelDown(request);
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + URLEncoder.encode(
+                new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date()) + "_출하지시서.xlsx"
+                , StandardCharsets.UTF_8));
 
-        HttpHeaders headersResponse = new HttpHeaders();
-        headersResponse.setContentLength(excelData.length);
+        byte[] excelData = shippingInstructionQueryService.shippingInstructionExcel(request);
 
         return ResponseEntity.ok()
-                .headers(headersResponse)
+                .headers(httpHeaders)
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(excelData);
     }
 

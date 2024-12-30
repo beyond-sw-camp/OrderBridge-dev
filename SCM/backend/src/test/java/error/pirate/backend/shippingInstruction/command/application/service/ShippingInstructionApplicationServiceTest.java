@@ -2,6 +2,7 @@ package error.pirate.backend.shippingInstruction.command.application.service;
 
 import error.pirate.backend.shippingInstruction.command.application.dto.ShippingInstructionItemRequest;
 import error.pirate.backend.shippingInstruction.command.application.dto.ShippingInstructionRequest;
+import error.pirate.backend.shippingInstruction.command.domain.aggregate.entity.ShippingAddress;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -26,28 +27,33 @@ class ShippingInstructionApplicationServiceTest {
         return Stream.of(
                 arguments(
                         new ShippingInstructionRequest(
-                                LocalDateTime.of(2024, 12, 15, 12, 0, 0),
-                                3L,
-                                "인천시",
+                                LocalDateTime.of(2024, 12, 31, 12, 0, 0),
+                                51L,
+                                ShippingAddress.GATE_7,
                                 "첫번째 출하지시서",
                                 List.of(
-                                        new ShippingInstructionItemRequest(1L, 100, "출하지시서 물품1"),
-                                        new ShippingInstructionItemRequest(2L, 500, "출하지시서 물품2"),
-                                        new ShippingInstructionItemRequest(3L, 5000, "출하지시서 물품3")
+                                        new ShippingInstructionItemRequest(1L, 50, "출하지시서 물품1"),
+                                        new ShippingInstructionItemRequest(2L, 50, "출하지시서 물품2"),
+                                        new ShippingInstructionItemRequest(3L, 500, "출하지시서 물품3"),
+                                        new ShippingInstructionItemRequest(4L, 500, "출하지시서 물품4")
                                 )
-                        )
+                        ),
+                        "jh"
                 ),
                 arguments(
                         new ShippingInstructionRequest(
-                                LocalDateTime.of(2024, 12, 12, 10, 0, 0),
-                                10L,
-                                "부산시",
+                                LocalDateTime.of(2024, 12, 31, 10, 0, 0),
+                                51L,
+                                ShippingAddress.GATE_3,
                                 "두번째 출하지시서",
                                 List.of(
-                                        new ShippingInstructionItemRequest(4L, 100, "출하지시서 물품1"),
-                                        new ShippingInstructionItemRequest(5L, 500, "출하지시서 물품2")
+                                        new ShippingInstructionItemRequest(1L, 70, "출하지시서 물품1"),
+                                        new ShippingInstructionItemRequest(2L, 70, "출하지시서 물품2"),
+                                        new ShippingInstructionItemRequest(3L, 300, "출하지시서 물품3"),
+                                        new ShippingInstructionItemRequest(4L, 300, "출하지시서 물품4")
                                 )
-                        )
+                        ),
+                        "jh"
                 )
         );
     }
@@ -56,40 +62,45 @@ class ShippingInstructionApplicationServiceTest {
     @ParameterizedTest(autoCloseArguments = true)
     @MethodSource("createShippingInstructionArguments")
     void readShippingInstructionListTest(
-            ShippingInstructionRequest request
+            ShippingInstructionRequest request, String userNo
     ) {
         assertDoesNotThrow(
-                () -> shippingInstructionApplicationService.createShippingInstruction(request));
+                () -> shippingInstructionApplicationService.createShippingInstruction(request, userNo));
     }
 
     private static Stream<Arguments> updateShippingInstructionArguments() {
         return Stream.of(
                 arguments(
-                        34L,
+                        77L,
                         new ShippingInstructionRequest(
-                                LocalDateTime.of(2024, 12, 12, 10, 0, 0),
-                                10L,
-                                "부산시",
+                                LocalDateTime.of(2024, 12, 31, 10, 0, 0),
+                                51L,
+                                ShippingAddress.GATE_8,
                                 "두번째 출하지시서",
                                 List.of(
-                                        new ShippingInstructionItemRequest(4L, 100, "출하지시서 물품1"),
-                                        new ShippingInstructionItemRequest(5L, 500, "출하지시서 물품2")
+                                        new ShippingInstructionItemRequest(1L, 70, "출하지시서 물품1"),
+                                        new ShippingInstructionItemRequest(2L, 70, "출하지시서 물품2"),
+                                        new ShippingInstructionItemRequest(3L, 300, "출하지시서 물품3"),
+                                        new ShippingInstructionItemRequest(4L, 300, "출하지시서 물품4")
                                 )
-                        )
+                        ),
+                        "jh"
                 ),
                 arguments(
-                        35L,
+                        78L,
                         new ShippingInstructionRequest(
-                                LocalDateTime.of(2024, 12, 15, 12, 0, 0),
-                                3L,
-                                "인천시",
+                                LocalDateTime.of(2024, 12, 31, 12, 0, 0),
+                                51L,
+                                ShippingAddress.GATE_4,
                                 "첫번째 출하지시서",
                                 List.of(
-                                        new ShippingInstructionItemRequest(1L, 100, "출하지시서 물품1"),
-                                        new ShippingInstructionItemRequest(2L, 500, "출하지시서 물품2"),
-                                        new ShippingInstructionItemRequest(3L, 5000, "출하지시서 물품3")
+                                        new ShippingInstructionItemRequest(1L, 50, "출하지시서 물품1"),
+                                        new ShippingInstructionItemRequest(2L, 50, "출하지시서 물품2"),
+                                        new ShippingInstructionItemRequest(3L, 500, "출하지시서 물품3"),
+                                        new ShippingInstructionItemRequest(4L, 500, "출하지시서 물품4")
                                 )
-                        )
+                        ),
+                        "jh"
                 )
         );
     }
@@ -98,42 +109,42 @@ class ShippingInstructionApplicationServiceTest {
     @ParameterizedTest(autoCloseArguments = true)
     @MethodSource("updateShippingInstructionArguments")
     void updateShippingInstructionTest(
-            Long shippingInstructionSeq, ShippingInstructionRequest request
+            Long shippingInstructionSeq, ShippingInstructionRequest request, String userNo
     ) {
         assertDoesNotThrow(
                 () -> shippingInstructionApplicationService.updateShippingInstruction(
-                        shippingInstructionSeq, request));
+                        shippingInstructionSeq, request, userNo));
     }
 
     private static Stream<Arguments> updateShippingInstructionStateArguments() {
         return Stream.of(
-                arguments(34L),
-                arguments(35L)
+                arguments(77L, "jh"),
+                arguments(78L, "jh")
         );
     }
 
     @DisplayName("출하지시서 결재 상태 변경")
     @ParameterizedTest(autoCloseArguments = true)
     @MethodSource("updateShippingInstructionStateArguments")
-    void updateShippingInstructionStatusTest(Long shippingInstructionSeq) {
+    void updateShippingInstructionStatusTest(Long shippingInstructionSeq, String userNo) {
         assertDoesNotThrow(
-                () -> shippingInstructionApplicationService.updateShippingInstructionApprovalStatus(shippingInstructionSeq)
+                () -> shippingInstructionApplicationService.updateShippingInstructionApprovalStatus(shippingInstructionSeq, userNo)
         );
     }
 
     private static Stream<Arguments> deleteShippingInstructionArguments() {
         return Stream.of(
-                arguments(34L),
-                arguments(35L)
+                arguments(77L, "jh"),
+                arguments(78L, "jh")
         );
     }
 
     @DisplayName("출하지시서 삭제")
     @ParameterizedTest(autoCloseArguments = true)
     @MethodSource("deleteShippingInstructionArguments")
-    void deleteShippingInstructionTest(Long shippingInstructionSeq) {
+    void deleteShippingInstructionTest(Long shippingInstructionSeq, String userNo) {
         assertDoesNotThrow(
-                () -> shippingInstructionApplicationService.deleteShippingInstruction(shippingInstructionSeq)
+                () -> shippingInstructionApplicationService.deleteShippingInstruction(shippingInstructionSeq, userNo)
         );
     }
 }
