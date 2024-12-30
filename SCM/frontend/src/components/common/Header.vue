@@ -7,14 +7,11 @@ import salesIcon from '@/assets/salesIcon.svg';
 import productionIcon from '@/assets/productionIcon.svg';
 import orderIcon from '@/assets/orderIcon.svg';
 import statisticsIcon from '@/assets/statisticsIcon.svg'
-import logoutIcon from '@/assets/logoutIcon.svg';
 import {useUserStore} from "@/stores/UserStore.js";
 import dayjs from 'dayjs';
 import { ref } from "vue";
 import axios from "@/axios.js";
 import Chatbot from "@/components/common/Chatbot.vue";
-
-import { ref } from "vue";
 
 const userStore = useUserStore();
 const notificationList = ref([]);
@@ -103,10 +100,8 @@ function chatbotOn() {
           </li>
         </ul>
         <ul class="navbar-nav mb-lg-0 d-flex flex-row">
-          <li class="nav-item"><RouterLink to="#" class="nav-link"><chatbotIcon class="icon-right"/></RouterLink></li>
           <li class="nav-item"><RouterLink to="#" class="nav-link" @click.prevent="fetchNotifications"><notificationIcon class="icon-right"/></RouterLink></li>
           <li class="nav-item" @click="chatbotOn()"><RouterLink to="#" class="nav-link"><chatbotIcon class="icon-right"/></RouterLink></li>
-          <li class="nav-item"><RouterLink to="#" class="nav-link"><notificationIcon class="icon-right"/></RouterLink></li>
           <li class="nav-item"><RouterLink to="#" class="nav-link"><myPageIcon class="icon-right"/></RouterLink></li>
           <li class="nav-item" @click="userStore.logout()"><RouterLink to="#" class="nav-link"><!--<logoutIcon class="icon-right"/>-->로그아웃</RouterLink></li>
         </ul>
@@ -211,7 +206,7 @@ function chatbotOn() {
   top: 100px;
   right: 5px;
   width: 400px;
-  height: 300px;
+  height: 500px;
   border: solid 2px silver;
   border-radius: 10px;
   backdrop-filter: blur(5px);

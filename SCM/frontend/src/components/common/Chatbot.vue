@@ -2,16 +2,21 @@
 import searchIcon from "@/assets/searchIcon.svg"
 import {ref} from "vue";
 import axios from "@/axios"
+import robotIcon from "@/assets/robotIcon.svg"
+import humanIcon from "@/assets/humanIcon.svg"
 
 // 상태 관리
-const questionTest = ref(""); // 입력 필드 값
+const questionTest = ref({
+  role: 'user',
+  message: '',
+}); // 입력 필드 값
 const items = ref([]); // 리스트 항목
 
-const fetchChatbot = async () =>{
-  try{
+const fetchChatbot = async () => {
+  try {
     const response = await axios.get(`chatbot`, {
       params: {
-        message: questionTest.value,
+        message: questionTest.value.message,
       }, paramsSerializer: (params) => {
         // null이나 undefined 값을 필터링
         const filteredParams = Object.fromEntries(
@@ -21,17 +26,16 @@ const fetchChatbot = async () =>{
       }
     });
 
-
     // 요청 성공 시 새로운 항목 추가
     if (response.status === 200) {
-      console.log(response.data.message);
-      items.value.push(response.data.message);
-      questionTest.value = ""; // 입력 필드 초기화
+      console.log(response.data);
+      items.value.push(response.data);
+      questionTest.value.message = ""; // 입력 필드 초기화
     }
 
     console.log(items.value);
-    scrollBar();
-  }catch (error) {
+    prepareScroll();
+  } catch (error) {
     if (error.response) {
       console.error(`챗봇 호출 실패 : 메세지 ${error.response.message}`);
     }
@@ -40,8 +44,8 @@ const fetchChatbot = async () =>{
 
 // 질문
 function question() {
-  items.value.push(questionTest.value);
-  scrollBar();
+  items.value.push({...questionTest.value});
+  prepareScroll();
   fetchChatbot();
 }
 
@@ -52,29 +56,42 @@ function scrollBar() {
   chatbotBody.scrollTop = chatbotBody.scrollHeight;
   // chatbotBody.scrollTo({top: chatbotBody.scrollHeight, behavior: "smooth"});
 }
+
+// 준비 함수, 약간의 시간을 두어 scroll 함수를 호출하기
+function prepareScroll() {
+  window.setTimeout(scrollBar, 50);
+}
+
 </script>
 
 <template>
   <div id="chatbotBody">
     <ul id="chatbotText">
       <template v-for="(item, index) in items" :key="index">
-        <template v-if="index % 2 === 0">
-          <li><div class="chat" style="justify-self: self-end;">{{ item }}</div></li>
+        <template v-if="item.role === 'user'">
+          <li>
+            <div class="icon-div" style="background-color: antiquewhite; justify-self: self-end;"><humanIcon class="icon"/></div>
+            <div class="chat" style="background-color: bisque; justify-self: self-end;">{{ item.message }}</div>
+          </li>
         </template>
         <template v-else>
-          <li><div class="chat" style="justify-self: self-start;">{{ item }}</div></li>
+          <li>
+            <div class="icon-div" style="background-color: bisque; justify-self: self-start;"><robotIcon class="icon"/></div>
+            <div class="chat" style="justify-self: self-start;">{{ item.message }}</div>
+          </li>
         </template>
       </template>
     </ul>
   </div>
-  <div style="width: 100%; height: 20%;" >
+  <div style="width: 100%; height: 20%;">
     <b-input-group class="mt-3">
-      <b-form-input v-model="questionTest" placeholder="질문을 입력하세요." @keyup.enter="question()"></b-form-input>
-      <b-button variant="light" class="button" :disabled="!questionTest.trim()" @click="question()">
+      <b-form-input v-model="questionTest.message" placeholder="질문을 입력하세요." @keyup.enter="question()"></b-form-input>
+      <b-button variant="light" class="button" :disabled="!(questionTest.message || '').trim()" @click="question()">
         <searchIcon class="icon"/>
       </b-button>
     </b-input-group>
   </div>
+
 </template>
 
 <style scoped>
@@ -83,19 +100,25 @@ function scrollBar() {
   border: 1px solid;
 }
 
-.answer{
+.answer {
   background-color: #FFF8E7;
   border: 1px solid;
 }
 
+.icon-div{
+  width: fit-content;
+  border: 1px solid;
+  border-radius: 10px;
+}
+
 .icon {
-  width: 20px;
-  height: 20px;
+  width: 30px;
+  height: 30px;
 }
 
 #chatbotBody {
-  width: 100%; 
-  height: 80%; 
+  width: 100%;
+  height: 80%;
   overflow-y: auto;
   border: solid 1px silver;
   border-radius: 10px;
@@ -114,6 +137,14 @@ function scrollBar() {
   border: solid 1px silver;
   border-radius: 10px;
   background-color: white;
+}
+
+.user{
+
+}
+
+.model{
+
 }
 
 </style>
