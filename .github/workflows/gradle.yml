@@ -77,6 +77,8 @@ jobs:
               operations-sorter: method
               doc-expansion: none        
           logging:
+              file:
+                path: /var/app/current/log
             level:
               root: info
               org.springframework.web: info
