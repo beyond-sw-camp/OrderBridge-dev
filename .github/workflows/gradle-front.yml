@@ -1,4 +1,4 @@
-name: OrderBridge Frontend CI/CD
+name: OrderBridge Workflows
 
 on:
   push:
