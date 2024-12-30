@@ -48,12 +48,12 @@ jobs:
           
           server:
             port: 5000
-              servlet:
-                encoding:
-                  charset: UTF-8
+            servlet:
+              encoding:
+                charset: UTF-8
           spring:
-              application:
-                name: orderBridge
+            application:
+              name: orderBridge
             datasource:
               driver-class-name: org.mariadb.jdbc.Driver
               url: jdbc:mariadb://\${RDS_HOSTNAME}:\${RDS_PORT}/\${RDS_DB_NAME}?serverTimezone=Asia/Seoul
