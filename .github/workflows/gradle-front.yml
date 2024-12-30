@@ -12,7 +12,7 @@ on:
       - main # main으로 pr하면 workflow 실행
 
 jobs:
-  ci:
+  CI:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest # 최신 Ubuntu 환경
     permissions:
@@ -43,7 +43,7 @@ jobs:
 
         working-directory: ./SCM/frontend
           
-  cd:
+  CD:
     if: github.event_name == 'push'
     runs-on: ubuntu-latest # 최신 Ubuntu 환경
     permissions:
