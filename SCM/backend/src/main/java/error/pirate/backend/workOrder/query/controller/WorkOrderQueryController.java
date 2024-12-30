@@ -69,17 +69,6 @@ public class WorkOrderQueryController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    /* 전표조회 */
-    @GetMapping("/{workOrderSeq}/slip")
-    @Operation(summary = "작업지시서 전표조회", description = "작업지시서 전표를 조회한다.")
-    public ResponseEntity<WorkOrderSlipResponse> readWorkOrderSlip (@PathVariable Long workOrderSeq){
-        log.info("-------------- GET /api/v1/workOrder/{}/slip 작업지시서 전표조회 요청 --------------", workOrderSeq);
-
-        WorkOrderSlipResponse response = workOrderQueryService.readWorkOrderSlip(workOrderSeq);
-
-        return ResponseEntity.status(HttpStatus.OK).body(response);
-    }
-
     /* 목록조회 엑셀 다운로드 */
     @GetMapping("/excelDownload")
     @Operation(summary = "작업지시서 목록조회 엑셀 다운로드", description = "작업지시서 목록을 엑셀로 다운로드한다.")

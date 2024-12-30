@@ -8,9 +8,7 @@ import error.pirate.backend.productionDisbursement.query.dto.*;
 import error.pirate.backend.productionDisbursement.query.mapper.ProductionDisbursementMapper;
 import error.pirate.backend.salesOrder.query.dto.SalesOrderResponse;
 import error.pirate.backend.shippingInstruction.query.dto.ShippingInstructionItemDTO;
-import error.pirate.backend.workOrder.query.dto.WorkOrderDetailDTO;
-import error.pirate.backend.workOrder.query.dto.WorkOrderItemDTO;
-import error.pirate.backend.workOrder.query.dto.WorkOrderResponse;
+import error.pirate.backend.workOrder.query.dto.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -19,8 +17,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -108,11 +109,83 @@ public class ProductionDisbursementQueryService {
     }
 
     /* 생산불출 목록 다운로드 */
-    public byte[] readProductionDisbursementExcel(LocalDate startDate, LocalDate endDate, String factoryName, List<ProductionDisbursementStatus> productionDisbursementStatus) {
+    public byte[] readProductionDisbursementExcel(LocalDate startDate,
+                                                  LocalDate endDate,
+                                                  String factoryName,
+                                                  List<ProductionDisbursementStatus> productionDisbursementStatus) {
         return excelDownBody.writeCells(
                 new String[] {"생산불출명", "품목명", "불출수량", "원자재창고", "생산공장명", "불출일", "상태"},
                 productionDisbursementMapper.downloadProductionDisbursementListExcel(startDate, endDate, factoryName, productionDisbursementStatus)
         );
     }
 
+    /* 생산불출 현황 조회 */
+    @Transactional(readOnly = true)
+    public ProductionDisbursementSituationResponse readProductionDisbursementSituation(LocalDate startDate,
+                                                                                       LocalDate endDate,
+                                                                                       String storeName,
+                                                                                       String factoryName) {
+        log.info("-------------- 생산불출 현황조회 서비스 진입 필터링 조건- startDate: {}, endDate: {}, storeName: {}, factoryName: {} --------------"
+                , startDate, endDate, storeName, factoryName);
+
+        // 날짜 변환 로직 추가
+        LocalDateTime startDateTime = startDate != null ? startDate.atStartOfDay() : null;
+        LocalDateTime endDateTime = endDate != null ? endDate.atTime(23, 59, 59) : null;
+
+        // 시작일이 종료일보다 나중인 경우 에러처리
+        if(startDateTime != null && endDateTime != null) {
+            if (startDateTime.isAfter(endDateTime)) {
+                throw new CustomException(ErrorCodeType.INVALID_DATE_RANGE);
+            }
+        }
+
+        // 데이터 조회
+        List<ProductionDisbursementSituationDTO> situations
+                = productionDisbursementMapper.readProductionDisbursementSituation(startDateTime, endDateTime, storeName, factoryName);
+
+        // 월별 그룹화
+        Map<String, List<ProductionDisbursementSituationDTO>> groupedByMonth = situations.stream()
+                .collect(Collectors.groupingBy(situation ->
+                        situation.getProductionDisbursementDepartureDate().format(DateTimeFormatter.ofPattern("yyyy/MM"))));
+
+        // 월별 데이터 정렬
+        List<Map.Entry<String, List<ProductionDisbursementSituationDTO>>> sortedByMonth = groupedByMonth.entrySet().stream()
+                .sorted(Map.Entry.comparingByKey()) // 키(월별 데이터)를 기준으로 정렬
+                .toList();
+
+        // 월별 데이터 생성
+        List<MonthlyProductionDisbursementSituationDTO> monthlySituations = sortedByMonth.stream()
+                .map(entry -> MonthlyProductionDisbursementSituationDTO.builder()
+                        .month(entry.getKey())
+                        .situations(entry.getValue())
+                        .monthlyTotalQuantity(entry.getValue().stream()
+                                .mapToInt(ProductionDisbursementSituationDTO::getProductionDisbursementTotalQuantity)
+                                .sum())
+                        .build())
+                .collect(Collectors.toList());
+
+        // 응답 DTO 생성
+        ProductionDisbursementSituationResponse response = ProductionDisbursementSituationResponse.builder()
+                .monthlySituations(monthlySituations)
+                .totalQuantity(situations.stream()
+                        .mapToInt(ProductionDisbursementSituationDTO::getProductionDisbursementTotalQuantity)
+                        .sum())
+                .build();
+
+        log.info("-------------- 생산불출 현황 서비스 완료: 총 생산불출 수량 - {}, 월별 그룹 - {} --------------",
+                response.getTotalQuantity(), monthlySituations.size());
+
+        return response;
+    }
+
+
+    public byte[] readProductionDisbursementSituationExcel(LocalDate startDate,
+                                                           LocalDate endDate,
+                                                           String factoryName,
+                                                           String storeName) {
+        return excelDownBody.writeCells(
+                new String[] {"생산불출명", "불출일", "불출 총수량", "생산공장명", "원자재창고", "비고"},
+                productionDisbursementMapper.downloadProductionDisbursementSituationExcel(startDate, endDate, factoryName, storeName)
+        );
+    }
 }

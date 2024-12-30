@@ -154,25 +154,6 @@ public class WorkOrderQueryService {
         return response;
     }
 
-    /* 전표 조회 */
-    public WorkOrderSlipResponse readWorkOrderSlip(Long workOrderSeq) {
-        log.info("-------------- 작업지시서 전표조회 서비스 진입 - workOrderSeq: {} --------------", workOrderSeq);
-
-        // BOM(하위) 품목 제외 전표(완제품이름 포함) 조회
-        WorkOrderSlipDTO workOrderSlip = workOrderMapper.readWorkOrderSlip(workOrderSeq);
-        if (workOrderSlip == null) {
-            throw new CustomException(ErrorCodeType.WORK_ORDER_NOT_FOUND);
-        }
-
-        // BOM 품목 조회
-        List<WorkOrderSlipItemDTO> bomItems  = workOrderMapper.readWorkOrderSlipItemByWorkOrderSeq(workOrderSeq);
-
-        return WorkOrderSlipResponse.builder()
-                .slipDTO(workOrderSlip)
-                .items(bomItems)
-                .build();
-    }
-
     // 목록조회 엑셀
     public byte[] readWorkOrderExcel(LocalDate startDate, LocalDate endDate, String warehouseName, List<WorkOrderStatus> workOrderStatus) {
         return excelDownBody.writeCells(

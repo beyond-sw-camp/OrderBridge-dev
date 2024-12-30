@@ -178,7 +178,7 @@ const printPage = () => {
       </div>
     </div>
     <div class="col-md-9">
-      <div style="width: 90%;">
+      <div>
         <div class="d-flex justify-content-between">
           <div>검색결과: {{ totalCount }}개</div>
           <div class="d-flex justify-content-end mt-3">
@@ -278,7 +278,7 @@ const printPage = () => {
               </div>
             </div>
           </div>
-          <div class="pagination">
+          <div class="pagination d-flex justify-content-center">
             <b-pagination
                 v-model="pageNumber"
                 :totalRows="props.totalCount"
@@ -302,12 +302,9 @@ const printPage = () => {
             <button class="button" @click="printPage">인쇄 미리보기</button>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
-
           <div class="container mt-4">
-
             <h2 class="text-center">출하지시서</h2>
             <br/><br/>
-
             <table class="table first-table" style="height: 140px">
               <tbody>
               <tr>
@@ -331,7 +328,6 @@ const printPage = () => {
               </tr>
               </tbody>
             </table>
-
             <table class="table table-bordered second-table">
               <thead>
               <tr>
@@ -356,7 +352,6 @@ const printPage = () => {
               </tr>
               </tfoot>
             </table>
-
           </div>
         </div>
       </div>

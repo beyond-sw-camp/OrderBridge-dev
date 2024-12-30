@@ -99,6 +99,7 @@ public class SecurityConfig {
 
         config.addExposedHeader("Authorization");
         config.addExposedHeader("Refresh-Token");
+        config.addExposedHeader("Content-Disposition");
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);

@@ -115,7 +115,7 @@ const printTable = () => {
                   <td>{{ shippingInstructionSituation.shippingInstructionNote }}</td>
                 </tr>
                 <tr v-else class="monthly-total">
-                  <td> - </td>
+                  <td>{{ index+1 }}</td>
                   <td>{{ shippingInstructionSituation.shippingInstructionScheduledShipmentMonthDate }}</td>
                   <td> - </td>
                   <td>{{ shippingInstructionSituation.shippingInstructionTotalQuantitySum }} 개</td>
