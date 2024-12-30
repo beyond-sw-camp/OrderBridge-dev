@@ -13,6 +13,7 @@ on:
 
 jobs:
   CI:
+    name: Continuous Integration
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest # 최신 Ubuntu 환경
     permissions:
@@ -41,51 +42,26 @@ jobs:
       - name: Build project
         run: npm run build
         working-directory: ./SCM/frontend
-        
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
 
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
-
-      - name: Get current time
-        uses: 1466587594/get-current-time@v2
-        id: current-time
-        with:
-          format: YYYY-MM-DD HH:mm:ss
-          utcOffset: "+09:00"
-
-      - name: Show Current Time
-        run: echo "currentTime=${{steps.current-time.outputs.formattedTime}}"
-        shell: bash
-
-      - name: Generate frontend deployment package
+      - name: Deploy to S3
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
         run: |
-          mkdir -p deploy
-          cp -r SCM/frontend/dist deploy
-          cp SCM/frontend/package.json deploy/.
-          cp SCM/frontend/server.js deploy/.
-          cp Procfile_front deploy/Procfile
-          cp -r .platform deploy/.platform
-          cd deploy && zip -r deploy.zip .
+          aws s3 sync ./SCM/frontend/dist s3://${{ secrets.S3_BUCKET_NAME }} --delete
 
-      - name: Beanstalk frontend Deploy
-        uses: einaregilsson/beanstalk-deploy@v22
-        with:
-          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          application_name: ${{ secrets.AWS_ELASTIC_BEANSTALK_FRONTEND_APPLICATION }}
-          environment_name: ${{ secrets.AWS_ELASTIC_BEANSTALK_FRONTEND_ENV }}
-          version_label: github-action-frontend_${{steps.current-time.outputs.formattedTime}}
-          region: ${{ secrets.AWS_REGION }}
-          deployment_package: deploy/deploy.zip
-          use_existing_version_if_available: false
-          wait_for_deployment: true
-          wait_for_environment_recovery: 300
-        
+      - name: Invalidate CloudFront Cache
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          CLOUDFRONT_DISTRIBUTION_ID: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
+        run: |
+          aws cloudfront create-invalidation --distribution-id $CLOUDFRONT_DISTRIBUTION_ID --paths "/*"
+
   CD:
+    name: Continuous Deployment
     if: github.event_name == 'push'
     runs-on: ubuntu-latest # 최신 Ubuntu 환경
     permissions:
@@ -115,33 +91,19 @@ jobs:
         run: npm run build
         working-directory: ./SCM/frontend
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
-
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
-
-      - name: Generate frontend deployment package
+      - name: Deploy to S3
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
         run: |
-          mkdir -p deploy
-          cp -r SCM/frontend/dist deploy
-          cp SCM/frontend/package.json deploy/.
-          cp SCM/frontend/server.js deploy/.
-          cp Procfile_front deploy/Procfile
-          cd deploy && zip -r deploy.zip .
+          aws s3 sync ./SCM/frontend/dist s3://${{ secrets.S3_BUCKET_NAME }} --delete
 
-      - name: Beanstalk frontend Deploy
-        uses: einaregilsson/beanstalk-deploy@v22
-        with:
-          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          application_name: ${{ secrets.AWS_ELASTIC_BEANSTALK_FRONTEND_APPLICATION }}
-          environment_name: ${{ secrets.AWS_ELASTIC_BEANSTALK_FRONTEND_ENV }}
-          version_label: github-action-frontend_${{steps.current-time.outputs.formattedTime}}
-          region: ${{ secrets.AWS_REGION }}
-          deployment_package: deploy/deploy.zip
-          use_existing_version_if_available: false
-          wait_for_deployment: true
-          wait_for_environment_recovery: 300
+      - name: Invalidate CloudFront Cache
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          CLOUDFRONT_DISTRIBUTION_ID: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
+        run: |
+          aws cloudfront create-invalidation --distribution-id $CLOUDFRONT_DISTRIBUTION_ID --paths "/*"
