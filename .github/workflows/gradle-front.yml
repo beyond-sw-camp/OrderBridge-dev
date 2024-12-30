@@ -1,0 +1,107 @@
+name: OrderBridge Frontend CI/CD
+
+on:
+  push:
+    branches:
+      - main # main으로 push하면 workflow 실행
+    paths:
+      - 'SCM/frontend/**'
+  pull_request:
+    types: [ opened, reopened, synchronize ]  # Pull Request가 열리거나, 다시 열리거나, 동기화될 때 트리거됩니다.
+    branches:
+      - main # main으로 pr하면 workflow 실행
+    paths:
+      - 'SCM/frontend/**'
+
+jobs:
+  deploy-ci:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest # 최신 Ubuntu 환경
+    permissions:
+      contents: read # contents read 권한을 부여
+
+    steps:
+      - uses: actions/checkout@v4 # 레포지토리 코드를 체크아웃 [v4라고 버전 지정 시 v4로 시작하는 최신 릴리즈 버전을 사용 (정확한 버전 기입 시 해당 릴리즈 버전만 사용)]
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 20
+
+      - name: Create .env.template
+        run: |
+          mkdir -p SCM/frontend
+          cat > SCM/frontend/.env.template <<EOL
+
+          VITE_API_URL=https://be.beanteacher.shop/api/v1/
+          EOF
+
+      - name: Install dependencies
+        run: npm install
+        working-directory: ./SCM/frontend
+
+      - name: Build project
+        run: npm run dev
+
+        working-directory: ./SCM/frontend
+          
+  deploy-cd:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest # 최신 Ubuntu 환경
+    permissions:
+      contents: read # contents read 권한을 부여
+
+    steps:
+      - uses: actions/checkout@v4 # 레포지토리 코드를 체크아웃 [v4라고 버전 지정 시 v4로 시작하는 최신 릴리즈 버전을 사용 (정확한 버전 기입 시 해당 릴리즈 버전만 사용)]
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 20
+
+      - name: Create .env.template
+        run: |
+          mkdir -p SCM/frontend
+          cat > SCM/frontend/.env.template <<EOL
+
+          VITE_API_URL=https://be.beanteacher.shop/api/v1/
+          EOF
+
+      - name: Install dependencies
+        run: npm install
+        working-directory: ./SCM/frontend
+
+      - name: Build project
+        run: npm run dev
+
+        working-directory: ./SCM/frontend
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+
+      - name: Generate frontend deployment package
+        run: |
+          mkdir -p deploy
+          cp -r SCM/frontend deploy
+          cp Procfile_front deploy/Procfile
+          cd deploy && zip -r deploy.zip .
+
+      - name: Beanstalk frontend Deploy
+        uses: einaregilsson/beanstalk-deploy@v22
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: ${{ secrets.AWS_ELASTIC_BEANSTALK_FRONTEND_APPLICATION }}
+          environment_name: ${{ secrets.AWS_ELASTIC_BEANSTALK_FRONTEND_ENV }}
+          version_label: github-action-frontend_${{steps.current-time.outputs.formattedTime}}
+          region: ${{ secrets.AWS_REGION }}
+          deployment_package: deploy/deploy.zip
+          use_existing_version_if_available: false
+          wait_for_deployment: true
+          wait_for_environment_recovery: 300
