@@ -10,8 +10,6 @@ on:
     types: [ opened, reopened, synchronize ]  # Pull Request가 열리거나, 다시 열리거나, 동기화될 때 트리거됩니다.
     branches:
       - main # main으로 pr하면 workflow 실행
-    paths:
-      - 'SCM/backend/**'
 
 jobs:
   deploy-ci:
