@@ -1,12 +1,13 @@
 package error.pirate.backend.item.query.controller;
 
+import error.pirate.backend.item.command.application.dto.BomItemDTO;
 import error.pirate.backend.item.command.domain.aggregate.entity.ItemDivision;
-import error.pirate.backend.item.command.domain.aggregate.entity.ItemUnit;
 import error.pirate.backend.item.query.dto.*;
 import error.pirate.backend.item.query.service.ItemQueryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -74,6 +75,13 @@ public class ItemQueryController {
     @Operation(summary = "품목 분류 조회")
     public ResponseEntity<List<ItemDivision.ItemDivisionResponse>> readItemDivision() {
         return ResponseEntity.ok(ItemDivision.readItemDivisionList());
+    }
+
+    @GetMapping("/bom-item/{itemSeq}")
+    @Operation(summary = "bom 품목 조회")
+    public ResponseEntity<List<BomItemDTO>> readBomItems(@PathVariable Long itemSeq) {
+        List<BomItemDTO> bomItems = itemQueryService.readBomItems(itemSeq);
+        return ResponseEntity.ok(bomItems);
     }
 }
 

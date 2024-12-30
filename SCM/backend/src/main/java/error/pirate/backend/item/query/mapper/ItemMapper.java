@@ -1,5 +1,6 @@
 package error.pirate.backend.item.query.mapper;
 
+import error.pirate.backend.item.command.application.dto.BomItemDTO;
 import error.pirate.backend.item.command.domain.aggregate.entity.ItemDivision;
 import error.pirate.backend.item.query.dto.ItemResponse;
 import org.apache.ibatis.annotations.Mapper;
@@ -25,4 +26,6 @@ public interface ItemMapper {
             @Param("minExpirationHour") Integer minExpirationHour,
             @Param("maxExpirationHour") Integer maxExpirationHour
     );
+
+    List<BomItemDTO> readBomItems(@Param("parentItemSeq") Long parentItemSeq);
 }
