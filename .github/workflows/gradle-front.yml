@@ -1,4 +1,4 @@
-name: OrderBridge Workflows
+name: Frontend Workflows
 
 on:
   push:
@@ -51,6 +51,17 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Get current time
+        uses: 1466587594/get-current-time@v2
+        id: current-time
+        with:
+          format: YYYY-MM-DD HH:mm:ss
+          utcOffset: "+09:00"
+
+      - name: Show Current Time
+        run: echo "currentTime=${{steps.current-time.outputs.formattedTime}}"
+        shell: bash
 
       - name: Generate frontend deployment package
         run: |
