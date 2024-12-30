@@ -48,27 +48,33 @@ jobs:
           
           server:
             port: 5000
-            servlet:
+            servlet::q
               encoding:
                 charset: UTF-8
           spring:
             application:
               name: orderBridge
             datasource:
-              driver-class-name: org.mariadb.jdbc.Driver
               url: jdbc:mariadb://\${RDS_HOSTNAME}:\${RDS_PORT}/\${RDS_DB_NAME}?serverTimezone=Asia/Seoul
               username: \${RDS_USERNAME}
               password: \${RDS_PASSWORD}
               driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
             jpa:
               show-sql: true
-              ddl-auto: none
-              naming:
-                physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
+              hibernate:
+                ddl-auto: none
+                naming:
+                  physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
               properties:
                 hibernate:
                   format_sql: true
                 hibernate.dialect: org.hibernate.dialect.MariaDBDialect
+              data:
+                redis:
+                  host: \${REDIS_HOST}
+                  port: \${REDIS_PORT}
+                  username: \${REDIS_HOSTNAME}
+                  password: \${REDIS_PASSWORD}
           springdoc:
             packages-to-scan: error.pirate.backend
             default-consumes-media-type: application/json;charset=UTF-8
@@ -118,6 +124,10 @@ jobs:
           RDS_USERNAME: ${{ secrets.RDS_USERNAME }}
           RDS_PASSWORD: ${{ secrets.RDS_PASSWORD }}
           JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
+          REDIS_HOST: ${{ secrets.REDIS_HOST }}
+          REDIS_HOSTNAME: ${{ secrets.REDIS_HOSTNAME }}
+          REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
+          REDIS_PORT: ${{ secrets.REDIS_PORT }}
           
       # backend 빌드
       - name: Build with Gradle Wrapper
