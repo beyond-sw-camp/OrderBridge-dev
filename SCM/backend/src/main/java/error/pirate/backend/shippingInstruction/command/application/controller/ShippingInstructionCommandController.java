@@ -1,5 +1,6 @@
 package error.pirate.backend.shippingInstruction.command.application.controller;
 
+import error.pirate.backend.security.AuthUtil;
 import error.pirate.backend.shippingInstruction.command.application.dto.ShippingInstructionRequest;
 import error.pirate.backend.shippingInstruction.command.application.service.ShippingInstructionApplicationService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -25,8 +26,8 @@ public class ShippingInstructionCommandController {
     public ResponseEntity<String> createShippingInstruction(
             @RequestBody ShippingInstructionRequest shippingInstructionRequest
     ) {
-
-        shippingInstructionApplicationService.createShippingInstruction(shippingInstructionRequest);
+        String userNo = AuthUtil.getAuthUser();
+        shippingInstructionApplicationService.createShippingInstruction(shippingInstructionRequest, userNo);
 
         return ResponseEntity.status(HttpStatus.CREATED).body("출하지시서 작성성공");
     }
@@ -38,8 +39,8 @@ public class ShippingInstructionCommandController {
             @PathVariable Long shippingInstructionSeq,
             @RequestBody ShippingInstructionRequest shippingInstructionRequest
     ) {
-
-        shippingInstructionApplicationService.updateShippingInstruction(shippingInstructionSeq, shippingInstructionRequest);
+        String userNo = AuthUtil.getAuthUser();
+        shippingInstructionApplicationService.updateShippingInstruction(shippingInstructionSeq, shippingInstructionRequest, userNo);
 
         return ResponseEntity.status(HttpStatus.OK).body("출하지시서 수정성공");
     }
@@ -50,8 +51,8 @@ public class ShippingInstructionCommandController {
     public ResponseEntity<String> updateShippingInstructionStatus(
             @PathVariable Long shippingInstructionSeq
     ) {
-
-        shippingInstructionApplicationService.updateShippingInstructionApprovalStatus(shippingInstructionSeq);
+        String userNo = AuthUtil.getAuthUser();
+        shippingInstructionApplicationService.updateShippingInstructionApprovalStatus(shippingInstructionSeq, userNo);
 
         return ResponseEntity.status(HttpStatus.OK).body("출하지시서 결재 상태 변경 성공");
     }
@@ -62,8 +63,8 @@ public class ShippingInstructionCommandController {
     public ResponseEntity<String> deleteShippingInstruction(
             @PathVariable Long shippingInstructionSeq
     ) {
-
-        shippingInstructionApplicationService.deleteShippingInstruction(shippingInstructionSeq);
+        String userNo = AuthUtil.getAuthUser();
+        shippingInstructionApplicationService.deleteShippingInstruction(shippingInstructionSeq, userNo);
 
         return ResponseEntity.status(HttpStatus.OK).body("출하지시서 삭제 성공");
     }

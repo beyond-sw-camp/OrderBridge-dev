@@ -1,5 +1,6 @@
 package error.pirate.backend.shippingSlip.command.application.controller;
 
+import error.pirate.backend.security.AuthUtil;
 import error.pirate.backend.shippingSlip.command.application.dto.ShippingSlipRequest;
 import error.pirate.backend.shippingSlip.command.application.service.ShippingSlipApplicationService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -25,8 +26,8 @@ public class ShippingSlipCommandController {
     public ResponseEntity<String> createShippingSlip(
             @RequestBody ShippingSlipRequest shippingSlipRequest
     ) {
-
-        shippingSlipApplicationService.createShippingSlip(shippingSlipRequest);
+        String userNo = AuthUtil.getAuthUser();
+        shippingSlipApplicationService.createShippingSlip(shippingSlipRequest, userNo);
 
         return ResponseEntity.status(HttpStatus.CREATED).body("출하전표 작성성공");
     }
