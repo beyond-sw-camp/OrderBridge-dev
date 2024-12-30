@@ -55,7 +55,7 @@ jobs:
             application:
               name: orderBridge
             datasource:
-              url: jdbc:mariadb://\${RDS_HOSTNAME}:\${RDS_PORT}/\${RDS_DB_NAME}?serverTimezone=Asia/Seoul
+              url: jdbc:log4jdbc:mariadb://\${RDS_HOSTNAME}:\${RDS_PORT}/\${RDS_DB_NAME}?serverTimezone=Asia/Seoul
               username: \${RDS_USERNAME}
               password: \${RDS_PASSWORD}
               driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
