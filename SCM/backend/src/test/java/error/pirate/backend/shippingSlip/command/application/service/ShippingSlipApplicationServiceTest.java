@@ -57,7 +57,7 @@ class ShippingSlipApplicationServiceTest {
             ShippingSlipRequest request
     ) {
         assertDoesNotThrow(
-                () -> shippingSlipApplicationService.createShippingSlip(request));
+                () -> shippingSlipApplicationService.createShippingSlip(request, userNo));
     }
 
     private static Stream<Arguments> updateShippingSlipArguments() {

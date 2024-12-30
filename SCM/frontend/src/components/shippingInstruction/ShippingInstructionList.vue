@@ -5,6 +5,7 @@ import trashIcon from "@/assets/trashIcon.svg";
 import editIcon from "@/assets/editIcon.svg";
 import printIcon from "@/assets/printIcon.svg";
 import dayjs from "dayjs";
+import {useUserStore} from "@/stores/UserStore.js";
 
 const props = defineProps({
   searchStartDate: {type: String, required: false}, // 시작 날짜
@@ -25,6 +26,7 @@ const emit = defineEmits(
     ['pageEvent', 'searchEvent', 'checkStatusEvent', 'extendItemEvent',
       'itemEditEvent', 'itemDeleteEvent', 'registerEvent', 'excelEvent', 'shippingSlipRegisterEvent']);
 
+const userStore = useUserStore();
 const startDate = ref(props.searchStartDate);
 const endDate = ref(props.searchEndDate);
 const pageNumber = ref(props.pageNumber);
@@ -266,10 +268,10 @@ const printPage = () => {
                                 @click="shippingSlipRegister(shippingInstruction.shippingInstructionSeq)">출하전표 등록
                       </b-button>
                       <printIcon class="me-3 icon" data-bs-toggle="modal" data-bs-target="#PrintModal" @click.stop="itemPrint(shippingInstruction)"/>
-                      <editIcon v-if="shippingInstruction.shippingInstructionStatus === 'BEFORE'" class="me-3 icon"
-                                @click.stop="itemEdit(shippingInstruction.shippingInstructionSeq)"/>
-                      <trashIcon v-if="shippingInstruction.shippingInstructionStatus === 'BEFORE'" class="icon"
-                                 @click.stop="itemDelete(shippingInstruction.shippingInstructionSeq)"/>
+                      <editIcon v-if="shippingInstruction.shippingInstructionStatus === 'BEFORE' && userStore.userId === expandShippingInstruction[shippingInstruction.shippingInstructionSeq].userEmployeeNo"
+                                class="me-3 icon" @click.stop="itemEdit(shippingInstruction.shippingInstructionSeq)"/>
+                      <trashIcon v-if="shippingInstruction.shippingInstructionStatus === 'BEFORE' && userStore.userId === expandShippingInstruction[shippingInstruction.shippingInstructionSeq].userEmployeeNo"
+                                 class="icon" @click.stop="itemDelete(shippingInstruction.shippingInstructionSeq)"/>
                     </div>
                   </div>
                 </div>
