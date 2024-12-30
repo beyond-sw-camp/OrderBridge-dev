@@ -1,6 +1,6 @@
 <script setup>
 import { onMounted, ref, watch } from 'vue';
-import axios from 'axios';
+import axios from "@/axios";
 import { BInputGroup, BFormInput, BFormCheckbox, BButton, BInputGroupText, BPagination } from 'bootstrap-vue-3';
 import {useRouter} from "vue-router";
 import dayjs from "dayjs";
@@ -45,7 +45,7 @@ const findItemsByFilter = async () => {
   const maxHour = (maxExpiration.value != null && maxExpiration.value >= 0) ? maxExpiration.value * 24 : null;
 
   try {
-    const response = await axios.get("http://localhost:8090/api/v1/item", {
+    const response = await axios.get("item", {
       params: {
         page: currentPage.value,
         size: perPage.value,
@@ -123,7 +123,7 @@ const itemDetail = async (itemSeq) => {
   itemInventoryCurrentPage.value = 0;
 
   try {
-    const response = await axios.get(`http://localhost:8090/api/v1/item/${itemSeq}`)
+    const response = await axios.get(`item/${itemSeq}`)
 
     childItemList.value = response.data.childItemList;
     itemInventoryList.value = response.data.itemInventoryList;
@@ -137,7 +137,7 @@ const itemDetail = async (itemSeq) => {
 
 const itemDelete = async (itemSeq) => {
   try{
-    await axios.delete(`http://localhost:8090/api/v1/item/${itemSeq}`)
+    await axios.delete(`item/${itemSeq}`)
   } catch (error) {
     alert(`품목 삭제 실패`);
   }

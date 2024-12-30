@@ -1,6 +1,6 @@
 <script setup>
 import {ref, onMounted, watch, defineProps} from 'vue';
-import axios from 'axios';
+import axios from "@/axios";
 import {BButton, BPagination} from "bootstrap-vue-3";
 import plusIcon from "@/assets/plus.svg";
 import router from "@/router/index.js";
@@ -68,7 +68,7 @@ const updatePreviewImage = () => {
 // 품목 구분 데이터 가져오기
 const fetchItemDivisions = async () => {
   try {
-    const response = await axios.get('http://localhost:8090/api/v1/item/division');
+    const response = await axios.get('item/division');
     itemDivisions.value = response.data;
   } catch (error) {
     console.error('품목 구분 데이터 가져오기 실패:', error);
@@ -79,7 +79,7 @@ const fetchItemDivisions = async () => {
 // 품목 단위 데이터 가져오기
 const fetchItemUnits = async () => {
   try {
-    const response = await axios.get('http://localhost:8090/api/v1/item/unit');
+    const response = await axios.get('item/unit');
     itemUnits.value = response.data;
   } catch (error) {
     console.error('품목 단위 목록 가져오기 실패:', error);
@@ -90,7 +90,7 @@ const fetchItemUnits = async () => {
 // 창고 데이터 가져오기
 const fetchAllWarehouses = async () => {
   try {
-    const response = await axios.get('http://localhost:8090/api/v1/warehouse/all');
+    const response = await axios.get('warehouse');
     warehouses.value = response.data;
   } catch (error) {
     console.error('창고 목록 가져오기 실패:', error);
@@ -144,7 +144,7 @@ const registerItems = async () => {
 
   isLoading.value = true;
   try {
-    await axios.post('http://localhost:8090/api/v1/item', payload, {
+    await axios.post('item', payload, {
       headers: {
         'Content-Type': 'application/json',
       },
@@ -204,7 +204,7 @@ const updateItem = async () => {
 
   isLoading.value = true;
   try {
-    await axios.put(`http://localhost:8090/api/v1/item/${props.itemDTO.itemSeq}`, payload, {
+    await axios.put(`item/${props.itemDTO.itemSeq}`, payload, {
       headers: {
         'Content-Type': 'application/json',
       },
@@ -238,7 +238,7 @@ watch(itemPageNumber, () => {
 
 const fetchItems = async () => {
   try {
-    const response = await axios.get(`http://localhost:8090/api/v1/item`, {
+    const response = await axios.get(`item`, {
       params: {
         page: itemPageNumber.value,
         size: itemPageSize.value,
