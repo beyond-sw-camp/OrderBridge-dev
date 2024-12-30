@@ -166,6 +166,9 @@ jobs:
           version_label: github-action-frontend_${{steps.current-time.outputs.formattedTime}}
           region: ${{ secrets.AWS_REGION }}
           deployment_package: deploy/deploy.zip
+          use_existing_version_if_available: false
+          wait_for_deployment: true
+          wait_for_environment_recovery: 300
 
   # 프로젝트의 의존성 그래프를 생성 및 제출하여 Github에서 시각적으로 관리하도록 한다.
   dependency-submission:
