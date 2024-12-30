@@ -69,12 +69,12 @@ jobs:
                 hibernate:
                   format_sql: true
                 hibernate.dialect: org.hibernate.dialect.MariaDBDialect
-              data:
-                redis:
-                  host: \${REDIS_HOST}
-                  port: \${REDIS_PORT}
-                  username: \${REDIS_HOSTNAME}
-                  password: \${REDIS_PASSWORD}
+            data:
+              redis:
+                host: \${REDIS_HOST}
+                port: \${REDIS_PORT}
+                username: \${REDIS_HOSTNAME}
+                password: \${REDIS_PASSWORD}
           
           springdoc:
             packages-to-scan: error.pirate.backend
