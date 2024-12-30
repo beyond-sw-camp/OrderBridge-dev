@@ -55,7 +55,9 @@ jobs:
       - name: Generate frontend deployment package
         run: |
           mkdir -p deploy
-          cp -r SCM/frontend deploy
+          cp -r SCM/frontend/dist deploy
+          cp SCM/frontend/package.json deploy/.
+          cp SCM/frontend/server.js deploy/.
           cp Procfile_front deploy/Procfile
           cd deploy && zip -r deploy.zip .
 
@@ -101,7 +103,6 @@ jobs:
 
       - name: Build project
         run: npm run build
-
         working-directory: ./SCM/frontend
 
       - name: Configure AWS credentials
@@ -112,11 +113,12 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-
       - name: Generate frontend deployment package
         run: |
           mkdir -p deploy
-          cp -r SCM/frontend deploy
+          cp -r SCM/frontend/dist deploy
+          cp SCM/frontend/package.json deploy/.
+          cp SCM/frontend/server.js deploy/.
           cp Procfile_front deploy/Procfile
           cd deploy && zip -r deploy.zip .
 
