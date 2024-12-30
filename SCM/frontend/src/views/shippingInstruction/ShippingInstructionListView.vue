@@ -118,7 +118,6 @@ const fetchItemDivision = async () => {
 
 // 엑셀 다운 요청
 const excelDown = async () => {
-  const excelName = "출하지시서_" + new Date().getFullYear() + (new Date().getMonth() + 1) + new Date().getDay();
   try {
     const response = await axios.get(`shipping-instruction/excel`, {
       params: {
@@ -136,17 +135,18 @@ const excelDown = async () => {
       responseType: "blob", // 중요: blob 형식으로 설정
     });
 
-    // Blob 객체 생성 및 다운로드 처리
     const blob = new Blob([response.data], {
-      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = decodeURIComponent(excelName); // 파일명 디코딩
-    link.click();
 
-    // Blob URL 해제
-    URL.revokeObjectURL(link.href);
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = decodeURIComponent(response.headers["content-disposition"].split('filename=')[1]);
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.URL.revokeObjectURL(url);
 
   } catch (error) {
     console.error("출하지시서 엑셀다운로드 실패 :", error);

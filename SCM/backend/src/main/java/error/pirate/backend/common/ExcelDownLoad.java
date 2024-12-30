@@ -58,6 +58,17 @@ public class ExcelDownLoad {
     public byte[] writeCells(String[] headers, ArrayList<Object> list) {
         String[][] cells = new String[list.size()][headers.length];
 
+        int status = 0;
+        int address = 0;
+        for(int i = 0; i < headers.length; i++) {
+            if(headers[i].contains("주소")) {
+                address = i;
+            }
+            if (headers[i].contains("상태")){
+                status = i;
+            }
+        }
+
         for (int i = 0; i < list.size(); i++) {
             Field[] fields = list.get(i).getClass().getDeclaredFields();
             for (int j = 0; j < headers.length; j++) {
@@ -69,7 +80,18 @@ public class ExcelDownLoad {
                 try {
                     Method getterMethod = list.get(i).getClass().getMethod(getterMethodName);
                     Object value = getterMethod.invoke(list.get(i));
-                    String stringValue = value == null ? "" : value.toString();
+
+                    String stringValue;
+                    if (value == null) {
+                        stringValue = "";
+                    } else if (value instanceof Enum) {
+                        // Enum인 경우 getValue 메서드 호출
+                        Method valueMethod = value.getClass().getMethod("getValue");
+                        stringValue = (String) valueMethod.invoke(value);
+                    } else {
+                        stringValue = value.toString();
+                    }
+
                     cells[i][j] = stringValue;
                 } catch (Exception e) {
                     log.error("writeCells Exception: ", e);
