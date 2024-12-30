@@ -46,18 +46,60 @@ jobs:
           cat > src/main/resources/application.yml.template <<EOL
           server:
             port: 5000
+              servlet:
+              encoding:
+                charset: UTF-8
           spring:
+              application:
+                name: orderBridge
             datasource:
               driver-class-name: org.mariadb.jdbc.Driver
-              url: jdbc:mariadb://\${RDS_HOSTNAME}:\${RDS_PORT}/\${RDS_DB_NAME}
+              url: jdbc:mariadb://\${RDS_HOSTNAME}:\${RDS_PORT}/\${RDS_DB_NAME}?serverTimezone=Asia/Seoul
               username: \${RDS_USERNAME}
               password: \${RDS_PASSWORD}
+              driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
             jpa:
               show-sql: true
+              ddl-auto: none
+              naming:
+                physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
               properties:
                 hibernate:
-                  '[format_sql]': true
-                  
+                  format_sql: true
+                hibernate.dialect: org.hibernate.dialect.MariaDBDialect
+          springdoc:
+            packages-to-scan: error.pirate.backend
+            default-consumes-media-type: application/json;charset=UTF-8
+            default-produces-media-type: application/json;charset=UTF-8
+            swagger-ui:
+              path: /swagger
+              operations-sorter: method
+              doc-expansion: none        
+          logging:
+            level:
+              root: info
+              org.springframework.web: info
+              com.zaxxer.hikari: info
+              log4jdbc.log4j2: error
+              jdbc.sqlonly: info
+              jdbc.resultsettable: info
+              jdbc.connection: info
+          mybatis:
+            configuration:
+              map-underscore-to-camel-case: true
+            mapper-locations: mappers/**/*.xml
+          
+          jwt:
+            secretKey: \${JWT_SECRET_KEY}
+            access:
+              expiration: 3600000 # 1시간
+              header: Authorization
+            refresh:
+              expiration: 1209600000 # 2주
+              header: Refresh-Token
+          
+          frontend: http://localhost:5173
+          
           EOL   
       
       # 템플릿 파일에 환경 변수를 대입하여 application.yml 생성
@@ -72,6 +114,7 @@ jobs:
           RDS_DB_NAME: ${{ secrets.RDS_DB_NAME }}
           RDS_USERNAME: ${{ secrets.RDS_USERNAME }}
           RDS_PASSWORD: ${{ secrets.RDS_PASSWORD }}
+          JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
           
       # backend 빌드
       - name: Build with Gradle Wrapper
