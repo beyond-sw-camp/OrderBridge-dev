@@ -1,4 +1,4 @@
-name: OrderBridge Frontend CI/CD
+name: Frontend Workflows
 
 on:
   push:
@@ -12,7 +12,7 @@ on:
       - main # main으로 pr하면 workflow 실행
 
 jobs:
-  deploy-ci:
+  ci:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest # 최신 Ubuntu 환경
     permissions:
@@ -43,7 +43,7 @@ jobs:
 
         working-directory: ./SCM/frontend
           
-  deploy-cd:
+  cd:
     if: github.event_name == 'push'
     runs-on: ubuntu-latest # 최신 Ubuntu 환경
     permissions:

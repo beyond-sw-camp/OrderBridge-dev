@@ -1,4 +1,4 @@
-name: OrderBridge Backend CI/CD
+name: Backend Workflows
 
 on:
   push:
@@ -12,7 +12,7 @@ on:
       - main # main으로 pr하면 workflow 실행
 
 jobs:
-  deploy-ci:
+  ci:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest # 최신 Ubuntu 환경
     permissions:
@@ -155,7 +155,7 @@ jobs:
       #      ./SCM/backend/build/test-results/test
       #      ./SCM/backend/build/reports/tests/test
   
-  deploy-cd:
+  cd:
     if: github.event_name == 'push'
     runs-on: ubuntu-latest # 최신 Ubuntu 환경
     permissions:
