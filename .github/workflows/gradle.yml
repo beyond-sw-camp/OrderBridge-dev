@@ -78,7 +78,7 @@ jobs:
               doc-expansion: none        
           logging:
               file:
-                path: /var/app/current/log
+                path: /var/app/current
             level:
               root: info
               org.springframework.web: info
