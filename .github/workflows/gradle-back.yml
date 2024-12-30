@@ -1,4 +1,4 @@
-name: OrderBridge Backend CI/CD
+name: Backend Workflows
 
 on:
   push:
@@ -10,11 +10,9 @@ on:
     types: [ opened, reopened, synchronize ]  # Pull Request가 열리거나, 다시 열리거나, 동기화될 때 트리거됩니다.
     branches:
       - main # main으로 pr하면 workflow 실행
-    paths:
-      - 'SCM/backend/**'
 
 jobs:
-  deploy-ci:
+  CI:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest # 최신 Ubuntu 환경
     permissions:
@@ -157,7 +155,7 @@ jobs:
       #      ./SCM/backend/build/test-results/test
       #      ./SCM/backend/build/reports/tests/test
   
-  deploy-cd:
+  CD:
     if: github.event_name == 'push'
     runs-on: ubuntu-latest # 최신 Ubuntu 환경
     permissions:
