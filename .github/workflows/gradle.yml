@@ -48,8 +48,8 @@ jobs:
           server:
             port: 5000
               servlet:
-              encoding:
-                charset: UTF-8
+                encoding:
+                  charset: UTF-8
           spring:
               application:
                 name: orderBridge
