@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch } from 'vue';
+import dayjs from 'dayjs';
 
 const props = defineProps({
   isVisible: Boolean,
@@ -34,7 +34,7 @@ const printPage = () => {
       <div class="modal-content">
         <div class="modal-body" id="print-area">
           <div class="d-flex justify-content-between">
-            <button @click="printPage">출력</button>
+            <button class="btn-print" @click="printPage">출력</button>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @click="closeModal" ></button>
           </div>
 
@@ -42,24 +42,55 @@ const printPage = () => {
 
             <h2 class="text-center">발주서</h2>
             <br/><br/>
+            <table class="info-table-eft" style="float: left;">
+              <tbody>
+              <tr>
+                <td class="to-column" style="height: 30px;">발주일자 &nbsp; : &nbsp;</td>
+                <td colspan="5" style="height: 30px;">&nbsp;20&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;년 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;월 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;일</td>
+              </tr>
+              <tr>
+                <td style="height: 30px;">거래처명 &nbsp; : &nbsp;</td>
+                <td colspan="5" style="height: 30px;"> &nbsp; {{ purchaseOrder?.clientName!=null ? purchaseOrder.clientName : '' }}</td>
+              </tr>
+              </tbody>
+            </table>
 
-            <table class="table first-table" style="height: 140px">
+            <table class="info-table-right" style="float: right; width: 50%; text-align: center; border-collapse: collapse;" border="1">
+              <tbody>
+              <tr>
+                <td class="approval-header color-column" rowspan="2" colspan="4">결재란</td>
+                <td class="color-column" colspan="5">담당</td>
+                <td class="color-column" colspan="5">승인</td>
+              </tr>
+              <tr>
+                <td colspan="5" style="height: 30px;"></td>
+                <td colspan="5" style="height: 30px;"></td>
+              </tr>
+              </tbody>
+            </table>
+            <br/><br/><br/>
+
+            <table class="table first-table left" style="height: 140px">
               <tbody v-if="purchaseOrder">
               <tr>
-                <td class="align-content-center">발주서명</td>
-                <td class="color-column align-content-center">{{ purchaseOrder.purchaseOrderName }}</td>
-                <td class="align-content-center">purchaseOrder.date</td>
-                <td class="color-column align-content-center">purchaseOrder.dateData</td>
+                <td class="color-column align-content-center">발주서명</td>
+                <td class="align-content-center">{{ purchaseOrder.purchaseOrderName }}</td>
+                <td class="color-column align-content-center">담당사</td>
+                <td class="align-content-center">Order Bridge</td>
               </tr>
               <tr>
-                <td class="align-content-center">거래처</td>
-                <td class="color-column align-content-center">{{ purchaseOrder.clientName }}</td>
-                <td class="align-content-center">담당자</td>
-                <td class="color-column align-content-center">{{ purchaseOrder.userName }}</td>
+                <td class="color-column align-content-center">담당자</td>
+                <td class="align-content-center">{{ purchaseOrder.userName }}</td>
+                <td class="color-column align-content-center">연락처</td>
+                <td class="align-content-center">{{ purchaseOrder.userPhoneNo }}</td>
               </tr>
               <tr>
-                <td class="align-content-center">가격</td>
-                <td class="color-column align-content-center" colspan="3">{{ purchaseOrder.purchaseOrderExtendedPrice.toLocaleString() }}</td>
+                <td class="color-column align-content-center">주소</td>
+                <td class="align-content-center" colspan="3">서울특별시 동작구 보라매로 87 플레이데이터 3층</td>
+              </tr>
+              <tr>
+                <td class="color-column align-content-center">계약 납기일</td>
+                <td class="align-content-center" colspan="3">{{ dayjs(purchaseOrder.purchaseOrderDueDate).format('YYYY-MM-DD') }}</td>
               </tr>
               </tbody>
             </table>
@@ -77,21 +108,28 @@ const printPage = () => {
               <tr v-for="(purchaseOrderItem, idx) in purchaseOrder.purchaseOrderItemResponseList"
                   :key="purchaseOrderItem.itemSeq || idx">
                 <td>{{ purchaseOrderItem.itemName }}</td>
-                <td>{{ purchaseOrderItem.purchaseOrderItemQuantity.toLocaleString() }}</td>
-                <td>{{ purchaseOrderItem.purchaseOrderItemPrice.toLocaleString() }}</td>
+                <td>{{ purchaseOrderItem.purchaseOrderItemQuantity ? purchaseOrderItem.purchaseOrderItemQuantity.toLocaleString() : 0 }}</td>
+                <td>{{ purchaseOrderItem.purchaseOrderItemPrice ? purchaseOrderItem.purchaseOrderItemPrice.toLocaleString() : 0 }}</td>
                 <td>{{ (purchaseOrderItem.purchaseOrderItemQuantity * purchaseOrderItem.purchaseOrderItemPrice).toLocaleString() }}</td>
               </tr>
               </tbody>
               <tfoot>
               <tr>
                 <td>합계</td>
-                <td>{{ purchaseOrder.purchaseOrderTotalQuantity.toLocaleString() }}</td>
+                <td>{{ purchaseOrder?.purchaseOrderTotalQuantity ? purchaseOrder.purchaseOrderTotalQuantity.toLocaleString() : 0 }}</td>
                 <td> - </td>
-                <td>{{ purchaseOrder.purchaseOrderExtendedPrice.toLocaleString() }}</td>
+                <td>{{ purchaseOrder?.purchaseOrderExtendedPrice ? purchaseOrder.purchaseOrderExtendedPrice.toLocaleString() : 0 }}</td>
               </tr>
               </tfoot>
             </table>
 
+            <ul class="notes">
+              <li>상기 자재를 발주하오니 납기를 준수하여 입고 바랍니다.</li>
+              <li>기타 의문사항이나 관련사항시 사전 관련부서에 통보하여 주십시오.</li>
+            </ul>
+
+            <div class="footer-line"></div>
+            <span style="float:right; padding-top:7px;"> (&nbsp;주&nbsp;) &nbsp; OrderBridge &nbsp;</span>
           </div>
         </div>
       </div>
@@ -100,6 +138,23 @@ const printPage = () => {
 </template>
 
 <style scoped>
+
+.footer-line {
+  border-bottom: 2px solid black; /* 테이블 하단에 두꺼운 테두리 추가 */
+}
+
+.approval-header {
+  width: 10%;
+  writing-mode: horizontal-tb;
+  text-orientation: upright;
+  font-size: 12px;
+  vertical-align: middle;
+}
+
+.info-table-right td {
+  border: 1px solid black;
+}
+
 /* 모달 오버레이 */
 .modal-overlay {
   display: flex;
@@ -190,6 +245,11 @@ button {
   font-weight: bold;
 }
 
+.notes {
+  margin-top: 20px;
+  padding-left: 20px;
+}
+
 /* 인쇄 시 적용되는 스타일 */
 @media print {
   @page { margin: 0.5cm; }
@@ -201,7 +261,11 @@ button {
 
   .modal-overlay,
   .modal-header button {
-    display: none; /* 버튼 숨기기 */
+    display: none;
+  }
+
+  .btn-print {
+    display: none;
   }
 
   .modal-content {
