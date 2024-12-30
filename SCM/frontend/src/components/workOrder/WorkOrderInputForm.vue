@@ -1,7 +1,6 @@
 <script setup>
 import {ref, onMounted, watch, defineProps} from 'vue';
 import axios from '@/axios';
-// import router from '@/router/index.js';
 import searchIcon from '@/assets/searchIcon.svg';
 import dayjs from 'dayjs';
 import { Modal } from 'bootstrap';
@@ -146,6 +145,7 @@ const fetchSalesOrderStatusList = async () => {
   }
 };
 
+// 주문서 선택
 const selectSalesOrder = (salesOrder) => {
   selectedSalesOrder.value = salesOrder;
 
