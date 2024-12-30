@@ -26,6 +26,7 @@ spring:
       hibernate:
         format_sql: true
       hibernate.dialect: org.hibernate.dialect.MariaDBDialect
+
   data:
     redis:
       host: ${REDIS_HOST}
