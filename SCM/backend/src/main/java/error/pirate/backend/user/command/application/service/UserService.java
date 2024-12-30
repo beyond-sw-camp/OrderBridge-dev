@@ -49,4 +49,12 @@ public class UserService implements UserDetailsService {
         log.info("logout issue delete refreshToken : {}", refreshToken);
         refreshTokenRepository.delete(refreshToken);
     }
+
+    public String findUserName() {
+        String userEmployeeNo = securityUtil.getCurrentUserEmployeeNo();
+        User user = userRepository.findByUserEmployeeNo(userEmployeeNo).orElseThrow(() -> new CustomException(ErrorCodeType.USER_NOT_FOUND));
+
+        return user.getUserName();
+    }
+
 }
