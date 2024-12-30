@@ -109,15 +109,6 @@ const fetchSalesOrderList = async () => {
 
 // 셀렉트박스로 창고목록 불러오기
 const fetchWarehouses = async () => {
-  // try {
-    // const response = await axios.get('warehouse');
-    // const response = await axios.get('warehouse?warehouseType=FACTORY');
-    // console.log(response.data)
-    // warehouses.value = response.data.warehouses;
-
-    // const factory = response.data.filter(warehouse => warehouse.warehouseType === 'FACTORY');
-    // console.log(factory);
-    // warehouses.value = factory;
   try {
     const response = await axios.get('warehouse', {
       params: {

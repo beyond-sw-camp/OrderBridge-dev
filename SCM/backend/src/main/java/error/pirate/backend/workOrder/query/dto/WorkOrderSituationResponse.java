@@ -14,6 +14,5 @@ import java.util.List;
 public class WorkOrderSituationResponse {
 
     private List<MonthlyWorkOrderSituationDTO> monthlySituations;   // 월별 작업지시서 현황
-
     private int totalQuantity;  // 전체 작업지시 수량
 }

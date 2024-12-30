@@ -3,8 +3,8 @@ package error.pirate.backend.productionDisbursement.query.controller;
 import error.pirate.backend.productionDisbursement.command.domain.aggregate.entity.ProductionDisbursementStatus;
 import error.pirate.backend.productionDisbursement.query.dto.ProductionDisbursementListResponse;
 import error.pirate.backend.productionDisbursement.query.dto.ProductionDisbursementResponse;
+import error.pirate.backend.productionDisbursement.query.dto.ProductionDisbursementSituationResponse;
 import error.pirate.backend.productionDisbursement.query.service.ProductionDisbursementQueryService;
-import error.pirate.backend.workOrder.command.domain.aggregate.entity.WorkOrderStatus;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -63,7 +63,7 @@ public class ProductionDisbursementQueryController {
     /* 목록조회 엑셀 다운로드 */
     @GetMapping("/excelDownload")
     @Operation(summary = "생산불출 목록조회 엑셀 다운로드", description = "생산불출 목록을 엑셀로 다운로드한다.")
-    public ResponseEntity<byte[]> workOrderExcelDown(
+    public ResponseEntity<byte[]> productionDisbursementExcelDown(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
             @RequestParam(required = false) String factoryName,
@@ -86,11 +86,45 @@ public class ProductionDisbursementQueryController {
     }
 
     /* 현황조회 */
+    @GetMapping("/currentSituation")
+    @Operation(summary = "생산불출 현황조회", description = "생산불출 현황을 조회한다.")
+    public ResponseEntity<ProductionDisbursementSituationResponse> readProductionDisbursementSituation (
+            @RequestParam(required = false) LocalDate startDate,
+            @RequestParam(required = false) LocalDate endDate,
+            @RequestParam(required = false) String storeName,
+            @RequestParam(required = false) String factoryName
+    ) {
+        log.info("-------------- GET /api/v1/productionDisbursement/currentSituation 생산불출 현황조회 요청 --------------");
+        ProductionDisbursementSituationResponse response
+                = productionDisbursementQueryService.readProductionDisbursementSituation(startDate, endDate, storeName, factoryName);
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
 
 
     /* 현황 엑셀 다운로드 */
+    @GetMapping("/situation/excelDownload")
+    @Operation(summary = "생산불출 목록조회 엑셀 다운로드", description = "생산불출 목록을 엑셀로 다운로드한다.")
+    public ResponseEntity<byte[]> productionDisbursementSituationExcelDown(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @RequestParam(required = false) String factoryName,
+            @RequestParam(required = false) String storeName
+    ) {
+        log.info("-------------- GET /api/v1/productionDisbursement/situation/excelDownload 생산불출 엑셀 다운로드 요청 --------------");
 
+        byte[] excelData = productionDisbursementQueryService.readProductionDisbursementSituationExcel(startDate, endDate, factoryName, storeName);
 
-    /* 전표조회 */
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + URLEncoder.encode(
+                new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date()) + "생산불출현황.xlsx",
+                StandardCharsets.UTF_8));
+        httpHeaders.setContentLength(excelData.length);
+
+        return ResponseEntity.ok()
+                .headers(httpHeaders)
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(excelData);
+    }
 
 }
