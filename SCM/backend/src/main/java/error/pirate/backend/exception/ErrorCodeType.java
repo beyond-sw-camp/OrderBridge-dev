@@ -61,12 +61,14 @@ public enum ErrorCodeType {
     WORK_ORDER_STATUS_ERROR(HttpStatus.BAD_REQUEST, "WORK_ORDER_ERROR_002", "작업지시가 완료된 경우만 생산 입고를 작성할 수 있습니다."),
     WORK_ORDER_REQUIRED_INFORMATION(HttpStatus.BAD_REQUEST, "WORK_ORDER_ERROR_003", "필수 입력 항목입니다."),
     WORK_ORDER_DUPLICATE(HttpStatus.CONFLICT, "WORK_ORDER_ERROR_004", "이미 작업지시서가 생성된 주문서입니다."),
-    WORK_ORDER_STATE_BAD_REQUEST(HttpStatus.BAD_REQUEST, "WORK_ORDER_ERROR_005", "작업지시서의 상태를 확인해주세요"),
+    WORK_ORDER_STATE_BAD_REQUEST(HttpStatus.BAD_REQUEST, "WORK_ORDER_ERROR_005", "작업지시서의 상태를 확인해주세요."),
     WORK_ORDER_INVALID_QUANTITY(HttpStatus.BAD_REQUEST, "WORK_ORDER_ERROR_006", "지시수량을 확인해주세요."),
 
     // 생산불출 오류
     PRODUCTION_DISBURSEMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "PRODUCTION_DISBURSEMENT_ERROR_001", "생산불출을 찾을 수 없습니다."),
-    PRODUCTION_DISBURSEMENT_STATE_BAD_REQUEST(HttpStatus.BAD_REQUEST, "PRODUCTION_DISBURSEMENT_ERROR_002", "생산불출의 상태를 확인해주세요"),
+    PRODUCTION_DISBURSEMENT_STATE_BAD_REQUEST(HttpStatus.BAD_REQUEST, "PRODUCTION_DISBURSEMENT_ERROR_002", "생산불출의 상태를 확인해주세요."),
+    PRODUCTION_DISBURSEMENT_DUPLICATE(HttpStatus.CONFLICT, "PRODUCTION_DISBURSEMENT_ERROR_003", "이미 생산불출이 생성된 작업지시서입니다."),
+    PRODUCTION_DISBURSEMENT_REQUIRED_INFORMATION(HttpStatus.BAD_REQUEST, "PRODUCTION_DISBURSEMENT_ERROR_004", "필수 입력 항목입니다."),
 
     // 회원 오류
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "USER_ERROR_001", "회원을 찾을 수 없습니다."),
@@ -78,7 +80,7 @@ public enum ErrorCodeType {
     // 물품 오류
     ITEM_NOT_FOUND(HttpStatus.NOT_FOUND, "ITEM_ERROR_001", "물품을 찾을 수 없습니다."),
     ITEM_STATUS_ERROR(HttpStatus.BAD_REQUEST, "ITEM_ERROR_002", "이미 삭제된 상품입니다."),
-    BOM_ITEM_NOT_FOUND(HttpStatus.NOT_FOUND, "ITEM_ERROR_003", "BOM 품목이 존재하지 않습니다."),
+    BOM_ITEM_NOT_FOUND(HttpStatus.NOT_FOUND, "ITEM_ERROR_003", "BOM 항목이 존재하지 않습니다."),
 
     // 물품 재고 오류
     OUT_OF_STOCK_ERROR(HttpStatus.BAD_REQUEST, "STOCK_ERROR_001", "재고가 부족합니다."),

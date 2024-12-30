@@ -1,5 +1,6 @@
 package error.pirate.backend.productionDisbursement.command.domain.aggregate.entity;
 
+import error.pirate.backend.productionDisbursement.command.application.dto.CreateProductionDisbursementRequest;
 import error.pirate.backend.user.command.domain.aggregate.entity.User;
 import error.pirate.backend.warehouse.command.domain.aggregate.entity.Warehouse;
 import error.pirate.backend.workOrder.command.domain.aggregate.entity.WorkOrder;
@@ -12,6 +13,8 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "tb_production_disbursement") // 생산 불출
@@ -33,7 +36,7 @@ public class ProductionDisbursement {
 
     private String productionDisbursementName; // 생산불출명
 
-    private String productionDisbursementTotalQuantity;  // 생산불출 총수량
+    private Integer productionDisbursementTotalQuantity;  // 생산불출 총수량
 
     @CreatedDate
     private LocalDateTime productionDisbursementRegDate; // 생산불출 등록일
@@ -49,8 +52,36 @@ public class ProductionDisbursement {
 
     private String productionDisbursementNote; // 생산불출 비고
 
+    @OneToMany(mappedBy = "productionDisbursement", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    private List<ProductionDisbursementItem> disbursementItems = new ArrayList<>();
+
+    // 생성 메소드
+    public static ProductionDisbursement createProductionDisbursement(CreateProductionDisbursementRequest request,
+                                                                      WorkOrder workOrder,
+                                                                      User user,
+                                                                      String productionDisbursementName) {
+
+        ProductionDisbursement disbursement = new ProductionDisbursement();
+        disbursement.productionDisbursementName = productionDisbursementName;
+        disbursement.productionDisbursementDepartureDate = request.getProductionDisbursementDepartureDate();
+        disbursement.productionDisbursementNote = request.getProductionDisbursementNote();
+        disbursement.productionDisbursementStatus = ProductionDisbursementStatus.valueOf("BEFORE");
+        disbursement.user = user;
+        disbursement.workOrder = workOrder;
+
+        return disbursement;
+    }
 
     public void deleteProductionDisbursement() {
         this.productionDisbursementStatus = ProductionDisbursementStatus.DELETE;
+    }
+
+    public void addDisbursementItem(ProductionDisbursementItem disbursementItem) {
+        this.disbursementItems.add(disbursementItem);
+        disbursementItem.specifyProductionDisbursement(this);
+    }
+
+    public void specifyProductionDisbursementTotalQuantity(int totalDisbursementQuantity) {
+        this.productionDisbursementTotalQuantity = totalDisbursementQuantity;
     }
 }
