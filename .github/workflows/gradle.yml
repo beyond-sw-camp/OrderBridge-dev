@@ -48,7 +48,7 @@ jobs:
           
           server:
             port: 5000
-            servlet::q
+            servlet:
               encoding:
                 charset: UTF-8
           spring:
