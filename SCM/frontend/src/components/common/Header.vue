@@ -185,7 +185,7 @@ function chatbotOn() {
 
 <!-- 알림 모달  -->
   <div v-if="isNotificationOpen" class="notification-bar">
-    <ul v-if="notificationList.value !== undefined">
+    <ul v-if="notificationList.length > 0">
       <li v-for="notification in notificationList" :class="{ 'selected-notification': selectedNotification?.notificationSeq === notification.notificationSeq }" :key="notification.notificationSeq" @click="openModal(notification)">
         <span>{{ notification.notificationTitle }}</span>
         <span style="float:right;">{{ dayjs(notification.notificationRegDate).format('YYYY/MM/DD HH:mm') }}</span>
@@ -344,7 +344,6 @@ body {
   Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", Helvetica, Arial,
   sans-serif;
 }
-
 
 #chatbot {
   display: none;
