@@ -139,6 +139,7 @@
              , wo.work_order_seq
              , wo.work_order_name
              , wo.work_order_due_date
+             , wo.work_order_indicated_date
              , pd.production_disbursement_name
              , pd.production_disbursement_departure_date
              , pd.production_disbursement_total_quantity

@@ -317,30 +317,20 @@ const updateWorkOrder = async (workOrderSeq) => {
 
   } catch (error) {
     console.error("작업지시서 수정 실패 :", error);
-    if (error.response.data.errorCode === 'WORK_ORDER_ERROR_001') {
-      alert(error.response.data.message);
-    } else if (error.response.data.errorCode === 'WORK_ORDER_ERROR_005') {
+    if (error.response.data.errorCode === 'WORK_ORDER_ERROR_005') {
       alert('작업지시서의 상태가 결재 전이거나 진행중일때만 수정 가능합니다.');
     } else if (error.response.data.errorCode === 'COMMON_ERROR_002') {
       alert('작업납기일은 현재보다 이전일 수 없습니다.');
     } else if (error.response.data.errorCode === 'WORK_ORDER_ERROR_006') {
       alert('지시수량은 이미 완료된 수량보다 적을 수 없습니다.');
-    } else if (error.response.data.errorCode === 'SALES_ORDER_ERROR_001') {
-      alert(error.response.data.message);
     } else if (error.response.data.errorCode === 'SALES_ORDER_ERROR_002') {
       alert('주문서의 상태가 결재 후일때만 수정 가능합니다.');
-    } else if (error.response.data.errorCode === 'SALES_ORDER_ITEM_ERROR_001') {
-      alert(error.response.data.message);
-    } else if (error.response.data.errorCode === 'ITEM_ERROR_001') {
-      alert(error.response.data.message);
     } else if (error.response.data.errorCode === 'WORK_ORDER_ERROR_004') {
       alert(error.response.data.message);
     } else if (error.response.data.errorCode === 'ITEM_ERROR_003') {
       alert('하위품목 정보가 존재하지 않습니다.');
     } else if (error.response.data.errorCode === 'STOCK_ERROR_001') {
-      alert(error.response.data.message);
-    } else if (error.response.data.errorCode === 'WAREHOUSE_ERROR_001') {
-      alert(error.response.data.message);
+      alert('재료가 부족해 작업지시가 불가능합니다.\n 발주서를 작성해 재료를 먼저 구매해주세요.');
     } else {
       alert('수정에 실패했습니다. 다시 시도해주세요.');
     }
@@ -367,23 +357,13 @@ const createWorkOrder = async () => {
   } catch (error) {
     console.error("작업지시서 등록 실패 :", error);
 
-    if (error.response.data.errorCode === 'SALES_ORDER_ITEM_NOT_FOUND') {
-      alert(error.response.data.message);
-    } else if (error.response.data.errorCode === 'SALES_ORDER_ERROR_001') {
-      alert(error.response.data.message);
-    } else if (error.response.data.errorCode === 'SALES_ORDER_ERROR_002') {
+    if (error.response.data.errorCode ===  'SALES_ORDER_ERROR_002') {
       alert('주문서의 상태가 결재 후일때만 등록 가능합니다.');
-    } else if (error.response.data.errorCode === 'WAREHOUSE_ERROR_001') {
-      alert(error.response.data.message);
     } else if (error.response.data.errorCode === 'WORK_ORDER_ERROR_006') {
       alert(error.response.data.message);
-    } else if (error.response.data.errorCode === 'ITEM_ERROR_001') {
+    }  else if (error.response.data.errorCode === 'WORK_ORDER_ERROR_004') {
       alert(error.response.data.message);
-    } else if (error.response.data.errorCode === 'WORK_ORDER_ERROR_004') {
-      alert(error.response.data.message);
-    } else if (error.response.data.errorCode === 'ITEM_ERROR_003') {
-      alert(error.response.data.message);
-    }  else if (error.response.data.errorCode === 'STOCK_ERROR_001') {
+    }   else if (error.response.data.errorCode === 'STOCK_ERROR_001') {
       alert('재료가 부족해 작업지시가 불가능합니다.\n 발주서를 작성해 재료를 먼저 구매해주세요.');
     } else if (error.response.data.errorCode === 'WORK_ORDER_ERROR_003') {
       alert('작업지시일과 납기일을 설정해주세요');

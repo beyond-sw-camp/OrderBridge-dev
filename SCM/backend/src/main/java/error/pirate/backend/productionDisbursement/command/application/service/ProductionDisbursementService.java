@@ -12,12 +12,13 @@ import error.pirate.backend.productionDisbursement.command.application.dto.Creat
 import error.pirate.backend.productionDisbursement.command.application.dto.ProductionDisbursementItemRequest;
 import error.pirate.backend.productionDisbursement.command.domain.aggregate.entity.ProductionDisbursement;
 import error.pirate.backend.productionDisbursement.command.domain.aggregate.entity.ProductionDisbursementItem;
+import error.pirate.backend.productionDisbursement.command.domain.aggregate.entity.ProductionDisbursementStatus;
 import error.pirate.backend.productionDisbursement.command.domain.aggregate.repository.ProductionDisbursementItemRepository;
 import error.pirate.backend.productionDisbursement.command.domain.aggregate.service.ProductionDisbursementDomainService;
+import error.pirate.backend.salesOrder.command.domain.service.SalesOrderDomainService;
 import error.pirate.backend.user.command.domain.aggregate.entity.User;
 import error.pirate.backend.warehouse.command.domain.aggregate.entity.Warehouse;
 import error.pirate.backend.warehouse.command.domain.repository.WarehouseRepository;
-import error.pirate.backend.warehouse.command.domain.service.WarehouseDomainService;
 import error.pirate.backend.workOrder.command.domain.aggregate.entity.WorkOrder;
 import error.pirate.backend.workOrder.command.domain.aggregate.entity.WorkOrderStatus;
 import error.pirate.backend.workOrder.command.domain.service.WorkOrderDomainService;
@@ -45,6 +46,7 @@ public class ProductionDisbursementService {
     private final ProductionDisbursementItemRepository productionDisbursementItemRepository;
     private final ItemRepository itemRepository;
     private final WarehouseRepository warehouseRepository;
+    private final SalesOrderDomainService salesOrderDomainService;
 
     // 등록
     @Transactional
@@ -65,7 +67,7 @@ public class ProductionDisbursementService {
         // 사용자 설정 - 작업지시서 작성 유저
         User user = workOrder.getUser();
 
-        // 생산불출서명 설정
+        // 생산불출명 설정
         String productionDisbursementName = nameGenerator.nameGenerator(ProductionDisbursement.class);
         log.info("-------------- 생성된 productionDisbursementName: {} -------------- ", productionDisbursementName);
 
@@ -81,14 +83,11 @@ public class ProductionDisbursementService {
         // BOM 재고 검증 및 차감
         bomItemDomainService.validateAndDeductStock(orderedItem, indicatedQuantity);
 
-        // 생산불출일 시간대 변경
+        // 생산불출일 유효값 검증
         LocalDateTime productionDisbursementDepartureDate = request.getProductionDisbursementDepartureDate();
         if (productionDisbursementDepartureDate == null) {
             throw new CustomException(ErrorCodeType.PRODUCTION_DISBURSEMENT_REQUIRED_INFORMATION);
         }
-        LocalDateTime seoulDepartureDate = productionDisbursementDomainService.convertDate(productionDisbursementDepartureDate);
-        request.setProductionDisbursementDepartureDate(seoulDepartureDate);
-        log.info("-------------- 불출일 시간대 변경 완료 : {} --------------", seoulDepartureDate);
 
         // 불출일이 작업지시서 납기일보다 전이어야 함.
         if (productionDisbursementDepartureDate.isAfter(workOrder.getWorkOrderDueDate())) {
@@ -99,6 +98,11 @@ public class ProductionDisbursementService {
         if (productionDisbursementDepartureDate.isBefore(workOrder.getWorkOrderIndicatedDate())) {
             throw new CustomException(ErrorCodeType.INVALID_DATE_RANGE);
         }
+
+        // 생산불출일 시간대 변경
+        LocalDateTime seoulDepartureDate = productionDisbursementDomainService.convertDate(productionDisbursementDepartureDate);
+        request.setProductionDisbursementDepartureDate(seoulDepartureDate);
+        log.info("-------------- 불출일 시간대 변경 완료 : {} --------------", seoulDepartureDate);
 
         // 생산불출 생성
         ProductionDisbursement newProductionDisbursement =
@@ -144,6 +148,9 @@ public class ProductionDisbursementService {
         // 작업지시서 상태 진행중으로 변경
         workOrderDomainService.updateWorkOrderStatus(workOrder, WorkOrderStatus.ONGOING);
 
+        // 주문서 상태 생산중으로 변경
+        salesOrderDomainService.updateSalesOrderStatus(workOrder.getSalesOrder(), "PRODUCTION");
+
         // 생산불출 저장
         productionDisbursementDomainService.saveProductionDisbursement(newProductionDisbursement);
     }
@@ -158,6 +165,32 @@ public class ProductionDisbursementService {
 
         // 수정 가능한 상태인지 확인
         productionDisbursementDomainService.checkProductionDisbursementStatus(productionDisbursement.getProductionDisbursementStatus());
+
+        WorkOrder workOrder = workOrderDomainService.findByWorkOrderSeq(request.getWorkOrderSeq());
+
+        // 생산불출일 유효값 검증
+        LocalDateTime productionDisbursementDepartureDate = request.getProductionDisbursementDepartureDate();
+        if (productionDisbursementDepartureDate == null) {
+            throw new CustomException(ErrorCodeType.PRODUCTION_DISBURSEMENT_REQUIRED_INFORMATION);
+        }
+
+        // 불출일이 작업지시서 납기일보다 전이어야 함.
+        if (productionDisbursementDepartureDate.isAfter(workOrder.getWorkOrderDueDate())) {
+            throw new CustomException(ErrorCodeType.INVALID_DATE_RANGE);
+        }
+
+        // 불출일이 작업지시서 지시일 이후 이어야 함.
+        if (productionDisbursementDepartureDate.isBefore(workOrder.getWorkOrderIndicatedDate())) {
+            throw new CustomException(ErrorCodeType.INVALID_DATE_RANGE);
+        }
+
+        // 생산불출일 시간대 변경
+        LocalDateTime seoulDepartureDate = productionDisbursementDomainService.convertDate(productionDisbursementDepartureDate);
+        request.setProductionDisbursementDepartureDate(seoulDepartureDate);
+        log.info("-------------- 불출일 시간대 변경 완료 : {} --------------", seoulDepartureDate);
+
+        // 수정
+        productionDisbursementDomainService.updateProductionDisbursement(request, productionDisbursementSeq, workOrder);
 
         // 품목 변경 여부 확인
         boolean itemChanges = productionDisbursementDomainService.itemChanges(productionDisbursement, request);
@@ -185,9 +218,6 @@ public class ProductionDisbursementService {
                 }
             }
         }
-
-
-
 
     }
 
@@ -217,8 +247,26 @@ public class ProductionDisbursementService {
 
         // 작업지시서 상태 after 로 변경
         workOrderDomainService.updateWorkOrderStatus(workOrder, WorkOrderStatus.AFTER);
-        log.info("-------------- 생산불출 삭제 및 작업지시서 상태 변경 완료 --------------");
+
+        // 주문서 상태 after 로 변경
+        salesOrderDomainService.updateSalesOrderStatus(workOrder.getSalesOrder(), "AFTER");
+        log.info("-------------- 생산불출 삭제 및 작업지시서, 주문서 상태 변경 완료 --------------");
     }
 
+    // 불출 상태 변경
+    @Transactional
+    public void updateProductionDisbursementStatus(Long productionDisbursementSeq, ProductionDisbursementStatus newStatus) {
+        log.info("-------------- 생산불출 상태 변경 서비스 진입 - {}번 변경 --------------", productionDisbursementSeq);
+        // 생산불출 찾기
+        ProductionDisbursement productionDisbursement = productionDisbursementDomainService.findByProductionDisbursementSeq(productionDisbursementSeq);
+        ProductionDisbursementStatus currentStatus  = productionDisbursement.getProductionDisbursementStatus();
 
+        if (!currentStatus.equals(ProductionDisbursementStatus.BEFORE)) {
+            throw new CustomException(ErrorCodeType.PRODUCTION_DISBURSEMENT_STATE_BAD_REQUEST);
+        }
+
+        // 상태 변경
+        productionDisbursementDomainService.updateProductionDisbursementStatus(productionDisbursement, newStatus);
+        log.info("-------------- 생산불출 상태 변경 완료 - {}번, 새로운 상태: {} --------------", productionDisbursementSeq, newStatus);
+    }
 }

@@ -131,4 +131,19 @@ public class ProductionDisbursementDomainService {
         // 모든 항목이 동일하면 변경되지 않은 것으로 판단
         return false;
     }
+
+    // 상태 변경
+    public void updateProductionDisbursementStatus(ProductionDisbursement productionDisbursement, ProductionDisbursementStatus newStatus) {
+        productionDisbursement.changeProductionDisbursementStatus(newStatus);
+    }
+
+    // 생산불출 수정
+    public void updateProductionDisbursement(CreateAndUpdateProductionDisbursementRequest request,
+                                             Long productionDisbursementSeq,
+                                             WorkOrder workOrder) {
+        ProductionDisbursement productionDisbursement = productionDisbursementRepository.findById(productionDisbursementSeq)
+                .orElseThrow(() -> new CustomException(ErrorCodeType.PRODUCTION_DISBURSEMENT_NOT_FOUND));
+
+        productionDisbursement.updateProductionDisbursement(request, workOrder);
+    }
 }

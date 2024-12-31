@@ -14,7 +14,6 @@ const props = defineProps({
   isEditMode: {type: Boolean, required: false},       // 수정모드 여부
 });
 
-
 const workOrderList = ref([]); // 작업지시서 목록
 const totalCount = ref(0); // 총 작업지시서 수
 const pageSize = ref(10); // 페이지 크기
@@ -22,6 +21,7 @@ const pageNumber = ref(1); // 페이지 번호
 
 const workOrderStatusList = ref([]); // 작업지시서 상태 목록
 const workOrderDueDate = ref(''); // 작업지시서 납기일
+const workOrderIndicatedDate = ref(''); // 작업지시서 지시일
 
 const bomItems = ref([]);
 
@@ -48,20 +48,12 @@ watch(
     [() => props.productionDisbursementDetail, () => props.productionDisbursementItem],
     ([newDetail, newItems]) => {
       if (newDetail) {
-        // productionDisbursementDetail 매핑
-        formData.value.workOrderIndicatedQuantity = newDetail.workOrderIndicatedQuantity || '';
-        formData.value.warehouseSeq = newDetail.warehouseSeq || '';
-        formData.value.workOrderIndicatedDate = newDetail.workOrderIndicatedDate || '';
-        formData.value.workOrderDueDate = newDetail.workOrderDueDate || '';
-        formData.value.workOrderWorkQuantity = newDetail.workOrderWorkQuantity || '';
-        formData.value.workOrderNote = newDetail.workOrderNote || '';
-        formData.value.workOrderName = newDetail.workOrderName || '';
-
         formData.value.workOrder = newDetail.workOrderName || '';
         formData.value.workOrderSeq = newDetail.workOrderSeq || '';
         workOrderDueDate.value = newDetail.workOrderDueDate || '';
         formData.value.factoryName = newDetail.factoryName || '';
         formData.value.storeName = newItems?.[0]?.storeName || '';
+        workOrderIndicatedDate.value = newDetail.workOrderIndicatedDate || '';
         formData.value.productionDisbursementDepartureDate = newDetail.productionDisbursementDepartureDate || '';
         formData.value.productionDisbursementNote = newDetail.productionDisbursementNote || '';
         formData.value.productionDisbursementItemSeq = newDetail.productionDisbursementItemSeq || '';
@@ -139,12 +131,11 @@ const selectWorkOrder = (workOrder) => {
   formData.value.workOrderSeq = workOrder.workOrderSeq;
   formData.value.workOrder = workOrder.workOrderName;
   formData.value.factoryName = workOrder.warehouseName;
+  workOrderIndicatedDate.value = workOrder.workOrderIndicatedDate;
+
   if (workOrder && workOrder.workOrderDueDate) {
     workOrderDueDate.value = workOrder.workOrderDueDate  // 납기일 설정
-  } else {
-    console.log('선택된 작업지시서에 납기일이 없습니다.');
   }
-
   console.log('선택된 작업지시서:', selectWorkOrder.value);
 
   fetchBomItems(workOrder.itemSeq);
@@ -227,20 +218,24 @@ const createProductionDisbursement = async () => {
       itemRequests: formData.value.itemRequests // BOM 기반 품목 리스트
     });
     console.log(response.data);
-    alert('생산불출서가 등록되었습니다!');
+    alert('생산불출이 등록되었습니다!');
     await router.push('/production-disbursement')
 
   } catch (error) {
-    console.error("생산불출서 등록 실패 :", error);
+    console.error("생산불출 등록 실패 :", error);
 
     if (error.response.data.errorCode === 'PRODUCTION_DISBURSEMENT_ERROR_004') {
       alert('불출일을 입력해주세요');
     } else if (error.response.data.errorCode === 'PRODUCTION_DISBURSEMENT_ERROR_003') {
       alert(error.response.data.message);
-    } else if (error.response.data.errorCode === '"COMMON_ERROR_002"') {
-      alert('불출일은 납기일보다 전이어야 합니다.');
-    } else if (error.response.data.errorCode === '"STOCK_ERROR_001"') {
+    } else if (error.response.data.errorCode === 'COMMON_ERROR_002') {
+      alert('불출일은 납기일보다 전이고, 작업지시일 이후여야 합니다.');
+    } else if (error.response.data.errorCode === 'STOCK_ERROR_001') {
       alert(error.response.data.message);
+    } else if (error.response.data.errorCode === 'PRODUCTION_DISBURSEMENT_ERROR_001') {
+      alert(error.response.data.message);
+    } else if (error.response.data.errorCode === 'WORK_ORDER_STATE_BAD_REQUEST') {
+      alert('작업지시서의 상태가 결재 후일때만 등록 가능합니다.');
     } else {
       alert('등록에 실패했습니다. 다시 시도해주세요.');
     }
@@ -254,6 +249,14 @@ const updateProductionDisbursement = async (productionDisbursementSeq) => {
     return;
   }
   console.log("수정요청 생산불출 번호", productionDisbursementSeq);
+  console.log("보내는 데이터:", {
+    workOrderSeq: formData.value.workOrderSeq,
+    ingredientsWarehouseSeq: formData.value.storeName,
+    productionDisbursementDepartureDate: formData.value.productionDisbursementDepartureDate,
+    productionDisbursementNote: formData.value.productionDisbursementNote,
+    itemRequests: formData.value.itemRequests
+  });
+
   try {
     const response = await axios.put(`productionDisbursement/${productionDisbursementSeq}`, {
       workOrderSeq: formData.value.workOrderSeq,
@@ -262,20 +265,25 @@ const updateProductionDisbursement = async (productionDisbursementSeq) => {
       productionDisbursementNote: formData.value.productionDisbursementNote,
       itemRequests: formData.value.itemRequests // BOM 기반 품목 리스트
     });
-    console.log('불출 데이터',response.data);
     console.log('itemRequests: ',formData.value.itemRequests);
     alert('생산불출이 수정되었습니다!');
     await router.push('/production-disbursement')
 
   } catch (error) {
     console.error("생산불출 수정 실패 :", error);
-    if (error.response.data.errorCode === 'PRODUCTION_DISBURSEMENT_ERROR_001') {
-      alert(error.response.data.message);
-    } else if (error.response.data.errorCode === 'PRODUCTION_DISBURSEMENT_ERROR_002') {
+    if (error.response.data.errorCode === 'PRODUCTION_DISBURSEMENT_ERROR_002') {
       alert('생산불출의 상태가 불출 전일때만 수정 가능합니다.');
     } else if (error.response.data.errorCode === 'PRODUCTION_DISBURSEMENT_ERROR_003') {
       alert(error.response.data.message);
-    }  else {
+    } else if (error.response.data.errorCode === 'PRODUCTION_DISBURSEMENT_ERROR_004') {
+      alert('불출일을 입력해주세요');
+    } else if (error.response.data.errorCode === 'COMMON_ERROR_002') {
+      alert('불출일은 납기일보다 전이고, 작업지시일 이후여야 합니다.');
+    }else if (error.response.data.errorCode === 'COMMON_ERROR_002') {
+      alert('불출일은 납기일보다 전이고, 작업지시일 이후여야 합니다.');
+    } else if (error.response.data.errorCode === 'STOCK_ERROR_001') {
+      alert(error.response.data.message);
+    } else {
       alert('수정에 실패했습니다. 다시 시도해주세요.');
     }
   }
@@ -297,6 +305,11 @@ const updateProductionDisbursement = async (productionDisbursementSeq) => {
             <searchIcon class="icon"/>
           </b-input-group-text>
         </b-input-group>
+      </b-form-group>
+      <!-- 작업지시일자 -->
+      <b-form-group label-cols="4" label-cols-lg="2" label="작업지시일" label-for="workOrderIndicatedDate">
+        <input class="form-control form-control-sm w-75" type="datetime-local" id="workOrderIndicatedDate"
+               v-model="workOrderIndicatedDate" readonly=""/>
       </b-form-group>
       <!-- 작업납기일자 -->
       <b-form-group label-cols="4" label-cols-lg="2" label="작업납기일" label-for="workOrderDueDate">

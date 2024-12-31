@@ -289,7 +289,7 @@ public class WorkOrderService {
             case AFTER:
                 log.info("-------------- 작업지시서 결재상태 변경 서비스 진입 - {}번 결재 전>후 변경, 현재상태 : {} --------------", workOrderSeq, currentStatus);
                 if (!currentStatus.equals(WorkOrderStatus.BEFORE)) {
-                    throw new CustomException(ErrorCodeType.WORK_ORDER_STATE_BAD_REQUEST); // 주석: 명확한 조건 검사 추가
+                    throw new CustomException(ErrorCodeType.WORK_ORDER_STATE_BAD_REQUEST);
                 }
                 break;
 

@@ -33,6 +33,7 @@ const fetchProductionDisbursementDetail = async (productionDisbursementSeq) => {
     productionDisbursementDetail.value = {
       ...response.data.productionDisbursementDetail,
       productionDisbursementDepartureDate: formatDateToInputDateTime(response.data.productionDisbursementDetail.productionDisbursementDepartureDate),
+      workOrderIndicatedDate: formatDateToInputDateTime(response.data.productionDisbursementDetail.workOrderIndicatedDate),
     };
 
     productionDisbursementItem.value = response.data.itemList.map(item => ({

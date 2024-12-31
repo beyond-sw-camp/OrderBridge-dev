@@ -2,6 +2,7 @@ package error.pirate.backend.productionDisbursement.command.application.controll
 
 import error.pirate.backend.productionDisbursement.command.application.dto.CreateAndUpdateProductionDisbursementRequest;
 import error.pirate.backend.productionDisbursement.command.application.service.ProductionDisbursementService;
+import error.pirate.backend.productionDisbursement.command.domain.aggregate.entity.ProductionDisbursementStatus;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -22,7 +23,7 @@ public class ProductionDisbursementController {
 
     /* 생산불출 등록 */
     @PostMapping
-    @Operation(summary = "생산불출 등록", description = "작업지시서를 불러와 생산불출서를 등록한다.")
+    @Operation(summary = "생산불출 등록", description = "작업지시서를 불러와 생산불출을 등록한다.")
     public ResponseEntity<Void> createProductionDisbursement(@Valid @RequestBody CreateAndUpdateProductionDisbursementRequest request
     ) {
         log.info("-------------- POST /api/v1/productionDisbursement 생산불출 등록 요청 - request:{} --------------", request);
@@ -33,7 +34,7 @@ public class ProductionDisbursementController {
 
     /* 생산불출 수정 */
     @PutMapping("/{productionDisbursementSeq}")
-    @Operation(summary = "생산불출 수정", description = "작업지시서를 불러와 생산불출서를 수정한다.")
+    @Operation(summary = "생산불출 수정", description = "작업지시서를 불러와 생산불출을 수정한다.")
     public ResponseEntity<Void> updateProductionDisbursement(@PathVariable Long productionDisbursementSeq,
                                                 @Valid @RequestBody CreateAndUpdateProductionDisbursementRequest request) {
         log.info("-------------- PUT /api/v1/productionDisbursement/{} 생산불출 수정 요청 - request:{} --------------", productionDisbursementSeq, request);
@@ -50,6 +51,16 @@ public class ProductionDisbursementController {
         productionDisbursementService.deleteProductionDisbursement(productionDisbursementSeq);
 
         return ResponseEntity.ok().build();
+    }
+
+    /* 생산불출 상태변경(불출 후) */
+    @PutMapping("/after/{productionDisbursementSeq}")
+    @Operation(summary = "생산불출 결재상태변경", description = "선택한 생산불출의 상태를 변경한다. 불출 전 > 불출 후")
+    public ResponseEntity<Void> updateProductionDisbursementAfter(@PathVariable Long productionDisbursementSeq) {
+        log.info("-------------- PUT /api/v1/productionDisbursement/after/{} 작업지시서 결재 상태 변경 요청 --------------", productionDisbursementSeq);
+        productionDisbursementService.updateProductionDisbursementStatus(productionDisbursementSeq, ProductionDisbursementStatus.AFTER);
+
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
 }

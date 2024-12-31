@@ -1,5 +1,6 @@
 package error.pirate.backend.productionDisbursement.command.domain.aggregate.entity;
 
+import error.pirate.backend.common.NullCheck;
 import error.pirate.backend.productionDisbursement.command.application.dto.CreateAndUpdateProductionDisbursementRequest;
 import error.pirate.backend.user.command.domain.aggregate.entity.User;
 import error.pirate.backend.workOrder.command.domain.aggregate.entity.WorkOrder;
@@ -82,5 +83,21 @@ public class ProductionDisbursement {
 
     public void specifyProductionDisbursementTotalQuantity(int totalDisbursementQuantity) {
         this.productionDisbursementTotalQuantity = totalDisbursementQuantity;
+    }
+
+    public void changeProductionDisbursementStatus(ProductionDisbursementStatus newStatus) {
+        this.productionDisbursementStatus = newStatus;
+    }
+
+    public void updateProductionDisbursement(CreateAndUpdateProductionDisbursementRequest request, WorkOrder workOrder) {
+        if(NullCheck.nullOrZeroCheck(request.getWorkOrderSeq())) {
+            this.workOrder = workOrder;
+        }
+        if(NullCheck.nullCheck(request.getProductionDisbursementDepartureDate())) {
+            this.productionDisbursementDepartureDate = request.getProductionDisbursementDepartureDate();
+        }
+        if(NullCheck.nullCheck(request.getProductionDisbursementNote())) {
+            this.productionDisbursementNote = request.getProductionDisbursementNote();
+        }
     }
 }
