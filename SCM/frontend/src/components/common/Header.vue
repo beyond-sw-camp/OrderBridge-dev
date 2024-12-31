@@ -7,11 +7,11 @@ import salesIcon from '@/assets/salesIcon.svg';
 import productionIcon from '@/assets/productionIcon.svg';
 import orderIcon from '@/assets/orderIcon.svg';
 import statisticsIcon from '@/assets/statisticsIcon.svg'
-import logoutIcon from '@/assets/logoutIcon.svg';
 import {useUserStore} from "@/stores/UserStore.js";
 import dayjs from 'dayjs';
 import { ref } from "vue";
 import axios from "@/axios.js";
+import Chatbot from "@/components/common/Chatbot.vue";
 import Swal from "sweetalert2";
 
 const userStore = useUserStore();
@@ -99,6 +99,15 @@ const clearCanvas = () => {
   context.value.clearRect(0, 0, canvas.width, canvas.height);
 };
 
+const chatbot = ref(null);
+
+function chatbotOn() {
+  if (chatbot.value) {
+    chatbot.value = null;
+  } else {
+    chatbot.value = "display: block";
+  }
+}
 </script>
 
 <template>
@@ -163,11 +172,14 @@ const clearCanvas = () => {
           </li>
         </ul>
         <ul class="navbar-nav mb-lg-0 d-flex flex-row">
-          <li class="nav-item"><RouterLink to="#" class="nav-link"><chatbotIcon class="icon-right"/></RouterLink></li>
           <li class="nav-item"><RouterLink to="#" class="nav-link" @click.prevent="fetchNotifications"><notificationIcon class="icon-right"/></RouterLink></li>
+          <li class="nav-item" @click="chatbotOn()"><RouterLink to="#" class="nav-link"><chatbotIcon class="icon-right"/></RouterLink></li>
           <li class="nav-item"><RouterLink to="#" class="nav-link"><myPageIcon class="icon-right"/></RouterLink></li>
           <li class="nav-item" @click="userStore.logout()"><RouterLink to="#" class="nav-link"><!--<logoutIcon class="icon-right"/>-->로그아웃</RouterLink></li>
         </ul>
+        <div id="chatbot" v-bind:style="chatbot">
+          <chatbot />
+        </div>
       </div>
   </nav>
 
@@ -328,4 +340,17 @@ body {
   sans-serif;
 }
 
+
+#chatbot {
+  display: none;
+  position: absolute;
+  padding: 10px;
+  top: 100px;
+  right: 5px;
+  width: 400px;
+  height: 500px;
+  border: solid 2px silver;
+  border-radius: 10px;
+  backdrop-filter: blur(5px);
+}
 </style>

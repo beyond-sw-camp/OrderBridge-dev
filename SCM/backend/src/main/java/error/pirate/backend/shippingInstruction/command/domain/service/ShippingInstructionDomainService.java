@@ -152,4 +152,11 @@ public class ShippingInstructionDomainService {
 
         return completeStatus;
     }
+
+    // 유저 체킹
+    public void checkUser(ShippingInstruction shippingInstruction, User user) {
+        if (!user.equals(shippingInstruction.getUser())) {
+            throw new CustomException(ErrorCodeType.SECURITY_ACCESS_ERROR);
+        }
+    }
 }
