@@ -250,7 +250,22 @@ const fetchItems = async () => {
         size: itemPageSize.value,
         itemDivisions: ["PART", "SUB"],
       },
+      paramsSerializer: (params) => {
+        const searchParams = new URLSearchParams();
+        for (const key in params) {
+          const value = params[key];
+          if (Array.isArray(value)) {
+            value.forEach((v) => {
+              if (v != null) searchParams.append(key, v);
+            });
+          } else if (value != null) {
+            searchParams.append(key, value);
+          }
+        }
+        return searchParams.toString();
+      }
     });
+    console.log(response)
     items.value = response.data.content;
     itemTotalCount.value = response.data.totalElements;
   } catch (error) {
@@ -286,6 +301,12 @@ onMounted(() => {
   fetchAllWarehouses();
   fetchItems();
 });
+
+const itemDivisionMap = {
+  FINISHED: "완제품",
+  PART: "부재료",
+  SUB: "원재료",
+};
 
 </script>
 
@@ -388,33 +409,33 @@ onMounted(() => {
       <div class="table-responsive">
         <table class="table table-bordered">
           <thead>
-            <tr v-if="bomItems.length > 0">
-              <th class="text-center header-image">품목 이미지</th>
-              <th class="text-center header-text">품목명</th>
-              <th class="text-center header-text">품목 구분</th>
-              <th class="text-center header-text">유통기한</th>
-              <th class="text-center header-text">품목 단가</th>
-              <th class="text-center header-text small-input">수량</th>
-              <th class="text-center header-text">단위</th>
-            </tr>
+          <tr v-if="bomItems.length > 0">
+            <th class="text-center header-image">품목 이미지</th>
+            <th class="text-center header-text">품목명</th>
+            <th class="text-center header-text">품목 구분</th>
+            <th class="text-center header-text">유통기한</th>
+            <th class="text-center header-text">품목 단가</th>
+            <th class="text-center header-text small-input">수량</th>
+            <th class="text-center header-text">단위</th>
+          </tr>
           </thead>
           <tbody>
-            <tr v-for="(bomItem, index) in bomItems" :key="index">
-              <td><div class="item-image"><b-img :src="bomItem.itemImageUrl"/></div></td>
-              <td class="text-center">{{ bomItem.itemName }}</td>
-              <td class="text-center">{{ itemDivisionMap[bomItem.itemDivision] }}</td>
-              <td class="text-center">{{ bomItem.itemExpirationHour }} 시간</td>
-              <td class="text-center">{{ bomItem.itemPrice.toLocaleString() }} ₩</td>
-              <td style="white-space: nowrap;">
-                <b-form-input class="small-input" size="sm" type="number" v-model="bomItem.bomChildItemQuantity" placeholder="수량 입력"/>
-              </td>
-              <td class="text-center">{{ bomItem.itemUnitTitle}}</td>
-            </tr>
-            <tr>
-              <td colspan="7" class="text-center" @click="openModal" data-bs-toggle="modal" data-bs-target="#bomItemModal">
-                <plusIcon class="icon"/>
-              </td>
-            </tr>
+          <tr v-for="(bomItem, index) in bomItems" :key="index">
+            <td><div class="item-image"><b-img :src="bomItem.itemImageUrl"/></div></td>
+            <td class="text-center">{{ bomItem.itemName }}</td>
+            <td class="text-center">{{ itemDivisionMap[bomItem.itemDivision] }}</td>
+            <td class="text-center">{{ bomItem.itemExpirationHour }} 시간</td>
+            <td class="text-center">{{ bomItem.itemPrice.toLocaleString() }} ₩</td>
+            <td style="white-space: nowrap;">
+              <b-form-input class="small-input" size="sm" type="number" v-model="bomItem.bomChildItemQuantity" placeholder="수량 입력"/>
+            </td>
+            <td class="text-center">{{ bomItem.itemUnitTitle}}</td>
+          </tr>
+          <tr>
+            <td colspan="7" class="text-center" @click="openModal" data-bs-toggle="modal" data-bs-target="#bomItemModal">
+              <plusIcon class="icon"/>
+            </td>
+          </tr>
           </tbody>
         </table>
       </div>

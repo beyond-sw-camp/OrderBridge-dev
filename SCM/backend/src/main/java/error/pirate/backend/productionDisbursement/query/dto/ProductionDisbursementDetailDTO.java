@@ -16,13 +16,14 @@ public class ProductionDisbursementDetailDTO {
     private Long productionDisbursementSeq;
     private Long workOrderSeq;
     private String workOrderName;
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime workOrderDueDate;
+    private LocalDateTime workOrderIndicatedDate;
     private Long factorySeq;
     private String factoryName;
     private String userName;
     private String productionDisbursementName;
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime productionDisbursementDepartureDate;
     private Integer productionDisbursementTotalQuantity;
     private ProductionDisbursementStatus productionDisbursementStatus;

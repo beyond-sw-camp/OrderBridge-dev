@@ -12,11 +12,16 @@
              , w.warehouse_seq
              , w.warehouse_name
              , wo.work_order_indicated_date
+             , wo.work_order_due_date
              , wo.work_order_status
-             , (SELECT GROUP_CONCAT(i.item_name SEPARATOR ', ')
-                  FROM tb_item i
-                 WHERE i.item_seq = wo.item_seq
+             , (SELECT i.item_name
+                FROM tb_item i
+                WHERE i.item_seq = wo.item_seq
                 )   AS item_name
+             , (SELECT i.item_seq
+                FROM tb_item i
+                WHERE i.item_seq = wo.item_seq
+                )   AS item_seq
           FROM tb_work_order wo
           LEFT JOIN tb_warehouse w ON wo.warehouse_seq = w.warehouse_seq
          WHERE wo.work_order_status NOT IN ('DELETE')
