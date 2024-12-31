@@ -174,7 +174,7 @@ const printPage = () => {
   background: #fff;
   border-radius: 2px;
   max-width: 900px; /* 넓이 확장 */
-  width: 90%;
+  width: 120%;
   padding: 30px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
   position: relative;
