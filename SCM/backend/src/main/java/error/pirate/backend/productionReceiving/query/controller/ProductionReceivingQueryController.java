@@ -17,7 +17,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/productionReceiving")
 @Slf4j
-@Tag(name = "생산입고 API", description = "생산입고 API")
+@Tag(name = "Production Receiving", description = "생산입고")
 public class ProductionReceivingQueryController {
 
     private final ProductionReceivingQueryService productionReceivingQueryService;

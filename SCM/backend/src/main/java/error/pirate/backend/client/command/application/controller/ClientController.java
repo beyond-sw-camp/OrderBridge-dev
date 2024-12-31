@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/client")
-@Tag(name = "거래처 관리", description = "거래처 관리 API")
+@Tag(name = "Client", description = "거래처 관리")
 public class ClientController {
 
     private final ClientService clientService;

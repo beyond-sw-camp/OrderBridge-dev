@@ -14,7 +14,7 @@ import java.util.Collections;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/v1/chatbot")
-@Tag(name = "챗봇", description = "챗봇 API")
+@Tag(name = "Chatbot", description = "챗봇")
 @Slf4j
 public class ChatbotController {
 

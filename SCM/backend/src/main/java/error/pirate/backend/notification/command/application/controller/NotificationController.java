@@ -17,7 +17,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/notification")
-@Tag(name = "알림 API", description = "알림 API")
+@Tag(name = "Notification", description = "알림")
 public class NotificationController {
 
     private final NotificationDomainService notificationDomainService;

@@ -3,7 +3,7 @@ package error.pirate.backend.invoice.command.application.service;
 import error.pirate.backend.common.NameGenerator;
 import error.pirate.backend.exception.CustomException;
 import error.pirate.backend.exception.ErrorCodeType;
-import error.pirate.backend.invoice.command.application.controller.UpdateInvoiceRequest;
+import error.pirate.backend.invoice.command.application.dto.UpdateInvoiceRequest;
 import error.pirate.backend.invoice.command.application.dto.CreateInvoiceItemRequest;
 import error.pirate.backend.invoice.command.application.dto.CreateInvoiceRequest;
 import error.pirate.backend.invoice.command.application.dto.UpdateInvoiceItemRequest;
