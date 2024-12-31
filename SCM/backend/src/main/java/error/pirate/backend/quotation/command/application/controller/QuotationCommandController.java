@@ -1,5 +1,6 @@
 package error.pirate.backend.quotation.command.application.controller;
 
+import error.pirate.backend.common.SecurityUtil;
 import error.pirate.backend.quotation.command.application.dto.CreateQuotationRequest;
 import error.pirate.backend.quotation.command.application.dto.UpdateQuotationRequest;
 import error.pirate.backend.quotation.command.application.service.QuotationCommandService;
@@ -16,13 +17,14 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "Quotation", description = "견적서")
 public class QuotationCommandController {
 
+    private final SecurityUtil securityUtil;
     private final QuotationCommandService quotationCommandService;
 
     @PostMapping("")
     @Operation(summary = "견적서 등록")
     public ResponseEntity<Void> createQuotation(@RequestBody CreateQuotationRequest request) {
 
-        quotationCommandService.createQuotation(request);
+        quotationCommandService.createQuotation(request, securityUtil.getCurrentUserEmployeeNo());
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }

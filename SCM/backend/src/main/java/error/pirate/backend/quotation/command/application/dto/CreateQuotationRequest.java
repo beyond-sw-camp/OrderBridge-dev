@@ -9,7 +9,6 @@ import java.util.List;
 public class CreateQuotationRequest {
     private LocalDateTime quotationQuotationDate;
     private Long clientSeq;
-    private Long userSeq;
     private String quotationNote;
     private List<QuotationItemDTO> quotationItem;
 }

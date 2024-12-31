@@ -15,6 +15,7 @@ import error.pirate.backend.quotation.query.service.QuotationQueryService;
 import error.pirate.backend.salesOrder.command.domain.service.SalesOrderDomainService;
 import error.pirate.backend.salesOrder.query.service.SalesOrderQueryService;
 import error.pirate.backend.user.command.domain.aggregate.entity.User;
+import error.pirate.backend.user.command.domain.repository.UserRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +28,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class QuotationCommandService {
 
-    private final QuotationQueryService quotationQueryService;
+    private final UserRepository userRepository;
     private final QuotationRepository quotationRepository;
     private final QuotationItemRepository quotationItemRepository;
     private final SalesOrderDomainService salesOrderDomainService;
@@ -36,11 +37,11 @@ public class QuotationCommandService {
 
     // 견적서 등록
     @Transactional
-    public void createQuotation(CreateQuotationRequest request) {
+    public void createQuotation(CreateQuotationRequest request, String userEmployeeNo) {
 
         // 엔티티 요구 변수 작성
         Client client = entityManager.getReference(Client.class, request.getClientSeq());
-        User user = entityManager.getReference(User.class, request.getUserSeq());
+        User user = userRepository.findByUserEmployeeNo(userEmployeeNo).orElseThrow();
         String quotationName = nameGenerator.nameGenerator(Quotation.class);
 
         // 견적서 합계 계산
