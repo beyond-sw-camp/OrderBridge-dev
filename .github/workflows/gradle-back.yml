@@ -119,6 +119,19 @@ jobs:
           googleai:
             api:
               key: \${GEMINI_KEY}
+          
+          cloud:
+            aws:
+              s3:
+                bucket: \${AWS_S3_BUCKET}
+              credentials:
+                access-key: \${AWS_ACCESS_KEY_ID}
+                secret-key: \${AWS_SECRET_ACCESS_KEY}
+              region:
+                static: \${AWS_REGION}
+                auto: false
+              stack:
+                auto: false
           EOL
       
       # 템플릿 파일에 환경 변수를 대입하여 application.yml 생성
@@ -141,6 +154,10 @@ jobs:
           GEMINI_URL: ${{ secrets.GEMINI_URL }}
           GEMINI_KEY: ${{ secrets.GEMINI_KEY }}
           FRONTEND_URL: ${{ secrets.FRONTEND_URL }}
+          AWS_S3_BUCKET: ${{ secrets.S3_BUCKET_NAME }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
           
       # backend 빌드
       - name: Build with Gradle Wrapper
@@ -270,6 +287,19 @@ jobs:
           googleai:
             api:
               key: \${GEMINI_KEY}
+          cloud:
+            aws:
+              s3:
+                bucket: \${AWS_S3_BUCKET}
+              credentials:
+                access-key: \${AWS_ACCESS_KEY_ID}
+                secret-key: \${AWS_SECRET_ACCESS_KEY}
+              region:
+                static: \${AWS_REGION}
+                auto: false
+              stack:
+                auto: false
+                
           EOL
 
       # 템플릿 파일에 환경 변수를 대입하여 application.yml 생성
@@ -292,6 +322,10 @@ jobs:
           GEMINI_URL: ${{ secrets.GEMINI_URL }}
           GEMINI_KEY: ${{ secrets.GEMINI_KEY }}
           FRONTEND_URL: ${{ secrets.FRONTEND_URL }}
+          AWS_S3_BUCKET: ${{ secrets.S3_BUCKET_NAME }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
 
       # backend 빌드
       - name: Build with Gradle Wrapper
