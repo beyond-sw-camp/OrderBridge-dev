@@ -159,7 +159,6 @@ const toggleSubMenu = (subMenu) => {
               <li>
                 <RouterLink class="content-item" to="/work-order" active-class="active" replace>작업지시서 조회</RouterLink>
                 <RouterLink class="content-item" to="/work-order/write">작업지시서 등록</RouterLink>
-                <RouterLink class="content-item" to="">작업지시서 작업처리</RouterLink>
                 <RouterLink class="content-item" to="/work-order/situation">작업지시서 현황</RouterLink>
               </li>
             </ul>
@@ -169,7 +168,7 @@ const toggleSubMenu = (subMenu) => {
             <ul v-if="activeSubMenu === 'client'">
               <li>
                 <RouterLink class="content-item" to="/production-disbursement">생산불출 조회</RouterLink>
-                <RouterLink class="content-item" to="">생산불출 등록</RouterLink>
+                <RouterLink class="content-item" to="/production-disbursement/write">생산불출 등록</RouterLink>
                 <RouterLink class="content-item" to="/production-disbursement/situation">생산불출 현황</RouterLink>
               </li>
             </ul>

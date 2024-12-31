@@ -1,7 +1,5 @@
 package error.pirate.backend.workOrder.query.controller;
 
-import error.pirate.backend.productionReceiving.query.dto.ProductionReceivingListRequest;
-import error.pirate.backend.quotation.command.domain.aggregate.entity.QuotationStatus;
 import error.pirate.backend.workOrder.command.domain.aggregate.entity.WorkOrderStatus;
 import error.pirate.backend.workOrder.query.dto.*;
 import error.pirate.backend.workOrder.query.service.WorkOrderQueryService;
@@ -9,7 +7,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -117,6 +114,12 @@ public class WorkOrderQueryController {
                 .headers(httpHeaders)
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(excelData);
+    }
+
+    @GetMapping("/status")
+    @Operation(summary = "작업지시서 상태 분류 조회")
+    public ResponseEntity<List<WorkOrderStatus.WorkOrderStatusResponse>> readWorkOrderStatus() {
+        return ResponseEntity.ok(WorkOrderStatus.readWorkOrderStatusList());
     }
 
 }

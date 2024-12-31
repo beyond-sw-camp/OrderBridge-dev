@@ -2,6 +2,7 @@ package error.pirate.backend.item.query.service;
 
 import error.pirate.backend.exception.CustomException;
 import error.pirate.backend.exception.ErrorCodeType;
+import error.pirate.backend.item.command.application.dto.BomItemDTO;
 import error.pirate.backend.item.command.domain.aggregate.entity.BomItem;
 import error.pirate.backend.item.command.domain.aggregate.entity.Item;
 import error.pirate.backend.item.command.domain.aggregate.entity.ItemInventory;
@@ -121,5 +122,12 @@ public class ItemQueryService {
                 .collect(Collectors.toList());
     }
 
-
+    // bom 조회
+    public List<BomItemDTO> readBomItems(Long itemSeq) {
+        List<BomItemDTO> bomItems = itemMapper.readBomItems(itemSeq);
+        if (bomItems.isEmpty()) {
+            throw new CustomException(ErrorCodeType.BOM_ITEM_NOT_FOUND);
+        }
+        return bomItems;
+    }
 }

@@ -137,9 +137,9 @@ public class WorkOrderDomainService {
     }
 
     // 작업지시서 결재 상태 확인
-    public void checkWorkOrderStatusApproval(WorkOrderStatus workOrderStatus) {
-        /* 결재전이 아니라면 변경 불가*/
-        if (!workOrderStatus.equals(WorkOrderStatus.BEFORE)) {
+    public void checkWorkOrderApprovalStatus(WorkOrderStatus workOrderStatus) {
+        /* 결재후가 아니라면 변경 불가*/
+        if (!workOrderStatus.equals(WorkOrderStatus.AFTER)) {
             throw new CustomException(ErrorCodeType.WORK_ORDER_STATE_BAD_REQUEST);
         }
     }

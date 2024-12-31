@@ -62,4 +62,19 @@
         LIMIT #{size} OFFSET #{offset}
     </select>
 
+    <select id="readBomItems" resultType="error.pirate.backend.item.query.dto.BomItemQueryDTO">
+        SELECT i1.item_name AS parent_item_name,
+                bi.parent_item_seq,
+                bi.child_item_seq,
+                i2.item_name AS child_item_name,
+                i2.item_image_url,
+                bi.bom_child_item_quantity,
+                w.warehouse_name AS store_name
+        FROM tb_bom_item bi
+        LEFT JOIN tb_item i1 ON bi.parent_item_seq = i1.item_seq
+        LEFT JOIN tb_item i2 ON bi.child_item_seq = i2.item_seq
+        LEFT JOIN tb_warehouse w ON w.warehouse_seq = i2.warehouse_seq
+        WHERE bi.parent_item_seq = #{parentItemSeq}
+    </select>
+
 </mapper>

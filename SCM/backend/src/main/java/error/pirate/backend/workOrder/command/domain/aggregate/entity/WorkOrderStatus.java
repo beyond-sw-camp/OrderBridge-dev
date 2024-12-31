@@ -1,10 +1,11 @@
 package error.pirate.backend.workOrder.command.domain.aggregate.entity;
 
-import error.pirate.backend.exception.CustomException;
-import error.pirate.backend.exception.ErrorCodeType;
 import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+
+import java.util.Arrays;
+import java.util.List;
 
 @Getter
 @RequiredArgsConstructor
@@ -29,15 +30,13 @@ public enum WorkOrderStatus {
         }
     }
 
-    public static String statusValue(String status) {
-        for (WorkOrderStatus s : WorkOrderStatus.values()) {
-            if(s.name().equals(status)) {
-                return s.value;
-            }
-        }
-        throw new CustomException(ErrorCodeType.WORK_ORDER_STATE_BAD_REQUEST);
+    public static List<WorkOrderStatus.WorkOrderStatusResponse> readWorkOrderStatusList() {
+        return Arrays.stream(WorkOrderStatus.class.getEnumConstants())
+                .filter(key -> !key.equals(WorkOrderStatus.DELETE))
+                .map(key ->
+                        new WorkOrderStatus.WorkOrderStatusResponse(key.toString(), WorkOrderStatus.valueOf(key.toString())))
+                .toList();
     }
-
 
 
 }

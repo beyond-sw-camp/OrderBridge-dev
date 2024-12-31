@@ -87,7 +87,7 @@ public class WorkOrderCommandController {
     /* 작업지시서 삭제 */
     @DeleteMapping("/{workOrderSeq}")
     @Operation(summary = "작업지시서 삭제", description = "선택한 작업지시서를 삭제한다.")
-    public ResponseEntity<Void> deleteSalesOrder(@PathVariable Long workOrderSeq) {
+    public ResponseEntity<Void> deleteWorkOrder(@PathVariable Long workOrderSeq) {
         log.info("-------------- DELETE /api/v1/workOrder/{} 작업지시서 삭제 요청 -  --------------", workOrderSeq);
         workOrderService.deleteWorkOrder(workOrderSeq);
 
