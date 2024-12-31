@@ -445,9 +445,11 @@ const validateFormData = () => {
               </li>
               <li class="mb-3 col-md-6">· 주문 수량 : {{ item.requiredQuantity }}</li>
               <li class="mb-3 col-md-6">· 생산가능 수량 : {{ item.availableQuantity }}</li>
-              <li class="mb-3 col-md-6" v-if="!item.isStockEnough">· <span style="color: red">[재고 부족!]</span> 부족한 수량: {{ item.insufficientQuantity }}</li>
+              <li class="mb-3 col-md-6" v-if="!item.isStockEnough">·
+                <span style="color: red">[재고 부족!]</span> 부족한 수량: {{ item.insufficientQuantity }}
+              </li>
               <li class="mb-3 col-md-6">
-                <b-button v-if="!item.isStockEnough" @click="goToOrderPage" variant="light" size="sm" class="button ms-2 mb-3" style="top: 10px; right: 10px;">발주하러 가기</b-button>
+              <b-button v-if="!item.isStockEnough" @click="goToOrderPage" variant="light" size="sm" class="button ms-2 mb-3" style="top: 10px; right: 10px;">발주하러 가기</b-button>
               </li>
             </ul>
           </div>
