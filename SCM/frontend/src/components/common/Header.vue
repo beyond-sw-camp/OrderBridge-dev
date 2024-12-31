@@ -185,12 +185,17 @@ function chatbotOn() {
 
 <!-- 알림 모달  -->
   <div v-if="isNotificationOpen" class="notification-bar">
-    <ul>
+    <ul v-if="notificationList.value !== undefined">
       <li v-for="notification in notificationList" :class="{ 'selected-notification': selectedNotification?.notificationSeq === notification.notificationSeq }" :key="notification.notificationSeq" @click="openModal(notification)">
         <span>{{ notification.notificationTitle }}</span>
         <span style="float:right;">{{ dayjs(notification.notificationRegDate).format('YYYY/MM/DD HH:mm') }}</span>
         <br/>
         <span v-html="notification.notificationContent"></span>
+      </li>
+    </ul>
+    <ul v-else>
+      <li>
+      조회된 알림이 없습니다.
       </li>
     </ul>
     <button @click="isNotificationOpen = false">닫기</button>

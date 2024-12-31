@@ -41,7 +41,6 @@ const fetchItems = async (filters = {}) => {
       },
     });
 
-    console.log(response.data);
     purchaseItemList.value = Array.isArray(response.data.content) ? response.data.content : [];
     totalCount.value =response.data.totalElements;
 
