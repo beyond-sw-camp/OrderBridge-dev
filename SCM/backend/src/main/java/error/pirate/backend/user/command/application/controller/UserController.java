@@ -10,11 +10,11 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "회원", description = "회원 API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/user")
 @Slf4j
+@Tag(name = "User", description = "회원")
 public class UserController {
 
     private final UserService userService;

@@ -19,11 +19,11 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-@Tag(name = "출하지시서")
 @RestController
 @RequiredArgsConstructor    // final 을 받은 필드의 생성자를 주입
 @RequestMapping("/api/v1/shipping-instruction")
 @Slf4j
+@Tag(name = "Shipping Instruction", description = "출하지시서")
 public class ShippingInstructionQueryController {
     private final ShippingInstructionQueryService shippingInstructionQueryService;
 

@@ -26,7 +26,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/purchaseOrder")
-@Tag(name = "발주 API", description = "발주 API")
+@Tag(name = "Purchase Order", description = "발주")
 public class PurchaseOrderQueryController {
 
     private final PurchaseOrderService purchaseOrderService;
