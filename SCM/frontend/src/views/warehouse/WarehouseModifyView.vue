@@ -1,17 +1,17 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useRouter, useRoute } from "vue-router";
-import axios from "@/axios"
+import axios from '@/axios';
 
 const router = useRouter();
 const route = useRoute();
-const warehouseSeq = route.params.id;  // URL에서 창고 ID 가져오기
+const warehouseSeq = route.params.id; // URL에서 창고 ID 가져오기
 
 const formData = ref({
   warehouseName: '',
   warehouseType: '',
   warehouseNote: '',
-  userSeq: 1
+  userSeq: 1 // 사용자 ID, 필요하다면 동적으로 설정
 });
 
 const warehouseTypeOptions = [
@@ -22,17 +22,17 @@ const warehouseTypeOptions = [
 // 기존 데이터 불러오기
 const fetchWarehouseData = async () => {
   try {
-    const response = await axios.get(`warehouse/${warehouseSeq}`);
+    const response = await axios.get(`warehouse/${warehouseSeq}`); // 상대 경로 사용
     formData.value = {
       warehouseName: response.data.warehouseName,
       warehouseType: response.data.warehouseType,
       warehouseNote: response.data.warehouseNote || '',
-      userSeq: response.data.userName
+      userSeq: response.data.userSeq // 사용자 ID 값이 있는 경우 설정
     };
   } catch (error) {
     console.error('창고 정보 조회 실패:', error);
     alert('창고 정보를 불러오는데 실패했습니다.');
-    await router.push('/warehouse');
+    router.push('/warehouse'); // 실패 시 창고 목록으로 이동
   }
 };
 
@@ -43,9 +43,9 @@ const updateWarehouse = async () => {
   }
 
   try {
-    await axios.put(`warehouse/${warehouseSeq}`, formData.value);
+    await axios.put(`warehouse/${warehouseSeq}`, formData.value); // 상대 경로 사용
     alert('창고 정보가 수정되었습니다.');
-    router.push('/warehouse');
+    router.push('/warehouse'); // 수정 후 창고 목록으로 이동
   } catch (error) {
     console.error('창고 수정 실패:', error);
     alert('창고 수정에 실패했습니다.');

@@ -1,5 +1,6 @@
 package error.pirate.backend.item.command.application.service;
 
+import error.pirate.backend.common.FileUploadUtil;
 import error.pirate.backend.common.NullCheck;
 import error.pirate.backend.exception.CustomException;
 import error.pirate.backend.exception.ErrorCodeType;
@@ -22,7 +23,9 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @Service
@@ -35,9 +38,10 @@ public class ItemService {
     private final BomItemRepository bomItemRepository;
     private final ModelMapper modelMapper;
     private final WarehouseRepository warehouseRepository;
+    private final FileUploadUtil fileUploadUtil;
 
     @Transactional
-    public void createItem(ItemCreateRequest request) {
+    public void createItem(ItemCreateRequest request, MultipartFile file) throws IOException {
         User user = userRepository.findById(request.getUserSeq())
                 .orElseThrow(() -> new CustomException(ErrorCodeType.USER_NOT_FOUND));
 
@@ -51,7 +55,7 @@ public class ItemService {
         itemDTO.setUser(user);
         itemDTO.setItemUnit(itemUnit);
         itemDTO.setWarehouse(warehouse);
-
+        itemDTO.setItemImageUrl(fileUploadUtil.uploadFile(file));
         Item item = modelMapper.map(itemDTO, Item.class);
 
         // bom 등록
