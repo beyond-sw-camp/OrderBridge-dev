@@ -7,6 +7,7 @@ import editIcon from "@/assets/editIcon.svg";
 import printIcon from "@/assets/printIcon.svg";
 import dayjs from "dayjs";
 import router from "@/router/index.js";
+import PrintPreviewModal from '@/components/purchaseOrder/PurchaseOrderPrintPreview.vue';
 
 const totalCount = ref(0);
 const pageNumber = ref(1);
@@ -16,6 +17,23 @@ const searchEndDate = ref('');
 const searchName = ref('');
 const searchStatus = ref([]);
 const expandedIndex = ref(null);
+const isModalVisible = ref(false);
+const selectedPurchaseOrder = ref(null);
+
+const openPrintPreview = (purchaseOrder) => {
+  if (!purchaseOrder) {
+    console.error('선택된 발주서가 없습니다.');
+    return;
+  }
+  console.log('openPrintPreview 호출됨, 선택된 발주서:', purchaseOrder);
+  selectedPurchaseOrder.value = purchaseOrder;
+  isModalVisible.value = true;
+};
+
+const closePrintPreview = () => {
+  isModalVisible.value = false;
+  selectedPurchaseOrder.value = null;
+};
 
 const toggleDetails = (index) => {
   expandedIndex.value = expandedIndex.value === index ? null : index;
@@ -141,23 +159,6 @@ const itemDelete = async (seq) => {
       alert('삭제에 실패했습니다. 다시 시도해주세요.');
     }
   }
-};
-
-// 인쇄 함수
-const printItem = (index) => {
-  const printContent = document.getElementById(`print-area-${index}`).innerHTML;
-  const originalContent = document.body.innerHTML;
-
-  // 선택된 영역만 표시
-  document.body.innerHTML = printContent;
-
-  window.print();
-
-  // 원래 내용 복원
-  document.body.innerHTML = originalContent;
-
-  // Vue 리렌더링 방지
-  location.reload();
 };
 
 </script>
@@ -293,7 +294,7 @@ const printItem = (index) => {
                   </div>
                   </div>
                   <div class="d-flex justify-content-end align-items-center">
-                    <printIcon class="me-3 icon" @click.stop="printItem(index)"/>
+                    <printIcon class="me-3 icon" v-if="purchaseOrder" @click.stop="openPrintPreview(purchaseOrder)"/>
                     <editIcon class="me-3 icon" @click.stop=""/>
                     <trashIcon class="icon" @click.stop="itemDelete(purchaseOrder.purchaseOrderSeq)"/>
                   </div>
@@ -318,6 +319,13 @@ const printItem = (index) => {
 
     </div>
   </div>
+
+  <PrintPreviewModal
+      :isVisible="isModalVisible"
+      :purchaseOrder="selectedPurchaseOrder"
+      @close="closePrintPreview"
+  />
+
 </template>
 
 <style scoped>
