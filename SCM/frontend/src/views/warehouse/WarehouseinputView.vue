@@ -2,7 +2,7 @@
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from "vue-router";
-import axios from 'axios';
+import axios from "@/axios"
 
 const router = useRouter();
 
@@ -21,7 +21,7 @@ const warehouseTypeOptions = [
 
 const registerWarehouse = async () => {
   try {
-    await axios.post('http://localhost:8090/api/v1/warehouse', formData.value);
+    await axios.post('warehouse', formData.value);
     alert('창고가 등록되었습니다.');
     router.push('/warehouse');
   } catch (error) {

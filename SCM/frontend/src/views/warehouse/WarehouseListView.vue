@@ -1,6 +1,6 @@
 <script setup>
 import { onMounted, ref, watch } from 'vue';
-import axios from 'axios';
+import axios from "@/axios"
 import { BInputGroup, BFormInput, BFormCheckbox, BButton } from 'bootstrap-vue-3';
 import { useRouter } from "vue-router";
 import dayjs from "dayjs";
@@ -28,7 +28,7 @@ const warehouseTypeMap = {
 
 const findWarehousesByFilter = async () => {
   try {
-    const response = await axios.get("http://localhost:8090/api/v1/warehouse", {
+    const response = await axios.get("warehouse", {
       params: {
         page: currentPage.value,
         size: perPage.value,
@@ -66,7 +66,7 @@ const toggleDetails = async (index, warehouse) => {
     expandedIndex.value = null;
   } else {
     try {
-      const response = await axios.get(`http://localhost:8090/api/v1/warehouse/${warehouse.warehouseSeq}`);
+      const response = await axios.get(`warehouse/${warehouse.warehouseSeq}`);
       expandedIndex.value = index;
       const warehouseIndex = warehouses.value.findIndex(w => w.warehouseSeq === warehouse.warehouseSeq);
       if (warehouseIndex !== -1) {
@@ -82,7 +82,7 @@ const deleteWarehouse = async (seq) => {
   const result = confirm("정말 삭제하시겠습니까?");
   if (result) {
     try {
-      await axios.delete(`http://localhost:8090/api/v1/warehouse/${seq}`);
+      await axios.delete(`warehouse/${seq}`);
       alert('창고가 삭제되었습니다.');
       findWarehousesByFilter(); // 삭제 후 목록 갱신
     } catch (error) {

@@ -15,7 +15,7 @@ export const useUserStore = defineStore('user', {
     async login(employeeNo, pwd) {
       this.error = null;
       try {
-        const response = await axios.post('http://localhost:8090/api/v1/login', {
+        const response = await axios.post(`${import.meta.env.VITE_API_URL}/login`, {
           userEmployeeNo: employeeNo,
           userPwd: pwd,
         });
@@ -58,6 +58,7 @@ export const useUserStore = defineStore('user', {
         this.isLoggingOut = false; // 로그아웃 상태 해제
       }
     },
+
     initialize() {
       const token = localStorage.getItem('accessToken');
 

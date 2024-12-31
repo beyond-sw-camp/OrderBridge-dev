@@ -1,6 +1,5 @@
-package error.pirate.backend.invoice.command.application.controller;
+package error.pirate.backend.invoice.command.application.dto;
 
-import error.pirate.backend.invoice.command.application.dto.UpdateInvoiceItemRequest;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
