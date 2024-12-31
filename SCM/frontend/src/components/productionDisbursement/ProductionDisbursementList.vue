@@ -334,7 +334,7 @@ function search() {
                                 {{ dayjs(item.itemInventoryExpirationDate).format('YYYY-MM-DD HH:mm:ss') }}</span>
                             </small>
                             <br><br>
-                            <small v-if="item.itemNote" style="margin-top: 20px;">
+                            <small v-if="item.productionDisbursementNote" style="margin-top: 20px;">
                               비고: {{ item.productionDisbursementNote }}</small>
                             <small v-else style="margin-top: 20px;">비고: 없음</small>
                           </div>

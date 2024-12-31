@@ -12,7 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @ToString
 @Schema(description = "생산불출 작성요청 데이터")
-public class CreateProductionDisbursementRequest {
+public class CreateAndUpdateProductionDisbursementRequest {
 
     private Long workOrderSeq;  // 작업지시서 번호
     private LocalDateTime productionDisbursementDepartureDate;  // 생산불출 불출일

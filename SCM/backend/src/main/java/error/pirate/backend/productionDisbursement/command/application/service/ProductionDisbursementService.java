@@ -5,26 +5,25 @@ import error.pirate.backend.exception.CustomException;
 import error.pirate.backend.exception.ErrorCodeType;
 import error.pirate.backend.item.command.domain.aggregate.entity.BomItem;
 import error.pirate.backend.item.command.domain.aggregate.entity.Item;
+import error.pirate.backend.item.command.domain.repository.ItemRepository;
 import error.pirate.backend.item.command.domain.service.BomItemDomainService;
 import error.pirate.backend.item.command.domain.service.ItemDomainService;
-import error.pirate.backend.productionDisbursement.command.application.dto.CreateProductionDisbursementRequest;
+import error.pirate.backend.productionDisbursement.command.application.dto.CreateAndUpdateProductionDisbursementRequest;
 import error.pirate.backend.productionDisbursement.command.application.dto.ProductionDisbursementItemRequest;
 import error.pirate.backend.productionDisbursement.command.domain.aggregate.entity.ProductionDisbursement;
 import error.pirate.backend.productionDisbursement.command.domain.aggregate.entity.ProductionDisbursementItem;
-import error.pirate.backend.productionDisbursement.command.domain.aggregate.repository.ProductionDisbursementRepository;
+import error.pirate.backend.productionDisbursement.command.domain.aggregate.repository.ProductionDisbursementItemRepository;
 import error.pirate.backend.productionDisbursement.command.domain.aggregate.service.ProductionDisbursementDomainService;
-import error.pirate.backend.salesOrder.command.domain.aggregate.entity.SalesOrder;
-import error.pirate.backend.shippingInstruction.command.domain.aggregate.entity.ShippingInstruction;
-import error.pirate.backend.user.command.application.service.UserService;
 import error.pirate.backend.user.command.domain.aggregate.entity.User;
 import error.pirate.backend.warehouse.command.domain.aggregate.entity.Warehouse;
+import error.pirate.backend.warehouse.command.domain.repository.WarehouseRepository;
 import error.pirate.backend.warehouse.command.domain.service.WarehouseDomainService;
 import error.pirate.backend.workOrder.command.domain.aggregate.entity.WorkOrder;
 import error.pirate.backend.workOrder.command.domain.aggregate.entity.WorkOrderStatus;
 import error.pirate.backend.workOrder.command.domain.service.WorkOrderDomainService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.authority.AuthorityUtils;
+import org.hibernate.jdbc.Work;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,13 +39,16 @@ public class ProductionDisbursementService {
 
     private final ProductionDisbursementDomainService productionDisbursementDomainService;
     private final WorkOrderDomainService workOrderDomainService;
-    private final WarehouseDomainService warehouseDomainService;
     private final NameGenerator nameGenerator;
     private final ItemDomainService itemDomainService;
     private final BomItemDomainService bomItemDomainService;
+    private final ProductionDisbursementItemRepository productionDisbursementItemRepository;
+    private final ItemRepository itemRepository;
+    private final WarehouseRepository warehouseRepository;
 
+    // 등록
     @Transactional
-    public void createProductionDisbursement(CreateProductionDisbursementRequest request) {
+    public void createProductionDisbursement(CreateAndUpdateProductionDisbursementRequest request) {
         log.info("-------------- 생산불출 등록 서비스 진입 :등록요청 조건 - request: {} --------------", request);
 
         // 작업지시서 상태 확인
@@ -106,6 +108,7 @@ public class ProductionDisbursementService {
         int totalDisbursementQuantity = 0;
         List<BomItem> bomItems = bomItemDomainService.findAllByParentItem(orderedItem); // BOM 항목 조회
         Map<Long, String> itemNotes = request.getItemRequests().stream()
+                .filter(dto -> dto.getItemSeq() != null && dto.getNote() != null)
                 .collect(Collectors.toMap(
                         ProductionDisbursementItemRequest::getItemSeq,
                         ProductionDisbursementItemRequest::getNote
@@ -117,7 +120,11 @@ public class ProductionDisbursementService {
             int requiredQuantity = bomItem.getBomChildItemQuantity() * indicatedQuantity;
 
             // 품목별 비고 설정 (Request에서 매핑된 비고 가져오기)
-            String note = itemNotes.getOrDefault(subItem.getItemSeq(), "");
+            String note = itemNotes.getOrDefault(subItem.getItemSeq(), null);
+            if (note == null) {
+                log.warn("ItemSeq {}에 대한 비고가 요청에 존재하지 않습니다.", subItem.getItemSeq());
+            }
+            log.info(note);
 
             // 생산불출 품목 생성
             ProductionDisbursementItem disbursementItem = productionDisbursementDomainService.createProductionDisbursementItem(
@@ -127,6 +134,7 @@ public class ProductionDisbursementService {
                     requiredQuantity,
                     note
             );
+            log.info("ItemSeq: {}, RequiredQuantity: {}, Note: {}", subItem.getItemSeq(), requiredQuantity, note);
 
             newProductionDisbursement.addDisbursementItem(disbursementItem); // 품목 추가
             totalDisbursementQuantity += requiredQuantity;
@@ -140,7 +148,50 @@ public class ProductionDisbursementService {
         productionDisbursementDomainService.saveProductionDisbursement(newProductionDisbursement);
     }
 
+    // 수정
+    @Transactional
+    public void updateWorkOrder(Long productionDisbursementSeq, CreateAndUpdateProductionDisbursementRequest request) {
+        log.info("-------------- 생산불출 수정 서비스 진입 - {}번 수정, 수정요청 조건 - request: {}   --------------", productionDisbursementSeq, request);
 
+        // 기존 생산불출 조회
+        ProductionDisbursement productionDisbursement = productionDisbursementDomainService.findByProductionDisbursementSeq(productionDisbursementSeq);
+
+        // 수정 가능한 상태인지 확인
+        productionDisbursementDomainService.checkProductionDisbursementStatus(productionDisbursement.getProductionDisbursementStatus());
+
+        // 품목 변경 여부 확인
+        boolean itemChanges = productionDisbursementDomainService.itemChanges(productionDisbursement, request);
+
+        if (itemChanges) {
+            // 3-1. 기존 품목 삭제
+            List<ProductionDisbursementItem> disbursementItems = productionDisbursementItemRepository.findAllByProductionDisbursement(productionDisbursement);
+            productionDisbursementItemRepository.deleteAllInBatch(disbursementItems);
+
+            // 3-2. 새로운 품목 등록
+            if (request.getItemRequests() != null && !request.getItemRequests().isEmpty()) {
+                for (ProductionDisbursementItemRequest dto : request.getItemRequests()) {
+                    Item item = itemRepository.findById(dto.getItemSeq())
+                            .orElseThrow(() -> new CustomException(ErrorCodeType.ITEM_NOT_FOUND));
+
+                    Warehouse warehouse = warehouseRepository.findById(item.getWarehouse().getWarehouseSeq())
+                            .orElseThrow(() -> new CustomException(ErrorCodeType.WAREHOUSE_NOT_FOUND));
+
+                    int requiredQuantity = productionDisbursementDomainService.calculateRequiredQuantity(item.getItemSeq(), productionDisbursement.getWorkOrder().getWorkOrderSeq());
+
+                    ProductionDisbursementItem disbursementItem = ProductionDisbursementItem.createProductionDisbursementItem(
+                            productionDisbursement, item, warehouse, requiredQuantity, dto.getNote()
+                    );
+                    productionDisbursementItemRepository.save(disbursementItem);
+                }
+            }
+        }
+
+
+
+
+    }
+
+    // 삭제
     @Transactional
     public void deleteProductionDisbursement(Long productionDisbursementSeq) {
         log.info("-------------- 생산불출 삭제 서비스 진입 - {}번 삭제 --------------", productionDisbursementSeq);
@@ -149,10 +200,24 @@ public class ProductionDisbursementService {
         ProductionDisbursement productionDisbursement = productionDisbursementDomainService.findByProductionDisbursementSeq(productionDisbursementSeq);
 
         // 삭제가능한 상태인지 체크
-        productionDisbursementDomainService.checkProductionDisbursementStatusDeletePossible(productionDisbursement.getProductionDisbursementStatus());
+        productionDisbursementDomainService.checkProductionDisbursementStatus(productionDisbursement.getProductionDisbursementStatus());
+
+        // 연결된 작업지시서 조회
+        WorkOrder workOrder = productionDisbursement.getWorkOrder();
+        if (workOrder == null) {
+            throw new CustomException(ErrorCodeType.WORK_ORDER_NOT_FOUND);
+        }
+
+        // 생산불출 품목 삭제
+        List<ProductionDisbursementItem> disbursementItems = productionDisbursementItemRepository.findAllByProductionDisbursement(productionDisbursement);
+        productionDisbursementItemRepository.deleteAllInBatch(disbursementItems);
 
         // 삭제로 상태 변경
         productionDisbursementDomainService.deleteProductionDisbursement(productionDisbursement);
+
+        // 작업지시서 상태 after 로 변경
+        workOrderDomainService.updateWorkOrderStatus(workOrder, WorkOrderStatus.AFTER);
+        log.info("-------------- 생산불출 삭제 및 작업지시서 상태 변경 완료 --------------");
     }
 
 

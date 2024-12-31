@@ -1,8 +1,7 @@
 package error.pirate.backend.productionDisbursement.command.application.controller;
 
-import error.pirate.backend.productionDisbursement.command.application.dto.CreateProductionDisbursementRequest;
+import error.pirate.backend.productionDisbursement.command.application.dto.CreateAndUpdateProductionDisbursementRequest;
 import error.pirate.backend.productionDisbursement.command.application.service.ProductionDisbursementService;
-import error.pirate.backend.workOrder.command.application.dto.CreateWorkOrderRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -24,7 +23,7 @@ public class ProductionDisbursementController {
     /* 생산불출 등록 */
     @PostMapping
     @Operation(summary = "생산불출 등록", description = "작업지시서를 불러와 생산불출서를 등록한다.")
-    public ResponseEntity<Void> createProductionDisbursement(@Valid @RequestBody CreateProductionDisbursementRequest request
+    public ResponseEntity<Void> createProductionDisbursement(@Valid @RequestBody CreateAndUpdateProductionDisbursementRequest request
     ) {
         log.info("-------------- POST /api/v1/productionDisbursement 생산불출 등록 요청 - request:{} --------------", request);
         productionDisbursementService.createProductionDisbursement(request);
@@ -32,7 +31,16 @@ public class ProductionDisbursementController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
+    /* 생산불출 수정 */
+    @PutMapping("/{productionDisbursementSeq}")
+    @Operation(summary = "생산불출 수정", description = "작업지시서를 불러와 생산불출서를 수정한다.")
+    public ResponseEntity<Void> updateProductionDisbursement(@PathVariable Long productionDisbursementSeq,
+                                                @Valid @RequestBody CreateAndUpdateProductionDisbursementRequest request) {
+        log.info("-------------- PUT /api/v1/productionDisbursement/{} 생산불출 수정 요청 - request:{} --------------", productionDisbursementSeq, request);
+        productionDisbursementService.updateWorkOrder(productionDisbursementSeq, request);
 
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
 
     /* 생산불출 삭제 */
     @DeleteMapping("/{productionDisbursementSeq}")

@@ -1,8 +1,7 @@
 package error.pirate.backend.productionDisbursement.command.domain.aggregate.entity;
 
-import error.pirate.backend.productionDisbursement.command.application.dto.CreateProductionDisbursementRequest;
+import error.pirate.backend.productionDisbursement.command.application.dto.CreateAndUpdateProductionDisbursementRequest;
 import error.pirate.backend.user.command.domain.aggregate.entity.User;
-import error.pirate.backend.warehouse.command.domain.aggregate.entity.Warehouse;
 import error.pirate.backend.workOrder.command.domain.aggregate.entity.WorkOrder;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -56,7 +55,7 @@ public class ProductionDisbursement {
     private List<ProductionDisbursementItem> disbursementItems = new ArrayList<>();
 
     // 생성 메소드
-    public static ProductionDisbursement createProductionDisbursement(CreateProductionDisbursementRequest request,
+    public static ProductionDisbursement createProductionDisbursement(CreateAndUpdateProductionDisbursementRequest request,
                                                                       WorkOrder workOrder,
                                                                       User user,
                                                                       String productionDisbursementName) {
