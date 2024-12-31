@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/purchase")
-@Tag(name = "구매 API", description = "구매 API")
+@Tag(name = "Purchase", description = "구매")
 public class PurchaseController {
 
     private final PurchaseApplicationService purchaseApplicationService;

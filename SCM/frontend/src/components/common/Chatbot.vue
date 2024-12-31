@@ -1,6 +1,6 @@
 <script setup>
 import searchIcon from "@/assets/searchIcon.svg"
-import {ref} from "vue";
+import {computed, ref} from "vue";
 import axios from "@/axios"
 import robotIcon from "@/assets/robotIcon.svg"
 import humanIcon from "@/assets/humanIcon.svg"
@@ -16,7 +16,7 @@ const fetchChatbot = async () => {
   try {
     const response = await axios.get(`chatbot`, {
       params: {
-        message: questionTest.value.message,
+        message: messageData.value,
       }, paramsSerializer: (params) => {
         // null이나 undefined 값을 필터링
         const filteredParams = Object.fromEntries(
@@ -28,12 +28,9 @@ const fetchChatbot = async () => {
 
     // 요청 성공 시 새로운 항목 추가
     if (response.status === 200) {
-      console.log(response.data);
       items.value.push(response.data);
-      questionTest.value.message = ""; // 입력 필드 초기화
     }
 
-    console.log(items.value);
     prepareScroll();
   } catch (error) {
     if (error.response) {
@@ -42,9 +39,25 @@ const fetchChatbot = async () => {
   }
 }
 
+// 질문인지 답변인지 체크
+const canQuestion = computed(() => {
+  // items 배열의 마지막 role이 'model'인지 확인
+  return items.value.length > 0 && items.value[items.value.length - 1].role === 'model';
+});
+
+// 질문은 답변이후에만 다시 할 수 있음
+function checkAndQuestion() {
+  if ((canQuestion.value || items.value.length === 0) && questionTest.value.message.trim()) {
+    question();
+  }
+}
+
 // 질문
+const messageData = ref('');
 function question() {
   items.value.push({...questionTest.value});
+  messageData.value = questionTest.value.message;
+  questionTest.value.message = ""; // 입력 필드 초기화
   prepareScroll();
   fetchChatbot();
 }
@@ -54,7 +67,6 @@ function scrollBar() {
   const chatbotBody = document.getElementById("chatbotBody");
   console.log(chatbotBody.scrollTop, chatbotBody.offsetHeight);
   chatbotBody.scrollTop = chatbotBody.scrollHeight;
-  // chatbotBody.scrollTo({top: chatbotBody.scrollHeight, behavior: "smooth"});
 }
 
 // 준비 함수, 약간의 시간을 두어 scroll 함수를 호출하기
@@ -85,8 +97,8 @@ function prepareScroll() {
   </div>
   <div style="width: 100%; height: 20%;">
     <b-input-group class="mt-3">
-      <b-form-input v-model="questionTest.message" placeholder="질문을 입력하세요." @keyup.enter="question()"></b-form-input>
-      <b-button variant="light" class="button" :disabled="!(questionTest.message || '').trim()" @click="question()">
+      <b-form-input v-model="questionTest.message" placeholder="질문을 입력하세요." @keyup.enter="checkAndQuestion()"></b-form-input>
+      <b-button variant="light" class="button" :disabled="!canQuestion || !questionTest.message.trim()" @click="question()">
         <searchIcon class="icon"/>
       </b-button>
     </b-input-group>
@@ -138,13 +150,4 @@ function prepareScroll() {
   border-radius: 10px;
   background-color: white;
 }
-
-.user{
-
-}
-
-.model{
-
-}
-
 </style>

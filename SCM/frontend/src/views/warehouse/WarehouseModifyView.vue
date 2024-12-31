@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useRouter, useRoute } from "vue-router";
-import axios from 'axios';
+import axios from "@/axios"
 
 const router = useRouter();
 const route = useRoute();
@@ -22,7 +22,7 @@ const warehouseTypeOptions = [
 // 기존 데이터 불러오기
 const fetchWarehouseData = async () => {
   try {
-    const response = await axios.get(`http://localhost:8090/api/v1/warehouse/${warehouseSeq}`);
+    const response = await axios.get(`warehouse/${warehouseSeq}`);
     formData.value = {
       warehouseName: response.data.warehouseName,
       warehouseType: response.data.warehouseType,
@@ -43,7 +43,7 @@ const updateWarehouse = async () => {
   }
 
   try {
-    await axios.put(`http://localhost:8090/api/v1/warehouse/${warehouseSeq}`, formData.value);
+    await axios.put(`warehouse/${warehouseSeq}`, formData.value);
     alert('창고 정보가 수정되었습니다.');
     router.push('/warehouse');
   } catch (error) {

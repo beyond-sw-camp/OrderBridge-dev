@@ -17,11 +17,11 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-@Tag(name = "출하전표")
 @RestController
 @RequiredArgsConstructor    // final 을 받은 필드의 생성자를 주입
 @RequestMapping("/api/v1/shipping-slip")
 @Slf4j
+@Tag(name = "Shipping Slip", description = "출하전표")
 public class ShippingSlipQueryController {
     private final ShippingSlipQueryService shippingSlipQueryService;
 

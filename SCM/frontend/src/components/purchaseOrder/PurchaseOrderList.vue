@@ -150,7 +150,7 @@ const itemDelete = async (seq) => {
   console.log(seq);
   if (result) {
     try {
-      const response = await axios.delete(`http://localhost:8090/api/v1/purchaseOrder/${seq}`);
+      const response = await axios.delete(`purchaseOrder/${seq}`);
       alert('발주서가 삭제되었습니다.');
 
       search(); // 삭제 후 목록 갱신

@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @Slf4j
 @RequestMapping("/api/v1/productionReceiving")
-@Tag(name = "생산입고 API", description = "생산입고 API")
+@Tag(name = "Production Receiving", description = "생산입고")
 public class ProductionReceivingController {
 
     private final ProductionReceivingService productionReceivingService;

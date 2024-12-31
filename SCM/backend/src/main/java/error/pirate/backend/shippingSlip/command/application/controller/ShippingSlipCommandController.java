@@ -11,11 +11,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "출하전표", description = "출하전표 조회/등록/수정/삭제")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/v1/shipping-slip")
 @Slf4j
+@Tag(name = "Shipping Slip", description = "출하전표")
 public class ShippingSlipCommandController {
 
     private final ShippingSlipApplicationService shippingSlipApplicationService;
