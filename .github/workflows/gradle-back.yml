@@ -113,7 +113,12 @@ jobs:
               expiration: 1209600000 # 2주
               header: Refresh-Token
           
-          frontend: https://fe.beanteacher.shop
+          frontend: \${FRONTEND_URL}
+          gemini:
+            baseurl: \${GEMINI_URL}
+          googleai:
+            api:
+              key: \${GEMINI_KEY}
           EOL
       
       # 템플릿 파일에 환경 변수를 대입하여 application.yml 생성
@@ -133,6 +138,9 @@ jobs:
           REDIS_HOSTNAME: ${{ secrets.REDIS_HOSTNAME }}
           REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
           REDIS_PORT: ${{ secrets.REDIS_PORT }}
+          GEMINI_URL: ${{ secrets.GEMINI_URL }}
+          GEMINI_KEY: ${{ secrets.GEMINI_KEY }}
+          FRONTEND_URL: ${{ secrets.FRONTEND_URL }}
           
       # backend 빌드
       - name: Build with Gradle Wrapper
@@ -256,7 +264,7 @@ jobs:
               expiration: 1209600000 # 2주
               header: Refresh-Token
 
-          frontend: https://fe.beanteacher.shop
+          frontend: \${FRONTEND_URL}
           gemini:
             baseurl: \${GEMINI_URL}
           googleai:
@@ -283,6 +291,7 @@ jobs:
           REDIS_PORT: ${{ secrets.REDIS_PORT }}
           GEMINI_URL: ${{ secrets.GEMINI_URL }}
           GEMINI_KEY: ${{ secrets.GEMINI_KEY }}
+          FRONTEND_URL: ${{ secrets.FRONTEND_URL }}
 
       # backend 빌드
       - name: Build with Gradle Wrapper
