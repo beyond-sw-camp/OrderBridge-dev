@@ -1,8 +1,7 @@
-```vue
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from "vue-router";
-import axios from 'axios';
+import axios from '@/axios'; // axios 인스턴스 사용
 
 const router = useRouter();
 
@@ -10,9 +9,8 @@ const formData = ref({
   warehouseName: '',
   warehouseType: '',
   warehouseNote: '',
-  userSeq: 1  // userSeq 고정값 설정
+  userSeq: 1 // userSeq 고정값 설정
 });
-
 
 const warehouseTypeOptions = [
   { value: 'FACTORY', text: '생산' },
@@ -21,16 +19,15 @@ const warehouseTypeOptions = [
 
 const registerWarehouse = async () => {
   try {
-    await axios.post('http://localhost:8090/api/v1/warehouse', formData.value);
+    await axios.post('warehouse', formData.value); // 상대 경로 사용
     alert('창고가 등록되었습니다.');
-    router.push('/warehouse');
+    router.push('/warehouse'); // 창고 목록으로 이동
   } catch (error) {
     console.error('창고 등록 실패:', error);
     alert('창고 등록에 실패했습니다.');
   }
 };
 </script>
-
 <template>
   <div class="container-fluid">
     <h4 class="title">창고관리 > 창고등록</h4>
