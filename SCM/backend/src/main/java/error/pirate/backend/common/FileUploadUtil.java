@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
 @Component
@@ -47,5 +48,25 @@ public class FileUploadUtil {
         // S3에 저장된 파일의 URL을 반환
         return amazonS3Client.getUrl(bucket, fileName).toString();
     }
+
+    public String uploadImagePath(String base64Image) {
+        try {
+            String fileName = "sign_" + System.currentTimeMillis() + ".jpg";
+            String localFilePath = "uploads/" + fileName;
+
+            String base64Data = base64Image.split(",")[1]; // Base64 데이터 분리
+            byte[] decodedBytes = java.util.Base64.getDecoder().decode(base64Data);
+
+            java.nio.file.Files.createDirectories(java.nio.file.Paths.get("uploads"));
+            java.nio.file.Files.write(java.nio.file.Paths.get(localFilePath), decodedBytes);
+
+            amazonS3Client.putObject(bucket, fileName, new ByteArrayInputStream(decodedBytes), null);
+
+            return amazonS3Client.getUrl(bucket, fileName).toString();
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to save image", e);
+        }
+    }
+
 }
 

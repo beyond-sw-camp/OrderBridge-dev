@@ -43,6 +43,14 @@ public class PurchaseOrderService {
 
     }
 
+    public PurchaseOrderResponse readPurchaseOrder(Long purchaseOrderSeq) {
+        PurchaseOrderResponse purchaseOrderResponse = purchaseOrderMapper.readPurchaseOrder(purchaseOrderSeq);
+        List<PurchaseOrderItemResponse> purchaseOrderItemResponseList = purchaseOrderMapper.readPurchaseOrderItemList(purchaseOrderResponse.getPurchaseOrderSeq());
+        purchaseOrderResponse.setPurchaseOrderItemResponseList(purchaseOrderItemResponseList);
+
+        return purchaseOrderResponse;
+    }
+
     public byte[] purchaseOrderExcelDown(PurchaseOrderRequest request) {
         request.setLimit(null);
         request.setOffset(null);
