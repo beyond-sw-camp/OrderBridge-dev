@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/warehouse")
 @RequiredArgsConstructor
-@Tag(name = "창고 관리", description = "창고 관리 API")
+@Tag(name = "Warehouse", description = "창고 관리")
 public class WarehouseController {
     private final WarehouseService warehouseService;
 

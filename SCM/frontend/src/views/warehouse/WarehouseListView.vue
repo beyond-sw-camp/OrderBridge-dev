@@ -1,6 +1,6 @@
 <script setup>
 import { onMounted, ref, watch } from 'vue';
-import axios from "@/axios"; // axios 인스턴스 사용
+import axios from "@/axios";
 import { BInputGroup, BFormInput, BFormCheckbox, BButton } from 'bootstrap-vue-3';
 import { useRouter } from "vue-router";
 import dayjs from "dayjs";
@@ -92,7 +92,6 @@ const deleteWarehouse = async (seq) => {
   }
 };
 </script>
-
 
 <template>
   <h4 class="title">창고관리 > 창고조회</h4>

@@ -105,7 +105,7 @@
              , pd.production_disbursement_status
           FROM tb_production_disbursement pd
           LEFT JOIN tb_production_disbursement_item pdi
-                ON pd.production_disbursement_seq = pdi.production_disbursement_seq
+                 ON pd.production_disbursement_seq = pdi.production_disbursement_seq
           LEFT JOIN tb_work_order wo ON wo.work_order_seq = pd.work_order_seq
           LEFT JOIN tb_warehouse w1 ON wo.warehouse_seq = w1.warehouse_seq
           LEFT JOIN tb_warehouse w2 ON pdi.ingredients_warehouse_seq = w2.warehouse_seq
@@ -177,9 +177,83 @@
     </select>
 
     <!-- 현황조회 -->
+    <select id="readProductionDisbursementSituation" resultType="error.pirate.backend.productionDisbursement.query.dto.ProductionDisbursementSituationDTO">
+        SELECT DISTINCT pd.production_disbursement_name
+             , pd.production_disbursement_departure_date
+             , pd.production_disbursement_total_quantity
+             , w1.warehouse_name AS factory_name
+             , (
+                SELECT
+                GROUP_CONCAT(w.warehouse_name SEPARATOR ", ")
+                FROM tb_production_disbursement_item pdi
+                JOIN tb_warehouse w ON w.warehouse_seq = pdi.ingredients_warehouse_seq
+                WHERE pd.production_disbursement_seq = pdi.production_disbursement_seq
+             ) AS store_name
+             , pd.production_disbursement_note
+        FROM tb_production_disbursement pd
+        LEFT JOIN tb_production_disbursement_item pdi
+               ON pd.production_disbursement_seq = pdi.production_disbursement_seq
+        LEFT JOIN tb_work_order wo ON wo.work_order_seq = pd.work_order_seq
+        LEFT JOIN tb_warehouse w1 ON wo.warehouse_seq = w1.warehouse_seq
+        LEFT JOIN tb_warehouse w2 ON pdi.ingredients_warehouse_seq = w2.warehouse_seq
+        WHERE pd.production_disbursement_status NOT IN ('DELETE')
+        <if test="startDate != null">
+            <![CDATA[
+                AND pd.production_disbursement_departure_date >= #{startDate}
+            ]]>
+        </if>
+        <if test="endDate != null">
+            <![CDATA[
+                AND pd.production_disbursement_departure_date <= #{endDate}
+            ]]>
+        </if>
+        <if test="factoryName != '' and factoryName != null">
+            AND w1.warehouse_name LIKE CONCAT('%', #{factoryName}, '%')
+        </if>
+        <if test="storeName != '' and storeName != null">
+            AND w2.warehouse_name LIKE CONCAT('%', #{storeName}, '%')
+        </if>
+        ORDER BY pd.production_disbursement_departure_date
+    </select>
 
-
-    <!-- 전표조회 -->
-
+    <!-- 현황조회 다운로드 -->
+    <select id="downloadProductionDisbursementSituationExcel" resultType="error.pirate.backend.productionDisbursement.query.dto.ProductionDisbursementSituationDTO">
+        SELECT DISTINCT pd.production_disbursement_name
+             , pd.production_disbursement_departure_date
+             , pd.production_disbursement_total_quantity
+             , w1.warehouse_name AS factory_name
+             , (
+                SELECT
+                GROUP_CONCAT(w.warehouse_name SEPARATOR ", ")
+                FROM tb_production_disbursement_item pdi
+                JOIN tb_warehouse w ON w.warehouse_seq = pdi.ingredients_warehouse_seq
+                WHERE pd.production_disbursement_seq = pdi.production_disbursement_seq
+             ) AS store_name
+             , pd.production_disbursement_note
+        FROM tb_production_disbursement pd
+        LEFT JOIN tb_production_disbursement_item pdi
+               ON pd.production_disbursement_seq = pdi.production_disbursement_seq
+        LEFT JOIN tb_work_order wo ON wo.work_order_seq = pd.work_order_seq
+        LEFT JOIN tb_warehouse w1 ON wo.warehouse_seq = w1.warehouse_seq
+        LEFT JOIN tb_warehouse w2 ON pdi.ingredients_warehouse_seq = w2.warehouse_seq
+        WHERE pd.production_disbursement_status NOT IN ('DELETE')
+        <if test="startDate != null">
+            <![CDATA[
+                AND pd.production_disbursement_departure_date >= #{startDate}
+            ]]>
+        </if>
+        <if test="endDate != null">
+            <![CDATA[
+                AND pd.production_disbursement_departure_date <= #{endDate}
+            ]]>
+        </if>
+        <if test="factoryName != '' and factoryName != null">
+            AND w1.warehouse_name LIKE CONCAT('%', #{factoryName}, '%')
+        </if>
+        <if test="storeName != '' and storeName != null">
+            AND w2.warehouse_name LIKE CONCAT('%', #{storeName}, '%')
+        </if>
+        ORDER BY pd.production_disbursement_departure_date
+    </select>
 
 </mapper>

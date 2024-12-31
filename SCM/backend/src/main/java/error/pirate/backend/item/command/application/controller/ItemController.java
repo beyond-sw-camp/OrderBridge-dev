@@ -21,7 +21,7 @@ import java.io.IOException;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/item")
-@Tag(name = "품목 관리", description = "품목 관리 API")
+@Tag(name = "Item", description = "품목 관리")
 @Slf4j
 public class ItemController {
 

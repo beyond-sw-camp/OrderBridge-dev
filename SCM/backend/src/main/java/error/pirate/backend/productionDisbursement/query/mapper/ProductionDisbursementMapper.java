@@ -4,6 +4,7 @@ import error.pirate.backend.productionDisbursement.command.domain.aggregate.enti
 import error.pirate.backend.productionDisbursement.query.dto.ProductionDisbursementDetailDTO;
 import error.pirate.backend.productionDisbursement.query.dto.ProductionDisbursementItemDTO;
 import error.pirate.backend.productionDisbursement.query.dto.ProductionDisbursementListDTO;
+import error.pirate.backend.productionDisbursement.query.dto.ProductionDisbursementSituationDTO;
 import error.pirate.backend.workOrder.command.domain.aggregate.entity.WorkOrderStatus;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -37,12 +38,23 @@ public interface ProductionDisbursementMapper {
     // 생산불출 상세품목조회
     List<ProductionDisbursementItemDTO> readProductionDisbursementItem(@Param("productionDisbursementSeq")Long productionDisbursementSeq);
 
-    // 생산불출 엑셀 다운로드
+    // 생산불출 목록 엑셀 다운로드
     ArrayList<Object> downloadProductionDisbursementListExcel(
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate,
             @Param("factoryName")  String factoryName,
             @Param("productionDisbursementStatus") List<ProductionDisbursementStatus> productionDisbursementStatus);
 
+    // 생산불출 현황 조회
+    List<ProductionDisbursementSituationDTO> readProductionDisbursementSituation(@Param("startDate") LocalDateTime startDateTime,
+                                                                                 @Param("endDate") LocalDateTime endDateTime,
+                                                                                 @Param("storeName") String storeName,
+                                                                                 @Param("factoryName") String factoryName);
+
+    // 생산불출 현황 엑셀 다운로드
+    ArrayList<Object> downloadProductionDisbursementSituationExcel(@Param("startDate") LocalDate startDate,
+                                                                   @Param("endDate") LocalDate endDate,
+                                                                   @Param("storeName") String storeName,
+                                                                   @Param("factoryName") String factoryName);
 
 }

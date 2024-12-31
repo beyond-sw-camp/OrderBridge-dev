@@ -5,6 +5,7 @@ import trashIcon from "@/assets/trashIcon.svg";
 import editIcon from "@/assets/editIcon.svg";
 import printIcon from "@/assets/printIcon.svg";
 import dayjs from "dayjs";
+import {useUserStore} from "@/stores/UserStore.js";
 
 const props = defineProps({
   searchStartDate: {type: String, required: false}, // 시작 날짜
@@ -25,6 +26,7 @@ const emit = defineEmits(
     ['pageEvent', 'searchEvent', 'checkStatusEvent', 'extendItemEvent',
       'itemEditEvent', 'itemDeleteEvent', 'registerEvent', 'excelEvent', 'shippingSlipRegisterEvent']);
 
+const userStore = useUserStore();
 const startDate = ref(props.searchStartDate);
 const endDate = ref(props.searchEndDate);
 const pageNumber = ref(props.pageNumber);
@@ -176,7 +178,7 @@ const printPage = () => {
       </div>
     </div>
     <div class="col-md-9">
-      <div style="width: 90%;">
+      <div>
         <div class="d-flex justify-content-between">
           <div>검색결과: {{ totalCount }}개</div>
           <div class="d-flex justify-content-end mt-3">
@@ -266,17 +268,17 @@ const printPage = () => {
                                 @click="shippingSlipRegister(shippingInstruction.shippingInstructionSeq)">출하전표 등록
                       </b-button>
                       <printIcon class="me-3 icon" data-bs-toggle="modal" data-bs-target="#PrintModal" @click.stop="itemPrint(shippingInstruction)"/>
-                      <editIcon v-if="shippingInstruction.shippingInstructionStatus === 'BEFORE'" class="me-3 icon"
-                                @click.stop="itemEdit(shippingInstruction.shippingInstructionSeq)"/>
-                      <trashIcon v-if="shippingInstruction.shippingInstructionStatus === 'BEFORE'" class="icon"
-                                 @click.stop="itemDelete(shippingInstruction.shippingInstructionSeq)"/>
+                      <editIcon v-if="shippingInstruction.shippingInstructionStatus === 'BEFORE' && userStore.userId === expandShippingInstruction[shippingInstruction.shippingInstructionSeq].userEmployeeNo"
+                                class="me-3 icon" @click.stop="itemEdit(shippingInstruction.shippingInstructionSeq)"/>
+                      <trashIcon v-if="shippingInstruction.shippingInstructionStatus === 'BEFORE' && userStore.userId === expandShippingInstruction[shippingInstruction.shippingInstructionSeq].userEmployeeNo"
+                                 class="icon" @click.stop="itemDelete(shippingInstruction.shippingInstructionSeq)"/>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-          <div class="pagination">
+          <div class="pagination d-flex justify-content-center">
             <b-pagination
                 v-model="pageNumber"
                 :totalRows="props.totalCount"
@@ -300,12 +302,9 @@ const printPage = () => {
             <button class="button" @click="printPage">인쇄 미리보기</button>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
-
           <div class="container mt-4">
-
             <h2 class="text-center">출하지시서</h2>
             <br/><br/>
-
             <table class="table first-table" style="height: 140px">
               <tbody>
               <tr>
@@ -329,7 +328,6 @@ const printPage = () => {
               </tr>
               </tbody>
             </table>
-
             <table class="table table-bordered second-table">
               <thead>
               <tr>
@@ -354,7 +352,6 @@ const printPage = () => {
               </tr>
               </tfoot>
             </table>
-
           </div>
         </div>
       </div>

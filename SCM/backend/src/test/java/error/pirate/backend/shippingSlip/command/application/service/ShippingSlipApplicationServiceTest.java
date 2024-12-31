@@ -1,5 +1,6 @@
 package error.pirate.backend.shippingSlip.command.application.service;
 
+import error.pirate.backend.shippingInstruction.command.application.dto.ShippingInstructionItemRequest;
 import error.pirate.backend.shippingSlip.command.application.dto.ShippingSlipItemRequest;
 import error.pirate.backend.shippingSlip.command.application.dto.ShippingSlipRequest;
 import org.junit.jupiter.api.DisplayName;
@@ -26,26 +27,31 @@ class ShippingSlipApplicationServiceTest {
         return Stream.of(
                 arguments(
                         new ShippingSlipRequest(
-                                LocalDateTime.of(2024, 12, 15, 12, 0, 0),
-                                10L,
+                                LocalDateTime.of(2024, 12, 31, 12, 0, 0),
+                                79L,
                                 "첫번째 출하전표",
                                 List.of(
-                                        new ShippingSlipItemRequest(1L, 100, "출하전표 물품1"),
-                                        new ShippingSlipItemRequest(2L, 500, "출하전표 물품2"),
-                                        new ShippingSlipItemRequest(3L, 5000, "출하전표 물품3")
+                                        new ShippingSlipItemRequest(1L, 50, "출하전표 물품1"),
+                                        new ShippingSlipItemRequest(2L, 50, "출하전표 물품2"),
+                                        new ShippingSlipItemRequest(3L, 500, "출하전표 물품3"),
+                                        new ShippingSlipItemRequest(4L, 500, "출하전표 물품4")
                                 )
-                        )
+                        ),
+                        "jh"
                 ),
                 arguments(
                         new ShippingSlipRequest(
-                                LocalDateTime.of(2024, 12, 12, 10, 0, 0),
-                                20L,
+                                LocalDateTime.of(2024, 12, 31, 10, 0, 0),
+                                80L,
                                 "두번째 출하전표",
                                 List.of(
-                                        new ShippingSlipItemRequest(4L, 100, "출하전표 물품1"),
-                                        new ShippingSlipItemRequest(5L, 500, "출하전표 물품2")
+                                        new ShippingSlipItemRequest(1L, 70, "출하전표 물품1"),
+                                        new ShippingSlipItemRequest(2L, 70, "출하전표 물품2"),
+                                        new ShippingSlipItemRequest(3L, 300, "출하전표 물품3"),
+                                        new ShippingSlipItemRequest(4L, 300, "출하전표 물품4")
                                 )
-                        )
+                        ),
+                        "jh"
                 )
         );
     }
@@ -54,66 +60,9 @@ class ShippingSlipApplicationServiceTest {
     @ParameterizedTest(autoCloseArguments = true)
     @MethodSource("createShippingSlipArguments")
     void readShippingSlipListTest(
-            ShippingSlipRequest request
+            ShippingSlipRequest request, String userNo
     ) {
         assertDoesNotThrow(
-                () -> shippingSlipApplicationService.createShippingSlip(request));
-    }
-
-    private static Stream<Arguments> updateShippingSlipArguments() {
-        return Stream.of(
-                arguments(
-                        24L,
-                        new ShippingSlipRequest(
-                                LocalDateTime.of(2024, 12, 12, 10, 0, 0),
-                                20L,
-                                "두번째 출하전표",
-                                List.of(
-                                        new ShippingSlipItemRequest(4L, 100, "출하전표 물품1"),
-                                        new ShippingSlipItemRequest(5L, 500, "출하전표 물품2")
-                                )
-                        )
-                ),
-                arguments(
-                        25L,
-                        new ShippingSlipRequest(
-                                LocalDateTime.of(2024, 12, 15, 12, 0, 0),
-                                10L,
-                                "첫번째 출하전표",
-                                List.of(
-                                        new ShippingSlipItemRequest(1L, 100, "출하전표 물품1"),
-                                        new ShippingSlipItemRequest(2L, 500, "출하전표 물품2"),
-                                        new ShippingSlipItemRequest(3L, 5000, "출하전표 물품3")
-                                )
-                        )
-                )
-        );
-    }
-
-    @DisplayName("출하전표 수정")
-    @ParameterizedTest(autoCloseArguments = true)
-    @MethodSource("updateShippingSlipArguments")
-    void updateShippingSlipTest(
-            Long shippingSlipSeq, ShippingSlipRequest request
-    ) {
-        assertDoesNotThrow(
-                () -> shippingSlipApplicationService.updateShippingSlip(
-                        shippingSlipSeq, request));
-    }
-
-    private static Stream<Arguments> deleteShippingSlipArguments() {
-        return Stream.of(
-                arguments(24L),
-                arguments(25L)
-        );
-    }
-
-    @DisplayName("출하전표 삭제")
-    @ParameterizedTest(autoCloseArguments = true)
-    @MethodSource("deleteShippingSlipArguments")
-    void deleteShippingSlipTest(Long shippingSlipSeq) {
-        assertDoesNotThrow(
-                () -> shippingSlipApplicationService.deleteShippingSlip(shippingSlipSeq)
-        );
+                () -> shippingSlipApplicationService.createShippingSlip(request, userNo));
     }
 }

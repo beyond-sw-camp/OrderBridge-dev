@@ -15,7 +15,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/client")
 @RequiredArgsConstructor
-@Tag(name = "거래처 관리", description = "거래처 목록 조회 API")
+@Tag(name = "Client", description = "거래처 관리")
 public class ClientQueryController {
 
     private final ClientQueryService clientQueryService;

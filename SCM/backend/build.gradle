@@ -13,6 +13,10 @@ java {
     }
 }
 
+jar {
+    enabled = false
+}
+
 repositories {
     mavenCentral()
 }
@@ -86,6 +90,9 @@ dependencies {
 
     // Aws
     implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+
+    // Jackson
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
 }
 
 tasks.named('test') {

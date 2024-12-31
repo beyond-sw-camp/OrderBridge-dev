@@ -132,7 +132,7 @@ const itemDelete = async (seq) => {
   const result = confirm("정말 삭제하시겠습니까?");
   if (result) {
     try {
-      const response = await axios.delete(`http://localhost:8090/api/v1/purchase/${seq}`);
+      const response = await axios.delete(`purchase/${seq}`);
       alert('구매서의 상태가 변경되었습니다.');
 
       search(); // 삭제 후 목록 갱신

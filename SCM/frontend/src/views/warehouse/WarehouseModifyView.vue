@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useRouter, useRoute } from "vue-router";
-import axios from '@/axios'; // axios 인스턴스 사용
+import axios from '@/axios';
 
 const router = useRouter();
 const route = useRoute();

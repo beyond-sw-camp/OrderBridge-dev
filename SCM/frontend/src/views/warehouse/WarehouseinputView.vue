@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from "vue-router";
-import axios from '@/axios'; // axios 인스턴스 사용
+import axios from '@/axios';
 
 const router = useRouter();
 
@@ -28,6 +28,7 @@ const registerWarehouse = async () => {
   }
 };
 </script>
+
 <template>
   <div class="container-fluid">
     <h4 class="title">창고관리 > 창고등록</h4>

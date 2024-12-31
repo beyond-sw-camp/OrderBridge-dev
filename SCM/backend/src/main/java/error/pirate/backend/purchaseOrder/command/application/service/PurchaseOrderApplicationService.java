@@ -2,10 +2,13 @@ package error.pirate.backend.purchaseOrder.command.application.service;
 
 import error.pirate.backend.client.command.domain.aggregate.entity.Client;
 import error.pirate.backend.client.command.domain.aggregate.repository.ClientRepository;
+import error.pirate.backend.common.SecurityUtil;
 import error.pirate.backend.exception.CustomException;
 import error.pirate.backend.exception.ErrorCodeType;
 import error.pirate.backend.item.command.domain.aggregate.entity.Item;
 import error.pirate.backend.item.command.domain.repository.ItemRepository;
+import error.pirate.backend.notification.command.domain.aggregate.entity.NotificationType;
+import error.pirate.backend.notification.command.domain.service.NotificationDomainService;
 import error.pirate.backend.purchaseOrder.command.application.dto.PurchaseOrderCreateRequest;
 import error.pirate.backend.purchaseOrder.command.application.dto.PurchaseOrderItemDto;
 import error.pirate.backend.purchaseOrder.command.application.dto.PurchaseOrderUpdateRequest;
@@ -14,9 +17,6 @@ import error.pirate.backend.purchaseOrder.command.domain.aggregate.entity.Purcha
 import error.pirate.backend.purchaseOrder.command.domain.aggregate.entity.PurchaseOrderStatus;
 import error.pirate.backend.purchaseOrder.command.domain.service.PurchaseOrderDomainService;
 import error.pirate.backend.purchaseOrder.command.domain.service.PurchaseOrderItemDomainService;
-import error.pirate.backend.salesOrder.command.domain.aggregate.entity.SalesOrder;
-import error.pirate.backend.salesOrder.command.domain.aggregate.entity.SalesOrderStatus;
-import error.pirate.backend.salesOrder.command.domain.service.SalesOrderDomainService;
 import error.pirate.backend.user.command.domain.aggregate.entity.User;
 import error.pirate.backend.user.command.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +38,7 @@ public class PurchaseOrderApplicationService {
 
     private final PurchaseOrderItemDomainService purchaseOrderItemDomainService;
 
-    private final SalesOrderDomainService salesOrderDomainService;
+    private final NotificationDomainService notificationDomainService;
 
     private final UserRepository userRepository;
 
@@ -47,6 +47,8 @@ public class PurchaseOrderApplicationService {
     private final ModelMapper modelMapper;
 
     private final ItemRepository itemRepository;
+
+    private final SecurityUtil securityUtil;
 
     @Transactional
     public void createPurchaseOrder(PurchaseOrderCreateRequest request) {
@@ -81,6 +83,9 @@ public class PurchaseOrderApplicationService {
             }
         }
         purchaseOrderItemDomainService.createPurchaseOrderItem(items);
+
+        //알림 생성
+        notificationDomainService.createNotificationMessage(NotificationType.PURCHASE_ORDER, purchaseOrderResponse.getPurchaseOrderSeq(), purchaseOrderResponse.getPurchaseOrderName());
     }
 
     @Transactional

@@ -15,6 +15,7 @@
             tpo.purchase_order_total_quantity,
             tpo.purchase_order_note,
             tu.user_name,
+            tu.user_phone_no,
             tc.client_name
         FROM tb_purchase_order tpo
         JOIN tb_user tu USING (user_seq)

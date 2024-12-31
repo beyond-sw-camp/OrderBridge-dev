@@ -16,6 +16,7 @@ public class ShippingInstructionDTO {
     private LocalDateTime shippingInstructionScheduledShipmentDate; // 출하예정일
     private int shippingInstructionTotalQuantity;   // 출하지시서 총수량
     private ShippingAddress shippingAddress;  // 출하지시서 주소
+    private String userEmployeeNo;  // 담당자 사원번호
     private String userName;    // 출하지시서 담당자
     private String shippingInstructionNote; // 출하지시서 비고
 }

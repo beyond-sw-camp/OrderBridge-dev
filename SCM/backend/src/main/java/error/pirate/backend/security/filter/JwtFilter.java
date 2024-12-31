@@ -48,6 +48,9 @@ public class JwtFilter extends OncePerRequestFilter {
                     log.info("pair left : {}", pair.getLeft());
                     if(!"ACCESS_FAIL".equals(pair.getLeft())) {
                         if ("ACCESS_EXPIRED".equals(pair.getLeft())) {
+                            // 액세스 토큰 만료 시 재발급된 토큰으로 변경
+                            accessToken = pair.getRight();
+
                             jwtUtil.setAccessTokenHeader(response, pair.getRight());
                         } else if ("REFRESH_EXPIRED".equals(pair.getLeft())) {
                             jwtUtil.setRefreshTokenHeader(response, pair.getRight());
