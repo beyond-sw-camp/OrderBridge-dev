@@ -1,49 +1,33 @@
 <script setup>
-import {ref, onMounted, watch, defineProps} from 'vue';
-import axios from "@/axios";
-import {BButton, BPagination} from "bootstrap-vue-3";
+import { ref, onMounted, watch, defineProps } from 'vue';
+import axios from '@/axios';
+import { BButton, BPagination } from "bootstrap-vue-3";
 import plusIcon from "@/assets/plus.svg";
 import router from "@/router/index.js";
 
 const props = defineProps({
-  itemDTO: {type: Object, required: false},
-  childItemList: {type: Array, required: false},
+  itemDTO: { type: Object, required: false },
+  childItemList: { type: Array, required: false },
 });
 
-/*const payload = {
-  userSeq: 1,
-  itemUnitSeq: itemUnitSeq.value,
-  itemName: itemName.value,
-  itemDivision: itemDivision.value,
-  itemExpirationHour: itemExpiration.value,
-  itemImageUrl: itemImageUrl.value,
-  itemPrice: itemPrice.value,
-  itemNote: itemNote.value,
-  warehouseSeq: warehouseSeq.value,
-
-  bomItemList: bomItems.value
-};*/
-
-
 watch(props, () => {
+  if (props.itemDTO) {
+    itemUnitSeq.value = props.itemDTO.itemUnitSeq;
+    itemName.value = props.itemDTO.itemName;
+    itemDivision.value = props.itemDTO.itemDivision;
+    itemExpiration.value = props.itemDTO.itemExpirationHour;
+    itemImageUrl.value = props.itemDTO.itemImageUrl;
+    itemPrice.value = props.itemDTO.itemPrice;
+    itemNote.value = props.itemDTO.itemNote;
+    warehouseSeq.value = props.itemDTO.warehouseSeq;
+  }
 
-  itemUnitSeq.value = props.itemDTO.itemUnitSeq;
-  itemName.value = props.itemDTO.itemName;
-  itemDivision.value = props.itemDTO.itemDivision;
-  itemExpiration.value = props.itemDTO.itemExpirationHour;
-  itemImageUrl.value = props.itemDTO.itemImageUrl;
-  itemPrice.value = props.itemDTO.itemPrice;
-  itemNote.value = props.itemDTO.itemNote;
-  itemUnitSeq.value = props.itemDTO.itemUnitSeq;
-  warehouseSeq.value = props.itemDTO.warehouseSeq;
-
-  bomItems.value = props.childItemList;
-  for(const item of props.childItemList) {
-
-    selectedItems.value.push(item.itemSeq);
+  if (props.childItemList) {
+    bomItems.value = props.childItemList;
+    selectedItems.value = props.childItemList.map(item => item.itemSeq);
   }
   updatePreviewImage();
-})
+});
 
 // 폼 데이터 관리
 const itemName = ref('');
@@ -65,10 +49,49 @@ const updatePreviewImage = () => {
   previewImageUrl.value = itemImageUrl.value || '';
 };
 
+// 파일 업로드 처리 함수
+const handleFileUpload = async (event) => {
+  const file = event.target.files[0];
+  if (file) {
+    // 파일 타입 체크
+    if (!file.type.startsWith('image/')) {
+      alert('이미지 파일만 업로드 가능합니다.');
+      return;
+    }
+
+    // 파일 확장자 체크
+    const extension = file.name.split('.').pop().toLowerCase();
+    if (!['jpg', 'png'].includes(extension)) {
+      alert('JPG, PNG 파일만 업로드 가능합니다.');
+      return;
+    }
+
+    try {
+      // FormData 생성
+      const formData = new FormData();
+      formData.append('file', file);
+
+      // 파일 업로드 API 호출
+      const response = await axios.post('api/upload', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+
+      // 업로드 성공 시 URL 저장 및 미리보기 설정
+      itemImageUrl.value = response.data;
+      previewImageUrl.value = response.data;
+    } catch (error) {
+      console.error('파일 업로드 실패:', error);
+      alert('파일 업로드에 실패했습니다.');
+    }
+  }
+};
+
 // 품목 구분 데이터 가져오기
 const fetchItemDivisions = async () => {
   try {
-    const response = await axios.get('item/division');
+    const response = await axios.get('item/division'); // 상대 경로 사용
     itemDivisions.value = response.data;
   } catch (error) {
     console.error('품목 구분 데이터 가져오기 실패:', error);
@@ -79,7 +102,7 @@ const fetchItemDivisions = async () => {
 // 품목 단위 데이터 가져오기
 const fetchItemUnits = async () => {
   try {
-    const response = await axios.get('item/unit');
+    const response = await axios.get('item/unit'); // 상대 경로 사용
     itemUnits.value = response.data;
   } catch (error) {
     console.error('품목 단위 목록 가져오기 실패:', error);
@@ -87,46 +110,26 @@ const fetchItemUnits = async () => {
   }
 };
 
-// 창고 데이터 가져오기
 const fetchAllWarehouses = async () => {
   try {
-    const response = await axios.get('warehouse');
-    warehouses.value = response.data;
+    const response = await axios.get('warehouse', {
+      params: {
+        page: 1,
+        size: 100,
+        warehouseType: "WAREHOUSE"
+      }
+    });
+    // 응답 데이터 구조 확인
+    console.log(response.data);
+    warehouses.value = response.data.warehouses || response.data;
   } catch (error) {
     console.error('창고 목록 가져오기 실패:', error);
-    alert('창고 목록을 불러오는 데 실패했습니다.');
   }
 };
 
 // 품목 등록 처리
 const registerItems = async () => {
-  if (!itemName.value) {
-    alert('품목명을 입력해주세요.');
-    return;
-  } else if(!itemDivision.value) {
-    alert('품목 구분을 선택해주세요.');
-    return;
-  } else if(!itemExpiration.value) {
-    alert('품목 유통기한을 입력해주세요.')
-    return;
-  } else if(!itemPrice.value) {
-    alert('품목 단가를 입력해주세요.')
-    return;
-  } else if(!itemUnitSeq.value) {
-    alert('품목 단위를 선택해주세요.')
-    return;
-  } else if(!warehouseSeq.value) {
-    alert('보관 창고를 입력해주세요.')
-    return;
-  }
-
-  for(const bomItem of bomItems.value) {
-    console.log(bomItem.bomChildItemQuantity);
-    if(!bomItem.bomChildItemQuantity > 0) {
-      alert(`${bomItem.itemName} 품목의 수량을 입력해주세요.`);
-      return;
-    }
-  }
+  if (!validateForm()) return;
 
   const payload = {
     userSeq: 1,
@@ -138,55 +141,25 @@ const registerItems = async () => {
     itemPrice: itemPrice.value,
     itemNote: itemNote.value,
     warehouseSeq: warehouseSeq.value,
-
-    bomItemList: bomItems.value
+    bomItemList: bomItems.value,
   };
 
-  isLoading.value = true;
   try {
-    await axios.post('item', payload, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+    isLoading.value = true;
+    await axios.post('item', payload); // 상대 경로 사용
     alert('품목이 성공적으로 등록되었습니다.');
     await router.push("/item");
   } catch (error) {
-    console.error('품목 등록 실패:', error.response || error.message);
+    console.error('품목 등록 실패:', error);
     alert('품목 등록에 실패했습니다.');
   } finally {
     isLoading.value = false;
   }
 };
 
+// 품목 수정 처리
 const updateItem = async () => {
-  if (!itemName.value) {
-    alert('품목명을 입력해주세요.');
-    return;
-  } else if(!itemDivision.value) {
-    alert('품목 구분을 선택해주세요.');
-    return;
-  } else if(!itemExpiration.value) {
-    alert('품목 유통기한을 입력해주세요.')
-    return;
-  } else if(!itemPrice.value) {
-    alert('품목 단가를 입력해주세요.')
-    return;
-  } else if(!itemUnitSeq.value) {
-    alert('품목 단위를 선택해주세요.')
-    return;
-  } else if(!warehouseSeq.value) {
-    alert('보관 창고를 입력해주세요.')
-    return;
-  }
-
-  for(const bomItem of bomItems.value) {
-    console.log(bomItem.bomChildItemQuantity);
-    if(!bomItem.bomChildItemQuantity > 0) {
-      alert(`${bomItem.itemName} 품목의 수량을 입력해주세요.`);
-      return;
-    }
-  }
+  if (!validateForm()) return;
 
   const payload = {
     userSeq: 1,
@@ -198,26 +171,113 @@ const updateItem = async () => {
     itemPrice: itemPrice.value,
     itemNote: itemNote.value,
     warehouseSeq: warehouseSeq.value,
-
-    bomItemList: bomItems.value
+    bomItemList: bomItems.value,
   };
 
-  isLoading.value = true;
   try {
-    await axios.put(`item/${props.itemDTO.itemSeq}`, payload, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+    isLoading.value = true;
+    await axios.put(`item/${props.itemDTO.itemSeq}`, payload); // 상대 경로 사용
     alert('품목 수정이 완료되었습니다.');
     await router.push("/item");
   } catch (error) {
-    console.error('품목 수정 실패:', error.response || error.message);
+    console.error('품목 수정 실패:', error);
     alert('품목 수정에 실패했습니다.');
   } finally {
     isLoading.value = false;
   }
-}
+};
+
+// 폼 데이터 유효성 검사
+const validateForm = () => {
+  if (!itemName.value) {
+    alert('품목명을 입력해주세요.');
+    return false;
+  }
+  if (!itemDivision.value) {
+    alert('품목 구분을 선택해주세요.');
+    return false;
+  }
+  if (!itemExpiration.value) {
+    alert('품목 유통기한을 입력해주세요.');
+    return false;
+  }
+  if (!itemPrice.value) {
+    alert('품목 단가를 입력해주세요.');
+    return false;
+  }
+  if (!itemUnitSeq.value) {
+    alert('품목 단위를 선택해주세요.');
+    return false;
+  }
+  if (!warehouseSeq.value) {
+    alert('보관 창고를 입력해주세요.');
+    return false;
+  }
+  for (const bomItem of bomItems.value) {
+    if (!(bomItem.bomChildItemQuantity > 0)) {
+      alert(`${bomItem.itemName} 품목의 수량을 입력해주세요.`);
+      return false;
+    }
+  }
+  return true;
+};
+
+// 모달 열기/닫기
+const openModal = () => {
+  const modal = document.getElementById('bomItemModal');
+  modal.removeAttribute('aria-hidden');
+  modal.style.display = 'block';
+  modal.focus();
+};
+
+const closeModal = () => {
+  const modal = document.getElementById('bomItemModal');
+  modal.setAttribute('aria-hidden', 'true');
+  modal.style.display = 'none';
+};
+
+// 품목 목록 가져오기
+const items = ref([]);
+const itemTotalCount = ref(0);
+const itemPageSize = ref(8);
+const itemPageNumber = ref(1);
+
+const fetchItems = async () => {
+  try {
+    const response = await axios.get('item', {
+      params: {
+        page: itemPageNumber.value,
+        size: itemPageSize.value,
+        itemDivisions: ["PART", "SUB"],
+      },
+    });
+    items.value = response.data.content;
+    itemTotalCount.value = response.data.totalElements;
+  } catch (error) {
+    console.error('품목 목록 조회 실패:', error);
+  }
+};
+
+watch(itemPageNumber, () => {
+  fetchItems();
+});
+
+// 선택된 아이템 관리
+const selectedItems = ref([]);
+const bomItems = ref([]);
+
+const toggleSelection = (itemSeq) => {
+  if (selectedItems.value.includes(itemSeq)) {
+    selectedItems.value = selectedItems.value.filter(seq => seq !== itemSeq);
+    bomItems.value = bomItems.value.filter(item => item.itemSeq !== itemSeq);
+  } else {
+    selectedItems.value.push(itemSeq);
+    const matchedItem = items.value.find(item => item.itemSeq === itemSeq);
+    if (matchedItem) {
+      bomItems.value.push({ ...matchedItem, bomChildItemQuantity: 0 });
+    }
+  }
+};
 
 // 초기 데이터 로드
 onMounted(() => {
@@ -226,75 +286,6 @@ onMounted(() => {
   fetchAllWarehouses();
   fetchItems();
 });
-
-const items = ref([]);
-const itemTotalCount = ref(0);
-const itemPageSize = ref(8);
-const itemPageNumber = ref(1);
-
-watch(itemPageNumber, () => {
-  fetchItems();
-});
-
-const fetchItems = async () => {
-  try {
-    const response = await axios.get(`item`, {
-      params: {
-        page: itemPageNumber.value,
-        size: itemPageSize.value,
-        itemDivisions: ["PART", "SUB"]
-      }, paramsSerializer: (params) => {
-        // null이나 undefined 값을 필터링
-        const filteredParams = Object.fromEntries(
-            Object.entries(params).filter(([_, value]) => value !== null && value !== undefined)
-        );
-        return new URLSearchParams(filteredParams).toString();
-      }
-    });
-    console.log(response.data)
-    items.value = response.data.content;
-    itemTotalCount.value = response.data.totalElements;
-  } catch (error) {
-    console.log(`품목 목록 조회 실패`, error);
-  }
-}
-
-function openModal() {
-  const modal = document.getElementById('bomItemModal');
-  modal.removeAttribute('aria-hidden'); // 모달 활성화 시 aria-hidden 제거
-  modal.style.display = 'block';
-  modal.focus(); // 포커스를 모달로 이동
-}
-
-function closeModal() {
-  const modal = document.getElementById('bomItemModal');
-  modal.setAttribute('aria-hidden', 'true'); // 모달 비활성화 시 aria-hidden 추가
-  modal.style.display = 'none';
-}
-
-const itemDivisionMap = {
-  FINISHED: "완제품",
-  PART: "부재료",
-  SUB: "원재료",
-};
-
-// 선택된 아이템 저장
-const selectedItems = ref([]);
-const bomItems = ref([]);
-
-// 선택 상태 토글
-const toggleSelection = (itemSeq) => {
-  if (selectedItems.value.includes(itemSeq)) {
-    selectedItems.value = selectedItems.value.filter((seq) => seq !== itemSeq);
-    bomItems.value = items.value.filter((item) => selectedItems.value.includes(item.itemSeq));
-  } else {
-    selectedItems.value.push(itemSeq);
-    // 선택된 itemSeq와 일치하는 항목을 items에서 찾기
-    const matchedItem = items.value.find((item) => item.itemSeq === itemSeq);
-
-    bomItems.value.push(matchedItem);
-  }
-};
 
 </script>
 
@@ -358,10 +349,26 @@ const toggleSelection = (itemSeq) => {
             <option v-for="warehouse in warehouses" :key="warehouse.warehouseSeq" :value="warehouse.warehouseSeq">{{ warehouse.warehouseName }}</option>
           </b-form-select>
         </b-form-group>
-        <!-- 이미지 URL -->
-        <b-form-group label-cols="3" label-size="default" label="이미지 URL" label-for="itemImageUrl">
+        <!-- 파일 선택 -->
+        <b-form-group label-cols="3" label-size="default" label="이미지" label-for="itemImage">
           <b-input-group size="sm">
-            <b-form-input type="text" id="itemImageUrl" v-model="itemImageUrl" @input="updatePreviewImage" placeholder="이미지 URL을 입력하세요"/>
+            <input
+                type="file"
+                id="itemImage"
+                ref="fileInput"
+                accept="image/*"
+                style="display: none"
+                @change="handleFileUpload"
+            />
+            <b-button
+                size="sm"
+                variant="light"
+                class="button"
+                @click="$refs.fileInput.click()"
+            >
+              파일 선택
+            </b-button>
+            <span v-if="itemImageUrl" class="ms-2 align-self-center">{{ itemImageUrl }}</span>
           </b-input-group>
         </b-form-group>
         <!-- 품목 비고 -->

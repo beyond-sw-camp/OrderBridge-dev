@@ -1,0 +1,121 @@
+name: Frontend Workflows
+
+on:
+  push:
+    branches:
+      - main # main으로 push하면 workflow 실행
+    paths:
+      - 'SCM/frontend/**'
+  pull_request:
+    types: [ opened, reopened, synchronize ]  # Pull Request가 열리거나, 다시 열리거나, 동기화될 때 트리거됩니다.
+    branches:
+      - main # main으로 pr하면 workflow 실행
+
+jobs:
+  CI:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest # 최신 Ubuntu 환경
+    permissions:
+      contents: read # contents read 권한을 부여
+
+    steps:
+      - uses: actions/checkout@v4 # 레포지토리 코드를 체크아웃 [v4라고 버전 지정 시 v4로 시작하는 최신 릴리즈 버전을 사용 (정확한 버전 기입 시 해당 릴리즈 버전만 사용)]
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 20
+
+      - name: Create .env.template
+        run: |
+          mkdir -p SCM/frontend
+          cat > SCM/frontend/.env.template <<EOL
+
+          VITE_API_URL=\${BACKEND_URL}
+          EOF
+      - name: Set env
+        run: |
+          envsubst < SCM/frontend/.env.template > SCM/frontend/.env
+          echo "Generated .env:"
+          cat SCM/frontend/.env
+        env:
+          BACKEND_URL: ${{ secrets.BACKEND_URL }}
+          
+      - name: Install dependencies
+        run: npm install
+        working-directory: ./SCM/frontend
+
+      - name: Build project
+        run: npm run build
+        working-directory: ./SCM/frontend
+
+      - name: Deploy to S3
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+        run: |
+          aws s3 sync ./SCM/frontend/dist s3://${{ secrets.S3_BUCKET_NAME }} --delete
+
+      - name: Invalidate CloudFront Cache
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          CLOUDFRONT_DISTRIBUTION_ID: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
+        run: |
+          aws cloudfront create-invalidation --distribution-id $CLOUDFRONT_DISTRIBUTION_ID --paths "/*"
+
+  CD:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest # 최신 Ubuntu 환경
+    permissions:
+      contents: read # contents read 권한을 부여
+
+    steps:
+      - uses: actions/checkout@v4 # 레포지토리 코드를 체크아웃 [v4라고 버전 지정 시 v4로 시작하는 최신 릴리즈 버전을 사용 (정확한 버전 기입 시 해당 릴리즈 버전만 사용)]
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 20
+
+      - name: Create .env.template
+        run: |
+          mkdir -p SCM/frontend
+          cat > SCM/frontend/.env.template <<EOL
+
+          VITE_API_URL=\${BACKEND_URL}
+          EOF
+      - name: Set env
+        run: |
+          envsubst < SCM/frontend/.env.template > SCM/frontend/.env
+          echo "Generated .env:"
+          cat SCM/frontend/.env
+        env:
+          BACKEND_URL: ${{ secrets.BACKEND_URL }}
+
+      - name: Install dependencies
+        run: npm install
+        working-directory: ./SCM/frontend
+
+      - name: Build project
+        run: npm run build
+        working-directory: ./SCM/frontend
+
+      - name: Deploy to S3
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+        run: |
+          aws s3 sync ./SCM/frontend/dist s3://${{ secrets.S3_BUCKET_NAME }} --delete
+
+      - name: Invalidate CloudFront Cache
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          CLOUDFRONT_DISTRIBUTION_ID: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
+        run: |
+          aws cloudfront create-invalidation --distribution-id $CLOUDFRONT_DISTRIBUTION_ID --paths "/*"

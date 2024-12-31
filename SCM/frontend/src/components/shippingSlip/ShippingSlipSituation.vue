@@ -115,7 +115,7 @@ const printTable = () => {
                   <td>{{ shippingSlipSituation.shippingSlipNote }}</td>
                 </tr>
                 <tr v-else class="monthly-total">
-                  <td> - </td>
+                  <td>{{ index+1 }}</td>
                   <td>{{ shippingSlipSituation.shippingSlipShippingMonthDate }}</td>
                   <td> - </td>
                   <td>{{ shippingSlipSituation.shippingSlipTotalQuantitySum }} 개</td>

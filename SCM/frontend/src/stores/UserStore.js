@@ -8,13 +8,14 @@ export const useUserStore = defineStore('user', {
     isAuthenticated: false,
     isLoggingOut: false,
     error: null,
+    userId: null,
   }),
 
   actions: {
     async login(employeeNo, pwd) {
       this.error = null;
       try {
-        const response = await axios.post('http://localhost:8090/api/v1/login', {
+        const response = await axios.post(`${import.meta.env.VITE_API_URL}/login`, {
           userEmployeeNo: employeeNo,
           userPwd: pwd,
         });
@@ -24,6 +25,9 @@ export const useUserStore = defineStore('user', {
 
         if (accessToken) {
           this.isAuthenticated = true;
+          // JWT 토큰의 페이로드 추출
+          const payload = JSON.parse(atob(accessToken.split('.')[1]));
+          this.userId = payload.sub;
 
           // JWT 토큰 로컬 스토리지에 저장
           localStorage.setItem('accessToken', accessToken);
@@ -43,6 +47,7 @@ export const useUserStore = defineStore('user', {
         await customAxios.post(`user/logout`);
 
         this.isAuthenticated = false;
+        this.userId = null;
         await router.push("/");
 
         localStorage.removeItem('accessToken');
@@ -53,12 +58,16 @@ export const useUserStore = defineStore('user', {
         this.isLoggingOut = false; // 로그아웃 상태 해제
       }
     },
+
     initialize() {
       const token = localStorage.getItem('accessToken');
 
       if (token) {
         try {
           this.isAuthenticated = true;
+          // JWT 토큰의 페이로드 추출
+          const payload = JSON.parse(atob(token.split('.')[1]));
+          this.userId = payload.sub;
         } catch (error) {
           console.error('Token parsing error:', error);
           this.logout(); // 토큰이 유효하지 않으면 로그아웃 처리

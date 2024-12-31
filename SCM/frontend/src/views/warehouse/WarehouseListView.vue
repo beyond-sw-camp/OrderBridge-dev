@@ -1,6 +1,6 @@
 <script setup>
 import { onMounted, ref, watch } from 'vue';
-import axios from 'axios';
+import axios from "@/axios";
 import { BInputGroup, BFormInput, BFormCheckbox, BButton } from 'bootstrap-vue-3';
 import { useRouter } from "vue-router";
 import dayjs from "dayjs";
@@ -28,7 +28,7 @@ const warehouseTypeMap = {
 
 const findWarehousesByFilter = async () => {
   try {
-    const response = await axios.get("http://localhost:8090/api/v1/warehouse", {
+    const response = await axios.get("warehouse", { // 상대 경로 사용
       params: {
         page: currentPage.value,
         size: perPage.value,
@@ -45,7 +45,7 @@ const findWarehousesByFilter = async () => {
 };
 
 watch([searchName, selectedType], () => {
-  currentPage.value = 1;  // 검색 조건 변경시 첫 페이지로
+  currentPage.value = 1; // 검색 조건 변경 시 첫 페이지로 이동
   findWarehousesByFilter();
 });
 
@@ -63,14 +63,14 @@ function checkWarehouseType(key) {
 
 const toggleDetails = async (index, warehouse) => {
   if (expandedIndex.value === index) {
-    expandedIndex.value = null;
+    expandedIndex.value = null; // 이미 확장된 항목은 닫기
   } else {
     try {
-      const response = await axios.get(`http://localhost:8090/api/v1/warehouse/${warehouse.warehouseSeq}`);
+      const response = await axios.get(`warehouse/${warehouse.warehouseSeq}`); // 상대 경로 사용
       expandedIndex.value = index;
       const warehouseIndex = warehouses.value.findIndex(w => w.warehouseSeq === warehouse.warehouseSeq);
       if (warehouseIndex !== -1) {
-        warehouses.value[warehouseIndex] = { ...warehouses.value[warehouseIndex], ...response.data };
+        warehouses.value[warehouseIndex] = { ...warehouses.value[warehouseIndex], ...response.data }; // 상세 정보 추가
       }
     } catch (error) {
       console.error("창고 상세 정보 조회 실패:", error);
@@ -82,7 +82,7 @@ const deleteWarehouse = async (seq) => {
   const result = confirm("정말 삭제하시겠습니까?");
   if (result) {
     try {
-      await axios.delete(`http://localhost:8090/api/v1/warehouse/${seq}`);
+      await axios.delete(`warehouse/${seq}`); // 상대 경로 사용
       alert('창고가 삭제되었습니다.');
       findWarehousesByFilter(); // 삭제 후 목록 갱신
     } catch (error) {

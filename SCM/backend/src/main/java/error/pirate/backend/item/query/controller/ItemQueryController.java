@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/v1/item")
 @RequiredArgsConstructor
-@Tag(name = "품목 관리", description = "품목 관리 API")
+@Tag(name = "Item", description = "품목 관리")
 public class ItemQueryController {
 
     private final ItemQueryService itemQueryService;

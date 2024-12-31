@@ -1,10 +1,9 @@
 <script setup>
 import { onMounted, ref, watch } from 'vue';
-import axios from "@/axios";
+import axios from '@/axios'; // axios 인스턴스 사용
 import { BInputGroup, BFormInput, BFormCheckbox, BButton, BInputGroupText, BPagination } from 'bootstrap-vue-3';
-import {useRouter} from "vue-router";
+import { useRouter } from "vue-router";
 import dayjs from "dayjs";
-import item from "../../router/item.js";
 import editIcon from "@/assets/editIcon.svg";
 import trashIcon from "@/assets/trashIcon.svg";
 
@@ -15,16 +14,10 @@ const searchName = ref("");
 const rows = ref(0);
 const perPage = ref(4);
 const currentPage = ref(1);
+const loadingImages = ref(new Set());
 
-// 유통기한 필터용 상태 (일 단위)
 const minExpiration = ref(null);
 const maxExpiration = ref(null);
-
-const itemDivisionList = [
-  { key: 'FINISHED', value: '완제품' },
-  { key: 'PART', value: '부재료' },
-  { key: 'SUB', value: '원재료' },
-];
 
 const itemDivisionMap = {
   FINISHED: "완제품",
@@ -32,19 +25,17 @@ const itemDivisionMap = {
   SUB: "원재료",
 };
 
+const itemDivisionList = [
+  { key: 'FINISHED', value: '완제품' },
+  { key: 'PART', value: '부재료' },
+  { key: 'SUB', value: '원재료' },
+];
+
 const findItemsByFilter = async () => {
-  itemDTO.value = null;
-  console.log("현재 검색어:", searchName.value);
-  console.log("현재 선택된 품목 구분:", selectedDivisions.value);
-  console.log("현재 페이지:", currentPage.value);
-  console.log("유통기한 범위:", minExpiration.value, "~", maxExpiration.value);
-
-  if (currentPage.value < 1) currentPage.value = 1;
-
-  const minHour = (minExpiration.value != null && minExpiration.value >= 0) ? minExpiration.value * 24 : null;
-  const maxHour = (maxExpiration.value != null && maxExpiration.value >= 0) ? maxExpiration.value * 24 : null;
-
   try {
+    const minHour = minExpiration.value != null ? minExpiration.value * 24 : null;
+    const maxHour = maxExpiration.value != null ? maxExpiration.value * 24 : null;
+
     const response = await axios.get("item", {
       params: {
         page: currentPage.value,
@@ -53,47 +44,78 @@ const findItemsByFilter = async () => {
         itemDivisions: selectedDivisions.value.length > 0 ? selectedDivisions.value : null,
         minExpirationHour: minHour,
         maxExpirationHour: maxHour,
-      }, paramsSerializer: (params) => {
+      },
+      paramsSerializer: (params) => {
         const searchParams = new URLSearchParams();
         for (const key in params) {
           const value = params[key];
           if (Array.isArray(value)) {
-            value.forEach(v => {
-            if (v !== null && v !== undefined) {
-              searchParams.append(key, v);
-              }
+            value.forEach((v) => {
+              if (v != null) searchParams.append(key, v);
             });
-          } else if (value !== null && value !== undefined) {
+          } else if (value != null) {
             searchParams.append(key, value);
           }
         }
         return searchParams.toString();
       }
     });
-    console.log("서버 응답 데이터:", response.data);
 
     rows.value = response.data.totalElements;
     items.value = response.data.content;
+    loadingImages.value = new Set(items.value.map((item) => item.itemSeq));
   } catch (error) {
     console.error("데이터 불러오기 실패:", error);
   }
 };
+const handleImageLoad = (itemSeq) => {
+  loadingImages.value.delete(itemSeq);
+};
 
-// 검색어 변경 시 자동 검색
-watch(searchName, (newValue) => {
-  console.log("검색어 변경됨:", newValue);
+const handleImageError = (itemSeq) => {
+  loadingImages.value.delete(itemSeq);
+};
+
+const getImageUrl = (url) => {
+  return url || '/no-image.png';
+};
+
+function checkItemDivision(key) {
+  const index = selectedDivisions.value.indexOf(key);
+  if (index > -1) {
+    selectedDivisions.value.splice(index, 1);
+  } else {
+    selectedDivisions.value.push(key);
+  }
   findItemsByFilter();
+}
+
+const childItemList = ref([]);
+const itemInventoryList = ref([]);
+const itemDTO = ref();
+const itemInventory = ref();
+const itemInventoryCurrentPage = ref(0);
+
+const itemDetail = async (itemSeq) => {
+  itemInventoryCurrentPage.value = 0;
+  try {
+    const response = await axios.get(`item/${itemSeq}`);
+    childItemList.value = response.data.childItemList;
+    itemInventoryList.value = response.data.itemInventoryList;
+    itemDTO.value = response.data.itemDTO;
+    itemInventory.value = itemInventoryList.value[0];
+  } catch (error) {
+    console.error("품목 상세보기 불러오기 실패:", error);
+  }
+};
+
+watch(itemInventoryCurrentPage, () => {
+  itemInventory.value = itemInventoryList.value[itemInventoryCurrentPage.value - 1];
 });
 
-// 페이지 변경 시 자동 검색
-watch(currentPage, () => {
-  findItemsByFilter();
-});
-
-  // 유통기한 변경 시 자동 검색
-watch([minExpiration, maxExpiration], () => {
-  findItemsByFilter();
-});
+watch(searchName, findItemsByFilter);
+watch(currentPage, findItemsByFilter);
+watch([minExpiration, maxExpiration], findItemsByFilter);
 
 onMounted(() => {
   findItemsByFilter();
@@ -103,50 +125,14 @@ const handleItemUpdate = (itemSeq) => {
   router.push(`/item/update/${itemSeq}`);
 };
 
-function checkItemDivision(key) {
-  const index = selectedDivisions.value.indexOf(key);
-  if (index > -1) {
-  selectedDivisions.value.splice(index, 1);
-} else {
-  selectedDivisions.value.push(key);
-}
-  findItemsByFilter();
-}
-
-const childItemList = ref([]);
-const itemInventoryList = ref([]);
-const itemDTO = ref();
-const itemInventoryCurrentPage = ref(0);
-const itemInventory = ref();
-
-const itemDetail = async (itemSeq) => {
-  itemInventoryCurrentPage.value = 0;
-
-  try {
-    const response = await axios.get(`item/${itemSeq}`)
-
-    childItemList.value = response.data.childItemList;
-    itemInventoryList.value = response.data.itemInventoryList;
-    itemDTO.value = response.data.itemDTO;
-    itemInventory.value = itemInventoryList.value[0];
-    console.log(response.data);
-  } catch (error) {
-    console.error("품목 상세보기 불러오기 실패 :", error);
-  }
-}
-
 const itemDelete = async (itemSeq) => {
-  try{
-    await axios.delete(`item/${itemSeq}`)
+  try {
+    await axios.delete(`item/${itemSeq}`);
+    findItemsByFilter();
   } catch (error) {
     alert(`품목 삭제 실패`);
   }
-}
-watch(itemInventoryCurrentPage, () => {
-  itemInventory.value = itemInventoryList.value[itemInventoryCurrentPage.value - 1];
-})
-
-
+};
 </script>
 
 <template>
@@ -184,14 +170,12 @@ watch(itemInventoryCurrentPage, () => {
           <p class="card-title">품목 유통기한</p>
           <div class="d-flex align-items-center">
             <div class="input-group" style="width: 100px;">
-              <!-- 유통기한 최소값 입력 -->
               <input type="number" class="form-control text-center" placeholder=""
                      v-model.number="minExpiration" />
               <span class="input-group-text">일</span>
             </div>
             <span class="mx-2">~</span>
             <div class="input-group" style="width: 100px;">
-              <!-- 유통기한 최대값 입력 -->
               <input type="number" class="form-control text-center" placeholder=""
                      v-model.number="maxExpiration" />
               <span class="input-group-text">일</span>
@@ -200,7 +184,6 @@ watch(itemInventoryCurrentPage, () => {
         </div>
       </div>
     </div>
-    <!-- 리스트 출력 부분 -->
     <div class="col-md-9">
       <div style="width: 90%;">
         <div class="d-flex justify-content-between">
@@ -216,9 +199,19 @@ watch(itemInventoryCurrentPage, () => {
         <div class="list-headline row"></div>
         <div style="max-height: 600px; overflow-y: auto;">
           <div class="item-container">
-            <div v-for="item in items" :key="item.id" class="item-card" @click="itemDetail(item.itemSeq)">
+            <div v-for="item in items" :key="item.itemSeq" class="item-card" @click="itemDetail(item.itemSeq)">
               <div class="item-image">
-                <img :src="item.itemImageUrl" alt="품목 이미지" />
+                <div v-if="loadingImages.has(item.itemSeq)" class="image-loading">
+                  <div class="spinner"></div>
+                </div>
+                <img
+                    :src="getImageUrl(item.itemImageUrl)"
+                    :alt="item.itemName"
+                    @load="handleImageLoad(item.itemSeq)"
+                    @error="handleImageError(item.itemSeq)"
+                    class="item-img"
+                    :class="{ 'hidden': loadingImages.has(item.itemSeq) }"
+                />
               </div>
               <div class="item-content">
                 <p class="item-name">{{ item.itemName }}</p>
@@ -228,21 +221,21 @@ watch(itemInventoryCurrentPage, () => {
                   <li>단가: {{ item.itemPrice.toLocaleString() }} ₩</li>
                 </ul>
                 <div class="d-flex justify-content-end mt-3">
-                  <editIcon @click="handleItemUpdate(item.itemSeq)" class="icon"/>
-                  <trashIcon @click="itemDelete(item.itemSeq)" class="icon"/>
+                  <editIcon @click.stop="handleItemUpdate(item.itemSeq)" class="icon"/>
+                  <trashIcon @click.stop="itemDelete(item.itemSeq)" class="icon"/>
                 </div>
               </div>
             </div>
           </div>
-          <!-- 클릭 시 하단 상세보기 -->
           <div v-if="itemDTO" class="mt-4 p-4 border rounded shadow-sm bg-light">
             <div class="row">
-              <!-- 이미지 -->
               <div class="col-md-2">
-                <img :src="itemDTO.itemImageUrl" class="img-fluid rounded" alt="상세 이미지"/>
+                <img
+                    :src="getImageUrl(itemDTO.itemImageUrl)"
+                    class="img-fluid rounded detail-img"
+                    :alt="itemDTO.itemName"
+                />
               </div>
-
-              <!-- BOM 정보 -->
               <div class="col-md-3">
                 <h5 class="item-name">{{ itemDTO.itemName }} BOM</h5>
                 <ul class="list-unstyled">
@@ -251,8 +244,6 @@ watch(itemInventoryCurrentPage, () => {
                   </li>
                 </ul>
               </div>
-
-              <!-- 재고 정보 -->
               <div v-if="itemInventoryList.length > 0" class="col-md-6">
                 <h5 class="item-name">재고 조회</h5>
                 <ul class="list-unstyled">
@@ -285,34 +276,82 @@ watch(itemInventoryCurrentPage, () => {
   display: flex;
   flex-wrap: wrap;
   gap: 20px;
-  justify-content: space-between;
+  justify-content: flex-start;
 }
 
 .item-card {
-  flex: 1 1 calc(25% - 20px);
-  max-width: calc(25% - 20px);
+  flex: 0 0 calc(25% - 20px);
   border: 1px solid #ddd;
   border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   background-color: #fff;
-  text-align: center;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+}
+
+.item-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.item-image {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  background-color: #f8f9fa;
   overflow: hidden;
 }
 
-.item-image img {
+.item-img {
   width: 100%;
-  height: 120px;
-  object-fit: cover; /* 이미지 비율 유지 */
+  height: 100%;
+  object-fit: contain;
+  transition: opacity 0.3s ease;
+}
+
+.image-loading {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f8f9fa;
+}
+
+.spinner {
+  width: 30px;
+  height: 30px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #3498db;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.hidden {
+  opacity: 0;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 .item-content {
-  padding: 10px;
+  padding: 15px;
 }
 
 .item-name {
   font-size: 1.1em;
   font-weight: bold;
   margin-bottom: 8px;
+  color: #333;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .item-content ul {
@@ -320,11 +359,32 @@ watch(itemInventoryCurrentPage, () => {
   padding: 0;
   margin: 0;
   font-size: 0.9em;
-  text-align: left;
 }
 
 .item-content li {
   margin: 5px 0;
+  color: #666;
+}
+
+.detail-img {
+  width: 100%;
+  height: auto;
+  max-height: 200px;
+  object-fit: contain;
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+}
+
+.icon {
+  width: 20px;
+  height: 20px;
+  margin-left: 10px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.icon:hover {
+  transform: scale(1.1);
 }
 
 div {
@@ -334,36 +394,35 @@ div {
 .button {
   background-color: #FFF8E7;
   border: 1px solid;
+  transition: background-color 0.2s ease;
+}
+
+.button:hover {
+  background-color: #FFE4B5;
 }
 
 .side-box {
   min-height: 100px;
   margin-top: 20px;
+  border: 1px solid #dee2e6;
 }
 
 .card-title {
   font-size: medium;
   font-weight: bold;
+  color: #333;
 }
 
 .list-headline {
-  border-bottom: 1px solid black;
+  border-bottom: 1px solid #dee2e6;
   margin-bottom: 10px;
   padding: 20px 40px 20px 20px;
 }
 
 .page-center {
-  justify-items: center;
+  display: flex;
+  justify-content: center;
   margin-top: 20px;
 }
 
-.icon {
-
-  width: 20px;
-  height: 20px;
-  right: 10px; /* 오른쪽 끝에서 10px 간격 */
-  top: 50%; /* 세로 중앙에 배치 */
-  transform: translateY(-50%); /* 세로 중앙 정렬 */
-  cursor: pointer; /* 마우스 포인터 추가 */
-}
 </style>

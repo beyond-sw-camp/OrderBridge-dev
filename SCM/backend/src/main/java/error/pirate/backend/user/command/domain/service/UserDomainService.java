@@ -19,4 +19,9 @@ public class UserDomainService {
         return userRepository.findById(userSeq)
                 .orElseThrow(() -> new CustomException(ErrorCodeType.USER_NOT_FOUND));
     }
+
+    public User findByUserEmployeeNo(String userEmployeeNo) {
+        return userRepository.findByUserEmployeeNo(userEmployeeNo)
+                .orElseThrow(() -> new CustomException(ErrorCodeType.USER_NOT_FOUND));
+    }
 }

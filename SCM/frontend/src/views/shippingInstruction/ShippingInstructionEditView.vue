@@ -191,12 +191,8 @@ const updateShippingInstruction = async (formData, itemData, seq) => {
   } catch (error) {
     if (error.response) {
       // 서버에서 반환된 상태 코드에 따른 처리
-      if (error.response.status === 400) {
-        console.error(`출하지시서 등록 실패 : ${error.response.data.message}`);
-        alert(`${error.response.data.message}`);
-      } else {
-        console.error(`출하지시서 등록 실패 : 상태 코드 ${error.response.status}`);
-      }
+      console.error(`출하지시서 수정 실패 : ${error.response.data.message}`);
+      alert(`${error.response.data.message}`);
     }
   }
 };

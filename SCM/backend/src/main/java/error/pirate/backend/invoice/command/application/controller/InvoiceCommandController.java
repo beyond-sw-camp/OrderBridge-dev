@@ -1,6 +1,7 @@
 package error.pirate.backend.invoice.command.application.controller;
 
 import error.pirate.backend.invoice.command.application.dto.CreateInvoiceRequest;
+import error.pirate.backend.invoice.command.application.dto.UpdateInvoiceRequest;
 import error.pirate.backend.invoice.command.application.service.InvoiceCommandService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

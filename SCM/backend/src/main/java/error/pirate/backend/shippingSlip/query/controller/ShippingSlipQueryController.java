@@ -7,16 +7,21 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
-@Tag(name = "출하전표")
 @RestController
 @RequiredArgsConstructor    // final 을 받은 필드의 생성자를 주입
 @RequestMapping("/api/v1/shipping-slip")
 @Slf4j
+@Tag(name = "Shipping Slip", description = "출하전표")
 public class ShippingSlipQueryController {
     private final ShippingSlipQueryService shippingSlipQueryService;
 
@@ -42,19 +47,6 @@ public class ShippingSlipQueryController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/excelDown")
-    @Operation(summary = "출하전표 엑셀 다운")
-    public ResponseEntity<byte[]> shippingInstructionExcelDown(ShippingSlipListRequest request) {
-        byte[] excelData = shippingSlipQueryService.shippingSlipExcelDown(request);
-
-        HttpHeaders headersResponse = new HttpHeaders();
-        headersResponse.setContentLength(excelData.length);
-
-        return ResponseEntity.ok()
-                .headers(headersResponse)
-                .body(excelData);
-    }
-
     @Operation(summary = "출하전표 현황 조회", description = "출하전표 현황 조회")
     @GetMapping("/situation")
     public ResponseEntity<List<ShippingSlipSituationResponse>> readShippingSlipSituation(
@@ -66,18 +58,20 @@ public class ShippingSlipQueryController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/situation/excelDown")
-    @Operation(summary = "출하전표 현황 엑셀 다운")
-    public ResponseEntity<byte[]> shippingSlipSituationExcelDown(
-            @ModelAttribute ShippingSlipSituationRequest request) {
+    @GetMapping("/excel")
+    @Operation(summary = "출하전표 엑셀 다운")
+    public ResponseEntity<byte[]> shippingInstructionExcel(ShippingSlipListRequest request) {
 
-        byte[] excelData = shippingSlipQueryService.shippingSlipSituationExcelDown(request);
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + URLEncoder.encode(
+                new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date()) + "_출하전표.xlsx"
+                , StandardCharsets.UTF_8));
 
-        HttpHeaders headersResponse = new HttpHeaders();
-        headersResponse.setContentLength(excelData.length);
+        byte[] excelData = shippingSlipQueryService.shippingSlipExcel(request);
 
         return ResponseEntity.ok()
-                .headers(headersResponse)
+                .headers(httpHeaders)
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(excelData);
     }
 }

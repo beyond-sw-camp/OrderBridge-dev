@@ -11,6 +11,7 @@ import error.pirate.backend.shippingInstruction.command.domain.aggregate.entity.
 import error.pirate.backend.shippingInstruction.command.domain.service.ShippingInstructionDomainService;
 import error.pirate.backend.shippingInstruction.command.domain.service.ShippingInstructionItemDomainService;
 import error.pirate.backend.user.command.domain.aggregate.entity.User;
+import error.pirate.backend.user.command.domain.service.UserDomainService;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,12 +29,13 @@ public class ShippingInstructionApplicationService {
     private final ShippingInstructionDomainService shippingInstructionDomainService;
     private final ShippingInstructionItemDomainService shippingInstructionItemDomainService;
     private final ItemService itemService;
+    private final UserDomainService userDomainService;
     private final EntityManager entityManager;
     private final NameGenerator nameGenerator;
 
     /* 출하지시서 등록 */
     @Transactional
-    public void createShippingInstruction(ShippingInstructionRequest shippingInstructionRequest) {
+    public void createShippingInstruction(ShippingInstructionRequest shippingInstructionRequest, String userNo) {
 
         // 불러온 주문서가 있으면 주문서 확인 절차
         shippingInstructionItemDomainService.validateItem(
@@ -42,8 +44,8 @@ public class ShippingInstructionApplicationService {
         SalesOrder salesOrder = entityManager.getReference(SalesOrder.class, shippingInstructionRequest.getSalesOrderSeq());
         // 주문서가 생산완료 상태인지 체크
         shippingInstructionDomainService.checkSalesOrderStatus(salesOrder);
-        // 출하지시서 유저는 주문서 작성 유저
-        User user = salesOrder.getUser();
+        // 출하지시서 유저는 현재 로그인한 유저
+        User user = userDomainService.findByUserEmployeeNo(userNo);
         /* 등록일 설정 공통코드 */
         String shippingInstructionName = nameGenerator.nameGenerator(ShippingInstruction.class);
 
@@ -87,13 +89,17 @@ public class ShippingInstructionApplicationService {
 
     /* 출하지시서 수정 */
     @Transactional
-    public void updateShippingInstruction(Long shippingInstructionSeq, ShippingInstructionRequest shippingInstructionRequest) {
+    public void updateShippingInstruction(Long shippingInstructionSeq, ShippingInstructionRequest shippingInstructionRequest, String userNo) {
         // 불러온 주문서가 있으면 주문서 확인 절차
         shippingInstructionItemDomainService.validateItem(
                 shippingInstructionRequest.getSalesOrderSeq(), shippingInstructionRequest.getShippingInstructionItems());
 
         /* 출하지시서 찾기 */
         ShippingInstruction shippingInstruction = shippingInstructionDomainService.findByShippingInstructionSeq(shippingInstructionSeq);
+
+        // 현재 로그인한 유저가 접근 가능한지 체크
+        User user = userDomainService.findByUserEmployeeNo(userNo);
+        shippingInstructionDomainService.checkUser(shippingInstruction, user);
 
         /* 수정이 가능한 상태인지 체크 */
         shippingInstructionDomainService.checkShippingInstructionApprovalStatus(shippingInstruction.getShippingInstructionStatus());
@@ -102,8 +108,7 @@ public class ShippingInstructionApplicationService {
         SalesOrder salesOrder = entityManager.getReference(SalesOrder.class, shippingInstructionRequest.getSalesOrderSeq());
         // 주문서가 생산완료 상태인지 체크
         shippingInstructionDomainService.checkSalesOrderStatus(salesOrder);
-        // 출하지시서 유저는 주문서 작성 유저
-        User user = salesOrder.getUser();
+
         /* 출하예정일을 서울 시간으로 변경 */
         LocalDateTime shippingInstructionScheduledShipmentDate =
                 shippingInstructionDomainService.setShippingInstructionScheduledShipmentDate(
@@ -140,9 +145,13 @@ public class ShippingInstructionApplicationService {
 
     /* 출하지시서 결재 상태 변경 */
     @Transactional
-    public void updateShippingInstructionApprovalStatus(Long shippingInstructionSeq) {
+    public void updateShippingInstructionApprovalStatus(Long shippingInstructionSeq, String userNo) {
         /* 출하지시서 찾기 */
         ShippingInstruction shippingInstruction = shippingInstructionDomainService.findByShippingInstructionSeq(shippingInstructionSeq);
+
+        // 현재 로그인한 유저가 접근 가능한지 체크
+        User user = userDomainService.findByUserEmployeeNo(userNo);
+        shippingInstructionDomainService.checkUser(shippingInstruction, user);
 
         /* 결재전인지 체크 */
         shippingInstructionDomainService.checkShippingInstructionApprovalStatus(shippingInstruction.getShippingInstructionStatus());
@@ -153,9 +162,13 @@ public class ShippingInstructionApplicationService {
 
     /* 출하지시서 삭제 */
     @Transactional
-    public void deleteShippingInstruction(Long shippingInstructionSeq) {
+    public void deleteShippingInstruction(Long shippingInstructionSeq, String userNo) {
         /* 출하지시서 찾기 */
         ShippingInstruction shippingInstruction = shippingInstructionDomainService.findByShippingInstructionSeq(shippingInstructionSeq);
+
+        // 현재 로그인한 유저가 접근 가능한지 체크
+        User user = userDomainService.findByUserEmployeeNo(userNo);
+        shippingInstructionDomainService.checkUser(shippingInstruction, user);
 
         /* 결재전인지 체크 */
         shippingInstructionDomainService.checkShippingInstructionApprovalStatus(shippingInstruction.getShippingInstructionStatus());
