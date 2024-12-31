@@ -15,7 +15,6 @@ export const useUserStore = defineStore('user', {
     async login(employeeNo, pwd) {
       this.error = null;
       try {
-        console.log(`${import.meta.env.VITE_API_URL}/login`);
         const response = await axios.post(`${import.meta.env.VITE_API_URL}/login`, {
           userEmployeeNo: employeeNo,
           userPwd: pwd,
