@@ -39,7 +39,7 @@ jobs:
           echo "Generated .env:"
           cat SCM/frontend/.env
         env:
-          RDS_HOSTNAME: ${{ secrets.BACKEND_URL }}
+          BACKEND_URL: ${{ secrets.BACKEND_URL }}
           
       - name: Install dependencies
         run: npm install
@@ -93,7 +93,7 @@ jobs:
           echo "Generated .env:"
           cat SCM/frontend/.env
         env:
-          RDS_HOSTNAME: ${{ secrets.BACKEND_URL }}
+          BACKEND_URL: ${{ secrets.BACKEND_URL }}
 
       - name: Install dependencies
         run: npm install
