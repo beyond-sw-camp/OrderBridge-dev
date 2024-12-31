@@ -13,7 +13,7 @@ const props = defineProps({
   workOrderItem: {type: Object, required: false},       // 작업지시서 목록
   salesOrder: { type: Object, required: false },      // 주문서 정보
   stockStatusList: { type: Array, required: false },  // 주문서 품목 목록
-  isEditMode: {type: Boolean, required: false},       // 검색 결과 총 개수
+  isEditMode: {type: Boolean, required: false},       // 수정모드 여부
 });
 
 const salesOrderList = ref([]); // 주문서 목록
