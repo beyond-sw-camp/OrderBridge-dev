@@ -12,6 +12,7 @@ import dayjs from 'dayjs';
 import { ref } from "vue";
 import axios from "@/axios.js";
 import Chatbot from "@/components/common/Chatbot.vue";
+import Swal from "sweetalert2";
 
 const userStore = useUserStore();
 const notificationList = ref([]);
@@ -27,6 +28,77 @@ const fetchNotifications = async () => {
     console.error("알림 데이터를 가져오는 중 오류 발생:", error);
   }
 };
+
+const isModalOpen = ref(false);
+const selectedNotification = ref(null);
+
+// 드로잉 관련 변수
+const canvasRef = ref(null);
+const context = ref(null);
+let isDrawing = false;
+const openModal = (notification) => {
+  selectedNotification.value = notification;
+  isModalOpen.value = true;
+
+  // 드로잉 캔버스 초기화
+  setTimeout(() => {
+    const canvas = canvasRef.value;
+    context.value = canvas.getContext("2d");
+    context.value.strokeStyle = "black";
+    context.value.lineWidth = 2;
+  });
+};
+
+const closeModal = () => {
+  isModalOpen.value = false;
+  selectedNotification.value = null;
+};
+
+const saveCanvas = (selectedNotification) => {
+  //TODO 아영 - 이미지 캡쳐해서 업로드하기
+
+  isModalOpen.value = false;
+
+  Swal.fire({
+    position: "top-end",
+    icon: "success",
+    title: "결재 승인이 완료되었습니다.",
+    showConfirmButton: false,
+    timer: 1500
+  });
+};
+
+// 드로잉 시작
+const startDrawing = (event) => {
+  const canvas = canvasRef.value;
+  const rect = canvas.getBoundingClientRect();
+  isDrawing = true;
+  context.value.beginPath();
+  context.value.moveTo(event.clientX - rect.left, event.clientY - rect.top);
+};
+
+// 드로잉 중
+const draw = (event) => {
+  if (!isDrawing) return;
+  const canvas = canvasRef.value;
+  const rect = canvas.getBoundingClientRect();
+  context.value.lineTo(event.clientX - rect.left, event.clientY - rect.top);
+  context.value.stroke();
+};
+
+// 드로잉 종료
+const stopDrawing = () => {
+  if (!isDrawing) return;
+  isDrawing = false;
+  context.value.closePath();
+};
+
+// 캔버스 초기화
+const clearCanvas = () => {
+  const canvas = canvasRef.value;
+  context.value.clearRect(0, 0, canvas.width, canvas.height);
+};
+
 const chatbot = ref(null);
 
 function chatbotOn() {
@@ -111,9 +183,10 @@ function chatbotOn() {
       </div>
   </nav>
 
+<!-- 알림 모달  -->
   <div v-if="isNotificationOpen" class="notification-bar">
     <ul>
-      <li v-for="notification in notificationList" :key="notification.notificationSeq">
+      <li v-for="notification in notificationList" :class="{ 'selected-notification': selectedNotification?.notificationSeq === notification.notificationSeq }" :key="notification.notificationSeq" @click="openModal(notification)">
         <span>{{ notification.notificationTitle }}</span>
         <span style="float:right;">{{ dayjs(notification.notificationRegDate).format('YYYY/MM/DD HH:mm') }}</span>
         <br/>
@@ -121,6 +194,29 @@ function chatbotOn() {
       </li>
     </ul>
     <button @click="isNotificationOpen = false">닫기</button>
+  </div>
+
+<!-- 결재 싸인 모달  -->
+  <div v-if="isModalOpen" class="signModal-overlay" @click.self="closeModal">
+    <div class="signModal">
+      <h3 style="text-align: center;">{{ selectedNotification?.notificationTitle }}</h3>
+
+      <canvas
+          ref="canvasRef"
+          width="400"
+          height="200"
+          class="drawing-canvas"
+          @mousedown="startDrawing"
+          @mousemove="draw"
+          @mouseup="stopDrawing"
+          @mouseleave="stopDrawing"
+      ></canvas>
+      <div class="modal-buttons">
+        <button @click="clearCanvas">초기화</button>
+        <button @click="closeModal">닫기</button>
+        <button @click="saveCanvas(selectedNotification)">저장</button>
+      </div>
+    </div>
   </div>
 
 </template>
@@ -166,6 +262,11 @@ function chatbotOn() {
   z-index: 6;
 }
 
+.selected-notification {
+  background-color: #f0f8ff; /* 밝은 파란색 */
+  border-left: 4px solid #007bff; /* 강조를 위한 왼쪽 테두리 */
+}
+
 .notification-bar {
   position: fixed;
   top: 50px;
@@ -176,7 +277,7 @@ function chatbotOn() {
   border: 1px solid #ddd;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   overflow-y: auto;
-  z-index: 1000;
+  z-index: 1002;
   padding: 10px;
 }
 .notification-bar ul {
@@ -196,6 +297,47 @@ function chatbotOn() {
   background-color: #333;
   color: white;
   cursor: pointer;
+}
+
+.signModal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1001;
+}
+
+.signModal {
+  background: #fff;
+  padding: 20px;
+  border-radius: 5px;
+  max-width: 500px;
+  width: 100%;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.drawing-canvas {
+  border: 1px solid #ddd;
+  display: block;
+  margin: 20px auto;
+  cursor: crosshair;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+body {
+  font-family: "Open Sans", -apple-system, BlinkMacSystemFont, "Segoe UI",
+  Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", Helvetica, Arial,
+  sans-serif;
 }
 
 
