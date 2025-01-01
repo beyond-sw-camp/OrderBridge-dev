@@ -36,7 +36,7 @@ const closePrintModal = () => {
 };
 
 const printPage = () => {
-  const printContent = document.getElementById('print-area').innerHTML;
+  const printContent = document.getElementById('print-area-purchaseOrder').innerHTML;
   const originalContent = document.body.innerHTML; // 현재 페이지 내용 저장
 
   document.body.innerHTML = printContent;
@@ -143,7 +143,7 @@ const clearCanvas = () => {
     <div v-show="isVisible" class="modal-overlay" @click.self="closePrintModal">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
-        <div class="modal-body" id="print-area">
+        <div class="modal-body" id="print-area-purchaseOrder">
           <div class="d-flex justify-content-between">
             <button class="btn-print" @click="printPage">출력</button>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @click="closePrintModal" ></button>
