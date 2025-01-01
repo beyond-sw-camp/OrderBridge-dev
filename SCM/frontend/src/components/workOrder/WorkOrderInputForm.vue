@@ -202,7 +202,7 @@ const fetchSalesOrderItemStock = async (salesOrderSeq) => {
   } catch (error) {
     console.error('품목 재고 조회 실패:', error);
     if (error.response.data.errorCode === 'SALES_ORDER_ITEM_ERROR_001') {
-      alert(error.response.data.message);
+      alert('주문서에 품목이 없습니다.');
     }
   }
 };
@@ -308,10 +308,12 @@ const updateWorkOrder = async (workOrderSeq) => {
     const response = await axios.put(`workOrder/${workOrderSeq}`, {
       warehouseSeq: formData.value.warehouseSeq,
       workOrderIndicatedDate: formData.value.workOrderIndicatedDate,
+      workOrderIndicatedQuantity: formData.value.workOrderIndicatedQuantity,
       workOrderDueDate: formData.value.workOrderDueDate,
       workOrderNote: formData.value.workOrderNote,
     });
     console.log(response.data);
+    console.log(formData.value.workOrderIndicatedQuantity);
     alert('작업지시서가 수정되었습니다!');
     await router.push('/work-order')
 
@@ -320,7 +322,7 @@ const updateWorkOrder = async (workOrderSeq) => {
     if (error.response.data.errorCode === 'WORK_ORDER_ERROR_005') {
       alert('작업지시서의 상태가 결재 전이거나 진행중일때만 수정 가능합니다.');
     } else if (error.response.data.errorCode === 'COMMON_ERROR_002') {
-      alert('작업납기일은 현재보다 이전일 수 없습니다.');
+      alert('작업목표일은 주문납기일보다 전이어야 합니다.');
     } else if (error.response.data.errorCode === 'WORK_ORDER_ERROR_006') {
       alert('지시수량은 이미 완료된 수량보다 적을 수 없습니다.');
     } else if (error.response.data.errorCode === 'SALES_ORDER_ERROR_002') {
@@ -366,9 +368,9 @@ const createWorkOrder = async () => {
     }   else if (error.response.data.errorCode === 'STOCK_ERROR_001') {
       alert('재료가 부족해 작업지시가 불가능합니다.\n 발주서를 작성해 재료를 먼저 구매해주세요.');
     } else if (error.response.data.errorCode === 'WORK_ORDER_ERROR_003') {
-      alert('작업지시일과 납기일을 설정해주세요');
+      alert('작업지시일과 목표일을 선택해주세요');
     } else if (error.response.data.errorCode === 'COMMON_ERROR_002') {
-      alert('작업납기일은 현재보다 이전일 수 없고 주문납기일보다 전이어야 합니다.');
+      alert('작업목표일은 주문납기일보다 전이어야 합니다.');
     } else {
       alert('등록에 실패했습니다. 다시 시도해주세요.');
     }
@@ -382,6 +384,9 @@ const submitWorkOrder = async () => {
     console.warn('폼 데이터가 완전하지 않습니다.');
     return;
   }
+
+  if(!formData.value.workOrderIndicatedDate) {alert('작업지시일을 선택해주세요')}
+  if(!formData.value.workOrderDueDate) {alert('작업목표일을 선택해주세요')}
 
   if (props.isEditMode) {
     await updateWorkOrder(props.workOrderDetail.workOrderSeq);
@@ -420,7 +425,7 @@ const validateFormData = () => {
       </b-form-group>
       <!-- 주문납기일자 -->
       <b-form-group label-cols="4" label-cols-lg="2" label="주문납기일" label-for="salesOrderDueDate">
-        <input class="form-control form-control-sm w-75" type="date" id="salesOrderDueDate"
+        <input class="form-control form-control-sm w-75" type="datetime-local" id="salesOrderDueDate"
                v-model="salesOrderDueDate" readonly=""/>
       </b-form-group>
     </div>
@@ -490,8 +495,8 @@ const validateFormData = () => {
             <input class="form-control form-control-sm w-75" type="datetime-local" id="workOrderIndicatedDate"
                    v-model="formData.workOrderIndicatedDate" placeholder="작업지시일자를 선택해 주세요."/>
           </b-form-group>
-          <!-- 작업 납기일자 -->
-          <b-form-group label-cols="4" label-cols-lg="2" label="작업납기일" label-for="workOrderDueDate">
+          <!-- 작업 목표일자 -->
+          <b-form-group label-cols="4" label-cols-lg="2" label="작업목표일" label-for="workOrderDueDate">
             <!--   b-form-input 에서  datetime-local 을 사용할 수 없음  -->
             <input class="form-control form-control-sm w-75" type="datetime-local" id="workOrderDueDate"
                    v-model="formData.workOrderDueDate" placeholder="목표납기일자를 선택해 주세요."/>
