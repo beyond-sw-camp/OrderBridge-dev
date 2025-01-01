@@ -4,6 +4,8 @@ import error.pirate.backend.common.NameGenerator;
 import error.pirate.backend.item.command.application.service.ItemService;
 import error.pirate.backend.item.command.domain.aggregate.entity.Item;
 import error.pirate.backend.item.command.domain.service.ItemInventoryDomainService;
+import error.pirate.backend.notification.command.domain.aggregate.entity.NotificationType;
+import error.pirate.backend.notification.command.domain.service.NotificationDomainService;
 import error.pirate.backend.salesOrder.command.domain.service.SalesOrderDomainService;
 import error.pirate.backend.shippingInstruction.command.domain.aggregate.entity.ShippingInstruction;
 import error.pirate.backend.shippingInstruction.command.domain.service.ShippingInstructionDomainService;
@@ -36,6 +38,7 @@ public class ShippingSlipApplicationService {
     private final ItemService itemService;
     private final UserDomainService userDomainService;
     private final ItemInventoryDomainService itemInventoryDomainService;
+    private final NotificationDomainService notificationDomainService;
     private final EntityManager entityManager;
     private final NameGenerator nameGenerator;
 
@@ -109,5 +112,7 @@ public class ShippingSlipApplicationService {
             salesOrderDomainService.updateSalesOrderStatus(shippingInstruction.getSalesOrder(), "SHIPMENT_COMPLETE");
         }
 
+        //알림 생성
+        notificationDomainService.createNotificationMessage(NotificationType.shippingSlip, shippingSlip.getShippingSlipSeq(), shippingSlip.getShippingSlipName());
     }
 }

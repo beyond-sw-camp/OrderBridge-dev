@@ -10,9 +10,10 @@ const props = defineProps({
   shippingInstructionSituationList: {type: Array, required: true},       // 출하지시서 현황 목록
   shippingInstructionSituationTotal: {type: Number, required: true},       // 출하지시서 총수량 총합계
   shippingAddressList: {type: Array, required: true},       // 출하주소 목록
+  clientHintList: {type: Array, required: true},      // 거래처명 목록
 });
 
-const emit = defineEmits(['searchEvent', 'excelEvent']);
+const emit = defineEmits(['searchEvent', 'clientEvent', 'excelEvent']);
 
 const startDate = ref(props.searchStartDate);
 const endDate = ref(props.searchEndDate);
@@ -20,6 +21,10 @@ const clientName = ref(props.searchName);
 
 watch([startDate, endDate], () => {
   search();
+})
+
+watch(clientName, () => {
+  emit('clientEvent', clientName);
 })
 
 const search = () => {
@@ -78,6 +83,13 @@ const printTable = () => {
             <b-form-input v-model="clientName"></b-form-input>
             <b-button variant="light" class="button" @click="search()"><searchIcon class="icon"/></b-button>
           </b-input-group>
+          <div class="clientHint" style="position: absolute; z-index: 5;">
+            <ul class="list-group">
+              <template v-for="hint in clientHintList">
+                <li class="list-group-item list-group-item-action" @click="clientName = hint">{{ hint }}</li>
+              </template>
+            </ul>
+          </div>
         </div>
       </div>
     </div>
