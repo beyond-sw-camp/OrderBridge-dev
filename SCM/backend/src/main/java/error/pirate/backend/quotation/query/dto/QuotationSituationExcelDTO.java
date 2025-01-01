@@ -1,13 +1,13 @@
 package error.pirate.backend.quotation.query.dto;
 
+import error.pirate.backend.quotation.command.domain.aggregate.entity.QuotationStatus;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
-@Getter @Setter
-public class QuotationSituationDTO {
-    private Long quotationSeq;
+@Getter
+public class QuotationSituationExcelDTO {
     private LocalDate quotationQuotationDate;
     private String quotationName;
     private Integer quotationTotalQuantity;

@@ -36,7 +36,7 @@ public interface QuotationMapper {
             @Param("quotationSeq") Long quotationSeq);
 
     // 견적서 현황 조회
-    List<QuotationSituationDTO> selectQuotationSituation(
+    List<QuotationSituationResponse> selectQuotationSituation(
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate,
             @Param("clientName") String clientName);
@@ -51,4 +51,10 @@ public interface QuotationMapper {
             @Param("endDate") LocalDate endDate,
             @Param("clientName") String clientName,
             @Param("quotationStatus") List<QuotationStatus> quotationStatus);
+
+    // 견적서 현황 엑셀 다운로드
+    ArrayList<Object> selectQuotationSituationExcel(
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate,
+            @Param("clientName") String clientName);
 }
