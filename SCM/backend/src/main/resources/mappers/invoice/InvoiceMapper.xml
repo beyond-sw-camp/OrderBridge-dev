@@ -126,4 +126,27 @@
         JOIN tb_sales_order_item USING (sales_order_seq)
         WHERE tb_sales_order.sales_order_seq = #{salesOrderSeq}
     </select>
+
+    <!--  거래 명세서 목록 엑셀 다운로드  -->
+    <select id="selectInvoiceExcel" resultType="error.pirate.backend.invoice.query.dto.InvoiceExcelDTO">
+        SELECT
+            tb_invoice.invoice_reg_date,
+            tb_invoice.invoice_mod_date,
+            tb_invoice.invoice_name,
+            tb_invoice.invoice_sale_date,
+            tb_invoice.invoice_total_quantity,
+            tb_invoice.invoice_extended_price,
+            tb_invoice.invoice_note
+        FROM tb_invoice
+        WHERE tb_invoice.invoice_status NOT IN ("DELETE")
+        <if test="startDate != null"><![CDATA[
+            AND #{startDate} <= tb_invoice.invoice_sale_date
+        ]]></if>
+        <if test="endDate != null"><![CDATA[
+            AND #{endDate} >= tb_invoice.invoice_sale_date
+        ]]></if>
+        <if test="clientName != null">
+            AND tb_client.client_name LIKE CONCAT('%', #{clientName}, '%')
+        </if>
+    </select>
 </mapper>
