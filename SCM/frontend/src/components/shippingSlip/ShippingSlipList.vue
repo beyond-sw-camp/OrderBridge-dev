@@ -5,6 +5,7 @@ import trashIcon from "@/assets/trashIcon.svg";
 import editIcon from "@/assets/editIcon.svg";
 import printIcon from "@/assets/printIcon.svg";
 import dayjs from "dayjs";
+import ShippingSlipPrintPreview from "@/components/shippingSlip/ShippingSlipPrintPreview.vue";
 
 const props = defineProps({
   searchStartDate: {type: String, required: false}, // 시작 날짜
@@ -15,8 +16,7 @@ const props = defineProps({
   totalCount: {type: Number, required: true},       // 검색 결과 총 개수
   pageNumber: {type: Number, required: true},       // 현재 페이지 번호
   pageSize: {type: Number, required: true},         // 페이지 사이즈
-  expandShippingSlip: {type: Object, required: true},
-  expandItemList: {type: Object, required: true},
+  expandData: {type: Object, required: true},
   itemDivisionList: {type: Array, required: true},       // 물품 구분 목록
   clientHintList: {type: Array, required: true},      // 거래처명 목록
 });
@@ -28,6 +28,23 @@ const startDate = ref(props.searchStartDate);
 const endDate = ref(props.searchEndDate);
 const pageNumber = ref(props.pageNumber);
 const clientName = ref(props.searchName);
+const isModalVisible = ref(false);
+const selectedShippingSlip = ref(null);
+
+const openPrintPreview = (shippingSlip) => {
+  if (!shippingSlip) {
+    console.error('선택된 출하지시서가 없습니다.');
+    return;
+  }
+
+  selectedShippingSlip.value = shippingSlip;
+  isModalVisible.value = true;
+};
+
+const closePrintPreview = () => {
+  isModalVisible.value = false;
+  selectedShippingSlip.value = null;
+};
 
 watch([startDate, endDate], () => {
   search();
@@ -70,54 +87,6 @@ function findStatusValue(array, key) {
 // 숫자 쉼표 삽입
 function numberThree(number) {
   return `${number.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}`;
-}
-
-// 모달에 데이터 전달을 위한 함수
-const printModalData = ref({});
-const extendPrintModalData = ref({});
-const itemPrint = (shippingSlip) => {
-  printModalData.value = shippingSlip;
-  extendPrintModalData.value = props.expandShippingSlip[shippingSlip.shippingSlipSeq];
-  console.log(printModalData.value);
-}
-
-// 빈칸을 계산하는 computed 속성
-const emptyRows = computed(() => {
-  const totalRows = 10; // 최소 10행을 유지
-  const currentDataCount = props.expandItemList[printModalData.value.shippingSlipSeq];
-  // 배열, 객체 여부 확인
-  if (Array.isArray(currentDataCount)) {
-    return currentDataCount.length; // 배열이면 길이를 반환
-  } else if (currentDataCount && typeof currentDataCount === 'object') {
-    return Object.keys(currentDataCount).length; // 객체면 키 개수 반환
-  }
-  return currentDataCount < totalRows ? totalRows - currentDataCount : 0;
-});
-
-// 전체 수량 구하는 computed 속성
-const totalQuantity = computed(() => {
-  const data = props.expandItemList[printModalData.value.shippingSlipSeq];
-  // 객체 라면
-  if (data && typeof data === 'object') {
-    return Object.values(data).reduce((sum, product) => sum + (product.shippingSlipItemQuantity || 0), 0);
-  }
-});
-
-const printPage = () => {
-  const printContent = document.getElementById('print-area').innerHTML; // 특정 영역 가져오기
-  const originalContent = document.body.innerHTML; // 현재 페이지 내용 저장
-
-  // 페이지 내용을 특정 영역으로 교체
-  document.body.innerHTML = printContent;
-
-  // 인쇄
-  window.print();
-
-  // 원래 내용 복원
-  document.body.innerHTML = originalContent;
-
-  // SPA일 경우 Vue의 리렌더링 강제 호출
-  location.reload(); // 상태를 새로고침하여 업데이트
 }
 </script>
 
@@ -170,7 +139,7 @@ const printPage = () => {
               <div class="list-line row" :id="'print-area-' + index">
                 <div class="col-md-8">
                   <b>{{ shippingSlip.shippingSlipName }}</b>
-                  <div v-if="!expandShippingSlip[shippingSlip.shippingSlipSeq]">
+                  <div v-if="!expandData[shippingSlip.shippingSlipSeq]">
                     <div v-if="!shippingSlip.itemName"><br></div>
                     <div v-else>{{ shippingSlip.itemName }}</div>
                   </div>
@@ -183,28 +152,28 @@ const printPage = () => {
 
                 <!-- 확장된 상세 정보 표시 -->
                 <div class="d-flex justify-content-center">
-                  <div v-if="expandShippingSlip[shippingSlip.shippingSlipSeq]"
+                  <div v-if="expandData[shippingSlip.shippingSlipSeq]"
                        class="col-md-11 mt-3">
                     <b>총수량 : </b>
-                    {{ expandShippingSlip[shippingSlip.shippingSlipSeq].shippingSlipTotalQuantity }} 개<br>
+                    {{ expandData[shippingSlip.shippingSlipSeq].shippingSlipTotalQuantity }} 개<br>
                     <b>출하 주소 : </b>
                     {{ findStatusValue(shippingAddressList,
-                      expandShippingSlip[shippingSlip.shippingSlipSeq].shippingAddress) }}
+                      expandData[shippingSlip.shippingSlipSeq].shippingSlipDTO.shippingAddress) }}
                     {{  }}<br>
                     <b>담당자 : </b>
-                    {{ expandShippingSlip[shippingSlip.shippingSlipSeq].userName }}<br>
+                    {{ expandData[shippingSlip.shippingSlipSeq].shippingSlipDTO.userName }}<br>
                     <b>출하일시 : </b>
-                    {{ dayjs(expandShippingSlip[shippingSlip.shippingSlipSeq].shippingSlipShippingDate).format('YYYY/MM/DD HH:mm:ss') }}<br>
-                    <div v-if="expandShippingSlip[shippingSlip.shippingSlipSeq].shippingSlipNote">
+                    {{ dayjs(expandData[shippingSlip.shippingSlipSeq].shippingSlipDTO.shippingSlipShippingDate).format('YYYY/MM/DD HH:mm:ss') }}<br>
+                    <div v-if="expandData[shippingSlip.shippingSlipSeq].shippingSlipDTO.shippingSlipNote">
                       <b>출하전표 비고 :</b>
-                      {{ expandShippingSlip[shippingSlip.shippingSlipSeq].shippingSlipNote }}<br>
+                      {{ expandData[shippingSlip.shippingSlipSeq].shippingSlipDTO.shippingSlipNote }}<br>
                     </div>
                     <div v-else>
                       <b>출하전표 비고 :</b>없음<br>
                     </div>
                     <!-- 확장된 상세 품목 정보 표시-->
                     <div style="display:flex; flex-wrap: wrap;">
-                      <template v-for="expandItem in expandItemList[shippingSlip.shippingSlipSeq]">
+                      <template v-for="expandItem in expandData[shippingSlip.shippingSlipSeq].itemList">
                         <div class="card item-card">
                           <img :src=expandItem.itemImageUrl class="card-img-top">
                           <div style="margin: 5px;">
@@ -222,7 +191,7 @@ const printPage = () => {
                       </template>
                     </div>
                     <div class="d-flex justify-content-end align-items-center">
-                      <printIcon class="me-3 icon" data-bs-toggle="modal" data-bs-target="#PrintModal" @click.stop="itemPrint(shippingSlip)"/>
+                      <printIcon class="me-3 icon" @click.stop="openPrintPreview(expandData[shippingSlip.shippingSlipSeq])"/>
                     </div>
                   </div>
                 </div>
@@ -243,71 +212,12 @@ const printPage = () => {
       </div>
     </div>
   </div>
-  <!-- print Modal bootstrap -->
-  <div class="modal fade" id="PrintModal" tabindex="-1" aria-labelledby="PrintModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-body" id="print-area">
-          <!-- 인쇄 미리보기 버튼 -->
-          <div class="d-flex justify-content-between">
-            <button class="button" @click="printPage">인쇄 미리보기</button>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="container mt-4">
-            <h2 class="text-center">출하전표</h2>
-            <br/><br/>
-            <table class="table first-table" style="height: 140px">
-              <tbody>
-              <tr>
-                <td class="align-content-center">출하전표명</td>
-                <td class="color-column align-content-center">{{ printModalData.shippingSlipName }}</td>
-              </tr>
-              <tr>
-                <td class="align-content-center">출하일</td>
-                <td class="color-column align-content-center">{{ dayjs(printModalData.shippingSlipShippingDate).format('YYYY/MM/DD') }}</td>
-              </tr>
-              <tr>
-                <td class="align-content-center">거래처</td>
-                <td class="color-column align-content-center">{{ printModalData.clientName }}</td>
-                <td class="align-content-center">담당자</td>
-                <td class="color-column align-content-center">{{ extendPrintModalData.userName }}</td>
-              </tr>
-              <tr>
-                <td class="align-content-center">출하주소</td>
-                <td class="color-column align-content-center" colspan="3">
-                  {{ findStatusValue(shippingAddressList, extendPrintModalData.shippingAddress) }}</td>
-              </tr>
-              </tbody>
-            </table>
-            <table class="table table-bordered second-table">
-              <thead>
-              <tr>
-                <th>품목</th>
-                <th>수량</th>
-              </tr>
-              </thead>
-              <tbody>
-              <tr v-for="(itemInfo, index) in expandItemList[printModalData.shippingSlipSeq]" :key="'data-' + index">
-                <td>{{ itemInfo.itemName }}</td>
-                <td>{{ numberThree(itemInfo.shippingSlipItemQuantity) }}</td>
-              </tr>
-              <tr v-for="index in emptyRows" :key="'empty-' + index">
-                <td>&nbsp;</td>
-                <td>&nbsp;</td>
-              </tr>
-              </tbody>
-              <tfoot>
-              <tr>
-                <td>합계</td>
-                <td>{{ totalQuantity }}</td>
-              </tr>
-              </tfoot>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+
+  <ShippingSlipPrintPreview
+      :isVisible="isModalVisible"
+      :shippingSlip="selectedShippingSlip"
+      @close="closePrintPreview"
+  />
 </template>
 
 <style scoped>

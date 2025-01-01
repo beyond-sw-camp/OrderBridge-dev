@@ -74,6 +74,7 @@
             resultType="error.pirate.backend.shippingInstruction.query.dto.ShippingInstructionDTO">
         SELECT
             si.shipping_instruction_seq,
+            si.shipping_instruction_name,
             si.sales_order_seq,
             so.sales_order_name,
             c.client_name,
@@ -82,6 +83,7 @@
             si.shipping_instruction_address AS shipping_address,
             u.user_employee_no,
             u.user_name,
+            u.user_phone_no,
             si.shipping_instruction_note
         FROM tb_shipping_instruction si
         JOIN tb_sales_order so ON (si.sales_order_seq = so.sales_order_seq)

@@ -12,7 +12,9 @@ import dayjs from 'dayjs';
 import { ref } from "vue";
 import axios from "@/axios";
 import Chatbot from "@/components/common/Chatbot.vue";
-import PrintPreviewModal from "@/components/purchaseOrder/PurchaseOrderPrintPreview.vue";
+import PurchaseOrderPrintPreviewModal from "@/components/purchaseOrder/PurchaseOrderPrintPreview.vue";
+import ShippingInstructionPrintPreview from "@/components/shippingInstruction/ShippingInstructionPrintPreview.vue";
+import ShippingSlipPrintPreview from "@/components/shippingSlip/ShippingSlipPrintPreview.vue";
 
 const userStore = useUserStore();
 const notificationList = ref([]);
@@ -24,21 +26,32 @@ const fetchNotifications = async () => {
 
     notificationList.value = response.data;
     isNotificationOpen.value = true;
+
   } catch (error) {
     console.error("알림 데이터를 가져오는 중 오류 발생:", error);
   }
 };
 
 const isModalVisible = ref(false);
-const selectedPurchaseOrder = ref(null);
+const selectedData = ref(null);
+const selectedNotificationType = ref(null);
 
 const openPrintPreview = async (notification) => {
   try {
+    // 엔드포인트 변경을 위해 사용
+    if (notification.notificationType === 'shippingInstruction') {
+      notification.notificationType = 'shipping-instruction';
+    } else if(notification.notificationType === 'shippingSlip') {
+      notification.notificationType = 'shipping-slip';
+    }
+
     const response = await axios.get(notification.notificationType + `/${notification.notificationAnotherSeq}`);
 
-    selectedPurchaseOrder.value = response.data;
+    selectedNotificationType.value = notification.notificationType;
+    selectedData.value = response.data;
     isModalVisible.value = true;
     isNotificationOpen.value = false;
+
   } catch (error) {
     console.error("결재 서류 데이터를 가져오는 중 오류 발생:", error);
   }
@@ -46,7 +59,7 @@ const openPrintPreview = async (notification) => {
 
 const closePrintPreview = () => {
   isModalVisible.value = false;
-  selectedPurchaseOrder.value = null;
+  selectedData.value = null;
 };
 
 const chatbot = ref(null);
@@ -151,11 +164,28 @@ function chatbotOn() {
     <button @click="isNotificationOpen = false">닫기</button>
   </div>
 
-  <PrintPreviewModal
-      :isVisible="isModalVisible"
-      :purchaseOrder="selectedPurchaseOrder"
-      @close="closePrintPreview"
-  />
+  <template v-if="selectedNotificationType === 'purchaseOrder'">
+    <PurchaseOrderPrintPreviewModal
+        :isVisible="isModalVisible"
+        :purchaseOrder="selectedData"
+        @close="closePrintPreview"
+    />
+  </template>
+  <template v-else-if="selectedNotificationType === 'shipping-instruction'">
+    <ShippingInstructionPrintPreview
+        :isVisible="isModalVisible"
+        :shippingInstruction="selectedData"
+        @close="closePrintPreview"
+    />
+  </template>
+  <template v-else-if="selectedNotificationType === 'shipping-slip'">
+    <ShippingSlipPrintPreview
+        :isVisible="isModalVisible"
+        :shippingSlip="selectedData"
+        @close="closePrintPreview"
+    />
+  </template>
+
 
 </template>
 <style scoped>

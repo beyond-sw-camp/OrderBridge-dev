@@ -16,5 +16,6 @@ public class ShippingSlipDTO {
     private int shippingSlipTotalQuantity;   // 출하전표 총수량
     private ShippingAddress shippingAddress;  // 출하전표 주소
     private String userName;    // 출하전표 담당자
+    private String userPhoneNo; // 유저 핸드폰 번호
     private String shippingSlipNote; // 출하전표 비고
 }

@@ -118,17 +118,17 @@ class ShippingInstructionApplicationServiceTest {
 
     private static Stream<Arguments> updateShippingInstructionStateArguments() {
         return Stream.of(
-                arguments(77L, "jh"),
-                arguments(78L, "jh")
+                arguments(77L),
+                arguments(78L)
         );
     }
 
     @DisplayName("출하지시서 결재 상태 변경")
     @ParameterizedTest(autoCloseArguments = true)
     @MethodSource("updateShippingInstructionStateArguments")
-    void updateShippingInstructionStatusTest(Long shippingInstructionSeq, String userNo) {
+    void updateShippingInstructionStatusTest(Long shippingInstructionSeq) {
         assertDoesNotThrow(
-                () -> shippingInstructionApplicationService.updateShippingInstructionApprovalStatus(shippingInstructionSeq, userNo)
+                () -> shippingInstructionApplicationService.updateShippingInstructionApprovalStatus(shippingInstructionSeq)
         );
     }
 

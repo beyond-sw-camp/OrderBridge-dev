@@ -151,13 +151,9 @@ public class ShippingInstructionApplicationService {
 
     /* 출하지시서 결재 상태 변경 */
     @Transactional
-    public void updateShippingInstructionApprovalStatus(Long shippingInstructionSeq, String userNo) {
+    public void updateShippingInstructionApprovalStatus(Long shippingInstructionSeq) {
         /* 출하지시서 찾기 */
         ShippingInstruction shippingInstruction = shippingInstructionDomainService.findByShippingInstructionSeq(shippingInstructionSeq);
-
-        // 현재 로그인한 유저가 접근 가능한지 체크
-        User user = userDomainService.findByUserEmployeeNo(userNo);
-        shippingInstructionDomainService.checkUser(shippingInstruction, user);
 
         /* 결재전인지 체크 */
         shippingInstructionDomainService.checkShippingInstructionApprovalStatus(shippingInstruction.getShippingInstructionStatus());
