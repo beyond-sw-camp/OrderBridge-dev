@@ -1,5 +1,6 @@
 package error.pirate.backend.salesOrder.query.service;
 
+import error.pirate.backend.common.ExcelDownLoad;
 import error.pirate.backend.salesOrder.command.domain.aggregate.entity.SalesOrderStatus;
 import error.pirate.backend.exception.CustomException;
 import error.pirate.backend.exception.ErrorCodeType;
@@ -20,6 +21,7 @@ public class SalesOrderQueryService {
 
     private final ModelMapper modelMapper;
     private final SalesOrderMapper salesOrderMapper;
+    private final ExcelDownLoad excelDownBody;
 
     // 주문서 목록 조회
     public SalesOrderListResponse readSalesOrderList(
@@ -67,6 +69,16 @@ public class SalesOrderQueryService {
     // 주문서 품목 값 확인
     public List<SalesOrderItemCheckDTO> salesOrderItemCheck(Long quotationSeq) {
         return salesOrderMapper.sumSalesOrderItemValue(quotationSeq);
+    }
+
+    // 주문서 목록 엑셀 다운로드
+    public byte[] readSalesOrderExcel(
+            LocalDate startDate, LocalDate endDate, String clientName, List<SalesOrderStatus> salesOrderStatus) {
+
+        return excelDownBody.writeCells(
+                new String[] {"등록", "수정", "이름", "상태", "주문일", "납기일", "총 수량", "총 가격", "비고"},
+                salesOrderMapper.selectSalesOrderExcel(startDate, endDate, clientName, salesOrderStatus)
+        );
     }
 
     // 작업지시가 등록된 주문서 물품 조회

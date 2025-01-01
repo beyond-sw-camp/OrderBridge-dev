@@ -64,6 +64,7 @@
         SELECT
             tb_quotation.quotation_seq,
             tb_quotation.quotation_name,
+            tb_quotation.client_seq,
             tb_client.client_name,
             tb_quotation.quotation_extended_price,
             tb_quotation.quotation_total_quantity,
@@ -95,15 +96,17 @@
     </select>
 
     <!--  견적서 현황 조회  -->
-    <select id="selectQuotationSituation" resultType="error.pirate.backend.quotation.query.dto.QuotationSituationDTO">
+    <select id="selectQuotationSituation" resultType="error.pirate.backend.quotation.query.dto.QuotationSituationResponse">
         SELECT
-            tb_quotation.quotation_seq,
             tb_quotation.quotation_quotation_date,
             tb_quotation.quotation_name,
             tb_quotation.quotation_total_quantity,
             tb_quotation.quotation_extended_price,
             tb_client.client_name,
-            tb_quotation.quotation_note
+            tb_quotation.quotation_note,
+            DATE_FORMAT(tb_quotation.quotation_quotation_date, '%Y-%m') as quotation_quotation_month,
+            IFNULL(SUM(tb_quotation.quotation_extended_price), 0) as quotation_month_price,
+            IFNULL(SUM(tb_quotation.quotation_total_quantity), 0) as quotation_month_quantity
         FROM tb_quotation
         JOIN tb_client USING (client_seq)
         WHERE tb_quotation.quotation_status NOT IN ("DELETE")
@@ -116,6 +119,9 @@
         <if test="clientName != null">
             AND tb_client.client_name LIKE CONCAT('%', #{clientName}, '%')
         </if>
+        GROUP BY
+            DATE_FORMAT(tb_quotation.quotation_quotation_date, '%Y-%m'),
+            tb_quotation.quotation_quotation_date WITH ROLLUP;
     </select>
 
     <!--  오늘 견적서 개수 조회  -->
@@ -161,6 +167,29 @@
         <if test="quotationStatus != null">
             AND tb_quotation.quotation_status IN
             <foreach collection="quotationStatus" item="item" open="(" separator="," close=")">#{item}</foreach>
+        </if>
+    </select>
+
+    <!--  견적서 현황 엑셀 다운로드  -->
+    <select id="selectQuotationSituationExcel" resultType="error.pirate.backend.quotation.query.dto.QuotationSituationExcelDTO">
+        SELECT
+            tb_quotation.quotation_quotation_date,
+            tb_quotation.quotation_name,
+            tb_quotation.quotation_total_quantity,
+            tb_quotation.quotation_extended_price,
+            tb_client.client_name,
+            tb_quotation.quotation_note
+        FROM tb_quotation
+        JOIN tb_client USING (client_seq)
+        WHERE tb_quotation.quotation_status NOT IN ("DELETE")
+        <if test="startDate != null"><![CDATA[
+            AND #{startDate} <= tb_quotation.quotation_quotation_date
+        ]]></if>
+        <if test="endDate != null"><![CDATA[
+            AND #{endDate} >= tb_quotation.quotation_quotation_date
+        ]]></if>
+        <if test="clientName != null">
+            AND tb_client.client_name LIKE CONCAT('%', #{clientName}, '%')
         </if>
     </select>
 </mapper>

@@ -15,8 +15,7 @@ const searchStartDate = ref(null);
 const searchEndDate = ref(null);
 const searchName = ref(null);
 const searchStatus = ref(new Set([]));
-const expandShippingInstruction = ref({});
-const expandItemList = ref({});
+const expandData = ref({});
 const itemDivisionList = ref([]);
 
 // 출하지시서 목록 요청
@@ -52,8 +51,7 @@ const fetchShippingInstruction = async (seq) => {
   try {
     const response = await axios.get(`shipping-instruction/${seq}`, {});
 
-    expandShippingInstruction.value[seq] = response.data.shippingInstructionDTO; // ref 값에 추가
-    expandItemList.value[seq] = response.data.itemList;
+    expandData.value[seq] = response.data; // ref 값에 추가
 
   } catch (error) {
     console.error("상세 출하지시서 불러오기 실패 :", error);
@@ -62,7 +60,7 @@ const fetchShippingInstruction = async (seq) => {
 
 // 출하지시서 삭제 요청
 const deleteShippingInstruction = async (seq) => {
-  console.log(seq);
+
   try {
     const response = await axios.delete(`shipping-instruction/${seq}`, {});
 
@@ -158,10 +156,10 @@ const createShippingSlip = async (seq) => {
   try {
     const response = await axios.post('shipping-slip',
         {
-          shippingSlipShippingDate: expandShippingInstruction.value[seq].shippingInstructionScheduledShipmentDate,
-          shippingInstructionSeq: expandShippingInstruction.value[seq].shippingInstructionSeq,
-          shippingSlipNote: expandShippingInstruction.value[seq].shippingInstructionNote,
-          shippingSlipItems: expandItemList.value[seq].map(item => ({
+          shippingSlipShippingDate: expandData.value[seq].shippingInstructionDTO.shippingInstructionScheduledShipmentDate,
+          shippingInstructionSeq: expandData.value[seq].shippingInstructionDTO.shippingInstructionSeq,
+          shippingSlipNote: expandData.value[seq].shippingInstructionDTO.shippingInstructionNote,
+          shippingSlipItems: expandData.value[seq].itemList.map(item => ({
             itemSeq: item.itemSeq,
             shippingSlipItemQuantity: item.shippingInstructionItemQuantity,
             shippingSlipItemNote: item.shippingInstructionItemNote,
@@ -185,6 +183,37 @@ const createShippingSlip = async (seq) => {
   }
 };
 
+// 거래처 힌트 요청
+const clientHintList = ref(null);
+let clientSearchCount = 0;
+
+const fetchClientHint = async (clientName) => {
+  if (clientName.value === "") {
+    clientHintList.value = null;
+  } else {
+    try {
+      const response = await axios.get(`client/hint`, {
+        params: {
+          keyword: clientName.value
+        }
+      });
+      if (response.data.length > 0) {
+        clientHintList.value = response.data;
+        clientSearchCount = 0;
+      } else if (clientSearchCount > 2) {
+        clientHintList.value = null;
+      } else { clientSearchCount++; }
+    } catch (error) {
+      console.log(`거래처 힌트 요청 실패 ${error}`)
+    }
+  }
+  if (clientHintList.value) {
+    if (clientHintList.value.length === 1 && clientHintList.value[0] === searchClient.value) {
+      clientHintList.value = null;
+    }
+  }
+}
+
 onMounted(async () => {
   await fetchShippingInstructionList();
 
@@ -198,6 +227,11 @@ const handlePage = (newPageNumber) => {
   pageNumber.value = Number(newPageNumber.value);
   fetchShippingInstructionList();
 };
+
+// 거래처 추천
+const handleClient = (newClient) => {
+  fetchClientHint(newClient);
+}
 
 // 검색
 const handleSearch = (payload) => {
@@ -247,10 +281,9 @@ function search() {
 
 // 상세 정보 확장
 const handleExtendItem = (seq) => {
-  if (expandShippingInstruction.value[seq] && expandItemList.value[seq]) {
+  if (expandData.value[seq]) {
     // 이미 확장된 상태면 축소
-    delete expandShippingInstruction.value[seq];
-    delete expandItemList.value[seq];
+    delete expandData.value[seq];
   } else {
     // API로 데이터를 가져와서 저장
     fetchShippingInstruction(seq);
@@ -269,10 +302,11 @@ const handleExtendItem = (seq) => {
                            :totalCount="totalCount"
                            :pageNumber="pageNumber"
                            :pageSize="pageSize"
-                           :expandShippingInstruction="expandShippingInstruction"
-                           :expandItemList="expandItemList"
+                           :expandData="expandData"
                            :itemDivisionList="itemDivisionList"
+                           :clientHintList="clientHintList"
                            @pageEvent="handlePage"
+                           @clientEvent="handleClient"
                            @searchEvent="handleSearch"
                            @checkStatusEvent="handleStatus"
                            @extendItemEvent="handleExtendItem"

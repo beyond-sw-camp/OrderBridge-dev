@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 public class QuotationDTO {
     private Long quotationSeq;
     private String quotationName;
+    private Long clientSeq;
     private String clientName;
     private Integer quotationExtendedPrice;
     private Integer quotationTotalQuantity;

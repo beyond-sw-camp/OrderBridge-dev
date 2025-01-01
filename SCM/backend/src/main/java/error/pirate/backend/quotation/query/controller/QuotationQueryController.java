@@ -55,7 +55,7 @@ public class QuotationQueryController {
 
     @GetMapping("/situation")
     @Operation(summary = "견적서 현황 조회")
-    public ResponseEntity<QuotationSituationResponse> readQuotationSituation(
+    public ResponseEntity<List<QuotationSituationResponse>> readQuotationSituation(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
             @RequestParam(required = false) String clientName) {
@@ -87,5 +87,23 @@ public class QuotationQueryController {
                 .headers(httpHeaders)
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(quotationQueryService.readQuotationExcel(startDate, endDate, clientName, quotationStatus));
+    }
+
+    @GetMapping("/situation/excel")
+    @Operation(summary = "견적서 현황 엑셀 다운로드")
+    public ResponseEntity<byte[]> readQuotationSituationExcel(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @RequestParam(required = false) String clientName) {
+
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + URLEncoder.encode(
+                new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date()) + "_견적서_현황.xlsx"
+                , StandardCharsets.UTF_8));
+
+        return ResponseEntity.ok()
+                .headers(httpHeaders)
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(quotationQueryService.readQuotationSituationExcel(startDate, endDate, clientName));
     }
 }

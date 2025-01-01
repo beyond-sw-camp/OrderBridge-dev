@@ -10,6 +10,7 @@ import java.util.List;
 public class QuotationResponse {
     private Long quotationSeq;
     private String quotationName;
+    private Long clientSeq;
     private String clientName;
     private Integer quotationExtendedPrice;
     private Integer quotationTotalQuantity;

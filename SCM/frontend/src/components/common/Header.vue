@@ -10,9 +10,11 @@ import statisticsIcon from '@/assets/statisticsIcon.svg'
 import {useUserStore} from "@/stores/UserStore.js";
 import dayjs from 'dayjs';
 import { ref } from "vue";
-import axios from "@/axios.js";
+import axios from "@/axios";
 import Chatbot from "@/components/common/Chatbot.vue";
-import Swal from "sweetalert2";
+import PurchaseOrderPrintPreviewModal from "@/components/purchaseOrder/PurchaseOrderPrintPreview.vue";
+import ShippingInstructionPrintPreview from "@/components/shippingInstruction/ShippingInstructionPrintPreview.vue";
+import ShippingSlipPrintPreview from "@/components/shippingSlip/ShippingSlipPrintPreview.vue";
 
 const userStore = useUserStore();
 const notificationList = ref([]);
@@ -20,83 +22,44 @@ const isNotificationOpen = ref(false);
 
 const fetchNotifications = async () => {
   try {
-    const response = await axios.get("notification");
+    const response = await axios.get(`notification`);
 
     notificationList.value = response.data;
     isNotificationOpen.value = true;
+
   } catch (error) {
     console.error("알림 데이터를 가져오는 중 오류 발생:", error);
   }
 };
 
-const isModalOpen = ref(false);
-const selectedNotification = ref(null);
+const isModalVisible = ref(false);
+const selectedData = ref(null);
+const selectedNotificationType = ref(null);
 
-// 드로잉 관련 변수
-const canvasRef = ref(null);
-const context = ref(null);
-let isDrawing = false;
-const openModal = (notification) => {
-  selectedNotification.value = notification;
-  isModalOpen.value = true;
+const openPrintPreview = async (notification) => {
+  try {
+    // 엔드포인트 변경을 위해 사용
+    if (notification.notificationType === 'shippingInstruction') {
+      notification.notificationType = 'shipping-instruction';
+    } else if(notification.notificationType === 'shippingSlip') {
+      notification.notificationType = 'shipping-slip';
+    }
 
-  // 드로잉 캔버스 초기화
-  setTimeout(() => {
-    const canvas = canvasRef.value;
-    context.value = canvas.getContext("2d");
-    context.value.strokeStyle = "black";
-    context.value.lineWidth = 2;
-  });
-};
+    const response = await axios.get(notification.notificationType + `/${notification.notificationAnotherSeq}`);
 
-const closeModal = () => {
-  isModalOpen.value = false;
-  selectedNotification.value = null;
-};
+    selectedNotificationType.value = notification.notificationType;
+    selectedData.value = response.data;
+    isModalVisible.value = true;
+    isNotificationOpen.value = false;
 
-const saveCanvas = (selectedNotification) => {
-  //TODO 아영 - 이미지 캡쳐해서 업로드하기
+  } catch (error) {
+    console.error("결재 서류 데이터를 가져오는 중 오류 발생:", error);
+  }
+}
 
-  isModalOpen.value = false;
-
-  Swal.fire({
-    position: "top-end",
-    icon: "success",
-    title: "결재 승인이 완료되었습니다.",
-    showConfirmButton: false,
-    timer: 1500
-  });
-};
-
-// 드로잉 시작
-const startDrawing = (event) => {
-  const canvas = canvasRef.value;
-  const rect = canvas.getBoundingClientRect();
-  isDrawing = true;
-  context.value.beginPath();
-  context.value.moveTo(event.clientX - rect.left, event.clientY - rect.top);
-};
-
-// 드로잉 중
-const draw = (event) => {
-  if (!isDrawing) return;
-  const canvas = canvasRef.value;
-  const rect = canvas.getBoundingClientRect();
-  context.value.lineTo(event.clientX - rect.left, event.clientY - rect.top);
-  context.value.stroke();
-};
-
-// 드로잉 종료
-const stopDrawing = () => {
-  if (!isDrawing) return;
-  isDrawing = false;
-  context.value.closePath();
-};
-
-// 캔버스 초기화
-const clearCanvas = () => {
-  const canvas = canvasRef.value;
-  context.value.clearRect(0, 0, canvas.width, canvas.height);
+const closePrintPreview = () => {
+  isModalVisible.value = false;
+  selectedData.value = null;
 };
 
 const chatbot = ref(null);
@@ -186,7 +149,7 @@ function chatbotOn() {
 <!-- 알림 모달  -->
   <div v-if="isNotificationOpen" class="notification-bar">
     <ul v-if="notificationList.length > 0">
-      <li v-for="notification in notificationList" :class="{ 'selected-notification': selectedNotification?.notificationSeq === notification.notificationSeq }" :key="notification.notificationSeq" @click="openModal(notification)">
+      <li v-for="notification in notificationList" :class="{ 'selected-notification': notification.notificationReadYn === 'Y' }" :key="notification.notificationSeq" @click="openPrintPreview(notification)">
         <span>{{ notification.notificationTitle }}</span>
         <span style="float:right;">{{ dayjs(notification.notificationRegDate).format('YYYY/MM/DD HH:mm') }}</span>
         <br/>
@@ -201,28 +164,28 @@ function chatbotOn() {
     <button @click="isNotificationOpen = false">닫기</button>
   </div>
 
-<!-- 결재 싸인 모달  -->
-  <div v-if="isModalOpen" class="signModal-overlay" @click.self="closeModal">
-    <div class="signModal">
-      <h3 style="text-align: center;">{{ selectedNotification?.notificationTitle }}</h3>
+  <template v-if="selectedNotificationType === 'purchaseOrder'">
+    <PurchaseOrderPrintPreviewModal
+        :isVisible="isModalVisible"
+        :purchaseOrder="selectedData"
+        @close="closePrintPreview"
+    />
+  </template>
+  <template v-else-if="selectedNotificationType === 'shipping-instruction'">
+    <ShippingInstructionPrintPreview
+        :isVisible="isModalVisible"
+        :shippingInstruction="selectedData"
+        @close="closePrintPreview"
+    />
+  </template>
+  <template v-else-if="selectedNotificationType === 'shipping-slip'">
+    <ShippingSlipPrintPreview
+        :isVisible="isModalVisible"
+        :shippingSlip="selectedData"
+        @close="closePrintPreview"
+    />
+  </template>
 
-      <canvas
-          ref="canvasRef"
-          width="400"
-          height="200"
-          class="drawing-canvas"
-          @mousedown="startDrawing"
-          @mousemove="draw"
-          @mouseup="stopDrawing"
-          @mouseleave="stopDrawing"
-      ></canvas>
-      <div class="modal-buttons">
-        <button @click="clearCanvas">초기화</button>
-        <button @click="closeModal">닫기</button>
-        <button @click="saveCanvas(selectedNotification)">저장</button>
-      </div>
-    </div>
-  </div>
 
 </template>
 <style scoped>
@@ -302,41 +265,6 @@ function chatbotOn() {
   background-color: #333;
   color: white;
   cursor: pointer;
-}
-
-.signModal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1001;
-}
-
-.signModal {
-  background: #fff;
-  padding: 20px;
-  border-radius: 5px;
-  max-width: 500px;
-  width: 100%;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-}
-
-.drawing-canvas {
-  border: 1px solid #ddd;
-  display: block;
-  margin: 20px auto;
-  cursor: crosshair;
-}
-
-.modal-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
 }
 
 body {

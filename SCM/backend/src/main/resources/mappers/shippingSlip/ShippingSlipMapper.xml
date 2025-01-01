@@ -69,6 +69,7 @@
             s.shipping_slip_total_quantity,
             s.shipping_slip_address AS shipping_address,
             u.user_name,
+            u.user_phone_no,
             s.shipping_slip_note
         FROM tb_shipping_slip s
         JOIN tb_user u ON (s.user_seq = u.user_seq)

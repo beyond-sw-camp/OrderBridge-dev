@@ -1,9 +1,6 @@
 package error.pirate.backend.purchaseOrder.query.controller;
 
-import error.pirate.backend.purchaseOrder.query.dto.PurchaseOrderRequest;
-import error.pirate.backend.purchaseOrder.query.dto.PurchaseOrderResponsePagination;
-import error.pirate.backend.purchaseOrder.query.dto.PurchaseOrderSituationResponse;
-import error.pirate.backend.purchaseOrder.query.dto.PurchaseOrderStockSituationResponse;
+import error.pirate.backend.purchaseOrder.query.dto.*;
 import error.pirate.backend.purchaseOrder.query.service.PurchaseOrderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -13,6 +10,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -35,6 +33,12 @@ public class PurchaseOrderQueryController {
     @Operation(summary = "발주서 조회")
     public ResponseEntity<PurchaseOrderResponsePagination> readPurchaseOrderList(PurchaseOrderRequest purchaseOrderRequest) {
         return ResponseEntity.ok(purchaseOrderService.readPurchaseOrderList(purchaseOrderRequest));
+    }
+
+    @GetMapping("/{purchaseOrderSeq}")
+    @Operation(summary = "발주서 상세조회")
+    public ResponseEntity<PurchaseOrderResponse> readPurchaseOrder(@PathVariable Long purchaseOrderSeq) {
+        return ResponseEntity.ok(purchaseOrderService.readPurchaseOrder(purchaseOrderSeq));
     }
 
     @GetMapping("/excelDown")

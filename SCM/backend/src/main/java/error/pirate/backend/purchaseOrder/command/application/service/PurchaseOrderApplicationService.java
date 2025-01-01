@@ -85,7 +85,7 @@ public class PurchaseOrderApplicationService {
         purchaseOrderItemDomainService.createPurchaseOrderItem(items);
 
         //알림 생성
-        notificationDomainService.createNotificationMessage(NotificationType.PURCHASE_ORDER, purchaseOrderResponse.getPurchaseOrderSeq(), purchaseOrderResponse.getPurchaseOrderName());
+        notificationDomainService.createNotificationMessage(NotificationType.purchaseOrder, purchaseOrderResponse.getPurchaseOrderSeq(), purchaseOrderResponse.getPurchaseOrderName());
     }
 
     @Transactional

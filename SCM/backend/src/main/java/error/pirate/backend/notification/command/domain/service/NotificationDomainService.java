@@ -1,8 +1,10 @@
 package error.pirate.backend.notification.command.domain.service;
 
+import error.pirate.backend.common.FileUploadUtil;
 import error.pirate.backend.exception.CustomException;
 import error.pirate.backend.exception.ErrorCodeType;
 import error.pirate.backend.notification.command.application.dto.NotificationRequest;
+import error.pirate.backend.notification.command.application.dto.SignRequest;
 import error.pirate.backend.notification.command.domain.aggregate.entity.Notification;
 import error.pirate.backend.notification.command.domain.aggregate.entity.NotificationType;
 import error.pirate.backend.notification.command.domain.repository.NotificationRepository;
@@ -10,6 +12,7 @@ import error.pirate.backend.user.command.application.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -22,6 +25,8 @@ public class NotificationDomainService {
     private final UserService userService;
 
     private final ModelMapper modelMapper;
+
+    private final FileUploadUtil fileUploadUtil;
 
     public Notification findById(Long id) {
         return notificationRepository.findById(id)
@@ -38,6 +43,7 @@ public class NotificationDomainService {
         return notificationRepository.save(notification);
     }
 
+    @Transactional
     public Notification createNotificationMessage(NotificationType type, Long seq, String fileName) {
         String title = "[결재 요청]";
         String content = "결재할 문서가 도착하였습니다. <br> " +
@@ -52,5 +58,27 @@ public class NotificationDomainService {
                 .notificationSendUser(sendUser)
                 .build());
     }
-    
+
+    @Transactional
+    public void createSign(SignRequest signRequestDto) {
+        String filePath = saveImageToFile(signRequestDto.getNotificationImageUrl());
+        signRequestDto.setNotificationImageUrl(filePath);
+
+        Notification notification = findById(signRequestDto.getNotificationSeq());
+        notification.addNotificationSign(filePath, "Y");
+    }
+
+    private String saveImageToFile(String base64Image) {
+        try {
+            return fileUploadUtil.uploadImagePath(base64Image);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to save image", e);
+        }
+    }
+
+    public Notification findNotification(NotificationType notificationType, Long notificationAnotherSeq) {
+        return notificationRepository.findNotification(notificationType, notificationAnotherSeq);
+    }
+
 }
+

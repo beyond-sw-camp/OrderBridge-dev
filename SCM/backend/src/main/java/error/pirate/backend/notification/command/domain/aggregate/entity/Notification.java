@@ -36,5 +36,11 @@ public class Notification {
     @CreatedDate
     private LocalDateTime notificationRegDate;
 
+    private String notificationImageUrl;
+
+    public void addNotificationSign(String notificationImageUrl, String notificationReadYn) {
+        this.notificationImageUrl = notificationImageUrl;
+        this.notificationReadYn = notificationReadYn;
+    }
 
 }

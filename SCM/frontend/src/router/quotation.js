@@ -9,4 +9,9 @@ export default [
         name: "QuotationInput",
         component: () => import("@/views/quotation/QuotationInputView.vue")
     },
+    {
+        path: "/quotation/situation",
+        name: "QuotationSituation",
+        component: () => import("@/views/quotation/QuotationSituationView.vue")
+    },
 ]

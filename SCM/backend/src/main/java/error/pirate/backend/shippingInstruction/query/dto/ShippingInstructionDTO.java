@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 @Schema(description = "출하지시서 DTO")
 public class ShippingInstructionDTO {
     private long shippingInstructionSeq;    // 출하지시서 번호
+    private String shippingInstructionName; // 출하지시서명
     private long salesOrderSeq; // 주문서 번호
     private String salesOrderName; // 주문서명
     private String clientName;  // 거래처명
@@ -18,5 +19,6 @@ public class ShippingInstructionDTO {
     private ShippingAddress shippingAddress;  // 출하지시서 주소
     private String userEmployeeNo;  // 담당자 사원번호
     private String userName;    // 출하지시서 담당자
+    private String userPhoneNo; // 유저 핸드폰 번호
     private String shippingInstructionNote; // 출하지시서 비고
 }
