@@ -19,6 +19,7 @@ import error.pirate.backend.salesOrder.command.domain.repository.SalesOrderItemR
 import error.pirate.backend.salesOrder.command.domain.service.SalesOrderDomainService;
 import error.pirate.backend.salesOrder.query.dto.SalesOrderItemDTO;
 import error.pirate.backend.user.command.domain.aggregate.entity.User;
+import error.pirate.backend.user.command.domain.repository.UserRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +33,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class SalesOrderCommandService {
 
+    private final UserRepository userRepository;
     private final QuotationItemRepository quotationItemRepository;
     private final SalesOrderCommandRepository salesOrderCommandRepository;
     private final SalesOrderItemRepository salesOrderItemRepository;
@@ -41,7 +43,7 @@ public class SalesOrderCommandService {
 
     // 주문서 등록
     @Transactional
-    public void createSalesOrder(CreateSalesOrderRequest createSalesOrderRequest) {
+    public void createSalesOrder(CreateSalesOrderRequest createSalesOrderRequest, String userEmployeeNo) {
 
         // 불러온 견적서가 있으면 견적서 확인 절차
         validateItem(createSalesOrderRequest.getQuotationSeq(), createSalesOrderRequest.getSalesOrderItemList());
@@ -49,7 +51,7 @@ public class SalesOrderCommandService {
         // 엔티티 요구 변수 작성
         Quotation quotation = entityManager.getReference(Quotation.class, createSalesOrderRequest.getQuotationSeq());
         Client client = entityManager.getReference(Client.class, createSalesOrderRequest.getClientSeq());
-        User user = entityManager.getReference(User.class, 1L);
+        User user = userRepository.findByUserEmployeeNo(userEmployeeNo).orElseThrow();
         String name = nameGenerator.nameGenerator(SalesOrder.class);
 
         // 주문서 합계 계산
