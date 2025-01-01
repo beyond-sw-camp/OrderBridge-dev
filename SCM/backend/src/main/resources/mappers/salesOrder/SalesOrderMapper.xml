@@ -177,7 +177,7 @@
             tb_sales_order.sales_order_name,
             tb_sales_order.sales_order_total_quantity,
             tb_sales_order.sales_order_extended_price,
-            tb_client_client_name,
+            tb_client.client_name,
             tb_sales_order.sales_order_note
         FROM tb_sales_order
         JOIN tb_client USING (client_seq)
