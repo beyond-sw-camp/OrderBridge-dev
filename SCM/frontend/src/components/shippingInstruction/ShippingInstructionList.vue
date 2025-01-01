@@ -20,10 +20,11 @@ const props = defineProps({
   expandShippingInstruction: {type: Object, required: true},
   expandItemList: {type: Object, required: true},
   itemDivisionList: {type: Array, required: true},       // 물품 구분 목록
+  clientHintList: {type: Array, required: true},      // 거래처명 목록
 });
 
 const emit = defineEmits(
-    ['pageEvent', 'searchEvent', 'checkStatusEvent', 'extendItemEvent',
+    ['pageEvent', 'clientEvent', 'searchEvent', 'checkStatusEvent', 'extendItemEvent',
       'itemEditEvent', 'itemDeleteEvent', 'registerEvent', 'excelEvent', 'shippingSlipRegisterEvent']);
 
 const userStore = useUserStore();
@@ -38,6 +39,10 @@ watch([startDate, endDate], () => {
 
 watch(pageNumber, () => {
   emit('pageEvent', pageNumber);
+})
+
+watch(clientName, () => {
+  emit('clientEvent', clientName);
 })
 
 const search = () => {
@@ -164,6 +169,13 @@ const printPage = () => {
               <searchIcon class="icon"/>
             </b-button>
           </b-input-group>
+          <div class="clientHint" style="position: absolute; z-index: 5;">
+            <ul class="list-group">
+              <template v-for="hint in clientHintList">
+                <li class="list-group-item list-group-item-action" @click="clientName = hint">{{ hint }}</li>
+              </template>
+            </ul>
+          </div>
         </div>
       </div>
       <div class="side-box card">

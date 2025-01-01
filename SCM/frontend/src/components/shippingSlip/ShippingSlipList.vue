@@ -18,10 +18,11 @@ const props = defineProps({
   expandShippingSlip: {type: Object, required: true},
   expandItemList: {type: Object, required: true},
   itemDivisionList: {type: Array, required: true},       // 물품 구분 목록
+  clientHintList: {type: Array, required: true},      // 거래처명 목록
 });
 
 const emit = defineEmits(
-    ['pageEvent', 'searchEvent','extendItemEvent', 'excelEvent']);
+    ['pageEvent', 'clientEvent', 'searchEvent','extendItemEvent', 'excelEvent']);
 
 const startDate = ref(props.searchStartDate);
 const endDate = ref(props.searchEndDate);
@@ -34,6 +35,10 @@ watch([startDate, endDate], () => {
 
 watch(pageNumber, () => {
   emit('pageEvent', pageNumber);
+})
+
+watch(clientName, () => {
+  emit('clientEvent', clientName);
 })
 
 const search = () => {
@@ -134,6 +139,13 @@ const printPage = () => {
               <searchIcon class="icon"/>
             </b-button>
           </b-input-group>
+          <div class="clientHint" style="position: absolute; z-index: 5;">
+            <ul class="list-group">
+              <template v-for="hint in clientHintList">
+                <li class="list-group-item list-group-item-action" @click="clientName = hint">{{ hint }}</li>
+              </template>
+            </ul>
+          </div>
         </div>
       </div>
     </div>
