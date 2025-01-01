@@ -64,6 +64,7 @@
         SELECT
             tb_quotation.quotation_seq,
             tb_quotation.quotation_name,
+            tb_quotation.client_seq,
             tb_client.client_name,
             tb_quotation.quotation_extended_price,
             tb_quotation.quotation_total_quantity,

@@ -139,6 +139,15 @@ function addItemList(selectedItem) {
     document.getElementById(`closeItemModal`).click();
 }
 
+// 품목 삭제
+const removeItem = (quotationItemSeq) => {
+    quotationItemList.value = quotationItemList.value.filter(
+        (item) => item.itemSeq !== quotationItemSeq
+    );
+
+    delete quotationItemList.value[quotationItemSeq];
+};
+
 // 가격 갱신
 function updatePrice(itemSeq) {
     const item = quotationItemList.value.find((quotationItem) => quotationItem.itemSeq === itemSeq);
@@ -222,7 +231,7 @@ function numberThree(number) {
                             @input="updatePrice(quotationItem.itemSeq)"
                             :placeholder="quotationItem.quotationItemQuantity ? '' : '수량 입력'" :min="1" /></li>
                     <li class="mb-3 col-md-6">· 품목 총 가격: ₩ {{ numberThree(quotationItem.quotationItemPrice * quotationItem.quotationItemQuantity) }} </li>
-                    <li class="mb-3 col-md-6">· 품목 비고:<input type="text" v-model="quotationItem.quotationItemNote"/></li>
+                    <li class="mb-3 col-md-6 d-flex">· 품목 비고: <b-form-input type="text" size="sm" v-model="quotationItem.quotationItemNote" style="width: auto;"/></li>
                 </ul>
             </div>
             <div class="col-md-4 d-flex justify-content-center align-items-center">
@@ -315,9 +324,9 @@ function numberThree(number) {
                         </div>
                         <template v-if="itemList.length > 0">
                             <div v-for="Item in itemList" class="list-line row" @click="addItemList(Item)">
-                                <div class="list-body col-5 left">{{ Item.itemName }}</div>
-                                <div class="list-body col-2 left">{{ Item.itemPrice.toLocaleString() }} 원</div>
-                                <div class="list-body col-3 left">{{ Item.itemExpirationHour }} 시간</div>
+                                <div class="list-body col-5">{{ Item.itemName }}</div>
+                                <div class="list-body col-2">{{ Item.itemPrice }} 원</div>
+                                <div class="list-body col-3">{{ Item.itemExpirationHour }} 시간</div>
                                 <div class="list-body col-2">{{ findStatusValue(itemDivisionList, Item.itemDivision) }}
                                 </div>
                             </div>
