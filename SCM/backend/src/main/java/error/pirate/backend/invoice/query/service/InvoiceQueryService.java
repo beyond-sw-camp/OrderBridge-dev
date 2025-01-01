@@ -1,5 +1,6 @@
 package error.pirate.backend.invoice.query.service;
 
+import error.pirate.backend.common.ExcelDownLoad;
 import error.pirate.backend.invoice.command.domain.aggregate.entity.InvoiceStatus;
 import error.pirate.backend.invoice.query.dto.*;
 import error.pirate.backend.invoice.query.mapper.InvoiceMapper;
@@ -16,6 +17,7 @@ public class InvoiceQueryService {
 
     private final InvoiceMapper invoiceMapper;
     private final ModelMapper modelMapper;
+    private final ExcelDownLoad excelDownBody;
 
     // 거래 명세서 목록 조회
     public InvoiceListResponse readInvoiceList(
@@ -53,5 +55,14 @@ public class InvoiceQueryService {
     // 거래 명세서 값 확인
     public List<InvoiceItemCheckDTO> invoiceItemCheck(Long salesOrderSeq) {
         return invoiceMapper.sumInvoiceItemValue(salesOrderSeq);
+    }
+
+    // 거래 명세서 목록 엑셀 다운로드
+    public byte[] readInvoiceExcel(LocalDate startDate, LocalDate endDate, String clientName) {
+
+        return excelDownBody.writeCells(
+                new String[] {"등록", "수정", "이름", "판매일", "총 수량", "총 가격", "비고"},
+                invoiceMapper.selectInvoiceExcel(startDate, endDate, clientName)
+        );
     }
 }
