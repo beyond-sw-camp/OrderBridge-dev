@@ -38,7 +38,7 @@ public interface SalesOrderMapper {
             @Param("salesOrderSeq") Long salesOrderSeq);
 
     // 주문서 현황 조회
-    List<SalesOrderSituationDTO> selectSalesOrderSituation(
+    List<SalesOrderSituationResponse> selectSalesOrderSituation(
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate,
             @Param("clientName") String clientName);

@@ -95,18 +95,20 @@
     </select>
     
     <!--  주문서 현황 조회  -->
-    <select id="selectSalesOrderSituation" resultType="error.pirate.backend.salesOrder.query.dto.SalesOrderSituationDTO">
+    <select id="selectSalesOrderSituation" resultType="error.pirate.backend.salesOrder.query.dto.SalesOrderSituationResponse">
         SELECT
-            tb_sales_order.sales_order_seq,
             tb_sales_order.sales_order_order_date,
             tb_sales_order.sales_order_name,
             tb_sales_order.sales_order_total_quantity,
             tb_sales_order.sales_order_extended_price,
             tb_client.client_name,
-            tb_sales_order.sales_order_note
+            tb_sales_order.sales_order_note,
+            DATE_FORMAT(tb_sales_order.sales_order_order_date, '%Y-%m') as sales_order_order_month,
+            IFNULL(SUM(tb_sales_order.sales_order_extended_price), 0) as sales_order_month_price,
+            IFNULL(SUM(tb_sales_order.sales_order_total_quantity), 0) as sales_order_month_quantity
         FROM tb_sales_order
         JOIN tb_client USING (client_seq)
-        WHERE TRUE
+        WHERE tb_sales_order.sales_order_status NOT IN ("DELETE")
         <if test="startDate != null"><![CDATA[
             AND #{startDate} <= tb_sales_order.sales_order_order_date
         ]]></if>
@@ -116,6 +118,9 @@
         <if test="clientName != null">
             AND tb_client.client_name LIKE CONCAT('%', #{clientName}, '%')
         </if>
+        GROUP BY
+            DATE_FORMAT(tb_sales_order.sales_order_order_date, '%Y-%m'),
+            tb_sales_order.sales_order_order_date WITH ROLLUP;
     </select>
 
     <!--  주문서 품목 값 확인  -->

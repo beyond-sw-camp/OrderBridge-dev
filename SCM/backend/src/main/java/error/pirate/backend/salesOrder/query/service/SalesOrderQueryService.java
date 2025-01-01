@@ -58,12 +58,11 @@ public class SalesOrderQueryService {
     }
 
     // 주문서 현황 조회
-    public SalesOrderSituationResponse readSalesOrderSituation(
+    public List<SalesOrderSituationResponse> readSalesOrderSituation(
             LocalDate startDate, LocalDate endDate, String clientName) {
 
         // 주문서 현황 조회
-        return new SalesOrderSituationResponse(salesOrderMapper.selectSalesOrderSituation(
-                startDate, endDate, clientName));
+        return salesOrderMapper.selectSalesOrderSituation(startDate, endDate, clientName);
     }
 
     // 주문서 품목 값 확인

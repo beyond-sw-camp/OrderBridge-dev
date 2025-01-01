@@ -54,7 +54,7 @@ public class SalesOrderQueryController {
 
     @GetMapping("/situation")
     @Operation(summary = "주문서 현황 조회")
-    public ResponseEntity<SalesOrderSituationResponse> readSalesOrderSituation(
+    public ResponseEntity<List<SalesOrderSituationResponse>> readSalesOrderSituation(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
             @RequestParam(required = false) String clientName) {
