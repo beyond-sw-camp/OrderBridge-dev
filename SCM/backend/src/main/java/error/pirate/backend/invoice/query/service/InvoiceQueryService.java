@@ -65,4 +65,13 @@ public class InvoiceQueryService {
                 invoiceMapper.selectInvoiceExcel(startDate, endDate, clientName)
         );
     }
+
+    // 거래 명세서 현황 엑셀 다운로드
+    public byte[] readInvoiceSituationExcel(LocalDate startDate, LocalDate endDate, String clientName) {
+
+        return excelDownBody.writeCells(
+                new String[] {"판매일", "이름", "총 수량", "총 가격", "거래처", "비고"},
+                invoiceMapper.selectInvoiceSituationExcel(startDate, endDate, clientName)
+        );
+    }
 }

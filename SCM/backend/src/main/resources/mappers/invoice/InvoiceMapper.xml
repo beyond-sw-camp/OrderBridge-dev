@@ -149,4 +149,28 @@
             AND tb_client.client_name LIKE CONCAT('%', #{clientName}, '%')
         </if>
     </select>
+
+    <!--  거래 명세서 현황 엑셀 다운로드  -->
+    <select id="selectInvoiceSituationExcel" resultType="error.pirate.backend.invoice.query.dto.InvoiceSituationExcelDTO">
+        SELECT
+            tb_invoice.invoice_sale_date,
+            tb_invoice.invoice_name,
+            tb_invoice.invoice_total_quantity,
+            tb_invoice.invoice_extended_price,
+            tb_client.client_name,
+            tb_invoice.invoice_note
+        FROM tb_invoice
+        JOIN tb_sales_order USING (sales_order_seq)
+        JOIN tb_client USING (client_seq)
+        WHERE tb_invoice.invoice_status NOT IN ("DELETE")
+        <if test="startDate != null"><![CDATA[
+            AND #{startDate} <= tb_invoice.invoice_sale_date
+        ]]></if>
+        <if test="endDate != null"><![CDATA[
+            AND #{endDate} >= tb_invoice.invoice_sale_date
+        ]]></if>
+        <if test="clientName != null">
+            AND tb_client.client_name LIKE CONCAT('%', #{clientName}, '%')
+        </if>
+    </select>
 </mapper>

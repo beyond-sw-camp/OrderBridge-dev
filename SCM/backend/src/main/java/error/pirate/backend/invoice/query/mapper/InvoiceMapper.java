@@ -49,4 +49,10 @@ public interface InvoiceMapper {
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate,
             @Param("clientName") String clientName);
+
+    // 거래 명세서 현황 엑셀 다운로드
+    ArrayList<Object> selectInvoiceSituationExcel(
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate,
+            @Param("clientName") String clientName);
 }

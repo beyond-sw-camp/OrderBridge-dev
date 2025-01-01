@@ -84,4 +84,22 @@ public class InvoiceQueryController {
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(invoiceQueryService.readInvoiceExcel(startDate, endDate, clientName));
     }
+
+    @GetMapping("/situation/excel")
+    @Operation(summary = "거래 명세서 현황 엑셀 다운로드")
+    public ResponseEntity<byte[]> readInvoiceSituationExcel(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @RequestParam(required = false) String clientName) {
+
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + URLEncoder.encode(
+                new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date()) + "_거래명세서_현황.xlsx"
+                , StandardCharsets.UTF_8));
+
+        return ResponseEntity.ok()
+                .headers(httpHeaders)
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(invoiceQueryService.readInvoiceSituationExcel(startDate, endDate, clientName));
+    }
 }
