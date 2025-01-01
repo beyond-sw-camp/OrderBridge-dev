@@ -1,5 +1,6 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue';
+import { sConfirm } from "@/common/salert";
 import searchIcon from "@/assets/searchIcon.svg"
 import trashIcon from "@/assets/trashIcon.svg";
 import editIcon from "@/assets/editIcon.svg";
@@ -107,7 +108,7 @@ const excelDown = async () => {
 // 견적서 삭제 요청
 const deleteQuotation = async (quotationSeq) => {
     try {
-        const deleteConfirm = confirm(`선택한 견적서를 삭제하시겠습니까?`);
+        const deleteConfirm = await sConfirm(`선택한 견적서를 삭제하시겠습니까?`);
         if (deleteConfirm) {
             const response = await axios.delete(`quotation/${quotationSeq}`);
             fetchQuotationList();

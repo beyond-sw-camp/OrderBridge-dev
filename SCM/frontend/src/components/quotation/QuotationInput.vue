@@ -139,6 +139,15 @@ function addItemList(selectedItem) {
     document.getElementById(`closeItemModal`).click();
 }
 
+// 품목 삭제
+const removeItem = (quotationItemSeq) => {
+    quotationItemList.value = quotationItemList.value.filter(
+        (item) => item.itemSeq !== quotationItemSeq
+    );
+
+    delete quotationItemList.value[quotationItemSeq];
+};
+
 // 가격 갱신
 function updatePrice(itemSeq) {
     const item = quotationItemList.value.find((quotationItem) => quotationItem.itemSeq === itemSeq);

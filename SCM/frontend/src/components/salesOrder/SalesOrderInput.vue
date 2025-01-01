@@ -1,26 +1,25 @@
 <script setup>
 import { ref, onMounted, watch, computed } from "vue";
-import { useUserStore } from "@/stores/UserStore.js";
+import { sAlert, sSuccess, sError } from "@/common/salert";
 import plusIcon from '@/assets/plus.svg'
 import searchIcon from "@/assets/searchIcon.svg";
 import router from "@/router/index.js";
 import axios from "@/axios"
-import dayjs from "dayjs";
 
 const clientName = ref();
 const quotationName = ref();
 
-const username = useUserStore().$id;
 const requestQuotation = ref();
+const requestClient = ref();
 const salesOrderOrderDate = ref();
 const salesOrderDueDate = ref();
 const salesOrderNote = ref();
 const salesOrderItemList = ref([]);
 
 const calculatePrice = computed(() => {
-  return salesOrderItemList.value.reduce((total, item) => {
-    return total + (item.salesOrderItemPrice || 0) * (item.salesOrderItemQuantity || 1);
-  }, 0);
+    return salesOrderItemList.value.reduce((total, item) => {
+        return total + (item.salesOrderItemPrice || 0) * (item.salesOrderItemQuantity || 1);
+    }, 0);
 });
 
 // 견적서 목록 요청
@@ -29,6 +28,7 @@ const quotationPageSize = ref(10);
 const quotationPageNumber = ref(1);
 const quotationTotalCount = ref();
 
+// 거래처 목록 요청
 const fetchQuotationList = async () => {
     try {
         const response = await axios.get(`quotation`, {
@@ -41,20 +41,23 @@ const fetchQuotationList = async () => {
         quotationList.value = response.data.quotation;
         quotationTotalCount.value = response.data.totalCount;
     } catch (error) {
-        console.log(`거래처 목록 요청 실패 ${error}`);
+        await sError(error);
+        console.error(`거래처 목록 요청 실패`, error);
     }
 }
 
 // 견적서 상세 요청
-const quotationItemList = ref([]);
+const quotationItemList = ref();
 
 const fetchQuotationItemList = async (quotationSeq) => {
     try {
         const response = await axios.get(`quotation/${quotationSeq}`);
 
         quotationItemList.value = response.data.quotationItem;
+        requestClient.value = response.data.clientSeq;
     } catch (error) {
-        console.log(`견적서 상세 요청 실패 ${error}`);
+        await sError(error);
+        console.error(`견적서 상세 요청 실패`, error);
     }
 }
 
@@ -76,7 +79,8 @@ const fetchItemList = async () => {
         itemList.value = Array.isArray(response.data.content) ? response.data.content : [];
         itemTotalCount.value = response.data.totalElements;
     } catch (error) {
-        console.error(`품목 목록 요청 실패 ${error}`);
+        await sError(error);
+        console.error(`품목 목록 요청 실패`, error);
     }
 };
 
@@ -89,7 +93,8 @@ const fetchItem = async (itemSeq) => {
 
         itemDetail.value = response.data.itemDTO;
     } catch (error) {
-        console.error(`품목 상세 요청 실패 ${error}`);
+        await sError(error);
+        console.error(`품목 상세 요청 실패`, error);
     }
 }
 
@@ -102,26 +107,29 @@ const fetchItemDivision = async () => {
 
         itemDivisionList.value = response.data;
     } catch (error) {
-        console.log(`품목 분류 요청 실패 ${error}`);
+        await sError(error);
+        console.error(`품목 분류 요청 실패`, error);
     }
 }
 
 // 주문서 등록 요청
 const createSalesOrder = async () => {
     try {
-        const response = await axios.post('salesOrder',
+        const response = await axios.post('sales-order',
             {
-                salesOrderOrderDate: salesOrderDate.value,
+                salesOrderOrderDate: salesOrderOrderDate.value,
+                salesOrderDueDate: salesOrderDueDate.value,
+                quotationSeq: requestQuotation.value,
                 clientSeq: requestClient.value,
                 salesOrderNote: salesOrderNote.value,
-                salesOrderItem: salesOrderItemList.value
+                salesOrderItemList: salesOrderItemList.value
             });
 
-        alert('주문서가 등록되었습니다');
-        await router.push('/salesOrder');
+        sSuccess(`주문서가 등록되었습니다.`);
+        await router.push('/sales-order');
     } catch (error) {
-        console.error(`주문서 등록 실패 ${error}`);
-        throw error;
+        await sError(error);
+        console.error(`주문서 등록 요청 실패`, error);
     }
 }
 
@@ -129,12 +137,13 @@ const createSalesOrder = async () => {
 const salesOrderStatusList = ref();
 
 const fetchSalesOrderStatus = async () => {
-    try { 
+    try {
         const response = await axios.get(`sales-order/status`);
-        
+
         salesOrderStatusList.value = response.data;
     } catch (error) {
-        console.log(`주문서 상태 분류 목록 요청 실패`, error);
+        await sError(error);
+        console.error(`주문서 상태 분류 목록 요청 실패`, error);
     }
 }
 
@@ -159,17 +168,20 @@ async function setQuotation(object) {
     clientName.value = object.clientName;
 
     salesOrderItemList.value = [];
-    for (const quotationItem in quotationItemList) {
+    await fetchQuotationItemList(object.quotationSeq);
+
+    for (const quotationItem of quotationItemList.value) {
         await fetchItem(quotationItem.itemSeq);
+        
         salesOrderItemList.value.push({
             itemSeq: quotationItem.itemSeq,
-            itemName: itemDetail.itemName,
-            itemImageUrl: itemDetail.itemImageUrl,
+            itemName: itemDetail.value.itemName,
+            itemImageUrl: itemDetail.value.itemImageUrl,
             salesOrderItemPrice: quotationItem.quotationItemPrice,
-            salesOrderItemQuantity: quotationItem.quotationQuantity
+            salesOrderItemQuantity: quotationItem.quotationItemQuantity
         });
     }
-
+    
     document.getElementById(`closeClientModal`).click();
 }
 
@@ -189,11 +201,20 @@ function addItemList(selectedItem) {
             salesOrderItemNote: selectedItem.salesOrderItemNote
         });
     } else {
-        alert(`이미 추가된 품목입니다.`);
+        sAlert(`Error!`, `이미 추가된 품목입니다.`, `info`);
     }
 
     document.getElementById(`closeItemModal`).click();
 }
+
+// 품목 삭제
+const removeItem = (salesOrderItemSeq) => {
+    salesOrderItemList.value = salesOrderItemList.value.filter(
+        (item) => item.itemSeq !== salesOrderItemSeq
+    );
+
+    delete salesOrderItemList.value[salesOrderItemSeq];
+};
 
 // 가격 갱신
 function updatePrice(itemSeq) {
@@ -221,7 +242,7 @@ function numberThree(number) {
 
 <template>
     <div class="d-flex justify-content-end mt-3">
-        <RouterLink to="/salesOrder">
+        <RouterLink to="/sales-order">
             <b-button variant="light" size="sm" class="button ms-2">목록</b-button>
         </RouterLink>
     </div>
@@ -239,7 +260,8 @@ function numberThree(number) {
 
             <b-form-group label-cols="4" label-cols-lg="2" label-size="default" label="견적서">
                 <b-input-group class="w-75">
-                    <b-form-input type="text" size="sm" id="quotation" v-model="quotationName" placeholder="견적서" disabled="true"/>
+                    <b-form-input type="text" size="sm" id="quotation" v-model="quotationName" placeholder="견적서"
+                        disabled="true" />
                     <b-input-group-text data-bs-toggle="modal" data-bs-target="#openQuotationModal"
                         @click="fetchQuotationList">
                         <searchIcon class="icon" />
@@ -249,7 +271,7 @@ function numberThree(number) {
 
             <b-form-group label-cols="4" label-cols-lg="2" label-size="default" label="거래처">
                 <b-input-group class="w-75">
-                    <b-form-input type="text" size="sm" id="client" v-model="clientName" disabled="true"/>
+                    <b-form-input type="text" size="sm" id="client" v-model="clientName" disabled="true" />
                 </b-input-group>
             </b-form-group>
 
@@ -283,8 +305,10 @@ function numberThree(number) {
                             v-model.number="salesOrderItem.salesOrderItemQuantity"
                             @input="updatePrice(salesOrderItem.itemSeq)"
                             :placeholder="salesOrderItem.salesOrderItemQuantity ? '' : '수량 입력'" :min="1" /></li>
-                    <li class="mb-3 col-md-6">· 품목 총 가격: ₩ {{ numberThree(salesOrderItem.salesOrderItemPrice * salesOrderItem.salesOrderItemQuantity) }} </li>
-                    <li class="mb-3 col-md-6 d-flex">· 품목 비고: <b-form-input type="text" size="sm" v-model="salesOrderItem.salesOrderItemNote" style="width: auto;"/></li>
+                    <li class="mb-3 col-md-6">· 품목 총 가격: ₩ {{ numberThree(salesOrderItem.salesOrderItemPrice *
+                        salesOrderItem.salesOrderItemQuantity) }} </li>
+                    <li class="mb-3 col-md-6 d-flex">· 품목 비고: <b-form-input type="text" size="sm"
+                            v-model="salesOrderItem.salesOrderItemNote" style="width: auto;" /></li>
                 </ul>
             </div>
             <div class="col-md-4 d-flex justify-content-center align-items-center">
@@ -325,7 +349,8 @@ function numberThree(number) {
                 <div class="modal-header">
                     <h1 class="modal-title fs-5">견적서 선택</h1>
                     <div class="ms-5">검색결과: {{ quotationTotalCount }}개</div>
-                    <button id="closeClientModal" type="button" class="button btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button id="closeClientModal" type="button" class="button btn-close" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div style="max-height: 500px; overflow-y: scroll"
@@ -338,11 +363,13 @@ function numberThree(number) {
                             <div class="list-head col-2">상태</div>
                         </div>
                         <template v-if="quotationList.length > 0">
-                            <div v-for="quotation in quotationList" class="list-line row" @click="setQuotation(quotation)">
+                            <div v-for="quotation in quotationList" class="list-line row"
+                                @click="setQuotation(quotation)">
                                 <div class="list-body col-6">{{ quotation.quotationName }}</div>
                                 <div class="list-body col-2">{{ quotation.clientName }}</div>
                                 <div class="list-body col-2">{{ quotation.quotationQuotationDate }}</div>
-                                <div class="list-body col-2">{{ findStatusValue(salesOrderStatusList, quotation.quotationStatus) }}
+                                <div class="list-body col-2">{{ findStatusValue(salesOrderStatusList,
+                                    quotation.quotationStatus) }}
                                 </div>
                             </div>
                         </template>
@@ -352,7 +379,8 @@ function numberThree(number) {
                     </div>
                 </div>
                 <div class="modal-footer pagination">
-                    <b-pagination v-model="quotationPageNumber" :totalRows="quotationTotalCount" :perPage="quotationPageSize" />
+                    <b-pagination v-model="quotationPageNumber" :totalRows="quotationTotalCount"
+                        :perPage="quotationPageSize" />
                 </div>
             </div>
         </div>
@@ -364,10 +392,12 @@ function numberThree(number) {
                 <div class="modal-header">
                     <h1 class="modal-title fs-5">품목 선택</h1>
                     <div class="ms-5">검색결과: {{ itemTotalCount }}개</div>
-                    <button id="closeItemModal" type="button" class="button btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button id="closeItemModal" type="button" class="button btn-close" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <div style="max-height: 500px; overflow-y: scroll" class="d-flex row justify-content-center align-items-center">
+                    <div style="max-height: 500px; overflow-y: scroll"
+                        class="d-flex row justify-content-center align-items-center">
 
                         <div class="list-headline row">
                             <div class="list-head col-5">품목명</div>
@@ -450,5 +480,4 @@ div {
 li {
     list-style: none;
 }
-
 </style>
