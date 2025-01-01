@@ -187,7 +187,7 @@ function numberThree(number) {
 
             <b-form-group label-cols="4" label-cols-lg="2" label-size="default" label="거래처">
                 <b-input-group class="w-75">
-                    <b-form-input type="text" size="sm" id="client" v-model="clientName" placeholder="거래처" />
+                    <b-form-input type="text" size="sm" id="client" v-model="clientName" placeholder="거래처" :disabled=true />
                     <b-input-group-text data-bs-toggle="modal" data-bs-target="#openClientModal"
                         @click="fetchclientList">
                         <searchIcon class="icon" />
@@ -196,7 +196,7 @@ function numberThree(number) {
             </b-form-group>
 
             <b-form-group label-cols="4" label-cols-lg="2" label-size="default" label="담당자">
-                <b-form-input class="w-75" size="sm" id="user" v-model="username" disabled="false">
+                <b-form-input class="w-75" size="sm" id="user" v-model="username" :disabled=true>
                 </b-form-input>
             </b-form-group>
 
@@ -266,7 +266,7 @@ function numberThree(number) {
     <div class="d-flex justify-content-center">
 
     </div>
-    <div class="modal fade" id="openClientModal" tabindex="-1" aria-labelledby="OrderModalLabel" aria-hidden="true">
+    <div class="modal fade" id="openClientModal" tabindex="-1" aria-labelledby="OrderModalLabel">
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
@@ -305,7 +305,7 @@ function numberThree(number) {
         </div>
     </div>
 
-    <div class="modal fade" id="openItemModal" tabindex="-1" aria-labelledby="OrderModalLabel" aria-hidden="true">
+    <div class="modal fade" id="openItemModal" tabindex="-1" aria-labelledby="OrderModalLabel">
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <div class="modal-header">

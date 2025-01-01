@@ -1,5 +1,6 @@
 package error.pirate.backend.invoice.command.application.controller;
 
+import error.pirate.backend.common.SecurityUtil;
 import error.pirate.backend.invoice.command.application.dto.CreateInvoiceRequest;
 import error.pirate.backend.invoice.command.application.dto.UpdateInvoiceRequest;
 import error.pirate.backend.invoice.command.application.service.InvoiceCommandService;
@@ -16,13 +17,14 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "Invoice", description = "거래 명세서")
 public class InvoiceCommandController {
 
+    private final SecurityUtil securityUtil;
     private final InvoiceCommandService invoiceCommandService;
 
     @PostMapping("")
     @Operation(summary = "거래 명세서 등록")
     public ResponseEntity<Void> createInvoice(@RequestBody CreateInvoiceRequest createInvoiceRequest) {
 
-        invoiceCommandService.createInvoice(createInvoiceRequest);
+        invoiceCommandService.createInvoice(createInvoiceRequest, securityUtil.getCurrentUserEmployeeNo());
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }

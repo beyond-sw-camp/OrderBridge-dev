@@ -10,10 +10,16 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -61,6 +67,25 @@ public class SalesOrderQueryController {
     @Operation(summary = "주문서 상태 분류 조회")
     public ResponseEntity<List<SalesOrderStatus.SalesOrderStatusResponse>> readSalesOrderStatus() {
         return ResponseEntity.ok(SalesOrderStatus.readSalesOrderStatusList());
+    }
+
+    @GetMapping("/excel")
+    @Operation(summary = "주문서 목록 엑셀 다운로드")
+    public ResponseEntity<byte[]> readSalesOrderExcel(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @RequestParam(required = false) String clientName,
+            @RequestParam(required = false) List<SalesOrderStatus> salesOrderStatus) {
+
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + URLEncoder.encode(
+                new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date()) + "_주문서.xlsx"
+                , StandardCharsets.UTF_8));
+
+        return ResponseEntity.ok()
+                .headers(httpHeaders)
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(salesOrderQueryService.readSalesOrderExcel(startDate, endDate, clientName, salesOrderStatus));
     }
 
     /* 이미 작업지시가 등록된 주문서 물품 조회 */

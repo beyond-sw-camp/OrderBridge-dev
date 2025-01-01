@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Mapper
@@ -42,4 +43,10 @@ public interface InvoiceMapper {
     // 거래 명세서 품목 값 확인
     List<InvoiceItemCheckDTO> sumInvoiceItemValue(
             @Param("salesOrderSeq") Long salesOrderSeq);
+
+    // 거래 명세서 목록 엑셀 다운로드
+    ArrayList<Object> selectInvoiceExcel(
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate,
+            @Param("clientName") String clientName);
 }
