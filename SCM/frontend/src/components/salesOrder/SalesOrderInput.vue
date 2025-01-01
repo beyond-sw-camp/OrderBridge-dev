@@ -260,8 +260,7 @@ function numberThree(number) {
 
             <b-form-group label-cols="4" label-cols-lg="2" label-size="default" label="견적서">
                 <b-input-group class="w-75">
-                    <b-form-input type="text" size="sm" id="quotation" v-model="quotationName" placeholder="견적서"
-                        disabled="true" />
+                    <b-form-input type="text" size="sm" id="quotation" v-model="quotationName" placeholder="견적서" :disabled=true />
                     <b-input-group-text data-bs-toggle="modal" data-bs-target="#openQuotationModal"
                         @click="fetchQuotationList">
                         <searchIcon class="icon" />
@@ -271,7 +270,7 @@ function numberThree(number) {
 
             <b-form-group label-cols="4" label-cols-lg="2" label-size="default" label="거래처">
                 <b-input-group class="w-75">
-                    <b-form-input type="text" size="sm" id="client" v-model="clientName" disabled="true" />
+                    <b-form-input type="text" size="sm" id="client" v-model="clientName" :disabled=true />
                 </b-input-group>
             </b-form-group>
 

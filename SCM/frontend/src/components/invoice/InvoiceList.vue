@@ -217,7 +217,7 @@ function numberThree(number) {
                     <div>검색결과: {{ totalInvoice }}개</div>
                     <div class="d-flex justify-content-end mt-3">
                         <b-button @click="excelDown()" variant="light" size="sm" class="button">엑셀 다운로드</b-button>
-                        <b-button variant="light" size="sm" class="button ms-2">거래 명세서 등록</b-button>
+                        <RouterLink to="/invoice/input"><b-button variant="light" size="sm" class="button ms-2">거래 명세서 등록</b-button></RouterLink>
                     </div>
                 </div>
                 <div class="list-headline row">
