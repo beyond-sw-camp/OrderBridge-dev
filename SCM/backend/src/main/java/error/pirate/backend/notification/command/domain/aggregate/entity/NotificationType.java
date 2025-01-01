@@ -10,7 +10,9 @@ public enum NotificationType {
     // value 값은 알림 메세지에서 사용할거니까 결재서류명 입력해야함
 
     purchase("구매서"),
-    purchaseOrder("발주서");
+    purchaseOrder("발주서"),
+    shippingInstruction("출하지시서"),
+    shippingSlip("출하전표");
 
     private final String value;
 

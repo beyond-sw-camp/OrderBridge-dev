@@ -51,8 +51,7 @@ public class ShippingInstructionCommandController {
     public ResponseEntity<String> updateShippingInstructionStatus(
             @PathVariable Long shippingInstructionSeq
     ) {
-        String userNo = AuthUtil.getAuthUser();
-        shippingInstructionApplicationService.updateShippingInstructionApprovalStatus(shippingInstructionSeq, userNo);
+        shippingInstructionApplicationService.updateShippingInstructionApprovalStatus(shippingInstructionSeq);
 
         return ResponseEntity.status(HttpStatus.OK).body("출하지시서 결재 상태 변경 성공");
     }

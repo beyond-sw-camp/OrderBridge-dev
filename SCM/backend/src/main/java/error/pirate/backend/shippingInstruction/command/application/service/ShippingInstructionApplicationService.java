@@ -3,6 +3,8 @@ package error.pirate.backend.shippingInstruction.command.application.service;
 import error.pirate.backend.common.NameGenerator;
 import error.pirate.backend.item.command.application.service.ItemService;
 import error.pirate.backend.item.command.domain.aggregate.entity.Item;
+import error.pirate.backend.notification.command.domain.aggregate.entity.NotificationType;
+import error.pirate.backend.notification.command.domain.service.NotificationDomainService;
 import error.pirate.backend.salesOrder.command.domain.aggregate.entity.SalesOrder;
 import error.pirate.backend.shippingInstruction.command.application.dto.ShippingInstructionItemRequest;
 import error.pirate.backend.shippingInstruction.command.application.dto.ShippingInstructionRequest;
@@ -30,6 +32,7 @@ public class ShippingInstructionApplicationService {
     private final ShippingInstructionItemDomainService shippingInstructionItemDomainService;
     private final ItemService itemService;
     private final UserDomainService userDomainService;
+    private final NotificationDomainService notificationDomainService;
     private final EntityManager entityManager;
     private final NameGenerator nameGenerator;
 
@@ -85,6 +88,9 @@ public class ShippingInstructionApplicationService {
 
         // 주문서와 출하지시서의 품목 수량 비교
         shippingInstructionDomainService.validateItem(shippingInstructionRequest.getSalesOrderSeq());
+
+        //알림 생성
+        notificationDomainService.createNotificationMessage(NotificationType.shippingInstruction, shippingInstruction.getShippingInstructionSeq(), shippingInstruction.getShippingInstructionName());
     }
 
     /* 출하지시서 수정 */
@@ -145,13 +151,9 @@ public class ShippingInstructionApplicationService {
 
     /* 출하지시서 결재 상태 변경 */
     @Transactional
-    public void updateShippingInstructionApprovalStatus(Long shippingInstructionSeq, String userNo) {
+    public void updateShippingInstructionApprovalStatus(Long shippingInstructionSeq) {
         /* 출하지시서 찾기 */
         ShippingInstruction shippingInstruction = shippingInstructionDomainService.findByShippingInstructionSeq(shippingInstructionSeq);
-
-        // 현재 로그인한 유저가 접근 가능한지 체크
-        User user = userDomainService.findByUserEmployeeNo(userNo);
-        shippingInstructionDomainService.checkUser(shippingInstruction, user);
 
         /* 결재전인지 체크 */
         shippingInstructionDomainService.checkShippingInstructionApprovalStatus(shippingInstruction.getShippingInstructionStatus());
