@@ -52,7 +52,7 @@ public class InvoiceQueryController {
 
     @GetMapping("/situation")
     @Operation(summary = "거래 명세서 현황 조회")
-    public ResponseEntity<InvoiceSituationResponse> readInvoiceSituation(
+    public ResponseEntity<List<InvoiceSituationResponse>> readInvoiceSituation(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
             @RequestParam(required = false) String clientName) {

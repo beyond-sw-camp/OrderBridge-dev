@@ -46,10 +46,10 @@ public class InvoiceQueryService {
     }
 
     // 거래 명세서 현황 조회
-    public InvoiceSituationResponse readInvoiceSituation(LocalDate startDate, LocalDate endDate, String clientName) {
+    public List<InvoiceSituationResponse> readInvoiceSituation(LocalDate startDate, LocalDate endDate, String clientName) {
 
         // 거래 명세서 현황 조회
-        return new InvoiceSituationResponse(invoiceMapper.selectInvoiceSituation(startDate, endDate, clientName));
+        return invoiceMapper.selectInvoiceSituation(startDate, endDate, clientName);
     }
 
     // 거래 명세서 값 확인

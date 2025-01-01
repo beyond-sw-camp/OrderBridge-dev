@@ -35,7 +35,7 @@ public interface InvoiceMapper {
             @Param("invoiceSeq") Long invoiceSeq);
 
     // 거래 명세서 현황 조회
-    List<InvoiceSituationDTO> selectInvoiceSituation(
+    List<InvoiceSituationResponse> selectInvoiceSituation(
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate,
             @Param("clientName") String clientName);

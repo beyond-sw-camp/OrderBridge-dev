@@ -1,12 +1,19 @@
 package error.pirate.backend.invoice.query.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import java.util.List;
+import java.time.LocalDate;
 
 @Getter
-@AllArgsConstructor
 public class InvoiceSituationResponse {
-    private List<InvoiceSituationDTO> invoiceSituationList;
+    private LocalDate invoiceSaleDate;
+    private String invoiceName;
+    private Integer invoiceTotalQuantity;
+    private Integer invoiceExtendedPrice;
+    private String clientName;
+    private String invoiceNote;
+
+    private String invoiceSaleMonth;
+    private Integer invoiceMonthPrice;
+    private Integer invoiceMonthQuantity;
 }
