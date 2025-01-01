@@ -13,7 +13,7 @@ public class QuotationExcelDTO {
     private String quotationName;
     private QuotationStatus quotationStatus;
     private LocalDate quotationQuotationDate;
-    private LocalDate quotaitonEffectiveDate;
+    private LocalDate quotationEffectiveDate;
     private Integer quotationTotalQuantity;
     private Integer quotationExtendedPrice;
     private String quotationNote;

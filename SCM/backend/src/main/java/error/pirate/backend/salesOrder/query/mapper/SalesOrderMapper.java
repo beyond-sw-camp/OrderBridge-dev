@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.Param;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Mapper
@@ -46,6 +47,13 @@ public interface SalesOrderMapper {
     List<SalesOrderItemCheckDTO> sumSalesOrderItemValue(
             @Param("quotationSeq") Long quotationSeq);
 
+    // 주문서 목록 엑셀 다운로드
+    ArrayList<Object> selectSalesOrderExcel(
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate,
+            @Param("clientName") String clientName,
+            @Param("salesOrderStatus") List<SalesOrderStatus> salesOrderStatus);
+
     // 작업지시서가 등록된 주문서 품목 조회
     List<Long> selectRegisteredItemSeqsBySalesOrderSeq(@Param("salesOrderSeq") Long salesOrderSeq);
 
@@ -56,5 +64,4 @@ public interface SalesOrderMapper {
     List<SalesOrderItemStockStatusResponse> selectSalesOrderItemStockStatus(
             @Param("salesOrderSeq") Long salesOrderSeq,
             @Param("currentDateTime") LocalDateTime currentDateTime);
-
 }
