@@ -72,7 +72,6 @@ const excelDown = async () => {
             startDate: searchStartDate.value,
             endDate: searchEndDate.value,
             clientName: searchClient.value,
-            invoiceStatus: searchStatus.value.size === 0 ? null : Array.from(searchStatus.value).join(",")
         }, responseType: "blob"
     });
 
