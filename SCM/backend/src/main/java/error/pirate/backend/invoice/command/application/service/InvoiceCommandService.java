@@ -17,6 +17,7 @@ import error.pirate.backend.salesOrder.command.domain.aggregate.entity.SalesOrde
 import error.pirate.backend.salesOrder.command.domain.aggregate.entity.SalesOrderItem;
 import error.pirate.backend.salesOrder.command.domain.repository.SalesOrderItemRepository;
 import error.pirate.backend.user.command.domain.aggregate.entity.User;
+import error.pirate.backend.user.command.domain.repository.UserRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class InvoiceCommandService {
 
+    private final UserRepository userRepository;
     private final InvoiceDomainService invoiceDomainService;
     private final InvoiceRepository invoiceRepository;
     private final InvoiceItemRepository invoiceItemRepository;
@@ -37,14 +39,14 @@ public class InvoiceCommandService {
     private final NameGenerator nameGenerator;
 
     @Transactional
-    public void createInvoice(CreateInvoiceRequest createInvoiceRequest) {
+    public void createInvoice(CreateInvoiceRequest createInvoiceRequest, String userEmployeeNo) {
 
         // 주문서 품목과 거래 명세서 품목에 대한 검증
         validateItem(createInvoiceRequest.getSalesOrderSeq(), createInvoiceRequest.getCreateInvoiceItemRequestList());
 
         // 거래 명세서 등록
         SalesOrder salesOrder = entityManager.getReference(SalesOrder.class, createInvoiceRequest.getSalesOrderSeq());
-        User user = entityManager.getReference(User.class, 1L);
+        User user = userRepository.findByUserEmployeeNo(userEmployeeNo).orElseThrow();
         String name = nameGenerator.nameGenerator(Invoice.class);
 
         int invoiceExtendedPrice = 0;
