@@ -88,6 +88,24 @@ public class SalesOrderQueryController {
                 .body(salesOrderQueryService.readSalesOrderExcel(startDate, endDate, clientName, salesOrderStatus));
     }
 
+    @GetMapping("/situation/excel")
+    @Operation(summary = "주문서 현황 엑셀 다운로드")
+    public ResponseEntity<byte[]> readSalesOrderSituationExcel(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @RequestParam(required = false) String clientName) {
+
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + URLEncoder.encode(
+                new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date()) + "_주문서_현황.xlsx"
+                , StandardCharsets.UTF_8));
+
+        return ResponseEntity.ok()
+                .headers(httpHeaders)
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(salesOrderQueryService.readSalesOrderSituationExcel(startDate, endDate, clientName));
+    }
+
     /* 이미 작업지시가 등록된 주문서 물품 조회 */
     @GetMapping("/{salesOrderSeq}/registered-items")
     @Operation(summary = "작업지시가 등록된 주문서 물품 조회")

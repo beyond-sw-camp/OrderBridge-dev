@@ -81,6 +81,15 @@ public class SalesOrderQueryService {
         );
     }
 
+    // 주문서 현황 엑셀 다운로드
+    public byte[] readSalesOrderSituationExcel(LocalDate startDate, LocalDate endDate, String clientName) {
+
+        return excelDownBody.writeCells(
+                new String[] {"주문일", "이름", "총 수량", "총 가격", "거래처", "비고"},
+                salesOrderMapper.selectSalesOrderSituationExcel(startDate, endDate, clientName)
+        );
+    }
+
     // 작업지시가 등록된 주문서 물품 조회
     public List<Long> readRegisteredItems(Long salesOrderSeq) {
         return salesOrderMapper.selectRegisteredItemSeqsBySalesOrderSeq(salesOrderSeq);

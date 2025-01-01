@@ -165,6 +165,29 @@
         </if>
     </select>
 
+    <!--  주문서 현황 엑셀 다운로드  -->
+    <select id="selectSalesOrderSituationExcel" resultType="error.pirate.backend.salesOrder.query.dto.SalesOrderSituationExcelDTO">
+        SELECT
+            tb_sales_order.sales_order_order_date,
+            tb_sales_order.sales_order_name,
+            tb_sales_order.sales_order_total_quantity,
+            tb_sales_order.sales_order_extended_price,
+            tb_client_client_name,
+            tb_sales_order.sales_order_note
+        FROM tb_sales_order
+        JOIN tb_client USING (client_seq)
+        WHERE tb_sales_order.sales_order_status NOT IN ("DELETE")
+        <if test="startDate != null"><![CDATA[
+            AND #{startDate} <= tb_sales_order.sales_order_order_date
+        ]]></if>
+        <if test="endDate != null"><![CDATA[
+            AND #{endDate} >= tb_sales_order.sales_order_order_date
+        ]]></if>
+        <if test="clientName != null">
+            AND tb_client.client_name LIKE CONCAT('%', #{clientName}, '%')
+        </if>
+    </select>
+
     <!-- 작업지시서가 등록된 주문서 물품 조회 -->
     <select id="selectRegisteredItemSeqsBySalesOrderSeq" resultType="Long">
         SELECT soi.sales_order_item_seq

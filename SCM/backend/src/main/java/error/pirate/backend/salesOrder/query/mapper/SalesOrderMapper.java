@@ -54,6 +54,12 @@ public interface SalesOrderMapper {
             @Param("clientName") String clientName,
             @Param("salesOrderStatus") List<SalesOrderStatus> salesOrderStatus);
 
+    // 주문서 현황 엑셀 다운로드
+    ArrayList<Object> selectSalesOrderSituationExcel(
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate,
+            @Param("clientName") String clientName);
+
     // 작업지시서가 등록된 주문서 품목 조회
     List<Long> selectRegisteredItemSeqsBySalesOrderSeq(@Param("salesOrderSeq") Long salesOrderSeq);
 
