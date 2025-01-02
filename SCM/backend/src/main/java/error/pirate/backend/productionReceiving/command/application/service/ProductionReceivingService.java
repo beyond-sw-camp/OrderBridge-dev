@@ -9,6 +9,8 @@ import error.pirate.backend.item.command.domain.aggregate.entity.Item;
 import error.pirate.backend.item.command.domain.aggregate.entity.ItemInventory;
 import error.pirate.backend.item.command.domain.repository.ItemInventoryRepository;
 import error.pirate.backend.item.command.domain.repository.ItemRepository;
+import error.pirate.backend.notification.command.domain.aggregate.entity.NotificationType;
+import error.pirate.backend.notification.command.domain.service.NotificationDomainService;
 import error.pirate.backend.productionReceiving.command.application.dto.ProductionReceivingCreateRequest;
 import error.pirate.backend.productionReceiving.command.application.dto.ProductionReceivingItemDTO;
 import error.pirate.backend.productionReceiving.command.application.dto.ProductionReceivingUpdateRequest;
@@ -50,6 +52,7 @@ public class ProductionReceivingService {
     private final ItemInventoryRepository itemInventoryRepository;
     private final NameGenerator nameGenerator;
     private final SecurityUtil securityUtil;
+    private final NotificationDomainService notificationDomainService;
 
     @Transactional
     public void createProductionReceiving(ProductionReceivingCreateRequest request) {
@@ -80,6 +83,9 @@ public class ProductionReceivingService {
                 productionReceivingItemRepository.save(productionReceivingItem);
             }
         }
+
+        //알림 생성
+        notificationDomainService.createNotificationMessage(NotificationType.productionReceiving, productionReceiving.getProductionReceivingSeq(), productionReceiving.getProductionReceivingName());
     }
 
     @Transactional
@@ -154,7 +160,7 @@ public class ProductionReceivingService {
     @Transactional
     public void updateProductionReceivingComplete(Long productionReceivingSeq) {
         ProductionReceiving productionReceiving = productionReceivingRepository.findById(productionReceivingSeq).orElseThrow(() -> new CustomException(ErrorCodeType.PRODUCTION_RECEIVING_NOT_FOUND));
-        if(!ProductionReceivingStatus.AFTER.equals(productionReceiving.getProductionReceivingStatus())) {
+        if(!ProductionReceivingStatus.BEFORE.equals(productionReceiving.getProductionReceivingStatus())) {
             throw new CustomException(ErrorCodeType.PRODUCTION_RECEIVING_UPDATE_COMPLETE_ERROR);
         }
 
@@ -163,6 +169,12 @@ public class ProductionReceivingService {
         SalesOrder salesOrder = salesOrderRepository.findByProductionReceivingSeq(productionReceivingSeq);
 
         salesOrder.updateSalesOrderStatus(SalesOrderStatus.PRODUCTION_COMPLETE); // 주문서의 상태를 생산완료로 변경
+
+        List<WorkOrder> workOrderList = workOrderRepository.findByProductionReceiving(productionReceiving);
+
+        for(WorkOrder workOrder : workOrderList) {
+            workOrder.changeWorkOrderStatus(WorkOrderStatus.COMPLETE);
+        }
 
         /*
         * 품목 재고에 생산입고 수량만큼 추가
