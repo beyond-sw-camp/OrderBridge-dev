@@ -14,6 +14,7 @@ public class SalesOrderResponse {
     private Integer salesOrderExtendedPrice;
     private Integer salesOrderTotalQuantity;
     private String userName;
+    private String userPhoneNo;
     private LocalDateTime salesOrderOrderDate;
     private LocalDateTime salesOrderDueDate;
     private String salesOrderNote;

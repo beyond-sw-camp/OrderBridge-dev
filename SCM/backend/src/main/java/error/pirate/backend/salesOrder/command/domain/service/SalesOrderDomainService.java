@@ -2,6 +2,7 @@ package error.pirate.backend.salesOrder.command.domain.service;
 
 import error.pirate.backend.exception.CustomException;
 import error.pirate.backend.exception.ErrorCodeType;
+import error.pirate.backend.purchaseOrder.command.domain.aggregate.entity.PurchaseOrder;
 import error.pirate.backend.salesOrder.command.domain.aggregate.entity.SalesOrder;
 import error.pirate.backend.salesOrder.command.domain.aggregate.entity.SalesOrderStatus;
 import error.pirate.backend.salesOrder.command.domain.repository.SalesOrderRepository;
@@ -53,4 +54,12 @@ public class SalesOrderDomainService {
             throw new CustomException(ErrorCodeType.SALES_ORDER_STATE_BAD_REQUEST);
         }
     }
+
+    /* 결재후로 변경 */
+    public void updateSalesOrderStatus(Long salesOrderSeq, SalesOrderStatus salesOrderStatus) {
+        SalesOrder salesOrder = salesOrderRepository.findById(salesOrderSeq)
+                .orElseThrow(() -> new CustomException(ErrorCodeType.SALES_ORDER_NOT_FOUND));
+        salesOrder.updateSalesOrderStatus(salesOrderStatus);
+    }
+
 }

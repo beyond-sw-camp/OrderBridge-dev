@@ -49,4 +49,13 @@ public class SalesOrderCommandController {
 
         return ResponseEntity.ok().build();
     }
+
+    @PutMapping("/complete/{salesOrderSeq}")
+    @Operation(summary = "주문서 결재완료")
+    public ResponseEntity<Void> updateSalesOrderComplete(@PathVariable Long salesOrderSeq) {
+        salesOrderCommandService.updateSalesOrderComplete(salesOrderSeq);
+
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
 }

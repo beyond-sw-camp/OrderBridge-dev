@@ -92,6 +92,8 @@ const saveCanvas = async (selectedNotification) => {
     isModalOpen.value = false;
     emit('close');
 
+    await axios.put(`purchaseOrder/complete/${props.purchaseOrder.purchaseOrderSeq}`);
+
     await Swal.fire({
       position: "center",
       icon: "success",
@@ -102,7 +104,6 @@ const saveCanvas = async (selectedNotification) => {
 
   }
 
-  await axios.put(`purchaseOrder/complete/${props.purchaseOrder.purchaseOrderSeq}`);
 };
 
 // 드로잉 시작
@@ -158,10 +159,6 @@ const clearCanvas = () => {
               <tr>
                 <td class="to-column" style="height: 30px;">발주일자 &nbsp; : &nbsp;</td>
                 <td colspan="5" style="height: 30px;">&nbsp;20&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;년 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;월 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;일</td>
-              </tr>
-              <tr>
-                <td style="height: 30px;">거래처명 &nbsp; : &nbsp;</td>
-                <td colspan="5" style="height: 30px;"> &nbsp; {{ purchaseOrder?.clientName!=null ? purchaseOrder.clientName : '' }}</td>
               </tr>
               </tbody>
             </table>

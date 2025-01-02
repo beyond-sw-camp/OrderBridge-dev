@@ -1,21 +1,22 @@
 <script setup>
 import dayjs from 'dayjs';
 import axios from "@/axios.js";
-import { ref, watch } from 'vue';
+import {ref, watch} from 'vue';
 import Swal from "sweetalert2";
+
 
 const props = defineProps({
   isVisible: Boolean,
-  purchase: Object,
+  salesOrder: Object,
   isList: Boolean,
 });
 
-// 부모에서 넘어오는 발주서 시퀀스로 이미지를 가져옴
-const notification  = ref('');
+// 부모에서 넘어오는 주문서 시퀀스로 이미지를 가져옴
+const notification = ref('');
 const fetchImages = async () => {
 
   try {
-    const response = await axios.get( `notification/purchase/${props.purchase.purchaseSeq}`);
+    const response = await axios.get(`notification/salesOrder/${props.salesOrder.salesOrderSeq}`);
 
     notification.value = response.data;
   } catch (error) {
@@ -24,11 +25,11 @@ const fetchImages = async () => {
 }
 
 // 발주 데이터가 조회된 후 fetchImages 실행
-watch(() => props.purchase, (newVal) => {
-  if (newVal && newVal.purchaseSeq) {
+watch(() => props.salesOrder, (newVal) => {
+  if (newVal && newVal.salesOrderSeq) {
     fetchImages();
   }
-}, { immediate: true });
+}, {immediate: true});
 
 const emit = defineEmits(['close']);
 
@@ -37,7 +38,7 @@ const closePrintModal = () => {
 };
 
 const printPage = () => {
-  const printContent = document.getElementById('print-area-purchase').innerHTML;
+  const printContent = document.getElementById('print-area-salesOrder').innerHTML;
   const originalContent = document.body.innerHTML; // 현재 페이지 내용 저장
 
   document.body.innerHTML = printContent;
@@ -81,7 +82,7 @@ const saveCanvas = async (selectedNotification) => {
     throw new Error("캔버스를 찾을 수 없습니다.");
   }
 
-  if(confirm("결재를 승인하시겠습니까?")) {
+  if (confirm("결재를 승인하시겠습니까?")) {
     const imageData = canvas.toDataURL("signImage/jpg");
 
     await axios.post("notification", {
@@ -92,7 +93,7 @@ const saveCanvas = async (selectedNotification) => {
     isModalOpen.value = false;
     emit('close');
 
-    await axios.put(`purchase/complete/${props.purchase.purchaseSeq}`);
+    await axios.put(`sales-order/complete/${props.salesOrder.salesOrderSeq}`);
 
     await Swal.fire({
       position: "center",
@@ -101,6 +102,7 @@ const saveCanvas = async (selectedNotification) => {
       showConfirmButton: false,
       timer: 1500
     });
+
   }
 
 };
@@ -140,10 +142,10 @@ const clearCanvas = () => {
 
 <template>
   <!-- print Modal bootstrap -->
-    <div v-show="isVisible" class="modal-overlay" @click.self="closePrintModal">
+  <div v-show="isVisible" class="modal-overlay" @click.self="closePrintModal">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
-        <div class="modal-body" id="print-area-purchase">
+        <div class="modal-body" id="print-area-salesOrder">
           <div class="d-flex justify-content-between">
             <button class="btn-print" @click="printPage">출력</button>
             <button type="button" class="btn-close btn-print" data-bs-dismiss="modal" aria-label="Close" @click="closePrintModal" ></button>
@@ -151,17 +153,13 @@ const clearCanvas = () => {
 
           <div class="container mt-4">
 
-            <h2 class="text-center">구매서</h2>
+            <h2 class="text-center">주문서</h2>
             <br/><br/>
             <table class="info-table-eft" style="float: left;">
               <tbody>
               <tr>
-                <td class="to-column" style="height: 30px;">구매일자 &nbsp; : &nbsp;</td>
-                <td colspan="5" style="height: 30px;">&nbsp;20&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;년 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;월 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;일</td>
-              </tr>
-              <tr>
-                <td style="height: 30px;">거래처명 &nbsp; : &nbsp;</td>
-                <td colspan="5" style="height: 30px;"> &nbsp; {{ purchase?.clientName!=null ? purchase.clientName : '' }}</td>
+                <td class="to-column" style="height: 30px;">주문일자 &nbsp; : &nbsp;</td>
+                <td colspan="5" style="height: 30px;">&nbsp;{{ dayjs(salesOrder?.salesOrderDueDate).format('YYYY년 MM월 DD일') }} </td>
               </tr>
               </tbody>
             </table>
@@ -175,7 +173,7 @@ const clearCanvas = () => {
               </tr>
               <tr>
                 <td colspan="5" style="height: 30px;">
-                  {{ purchase?.userName }}
+                  {{ salesOrder?.userName }}
                 </td>
                 <td colspan="5" style="height: 30px;" class="image-gallery">
                   <img class="image-item" v-if="notification.notificationImageUrl != undefined" :src="notification.notificationImageUrl" alt="승인자 서명" style="width: 100px; height: auto;" />
@@ -194,26 +192,26 @@ const clearCanvas = () => {
             <br/><br/><br/>
 
             <table class="table first-table left" style="height: 140px">
-              <tbody v-if="purchase">
+              <tbody v-if="salesOrder">
               <tr>
-                <td class="color-column align-content-center">구매서명</td>
-                <td class="align-content-center">{{ purchase.purchaseName }}</td>
+                <td class="color-column align-content-center">주문서명</td>
+                <td class="align-content-center">{{ salesOrder.salesOrderName }}</td>
                 <td class="color-column align-content-center">담당사</td>
                 <td class="align-content-center">Order Bridge</td>
               </tr>
               <tr>
                 <td class="color-column align-content-center">담당자</td>
-                <td class="align-content-center">{{ purchase.userName }}</td>
+                <td class="align-content-center">{{ salesOrder.userName }}</td>
                 <td class="color-column align-content-center">연락처</td>
-                <td class="align-content-center">{{ purchase.userPhoneNo }}</td>
+                <td class="align-content-center">{{ salesOrder.userPhoneNo }}</td>
               </tr>
               <tr>
                 <td class="color-column align-content-center">주소</td>
                 <td class="align-content-center" colspan="3">서울특별시 동작구 보라매로 87 플레이데이터 3층</td>
               </tr>
               <tr>
-                <td class="color-column align-content-center">구매 계약일</td>
-                <td class="align-content-center" colspan="3">{{ dayjs(purchase.purchaseContractDate).format('YYYY-MM-DD') }}</td>
+                <td class="color-column align-content-center">식품 납기일</td>
+                <td class="align-content-center" colspan="3">{{ dayjs(salesOrder.salesOrderDueDate).format('YYYY-MM-DD') }}</td>
               </tr>
               </tbody>
             </table>
@@ -227,26 +225,27 @@ const clearCanvas = () => {
                 <th>금액</th>
               </tr>
               </thead>
-              <tbody v-if="purchase?.purchaseItemResponseList?.length > 0">
-              <tr v-for="(purchaseItem, idx) in purchase.purchaseItemResponseList"
-                  :key="purchaseItem.itemSeq || idx">
-                <td>{{ purchaseItem.itemName }}</td>
-                <td>{{ purchaseItem.purchaseItemQuantity ? purchaseItem.purchaseItemQuantity.toLocaleString() : 0 }}</td>
-                <td>{{ purchaseItem.purchaseItemPrice ? purchaseItem.purchaseItemPrice.toLocaleString() : 0 }}</td>
-                <td>{{ (purchaseItem.purchaseItemQuantity * purchaseItem.purchaseItemPrice).toLocaleString() }}</td>
+              <tbody v-if="salesOrder?.salesOrderItem?.length > 0">
+              <tr v-for="(orderItem, idx) in salesOrder.salesOrderItem"
+                  :key="orderItem.itemSeq || idx">
+                <td>{{ orderItem.itemName }}</td>
+                <td>{{ orderItem.salesOrderItemQuantity ? orderItem.salesOrderItemQuantity.toLocaleString() : 0 }}</td>
+                <td>{{ orderItem.salesOrderItemPrice ? orderItem.salesOrderItemPrice.toLocaleString() : 0 }}</td>
+                <td>{{ (orderItem.salesOrderItemQuantity * orderItem.salesOrderItemPrice).toLocaleString() }}</td>
               </tr>
               </tbody>
               <tfoot>
               <tr>
                 <td>합계</td>
-                <td>{{ purchase?.purchaseTotalQuantity ? purchase.purchaseTotalQuantity.toLocaleString() : 0 }}</td>
+                <td>{{ salesOrder?.salesOrderTotalQuantity ? salesOrder.salesOrderTotalQuantity.toLocaleString() : 0 }}</td>
                 <td> - </td>
-                <td>{{ purchase?.purchaseExtendedPrice ? purchase.purchaseExtendedPrice.toLocaleString() : 0 }}</td>
+                <td>{{ salesOrder?.salesOrderExtendedPrice ? salesOrder.salesOrderExtendedPrice.toLocaleString() : 0 }}</td>
               </tr>
               </tfoot>
             </table>
 
             <ul class="notes">
+              <li>상기 자재를 주문하오니 납기를 준수하여 입고 바랍니다.</li>
               <li>기타 의문사항이나 관련사항시 사전 관련부서에 통보하여 주십시오.</li>
             </ul>
 

@@ -9,13 +9,14 @@ import orderIcon from '@/assets/orderIcon.svg';
 import statisticsIcon from '@/assets/statisticsIcon.svg'
 import {useUserStore} from "@/stores/UserStore.js";
 import dayjs from 'dayjs';
-import { ref } from "vue";
+import { onMounted, onUnmounted, ref } from "vue";
 import axios from "@/axios";
 import Chatbot from "@/components/common/Chatbot.vue";
 import PurchaseOrderPrintPreviewModal from "@/components/purchaseOrder/PurchaseOrderPrintPreview.vue";
 import PurchasePrintPreviewModal from "@/components/purchase/PurchasePrintPreview.vue";
 import ShippingInstructionPrintPreview from "@/components/shippingInstruction/ShippingInstructionPrintPreview.vue";
 import ShippingSlipPrintPreview from "@/components/shippingSlip/ShippingSlipPrintPreview.vue";
+import SalesOrderPrintPreview from "@/components/salesOrder/SalesOrderPrintPreview.vue";
 import ProductionDisbursementPrintPreview from "@/components/productionDisbursement/ProductionDisbursementPrintPreview.vue";
 import WorkOrderPrintPreview from "@/components/workOrder/WorkOrderPrintPreview.vue";
 import ProductionReceivingPrintPreviewModal from "@/components/productionReceiving/ProductionReceivingPrintPreview.vue"
@@ -48,6 +49,8 @@ const openPrintPreview = async (notification) => {
       notification.notificationType = 'shipping-instruction';
     } else if(notification.notificationType === 'shippingSlip') {
       notification.notificationType = 'shipping-slip';
+    } else if(notification.notificationType === 'salesOrder') {
+      notification.notificationType = 'sales-order';
     }
 
     const response = await axios.get(`${notification.notificationType}/${notification.notificationAnotherSeq}`);
@@ -76,6 +79,35 @@ function chatbotOn() {
     chatbot.value = "display: block";
   }
 }
+
+const handleOutsideClick = (event) => {
+  const notificationBar = document.querySelector(".notification-bar");
+  const chatbotElement = document.getElementById("chatbot");
+
+  if (
+      isNotificationOpen.value &&
+      notificationBar &&
+      !notificationBar.contains(event.target)
+  ) {
+    isNotificationOpen.value = false;
+  }
+
+  if (
+      isModalVisible.value &&
+      chatbotElement &&
+      !chatbotElement.contains(event.target)
+  ) {
+    closePrintPreview();
+  }
+};
+
+onMounted(() => {
+  document.addEventListener("click", handleOutsideClick);
+});
+
+onUnmounted(() => {
+  document.removeEventListener("click", handleOutsideClick);
+});
 </script>
 
 <template>
@@ -142,7 +174,7 @@ function chatbotOn() {
 <!-- 알림 모달  -->
   <div v-if="isNotificationOpen" class="notification-bar">
     <ul v-if="notificationList.length > 0">
-      <li v-for="notification in notificationList" :class="{ 'selected-notification': notification.notificationReadYn === 'Y' }" :key="notification.notificationSeq" @click="openPrintPreview(notification)">
+      <li v-for="notification in notificationList" :class="{ 'selected-notification': notification.notificationReadYn === 'Y' }" :key="notification.notificationSeq" @click.stop="openPrintPreview(notification)">
         <span>{{ notification.notificationTitle }}</span>
         <span style="float:right;">{{ dayjs(notification.notificationRegDate).format('YYYY/MM/DD HH:mm') }}</span>
         <br/>
@@ -185,6 +217,15 @@ function chatbotOn() {
     <PurchasePrintPreviewModal
         :isVisible="isModalVisible"
         :purchase="selectedData"
+        :isList=false
+        @close="closePrintPreview"
+    />
+  </template>
+  <template v-else-if="selectedNotificationType === 'sales-order'">
+    <SalesOrderPrintPreview
+        :isVisible="isModalVisible"
+        :salesOrder="selectedData"
+        :isList=false
         @close="closePrintPreview"
     />
   </template>

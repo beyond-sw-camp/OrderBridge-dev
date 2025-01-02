@@ -7,6 +7,7 @@ import editIcon from "@/assets/editIcon.svg";
 import printIcon from "@/assets/printIcon.svg";
 import axios from "@/axios"
 import dayjs from 'dayjs';
+import SalesOrderPrintPreview from "@/components/salesOrder/SalesOrderPrintPreview.vue";
 
 const salesOrderDetail = ref({});
 const salesOrderExtended = ref({});
@@ -148,6 +149,24 @@ const fetchClientHint = async (clientName) => {
         }
     }
 }
+
+const isModalVisible = ref(false);
+const selectedSalesOrder = ref(null);
+
+const openPrintPreview = (salesOrder) => {
+  if (!salesOrder) {
+    console.error('선택된 주문서가 없습니다.');
+    return;
+  }
+
+  selectedSalesOrder.value = salesOrder;
+  isModalVisible.value = true;
+};
+
+const closePrintPreview = () => {
+  isModalVisible.value = false;
+  selectedSalesOrder.value = null;
+};
 
 onMounted(() => {
     fetchSalesOrderList();
@@ -293,8 +312,7 @@ function numberThree(number) {
                                 </div>
                                 
                                 <div class="d-flex justify-content-end align-items-center">
-                                    <!--printIcon class="me-3 icon" @click.stop="printSalesOrder(salesOrder.salesOrderSeq)"/>
-                                    <editIcon class="me-3 icon" @click.stop="modifySalesOrder(salesOrder.salesOrderSeq)"/-->
+                                    <printIcon class="me-3 icon" @click.stop="openPrintPreview(salesOrderDetail[salesOrder.salesOrderSeq])"/>
                                     <trashIcon class="icon" @click.stop="deleteSalesOrder(salesOrder.salesOrderSeq)"/>
                                 </div>
                             </div>
@@ -315,6 +333,13 @@ function numberThree(number) {
             </div>
         </div>
     </div>
+
+  <SalesOrderPrintPreview
+      :isVisible="isModalVisible"
+      :salesOrder="selectedSalesOrder"
+      :isList=true
+      @close="closePrintPreview"
+  />
 </template>
 
 <style scoped>
