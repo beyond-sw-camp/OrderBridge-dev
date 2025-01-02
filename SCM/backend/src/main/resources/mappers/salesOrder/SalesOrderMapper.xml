@@ -75,7 +75,8 @@
         FROM tb_sales_order
         JOIN tb_user USING (user_seq)
         JOIN tb_client USING (client_seq)
-        WHERE tb_sales_order.sales_order_seq = #{salesOrderSeq}
+        WHERE tb_sales_order.sales_order_status NOT IN ("DELETE")
+        AND tb_sales_order.sales_order_seq = #{salesOrderSeq}
     </select>
     
     <!--  주문서 상세 품목 조회  -->
@@ -138,7 +139,8 @@
             ), 0) AS remaining_quantity
         FROM tb_quotation AS tb_quotation
         JOIN tb_quotation_item USING (quotation_seq)
-        WHERE tb_quotation.quotation_seq = #{quotationSeq}
+        WHERE tb_quotation.quotation_status NOT IN ("DELETE")
+        AND tb_quotation.quotation_seq = #{quotationSeq}
     </select>
 
     <!--  주문서 목록 엑셀 다운로드  -->

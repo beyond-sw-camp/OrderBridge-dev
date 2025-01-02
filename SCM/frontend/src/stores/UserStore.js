@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia';
+import { sAlert } from '@/common/salert';
 import axios from 'axios';
 import customAxios from '@/axios';
 import router from "@/router/index.js";
@@ -53,7 +54,7 @@ export const useUserStore = defineStore('user', {
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
       } catch (error) {
-        alert(`로그아웃 실패하였습니다.`);
+        await sAlert(``, `로그아웃 실패하였습니다.`, `error`);
       } finally {
         this.isLoggingOut = false; // 로그아웃 상태 해제
       }

@@ -253,7 +253,7 @@ function numberThree(number) {
                     v-model="salesOrderOrderDate">
             </b-form-group>
 
-            <b-form-group label-cols="4" label-cols-lg="2" label="주문납기일시">
+            <b-form-group label-cols="4" label-cols-lg="2" label="납기일시">
                 <input class="form-control form-control-sm w-75" type="datetime-local" id="shippingInstructionDate"
                     v-model="salesOrderDueDate">
             </b-form-group>

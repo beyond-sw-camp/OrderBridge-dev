@@ -67,7 +67,8 @@
         JOIN tb_user USING (user_seq)
         JOIN tb_sales_order USING (sales_order_seq)
         JOIN tb_client USING (client_seq)
-        WHERE tb_invoice.invoice_seq = #{invoiceSeq}
+        WHERE tb_invoice.invoice_status NOT IN ("DELETE")
+        AND tb_invoice.invoice_seq = #{invoiceSeq}
     </select>
 
     <!--  거래 명세서 상세 품목 조회  -->
@@ -101,7 +102,7 @@
         FROM tb_invoice
         JOIN tb_sales_order USING (sales_order_seq)
         JOIN tb_client USING (client_seq)
-        WHERE TRUE
+        WHERE tb_invoice.invoice_status NOT IN ("DELETE")
         <if test="startDate != null"><![CDATA[
             AND #{startDate} <= tb_invoice.invoice_sale_date
         ]]></if>
@@ -129,7 +130,8 @@
             ), 0) AS remaining_quantity
         FROM tb_sales_order AS tb_sales_order
         JOIN tb_sales_order_item USING (sales_order_seq)
-        WHERE tb_sales_order.sales_order_seq = #{salesOrderSeq}
+        WHERE tb_sales_order.sales_order_status NOT IN ("DELETE")
+        AND tb_sales_order.sales_order_seq = #{salesOrderSeq}
     </select>
 
     <!--  거래 명세서 목록 엑셀 다운로드  -->

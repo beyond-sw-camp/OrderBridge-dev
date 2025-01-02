@@ -1,6 +1,5 @@
 <script setup>
 import { ref, onMounted, watch, computed } from "vue";
-import { useUserStore } from "@/stores/UserStore.js";
 import plusIcon from '@/assets/plus.svg'
 import searchIcon from "@/assets/searchIcon.svg";
 import router from "@/router/index.js";
@@ -9,7 +8,6 @@ import dayjs from "dayjs";
 
 const clientName = ref();
 
-const username = useUserStore().$id;
 const requestClient = ref();
 const quotationDate = ref();
 const quotationNote = ref();
@@ -193,11 +191,6 @@ function numberThree(number) {
                         <searchIcon class="icon" />
                     </b-input-group-text>
                 </b-input-group>
-            </b-form-group>
-
-            <b-form-group label-cols="4" label-cols-lg="2" label-size="default" label="담당자">
-                <b-form-input class="w-75" size="sm" id="user" v-model="username" :disabled=true>
-                </b-form-input>
             </b-form-group>
 
             <b-form-group label-cols="4" label-cols-lg="2" label-size="default" label="비고">
