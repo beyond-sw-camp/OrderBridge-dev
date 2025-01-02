@@ -291,8 +291,8 @@ function numberThree(number) {
                                 <b>총 수량</b>: {{ numberThree(salesOrderDetail[salesOrder.salesOrderSeq].salesOrderTotalQuantity) }} 개<br>
                                 <b>총 금액</b>: {{ `₩ ` + numberThree(salesOrderDetail[salesOrder.salesOrderSeq].salesOrderExtendedPrice) }}<br>
                                 <b>담당자</b>: {{ salesOrderDetail[salesOrder.salesOrderSeq].userName }}<br>
-                                <b>견적일시</b>: {{ dayjs(salesOrderDetail[salesOrder.salesOrderSeq].salesOrderOrderDate).format(`YYYY/MM/DD HH:mm:ss`) }}<br>
-                                <b>유효일시</b>: {{ dayjs(salesOrderDetail[salesOrder.salesOrderSeq].salesOrderEffectiveDate).format(`YYYY/MM/DD HH:mm:ss`) }}<br>
+                                <b>주문일시</b>: {{ dayjs(salesOrderDetail[salesOrder.salesOrderSeq].salesOrderOrderDate).format(`YYYY/MM/DD HH:mm:ss`) }}<br>
+                                <b>납기일시</b>: {{ dayjs(salesOrderDetail[salesOrder.salesOrderSeq].salesOrderEffectiveDate).format(`YYYY/MM/DD HH:mm:ss`) }}<br>
                                 <b>비고</b>: {{ salesOrderDetail[salesOrder.salesOrderSeq].salesOrderNote }}<br>
                                 <div style="display:flex; flex-wrap: wrap;">
                                 <template v-for="salesOrderItem in salesOrderDetail[salesOrder.salesOrderSeq].salesOrderItem">
@@ -313,7 +313,6 @@ function numberThree(number) {
                                 
                                 <div class="d-flex justify-content-end align-items-center">
                                     <printIcon class="me-3 icon" @click.stop="openPrintPreview(salesOrderDetail[salesOrder.salesOrderSeq])"/>
-                                    <editIcon class="me-3 icon" @click.stop="modifySalesOrder(salesOrder.salesOrderSeq)"/>
                                     <trashIcon class="icon" @click.stop="deleteSalesOrder(salesOrder.salesOrderSeq)"/>
                                 </div>
                             </div>

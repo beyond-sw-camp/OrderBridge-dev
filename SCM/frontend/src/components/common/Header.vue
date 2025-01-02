@@ -17,6 +17,9 @@ import PurchasePrintPreviewModal from "@/components/purchase/PurchasePrintPrevie
 import ShippingInstructionPrintPreview from "@/components/shippingInstruction/ShippingInstructionPrintPreview.vue";
 import ShippingSlipPrintPreview from "@/components/shippingSlip/ShippingSlipPrintPreview.vue";
 import SalesOrderPrintPreview from "@/components/salesOrder/SalesOrderPrintPreview.vue";
+import ProductionDisbursementPrintPreview from "@/components/productionDisbursement/ProductionDisbursementPrintPreview.vue";
+import WorkOrderPrintPreview from "@/components/workOrder/WorkOrderPrintPreview.vue";
+import ProductionReceivingPrintPreviewModal from "@/components/productionReceiving/ProductionReceivingPrintPreview.vue"
 
 const userStore = useUserStore();
 const notificationList = ref([]);
@@ -37,6 +40,7 @@ const fetchNotifications = async () => {
 const isModalVisible = ref(false);
 const selectedData = ref(null);
 const selectedNotificationType = ref(null);
+const productionReceivingDTO = ref(null);
 
 const openPrintPreview = async (notification) => {
   try {
@@ -49,7 +53,7 @@ const openPrintPreview = async (notification) => {
       notification.notificationType = 'sales-order';
     }
 
-    const response = await axios.get(notification.notificationType + `/${notification.notificationAnotherSeq}`);
+    const response = await axios.get(`${notification.notificationType}/${notification.notificationAnotherSeq}`);
 
     selectedNotificationType.value = notification.notificationType;
     selectedData.value = response.data;
@@ -154,18 +158,6 @@ onUnmounted(() => {
               <li><RouterLink to="/productionReceiving" class="dropdown-item">생산입고 관리</RouterLink></li>
             </ul>
           </li>
-          <li class="nav-item dropdown">
-            <a class="nav-link" href="" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              <statisticsIcon class="icon"/>통계
-            </a>
-            <ul class="dropdown-menu">
-              <li><RouterLink to="" class="dropdown-item">재고관리 현황</RouterLink></li>
-              <li><RouterLink to="" class="dropdown-item">영업관리 현황</RouterLink></li>
-              <li><RouterLink to="" class="dropdown-item">구매관리 현황</RouterLink></li>
-              <li><RouterLink to="/productionReceiving/situation" class="dropdown-item">생산입고 현황</RouterLink></li>
-              <li><RouterLink to="" class="dropdown-item">기타 현황</RouterLink></li>
-            </ul>
-          </li>
         </ul>
         <ul class="navbar-nav mb-lg-0 d-flex flex-row">
           <li class="nav-item"><RouterLink to="#" class="nav-link" @click.prevent="fetchNotifications"><notificationIcon class="icon-right"/></RouterLink></li>
@@ -237,7 +229,30 @@ onUnmounted(() => {
         @close="closePrintPreview"
     />
   </template>
-
+  <template v-else-if="selectedNotificationType === 'productionDisbursement'">
+    <ProductionDisbursementPrintPreview
+        :isVisible="isModalVisible"
+        :productionDisbursement="selectedData"
+        :isList=false
+        @close="closePrintPreview"
+    />
+  </template>
+  <template v-else-if="selectedNotificationType === 'workOrder'">
+    <WorkOrderPrintPreview
+        :isVisible="isModalVisible"
+        :workOrder="selectedData"
+        :isList=false
+        @close="closePrintPreview"
+    />
+  </template>
+  <template v-else-if="selectedNotificationType === 'productionReceiving'">
+    <ProductionReceivingPrintPreviewModal
+        :isVisible="isModalVisible"
+        :productionReceiving="selectedData"
+        :isList=false
+        @close="closePrintPreview"
+    />
+  </template>
 
 </template>
 <style scoped>

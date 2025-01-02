@@ -1,60 +1,37 @@
 <script setup>
 import dayjs from 'dayjs';
-import axios from "@/axios.js";
-import {computed, onMounted, ref, watch} from 'vue';
+import axios from "@/axios"
+import { ref, watch } from 'vue';
 import Swal from "sweetalert2";
 
 const props = defineProps({
   isVisible: Boolean,
-  shippingInstruction: Object,
+  productionDisbursement: Object,
   isList: Boolean,
 });
 
 const seq = ref(null);
-// 부모에서 넘어오는 발주서 시퀀스로 이미지를 가져옴
+
+// 부모에서 넘어오는 생산불출 시퀀스로 이미지를 가져옴
 const notification  = ref('');
 const fetchImages = async () => {
 
   try {
-    const response = await axios.get( `notification/shippingInstruction/${seq.value}`);
+    const response = await axios.get( `notification/productionDisbursement/${seq.value}`);
 
     notification.value = response.data;
-
+    console.log('알림:', response.data )
+    console.log(notification)
   } catch (error) {
     console.error("결재 서류 데이터를 가져오는 중 오류 발생:", error);
   }
 }
 
-const shippingAddressList = ref([]);
-// 출하주소 목록 요청
-const fetchShippingAddressList = async () => {
-  try {
-    const response = await axios.get(`shipping-instruction/address`, {});
-
-    shippingAddressList.value = response.data;
-
-  } catch (error) {
-    console.error("출하주소 목록 불러오기 실패 :", error);
-  }
-};
-
-// 키를 값 반환
-function findValue(array, key) {
-  for (const item of array) {
-    if (item.key === key) {
-      return item.value
-    }
-  }
-}
-
-onMounted(() => {
-  fetchShippingAddressList();
-});
-
-// 발주 데이터가 조회된 후 fetchImages 실행
-watch( () =>  props.shippingInstruction, (newVal) => {
-  if (newVal && newVal.shippingInstructionDTO.shippingInstructionSeq) {
-    seq.value = props.shippingInstruction.shippingInstructionDTO.shippingInstructionSeq
+// 생산불출 데이터가 조회된 후 fetchImages 실행
+watch(() => props.productionDisbursement, (newVal) => {
+  if (newVal && newVal.productionDisbursementDetail?.productionDisbursementSeq) {
+  // if (newVal && newVal.ProductionDisbursementDetailDTO?.productionDisbursementSeq) {
+    seq.value = props.productionDisbursement.productionDisbursementDetail.productionDisbursementSeq
     fetchImages();
   }
 }, { immediate: true });
@@ -66,7 +43,7 @@ const closePrintModal = () => {
 };
 
 const printPage = () => {
-  const printContent = document.getElementById('print-area').innerHTML;
+  const printContent = document.getElementById('print-area-productionDisbursement').innerHTML;
   const originalContent = document.body.innerHTML; // 현재 페이지 내용 저장
 
   document.body.innerHTML = printContent;
@@ -109,7 +86,6 @@ const saveCanvas = async (selectedNotification) => {
   if (!canvas) {
     throw new Error("캔버스를 찾을 수 없습니다.");
   }
-
   if(confirm("결재를 승인하시겠습니까?")) {
     const imageData = canvas.toDataURL("signImage/jpg");
 
@@ -129,9 +105,11 @@ const saveCanvas = async (selectedNotification) => {
       timer: 1500
     });
 
-    // 여기에 결재서류 상태 변경하는 코드 각자 추가해야함!!!!! TODO 아영
-    await axios.put(`shipping-instruction/approval/${seq.value}`);
   }
+
+  // 결재서류 상태 변경
+  console.log('결재변경:seq.value',seq.value)
+  await axios.put(`productionDisbursement/approval/${seq.value}`);
 };
 
 // 드로잉 시작
@@ -164,14 +142,15 @@ const clearCanvas = () => {
   const canvas = canvasRef.value;
   context.value.clearRect(0, 0, canvas.width, canvas.height);
 };
+
 </script>
 
 <template>
   <!-- print Modal bootstrap -->
-    <div v-show="isVisible" class="modal-overlay" @click.self="closePrintModal">
+  <div v-show="isVisible" class="modal-overlay" @click.self="closePrintModal">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
-        <div class="modal-body" id="print-area">
+        <div class="modal-body" id="print-area-productionDisbursement">
           <div class="d-flex justify-content-between">
             <button class="btn-print" @click="printPage">출력</button>
             <button type="button" class="btn-close btn-print" data-bs-dismiss="modal" aria-label="Close" @click="closePrintModal" ></button>
@@ -179,17 +158,18 @@ const clearCanvas = () => {
 
           <div class="container mt-4">
 
-            <h2 class="text-center">출하지시서</h2>
+            <h2 class="text-center">불출전표</h2>
             <br/><br/>
             <table class="info-table-eft" style="float: left;">
               <tbody>
               <tr>
-                <td class="to-column" style="height: 30px;">출하예정일 &nbsp; : &nbsp;</td>
-                <td colspan="5" style="height: 30px;">{{ dayjs(shippingInstruction?.shippingInstructionDTO.shippingInstructionScheduledShipmentDate).format('YYYY년 MM월 DD일') }}</td>
+                <td class="to-column" style="height: 30px;">생산불출일자 &nbsp; : &nbsp;</td>
+                <td colspan="5" style="height: 30px;">{{ dayjs(productionDisbursement?.productionDisbursementDetail.productionDisbursementDepartureDate).format('YYYY-MM-DD') }}</td>
+
               </tr>
               <tr>
                 <td style="height: 30px;">거래처명 &nbsp; : &nbsp;</td>
-                <td colspan="5" style="height: 30px;"> &nbsp; {{ shippingInstruction?.shippingInstructionDTO.clientName!=null ? shippingInstruction.shippingInstructionDTO.clientName : '' }}</td>
+                <td colspan="5" style="height: 30px;"> &nbsp; {{ productionDisbursement?.productionDisbursementDetail.clientName!=null ? productionDisbursement.productionDisbursementDetail.clientName : '' }}</td>
               </tr>
               </tbody>
             </table>
@@ -203,7 +183,7 @@ const clearCanvas = () => {
               </tr>
               <tr>
                 <td colspan="5" style="height: 30px;">
-                  {{ shippingInstruction?.shippingInstructionDTO.userName }}
+                  {{ productionDisbursement?.productionDisbursementDetail.userName }}
                 </td>
                 <td colspan="5" style="height: 30px;" class="image-gallery">
                   <img class="image-item" v-if="notification.notificationImageUrl != undefined" :src="notification.notificationImageUrl" alt="승인자 서명" style="width: 100px; height: auto;" />
@@ -214,7 +194,6 @@ const clearCanvas = () => {
                     </template>
                   </span>
 
-
                 </td>
               </tr>
               </tbody>
@@ -222,26 +201,26 @@ const clearCanvas = () => {
             <br/><br/><br/>
 
             <table class="table first-table left" style="height: 140px">
-              <tbody v-if="shippingInstruction">
+              <tbody v-if="productionDisbursement">
               <tr>
-                <td class="color-column align-content-center">출하지시서명</td>
-                <td class="align-content-center">{{ shippingInstruction.shippingInstructionDTO.shippingInstructionName }}</td>
+                <td class="color-column align-content-center">불출명</td>
+                <td class="align-content-center">{{ productionDisbursement.productionDisbursementDetail.productionDisbursementName }}</td>
                 <td class="color-column align-content-center">담당사</td>
                 <td class="align-content-center">Order Bridge</td>
               </tr>
               <tr>
                 <td class="color-column align-content-center">담당자</td>
-                <td class="align-content-center">{{ shippingInstruction.shippingInstructionDTO.userName }}</td>
+                <td class="align-content-center">{{ productionDisbursement.productionDisbursementDetail.userName }}</td>
                 <td class="color-column align-content-center">연락처</td>
-                <td class="align-content-center">{{ shippingInstruction.shippingInstructionDTO.userPhoneNo }}</td>
+                <td class="align-content-center">{{ productionDisbursement.productionDisbursementDetail.userPhoneNo }}</td>
               </tr>
               <tr>
-                <td class="color-column align-content-center">출하주소</td>
-                <td class="align-content-center" colspan="3">{{ findValue(shippingAddressList, shippingInstruction.shippingInstructionDTO.shippingAddress) }}</td>
+                <td class="color-column align-content-center">생산공장명</td>
+                <td class="align-content-center" colspan="3">{{ productionDisbursement.productionDisbursementDetail.factoryName }}</td>
               </tr>
               <tr>
-                <td class="color-column align-content-center">출하예정일</td>
-                <td class="align-content-center" colspan="3">{{ dayjs(shippingInstruction.shippingInstructionDTO.shippingInstructionScheduledShipmentDate).format('YYYY-MM-DD') }}</td>
+                <td class="color-column align-content-center">작업 목표일</td>
+                <td class="align-content-center" colspan="3">{{ dayjs(productionDisbursement.productionDisbursementDetail.workOrderDueDate).format('YYYY-MM-DD') }}</td>
               </tr>
               </tbody>
             </table>
@@ -251,24 +230,31 @@ const clearCanvas = () => {
               <tr>
                 <th>품목</th>
                 <th>수량</th>
+                <th>출고창고</th>
+                <th>유통기한</th>
               </tr>
               </thead>
-              <tbody v-if="shippingInstruction?.itemList?.length > 0">
-              <tr v-for="(item, idx) in shippingInstruction.itemList"
-                  :key="item.itemSeq || idx">
-                <td>{{ item.itemName }}</td>
-                <td>{{ item.shippingInstructionItemQuantity ? item.shippingInstructionItemQuantity.toLocaleString() : 0 }}</td>
+              <tbody v-if="productionDisbursement?.itemList?.length > 0">
+              <tr v-for="(productionDisbursementItem, idx) in productionDisbursement.itemList"
+                  :key="productionDisbursementItem.itemSeq || idx">
+                <td>{{ productionDisbursementItem.itemName }}</td>
+                <td>{{ productionDisbursementItem.productionDisbursementQuantity ? productionDisbursementItem.productionDisbursementQuantity.toLocaleString() : 0 }}</td>
+                <td>{{ productionDisbursementItem.storeName }}</td>
+                <td>{{ dayjs(productionDisbursementItem.itemInventoryExpirationDate).format('YYYY-MM-DD') }}</td>
               </tr>
               </tbody>
               <tfoot>
               <tr>
                 <td>합계</td>
-                <td>{{ shippingInstruction?.shippingInstructionDTO.shippingInstructionTotalQuantity }}</td>
+                <td>{{ productionDisbursement?.productionDisbursementDetail.productionDisbursementTotalQuantity ? productionDisbursement.productionDisbursementDetail.productionDisbursementTotalQuantity.toLocaleString() : 0 }}</td>
+                <td> - </td>
+                <td> - </td>
               </tr>
               </tfoot>
             </table>
 
             <ul class="notes">
+              <li>상기 품목을 불출하오니 목표를 준수하여 작업 바랍니다.</li>
               <li>기타 의문사항이나 관련사항시 사전 관련부서에 통보하여 주십시오.</li>
             </ul>
 

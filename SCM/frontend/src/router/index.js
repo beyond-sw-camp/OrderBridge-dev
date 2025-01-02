@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
+import { sAlert } from '@/common/salert.js';
 import shippingInstructionRoutes from './shipping-instruction.js'
 import productionReceivingRoutes from './production-receiving.js'
 import item from "@/router/item.js";
@@ -77,7 +78,7 @@ const router = createRouter({
     routes,
 });
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
     const token = localStorage.getItem('accessToken');
 
     if (useUserStore().isLoggingOut) {
@@ -87,7 +88,7 @@ router.beforeEach((to, from, next) => {
     }
 
     if(!token && (to.path !== '/' && to.path !== '/login')) {
-        alert('로그인 이후 이용할 수 있습니다.');
+        await sAlert(``, `로그인 이후 이용할 수 있습니다.`, `error`);
         next('/login');
     } else {
         next();

@@ -18,6 +18,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
 public class Client {
+
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long clientSeq;
 

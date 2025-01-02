@@ -5,6 +5,7 @@ import error.pirate.backend.client.command.application.dto.ClientDTO;
 import error.pirate.backend.client.command.application.dto.ClientUpdateRequest;
 import error.pirate.backend.client.command.domain.aggregate.entity.Client;
 import error.pirate.backend.client.command.domain.aggregate.repository.ClientRepository;
+import error.pirate.backend.common.SecurityUtil;
 import error.pirate.backend.exception.CustomException;
 import error.pirate.backend.exception.ErrorCodeType;
 import error.pirate.backend.user.command.domain.aggregate.entity.User;
@@ -21,10 +22,11 @@ public class ClientService {
     private final ClientRepository clientRepository;
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
+    private final SecurityUtil securityUtil;
 
     @Transactional
     public void createClient(ClientCreateRequest request) {
-        User user = userRepository.findById(request.getUserSeq())
+        User user = userRepository.findByUserEmployeeNo(securityUtil.getCurrentUserEmployeeNo())
                 .orElseThrow(() -> new CustomException(ErrorCodeType.USER_NOT_FOUND));
 
         ClientDTO clientDTO = modelMapper.map(request, ClientDTO.class);

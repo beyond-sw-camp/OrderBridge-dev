@@ -185,7 +185,7 @@ const clearCanvas = () => {
               <tbody>
               <tr>
                 <td class="to-column" style="height: 30px;">출하일 &nbsp; : &nbsp;</td>
-                <td colspan="5" style="height: 30px;">{{ dayjs(shippingSlip?.shippingSlipDTO.shippingSlipShippingDate).format('YYYY-MM-DD') }}</td>
+                <td colspan="5" style="height: 30px;">{{ dayjs(shippingSlip?.shippingSlipDTO.shippingSlipShippingDate).format('YYYY년 MM월 DD일') }}</td>
               </tr>
               <tr>
                 <td style="height: 30px;">거래처명 &nbsp; : &nbsp;</td>
@@ -269,7 +269,6 @@ const clearCanvas = () => {
             </table>
 
             <ul class="notes">
-              <li>상기 자재를 발주하오니 납기를 준수하여 입고 바랍니다.</li>
               <li>기타 의문사항이나 관련사항시 사전 관련부서에 통보하여 주십시오.</li>
             </ul>
 
