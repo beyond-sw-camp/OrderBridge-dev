@@ -10,5 +10,4 @@ public class CustomException extends RuntimeException {
     public CustomException(ErrorCodeType errorCode) {
         this.errorCode = errorCode;
     }
-
 }
