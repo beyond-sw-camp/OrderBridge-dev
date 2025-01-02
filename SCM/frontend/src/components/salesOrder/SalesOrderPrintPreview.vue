@@ -159,7 +159,7 @@ const clearCanvas = () => {
               <tbody>
               <tr>
                 <td class="to-column" style="height: 30px;">주문일자 &nbsp; : &nbsp;</td>
-                <td colspan="5" style="height: 30px;">&nbsp;{{ dayjs(props.salesOrder.salesOrderDueDate).format('YYYY년 MM월 DD일') }} </td>
+                <td colspan="5" style="height: 30px;">&nbsp;{{ dayjs(salesOrder?.salesOrderDueDate).format('YYYY년 MM월 DD일') }} </td>
               </tr>
               </tbody>
             </table>

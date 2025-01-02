@@ -324,6 +324,7 @@ const printItem = (index) => {
   <PrintPreviewModal
       :isVisible="isModalVisible"
       :purchase="selectedPurchaseOrder"
+      :isList=true
       @close="closePrintPreview"
   />
 

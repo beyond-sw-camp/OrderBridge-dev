@@ -7,6 +7,7 @@ import Swal from "sweetalert2";
 const props = defineProps({
   isVisible: Boolean,
   purchase: Object,
+  isList: Boolean,
 });
 
 // 부모에서 넘어오는 발주서 시퀀스로 이미지를 가져옴
@@ -180,7 +181,9 @@ const clearCanvas = () => {
                   <img class="image-item" v-if="notification.notificationImageUrl != undefined" :src="notification.notificationImageUrl" alt="승인자 서명" style="width: 100px; height: auto;" />
                   <span v-else>
                     (서명 또는 인)
+                    <template v-if="!isList">
                      <input type="button" class="btn-print" @click="openModal(notification)" value="결재하기">
+                    </template>
                   </span>
 
 

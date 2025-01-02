@@ -225,6 +225,7 @@ onUnmounted(() => {
     <PurchasePrintPreviewModal
         :isVisible="isModalVisible"
         :purchase="selectedData"
+        :isList=false
         @close="closePrintPreview"
     />
   </template>
@@ -232,6 +233,7 @@ onUnmounted(() => {
     <SalesOrderPrintPreview
         :isVisible="isModalVisible"
         :salesOrder="selectedData"
+        :isList=false
         @close="closePrintPreview"
     />
   </template>
