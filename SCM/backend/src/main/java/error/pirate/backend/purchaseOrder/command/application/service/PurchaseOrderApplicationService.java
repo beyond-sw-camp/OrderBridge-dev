@@ -56,7 +56,7 @@ public class PurchaseOrderApplicationService {
 
         PurchaseOrder purchaseOrder = modelMapper.map(request, PurchaseOrder.class);
 
-        User user = userRepository.findById(request.getUserSeq())
+        User user = userRepository.findByUserEmployeeNo(securityUtil.getCurrentUserEmployeeNo())
                 .orElseThrow(() -> new CustomException(ErrorCodeType.USER_NOT_FOUND));
 
         Client client = clientRepository.findById(request.getClientSeq())

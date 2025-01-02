@@ -103,7 +103,6 @@ const registerItems = async () => {
   const formData = new FormData();
 
   formData.append('itemCreateRequest', JSON.stringify( {
-    userSeq: 1,
     itemUnitSeq: itemUnitSeq.value,
     itemName: itemName.value,
     itemDivision: itemDivision.value,
