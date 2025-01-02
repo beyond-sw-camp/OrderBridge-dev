@@ -30,15 +30,15 @@ async function sError(error) {
 }
 
 async function sConfirm(message) {
-    salert.fire({
+    return await salert.fire({
         title: message,
         showDenyButton: true,
         confirmButtonText: `수락`,
         denyButtonText: `거절`,
         icon: `question`
     }).then((result) => {
-        if (result.isConfirmed) { return true }
-        else if (result.isDenied) { return false }
+        if (result.isConfirmed) { return true; }
+        else if (result.isDenied) { return false; }
     });
 }
 
