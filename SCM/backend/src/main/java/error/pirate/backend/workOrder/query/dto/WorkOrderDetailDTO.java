@@ -25,6 +25,7 @@ public class WorkOrderDetailDTO {
     private Integer workOrderIndicatedQuantity;
     private Integer workOrderPrice;
     private String userName;
+    private String userPhoneNo;
     private String clientName;
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime workOrderRegDate;

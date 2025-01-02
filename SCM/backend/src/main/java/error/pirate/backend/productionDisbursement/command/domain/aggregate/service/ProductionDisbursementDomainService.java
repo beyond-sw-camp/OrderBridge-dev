@@ -146,4 +146,11 @@ public class ProductionDisbursementDomainService {
 
         productionDisbursement.updateProductionDisbursement(request, workOrder);
     }
+
+    // 작성자인지 확인
+    public void checkUser(ProductionDisbursement productionDisbursement, User user) {
+        if (!user.equals(productionDisbursement.getUser())) {
+            throw new CustomException(ErrorCodeType.SECURITY_ACCESS_ERROR);
+        }
+    }
 }

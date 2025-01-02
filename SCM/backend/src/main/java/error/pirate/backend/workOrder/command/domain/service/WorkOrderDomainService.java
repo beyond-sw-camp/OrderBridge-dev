@@ -153,4 +153,11 @@ public class WorkOrderDomainService {
     public void updateWorkOrderWorkAutoComplete(WorkOrder workOrder, Integer indicatedQuantity) {
         workOrder.updateWorkOrderWorkAutoComplete(indicatedQuantity);
     }
+
+    // 작성자인지 확인
+    public void checkUser(WorkOrder workOrder, User user) {
+        if (!user.equals(workOrder.getUser())) {
+            throw new CustomException(ErrorCodeType.SECURITY_ACCESS_ERROR);
+        }
+    }
 }

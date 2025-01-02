@@ -21,7 +21,9 @@ public class ProductionDisbursementDetailDTO {
     private LocalDateTime workOrderIndicatedDate;
     private Long factorySeq;
     private String factoryName;
+    private String clientName;
     private String userName;
+    private String userPhoneNo;
     private String productionDisbursementName;
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime productionDisbursementDepartureDate;

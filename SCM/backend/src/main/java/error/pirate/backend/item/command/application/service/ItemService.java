@@ -2,6 +2,7 @@ package error.pirate.backend.item.command.application.service;
 
 import error.pirate.backend.common.FileUploadUtil;
 import error.pirate.backend.common.NullCheck;
+import error.pirate.backend.common.SecurityUtil;
 import error.pirate.backend.exception.CustomException;
 import error.pirate.backend.exception.ErrorCodeType;
 import error.pirate.backend.item.command.application.dto.BomItemDTO;
@@ -37,13 +38,13 @@ public class ItemService {
     private final ItemUnitRepository itemUnitRepository;
     private final UserRepository userRepository;
     private final BomItemRepository bomItemRepository;
-    private final ModelMapper modelMapper;
     private final WarehouseRepository warehouseRepository;
     private final FileUploadUtil fileUploadUtil;
+    private final SecurityUtil securityUtil;
 
     @Transactional
     public void createItem(ItemCreateRequest request, MultipartFile file) throws IOException {
-        User user = userRepository.findById(request.getUserSeq())
+        User user = userRepository.findByUserEmployeeNo(securityUtil.getCurrentUserEmployeeNo())
                 .orElseThrow(() -> new CustomException(ErrorCodeType.USER_NOT_FOUND));
 
         ItemUnit itemUnit = itemUnitRepository.findById(request.getItemUnitSeq())
@@ -52,7 +53,9 @@ public class ItemService {
         Warehouse warehouse = warehouseRepository.findById(request.getWarehouseSeq())
                 .orElseThrow(() -> new CustomException(ErrorCodeType.WAREHOUSE_NOT_FOUND));
 
-        request.setItemImageUrl(fileUploadUtil.uploadFile(file));
+        if(file != null) {
+            request.setItemImageUrl(fileUploadUtil.uploadFile(file));
+        }
 
         Item item = Item.createItem(user, itemUnit, warehouse, request);
 
@@ -85,7 +88,9 @@ public class ItemService {
                 .orElseThrow(() -> new CustomException(ErrorCodeType.WAREHOUSE_NOT_FOUND));
 
         // 파일 업로드 처리
-        request.setItemImageUrl(fileUploadUtil.uploadFile(file));
+        if(file != null) {
+            request.setItemImageUrl(fileUploadUtil.uploadFile(file));
+        }
 
         item.updateItem(itemUnit, warehouse, request);
 

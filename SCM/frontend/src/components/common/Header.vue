@@ -16,6 +16,8 @@ import PurchaseOrderPrintPreviewModal from "@/components/purchaseOrder/PurchaseO
 import PurchasePrintPreviewModal from "@/components/purchase/PurchasePrintPreview.vue";
 import ShippingInstructionPrintPreview from "@/components/shippingInstruction/ShippingInstructionPrintPreview.vue";
 import ShippingSlipPrintPreview from "@/components/shippingSlip/ShippingSlipPrintPreview.vue";
+import ProductionDisbursementPrintPreview from "@/components/productionDisbursement/ProductionDisbursementPrintPreview.vue";
+import WorkOrderPrintPreview from "@/components/workOrder/WorkOrderPrintPreview.vue";
 
 const userStore = useUserStore();
 const notificationList = ref([]);
@@ -50,6 +52,7 @@ const openPrintPreview = async (notification) => {
 
     selectedNotificationType.value = notification.notificationType;
     selectedData.value = response.data;
+    console.log("response data : ", response.data);
     isModalVisible.value = true;
     isNotificationOpen.value = false;
 
@@ -184,7 +187,22 @@ function chatbotOn() {
         @close="closePrintPreview"
     />
   </template>
-
+  <template v-else-if="selectedNotificationType === 'productionDisbursement'">
+    <ProductionDisbursementPrintPreview
+        :isVisible="isModalVisible"
+        :productionDisbursement="selectedData"
+        :isList=false
+        @close="closePrintPreview"
+    />
+  </template>
+  <template v-else-if="selectedNotificationType === 'workOrder'">
+    <WorkOrderPrintPreview
+        :isVisible="isModalVisible"
+        :workOrder="selectedData"
+        :isList=false
+        @close="closePrintPreview"
+    />
+  </template>
 
 </template>
 <style scoped>

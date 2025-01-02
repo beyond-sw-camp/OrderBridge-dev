@@ -26,14 +26,14 @@ public class ItemController {
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "품목 등록", description = "파일과 함께 품목을 등록합니다.")
-    public ResponseEntity<String> createItem(@RequestPart("file") MultipartFile file, @RequestPart("itemCreateRequest") ItemCreateRequest request) throws IOException {
+    public ResponseEntity<String> createItem(@RequestPart(value = "file", required = false) MultipartFile file, @RequestPart(value = "itemCreateRequest") ItemCreateRequest request) throws IOException {
         itemService.createItem(request, file);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PutMapping(value = "/{itemSeq}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "품목 수정", description = "품목 정보를 수정합니다.")
-    public ResponseEntity<Void> updateItem(@PathVariable Long itemSeq, @RequestPart("file") MultipartFile file, @RequestPart("itemUpdateRequest") ItemUpdateRequest request) throws IOException {
+    public ResponseEntity<Void> updateItem(@PathVariable Long itemSeq, @RequestPart(value = "file", required = false) MultipartFile file, @RequestPart(value = "itemUpdateRequest") ItemUpdateRequest request) throws IOException {
 
         itemService.updateItem(itemSeq, request, file);
         return ResponseEntity.status(HttpStatus.OK).build();
