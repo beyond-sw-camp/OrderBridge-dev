@@ -269,7 +269,6 @@ const clearCanvas = () => {
             </table>
 
             <ul class="notes">
-              <li>상기 자재를 발주하오니 납기를 준수하여 입고 바랍니다.</li>
               <li>기타 의문사항이나 관련사항시 사전 관련부서에 통보하여 주십시오.</li>
             </ul>
 
