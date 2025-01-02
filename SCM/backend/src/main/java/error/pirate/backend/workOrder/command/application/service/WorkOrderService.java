@@ -149,16 +149,17 @@ public class WorkOrderService {
         LocalDateTime dueDate = request.getWorkOrderDueDate();
         if (dueDate == null) {
             dueDate = workOrder.getWorkOrderDueDate(); // 기존 값 유지
-            log.info("납기일이 입력되지 않아 기존 값 유지: {}", dueDate);
+            log.info("목표일이 입력되지 않아 기존 값 유지: {}", dueDate);
         }
-        if (dueDate.isBefore(LocalDateTime.now())) {
-            throw new CustomException(ErrorCodeType.INVALID_DATE_RANGE);
-        }
-        log.info("납기일 유효성 검증 완료 - 납기일: {}", dueDate);
 
         LocalDateTime seoulDueDate =  workOrderDomainService.convertDueDate(dueDate);
-        log.info("-------------- 작업지시일 시간대 변경 완료 : {} --------------", seoulDueDate);
+        log.info("-------------- 작업목표일 시간대 변경 완료 : {} --------------", seoulDueDate);
 
+        SalesOrder salesOrder = workOrder.getSalesOrder();
+        // 납기일이 주문서 납기일보다 전이어야 함.
+        if (dueDate.isAfter(salesOrder.getSalesOrderDueDate())) {
+            throw new CustomException(ErrorCodeType.INVALID_DATE_RANGE);
+        }
 
         // 지시수량 변경
         Integer updatedQuantity = request.getWorkOrderIndicatedQuantity();
@@ -219,7 +220,6 @@ public class WorkOrderService {
         }
 
         // 작업지시일 시간대 변경
-//        LocalDate indicatedDate = request.getWorkOrderIndicatedDate();
         LocalDateTime indicatedDate = request.getWorkOrderIndicatedDate();
         if (indicatedDate == null) {
             indicatedDate = workOrder.getWorkOrderIndicatedDate(); // 기존 값 유지
@@ -232,15 +232,15 @@ public class WorkOrderService {
         LocalDateTime dueDate = request.getWorkOrderDueDate();
         if (dueDate == null) {
             dueDate = workOrder.getWorkOrderDueDate(); // 기존 값 유지
-            log.info("납기일이 입력되지 않아 기존 값 유지: {}", dueDate);
+            log.info("목표일이 입력되지 않아 기존 값 유지: {}", dueDate);
         }
-        if (dueDate.isBefore(LocalDateTime.now())) {
+        // 납기일이 주문서 납기일보다 전이어야 함.
+        if (dueDate.isAfter(workOrder.getSalesOrder().getSalesOrderDueDate())) {
             throw new CustomException(ErrorCodeType.INVALID_DATE_RANGE);
         }
-        log.info("납기일 유효성 검증 완료 - 납기일: {}", dueDate);
 
         LocalDateTime seoulDueDate =  workOrderDomainService.convertDueDate(dueDate);
-        log.info("-------------- 작업지시일 시간대 변경 완료 : {} --------------", seoulDueDate);
+        log.info("-------------- 작업목표일 시간대 변경 완료 : {} --------------", seoulDueDate);
 
         // 지시수량 변경
         Integer updatedQuantity = request.getWorkOrderIndicatedQuantity();

@@ -314,7 +314,7 @@ function search() {
                     <b>작업완료 수량 : </b>{{ numberFormating(workOrderDetail[workOrder.workOrderSeq].workOrderWorkQuantity) }} <br>
                     <b>담당자 : </b>{{ workOrderDetail[workOrder.workOrderSeq].userName }} <br>
                     <b>납품처명 : </b>{{ workOrderDetail[workOrder.workOrderSeq].clientName}} <br>
-                    <b>작업납기일 : </b>{{ dayjs(workOrderDetail[workOrder.workOrderSeq].workOrderDueDate).format('YYYY-MM-DD HH:mm:ss') }}<br>
+                    <b>작업목표일 : </b>{{ dayjs(workOrderDetail[workOrder.workOrderSeq].workOrderDueDate).format('YYYY-MM-DD HH:mm:ss') }}<br>
                     <b>작업완료일 : </b>
                     <div v-if ="workOrderDetail[workOrder.workOrderSeq].workOrderEndDate != null"> {{ dayjs(workOrderDetail[workOrder.workOrderSeq].workOrderEndDate).format('YYYY-MM-DD HH:mm:ss') }}</div>
                     <div v-else> 없음</div>

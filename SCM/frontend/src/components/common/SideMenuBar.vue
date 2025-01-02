@@ -77,7 +77,7 @@ const toggleSubMenu = (subMenu) => {
               <li>
                 <RouterLink class="content-item" to="/quotation">견적서 조회</RouterLink>
                 <RouterLink class="content-item" to="/quotation/input">견적서 등록</RouterLink>
-                <RouterLink class="content-item" to="">견적서 현황</RouterLink>
+                <RouterLink class="content-item" to="/quotation/situation">견적서 현황</RouterLink>
               </li>
             </ul>
           </li>
@@ -87,7 +87,7 @@ const toggleSubMenu = (subMenu) => {
               <li>
                 <RouterLink class="content-item" to="/sales-order">주문서 조회</RouterLink>
                 <RouterLink class="content-item" to="/sales-order/input">주문서 등록</RouterLink>
-                <RouterLink class="content-item" to="">주문서 현황</RouterLink>
+                <RouterLink class="content-item" to="/sales-order/situation">주문서 현황</RouterLink>
               </li>
             </ul>
           </li>
@@ -97,7 +97,7 @@ const toggleSubMenu = (subMenu) => {
               <li>
                 <RouterLink class="content-item" to="/invoice">거래명세서 조회</RouterLink>
                 <RouterLink class="content-item" to="/invoice/input">거래명세서 등록</RouterLink>
-                <RouterLink class="content-item" to="">거래명세서 현황</RouterLink>
+                <RouterLink class="content-item" to="/invoice/situation">거래명세서 현황</RouterLink>
               </li>
             </ul>
           </li>

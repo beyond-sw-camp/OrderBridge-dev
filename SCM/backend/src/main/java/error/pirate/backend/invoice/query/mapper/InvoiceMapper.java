@@ -35,7 +35,7 @@ public interface InvoiceMapper {
             @Param("invoiceSeq") Long invoiceSeq);
 
     // 거래 명세서 현황 조회
-    List<InvoiceSituationDTO> selectInvoiceSituation(
+    List<InvoiceSituationResponse> selectInvoiceSituation(
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate,
             @Param("clientName") String clientName);
@@ -46,6 +46,12 @@ public interface InvoiceMapper {
 
     // 거래 명세서 목록 엑셀 다운로드
     ArrayList<Object> selectInvoiceExcel(
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate,
+            @Param("clientName") String clientName);
+
+    // 거래 명세서 현황 엑셀 다운로드
+    ArrayList<Object> selectInvoiceSituationExcel(
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate,
             @Param("clientName") String clientName);
