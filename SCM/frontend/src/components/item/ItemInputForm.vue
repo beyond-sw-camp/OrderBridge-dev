@@ -42,7 +42,6 @@ const itemImageUrl = ref('');
 const previewImageUrl = ref('');
 const warehouses = ref([]);
 const warehouseSeq = ref('');
-const isLoading = ref(false);
 const fileInput = ref(null);
 
 // 이미지 미리보기 업데이트
@@ -103,7 +102,7 @@ const registerItems = async () => {
 
   const formData = new FormData();
 
-  const requestData = {
+  formData.append('itemCreateRequest', JSON.stringify( {
     userSeq: 1,
     itemUnitSeq: itemUnitSeq.value,
     itemName: itemName.value,
@@ -111,42 +110,35 @@ const registerItems = async () => {
     itemExpirationHour: itemExpiration.value,
     itemPrice: itemPrice.value,
     itemNote: itemNote.value,
-    warehouseSeq: warehouseSeq.value
-  };
+    warehouseSeq: warehouseSeq.value,
 
-  // 파일 객체 가져오기
-  const file = fileInput.value.files[0];
-  if (!file) {
-    alert('파일을 선택해주세요');
-    return;
+    bomItemList: bomItems.value
+  }))
+
+  // 파일 추가
+  console.log(fileInput.value.files[0]);
+  if (fileInput.value.files[0]) {
+    formData.append('file', fileInput.value.files[0]);
   }
 
-  formData.append('file', file);
-  formData.append('request', JSON.stringify(requestData));
-
   try {
-    isLoading.value = true;
-
-    const token = localStorage.getItem('accessToken');
 
     const response = await axios.post('item', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
-        'Authorization': `Bearer ${token}`
       }
     });
 
     if (response.status === 201) {
       alert('품목이 성공적으로 등록되었습니다.');
-      await router.push("item");
+      await router.push("/item");
     }
   } catch (error) {
     console.error('품목 등록 실패:', error);
     alert('품목 등록에 실패했습니다.');
-  } finally {
-    isLoading.value = false;
   }
 };
+
 const updateItem = async () => {
   if (!validateForm()) return;
 
@@ -160,6 +152,7 @@ const updateItem = async () => {
     itemPrice: itemPrice.value,
     itemNote: itemNote.value,
     warehouseSeq: warehouseSeq.value,
+
     bomItemList: bomItems.value
   };
 
@@ -173,13 +166,9 @@ const updateItem = async () => {
   formData.append('request', JSON.stringify(requestData));
 
   try {
-    isLoading.value = true;
 
     // 토큰 없이 직접 요청
     const response = await axios.put(`item/${props.itemDTO.itemSeq}`, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
     });
 
     if (response.status === 200) {
@@ -189,8 +178,6 @@ const updateItem = async () => {
   } catch (error) {
     console.error('품목 수정 실패:', error);
     alert('품목 수정에 실패했습니다.');
-  } finally {
-    isLoading.value = false;
   }
 };
 
@@ -380,14 +367,7 @@ const itemDivisionMap = {
         <!-- 파일 선택 -->
         <b-form-group label-cols="3" label-size="default" label="이미지" label-for="itemImage">
           <b-input-group size="sm">
-            <input
-                type="file"
-                id="itemImage"
-                ref="fileInput"
-                accept="image/*"
-                style="display: none"
-                @change="handleFileUpload"
-            />
+            <input type="file" id="itemImage" ref="fileInput" accept="image/*" style="display: none" @change="handleFileUpload"/>
             <b-button
                 size="sm"
                 variant="light"
@@ -452,7 +432,7 @@ const itemDivisionMap = {
   <!-- 버튼 그룹 -->
   <div class="d-flex justify-content-end mt-3">
     <b-button v-if="props.itemDTO" @click="updateItem" variant="light" size="sm" class="button ms-2">수정</b-button>
-    <b-button v-else :disabled="isLoading" @click="registerItems" variant="light" size="sm" class="button ms-2">등록</b-button>
+    <b-button v-else @click="registerItems" variant="light" size="sm" class="button ms-2">등록</b-button>
   </div>
 
   <!-- bomItemModal -->

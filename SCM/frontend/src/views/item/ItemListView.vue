@@ -236,7 +236,7 @@ const itemDelete = async (itemSeq) => {
                 <p class="item-name">{{ item.itemName }}</p>
                 <ul>
                   <li>품목: {{ itemDivisionMap[item.itemDivision] || item.itemDivision }}</li>
-                  <li>유통기한: {{ (item.itemExpirationHour / 24).toFixed(0) }} 일</li>
+                  <li>유통기한: {{ item.itemExpirationHour }} 시간</li>
                   <li>단가: {{ item.itemPrice.toLocaleString() }} ₩</li>
                 </ul>
                 <div class="d-flex justify-content-end mt-3">

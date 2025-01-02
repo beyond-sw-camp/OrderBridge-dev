@@ -1,5 +1,6 @@
 package error.pirate.backend.item.command.domain.aggregate.entity;
 
+import error.pirate.backend.item.command.application.dto.ItemCreateRequest;
 import error.pirate.backend.item.command.application.dto.ItemUpdateRequest;
 import error.pirate.backend.user.command.domain.aggregate.entity.User;
 import error.pirate.backend.warehouse.command.domain.aggregate.entity.Warehouse;
@@ -55,15 +56,43 @@ public class Item {
     private String itemNote;
 
     @Enumerated(EnumType.STRING)
-    private ItemStatus itemStatus = ItemStatus.ACTIVE;
+    private ItemStatus itemStatus;
 
-    public void updateItem(User user, ItemUnit itemUnit, Warehouse warehouse, ItemUpdateRequest request) {
-        if(itemUnit != null) {
-            this.itemUnit = itemUnit;
-        }
-        if(warehouse != null) {
-            this.warehouse = warehouse;
-        }
+    public static Item createItem(User user, ItemUnit itemUnit, Warehouse warehouse, ItemCreateRequest request) {
+        Item item = new Item(request);
+        item.specifyUser(user);
+        item.specifyItemUnit(itemUnit);
+        item.specifyWarehouse(warehouse);
+
+        return item;
+    }
+
+    public Item(ItemCreateRequest request) {
+        this.itemName = request.getItemName();
+        this.itemDivision = request.getItemDivision();
+        this.itemExpirationHour = request.getItemExpirationHour();
+        this.itemImageUrl = request.getItemImageUrl();
+        this.itemPrice = request.getItemPrice();
+        this.itemNote = request.getItemNote();
+        this.itemStatus = ItemStatus.ACTIVE;
+    }
+
+    private void specifyUser(User user) {
+        this.user = user;
+    }
+
+    private void specifyItemUnit(ItemUnit itemUnit) {
+        this.itemUnit = itemUnit;
+    }
+
+    private void specifyWarehouse(Warehouse warehouse) {
+        this.warehouse = warehouse;
+    }
+
+    public void updateItem(ItemUnit itemUnit, Warehouse warehouse, ItemUpdateRequest request) {
+        specifyItemUnit(itemUnit);
+        specifyWarehouse(warehouse);
+
         if(request.getItemName() != null) {
             this.itemName = request.getItemName();
         }
@@ -83,12 +112,10 @@ public class Item {
             this.itemNote = request.getItemNote();
         }
     }
+
     // 품목 삭제 메서드
     public void delete() {
         this.itemStatus = ItemStatus.DELETED;
-    }
-
-    public void setItemImageUrl(String ignoredItemImageUrl) {
     }
 }
 
