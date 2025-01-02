@@ -44,6 +44,7 @@ const findItemsByFilter = async () => {
         itemDivisions: selectedDivisions.value.length > 0 ? selectedDivisions.value : null,
         minExpirationHour: minHour,
         maxExpirationHour: maxHour,
+        sort: "itemSeq,desc"
       },
       paramsSerializer: (params) => {
         const searchParams = new URLSearchParams();
@@ -61,10 +62,12 @@ const findItemsByFilter = async () => {
       }
     });
 
-    rows.value = response.data.totalElements;
-    // 여기서 DELETED 상태가 아닌 아이템만 필터링
-    items.value = response.data.content.filter(item => item.itemStatus !== 'DELETED');
-    loadingImages.value = new Set(items.value.map((item) => item.itemSeq));
+
+    if (response.data && response.data.content) {
+      rows.value = response.data.totalElements;
+      items.value = response.data.content;
+      loadingImages.value = new Set(items.value.map((item) => item.itemSeq));
+    }
   } catch (error) {
     console.error("데이터 불러오기 실패:", error);
   }
@@ -89,6 +92,7 @@ function checkItemDivision(key) {
   } else {
     selectedDivisions.value.push(key);
   }
+  currentPage.value = 1;
   findItemsByFilter();
 }
 
@@ -115,9 +119,16 @@ watch(itemInventoryCurrentPage, () => {
   itemInventory.value = itemInventoryList.value[itemInventoryCurrentPage.value - 1];
 });
 
-watch(searchName, findItemsByFilter);
+watch(searchName, () => {
+  currentPage.value = 1;
+  findItemsByFilter();
+});
 watch(currentPage, findItemsByFilter);
-watch([minExpiration, maxExpiration], findItemsByFilter);
+
+watch([minExpiration, maxExpiration], () => {
+  currentPage.value = 1;
+  findItemsByFilter();
+});
 
 onMounted(() => {
   findItemsByFilter();
@@ -130,26 +141,35 @@ const handleItemUpdate = (itemSeq) => {
 const itemDelete = async (itemSeq) => {
   try {
     const token = localStorage.getItem('accessToken');
-    const response = await axios.delete(`item/${itemSeq}`, {
+    await axios.delete(`item/${itemSeq}`, {
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
-      },
-      data: {
-        itemSeq: itemSeq,
-        itemStatus: 'DELETED'
       }
     });
 
-    if (response.data) {
-      alert('삭제되었습니다.');
-      // DELETED 상태가 아닌 아이템만 필터링
-      const updatedResponse = await axios.get('item');
-      items.value = updatedResponse.data.filter(item => item.itemStatus !== 'DELETED');
-    }
+    // 성공 알림
+    alert('삭제되었습니다.');
+
+    // 현재 items 배열에서 삭제된 아이템 제거
+    items.value = items.value.filter(item => item.itemSeq !== itemSeq);
+
+    // 전체 아이템 수 감소
+    rows.value = rows.value - 1;
+
+    currentPage.value = 1;
+    await findItemsByFilter();
+
+
   } catch (error) {
-    console.error('삭제 실패:', error);
-    alert('삭제에 실패했습니다.');
+    if (error.response?.status === 401) {
+      alert('세션이 만료되었습니다. 다시 로그인해주세요.');
+      localStorage.removeItem('accessToken');
+      router.push('/login');
+    } else {
+      console.error('삭제 실패:', error);
+      alert('삭제에 실패했습니다.');
+    }
   }
 };
 </script>
