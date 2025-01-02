@@ -18,6 +18,7 @@ import ShippingInstructionPrintPreview from "@/components/shippingInstruction/Sh
 import ShippingSlipPrintPreview from "@/components/shippingSlip/ShippingSlipPrintPreview.vue";
 import ProductionDisbursementPrintPreview from "@/components/productionDisbursement/ProductionDisbursementPrintPreview.vue";
 import WorkOrderPrintPreview from "@/components/workOrder/WorkOrderPrintPreview.vue";
+import ProductionReceivingPrintPreviewModal from "@/components/productionReceiving/ProductionReceivingPrintPreview.vue"
 
 const userStore = useUserStore();
 const notificationList = ref([]);
@@ -38,6 +39,7 @@ const fetchNotifications = async () => {
 const isModalVisible = ref(false);
 const selectedData = ref(null);
 const selectedNotificationType = ref(null);
+const productionReceivingDTO = ref(null);
 
 const openPrintPreview = async (notification) => {
   try {
@@ -48,11 +50,10 @@ const openPrintPreview = async (notification) => {
       notification.notificationType = 'shipping-slip';
     }
 
-    const response = await axios.get(notification.notificationType + `/${notification.notificationAnotherSeq}`);
+    const response = await axios.get(`${notification.notificationType}/${notification.notificationAnotherSeq}`);
 
     selectedNotificationType.value = notification.notificationType;
     selectedData.value = response.data;
-    console.log("response data : ", response.data);
     isModalVisible.value = true;
     isNotificationOpen.value = false;
 
@@ -212,6 +213,13 @@ function chatbotOn() {
         :isVisible="isModalVisible"
         :workOrder="selectedData"
         :isList=false
+        @close="closePrintPreview"
+    />
+  </template>
+  <template v-else-if="selectedNotificationType === 'productionReceiving'">
+    <ProductionReceivingPrintPreviewModal
+        :isVisible="isModalVisible"
+        :productionReceiving="selectedData"
         @close="closePrintPreview"
     />
   </template>
