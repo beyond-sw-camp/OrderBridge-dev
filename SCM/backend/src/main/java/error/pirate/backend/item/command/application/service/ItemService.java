@@ -52,7 +52,9 @@ public class ItemService {
         Warehouse warehouse = warehouseRepository.findById(request.getWarehouseSeq())
                 .orElseThrow(() -> new CustomException(ErrorCodeType.WAREHOUSE_NOT_FOUND));
 
-        request.setItemImageUrl(fileUploadUtil.uploadFile(file));
+        if(file != null) {
+            request.setItemImageUrl(fileUploadUtil.uploadFile(file));
+        }
 
         Item item = Item.createItem(user, itemUnit, warehouse, request);
 
@@ -85,7 +87,9 @@ public class ItemService {
                 .orElseThrow(() -> new CustomException(ErrorCodeType.WAREHOUSE_NOT_FOUND));
 
         // 파일 업로드 처리
-        request.setItemImageUrl(fileUploadUtil.uploadFile(file));
+        if(file != null) {
+            request.setItemImageUrl(fileUploadUtil.uploadFile(file));
+        }
 
         item.updateItem(itemUnit, warehouse, request);
 
