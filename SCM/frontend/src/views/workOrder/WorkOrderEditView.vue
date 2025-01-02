@@ -12,19 +12,6 @@ const salesOrder = ref();
 const stockStatusList = ref([]);
 const isEditMode = ref(true); // 수정모드
 
-// 날짜 포맷 함수
-const formatDateToInputDate = (dateString) => {
-  if (!dateString) return '';
-  const date = new Date(dateString);
-  if (isNaN(date.getTime())) return ''; // 유효하지 않은 날짜 방지
-
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-
-  return `${year}-${month}-${day}`;
-};
-
 // 날짜 포맷 변환 함수
 const formatDateToInput = (dateString) => {
   if (!dateString) return '';
@@ -44,7 +31,6 @@ const fetchWorkOrderDetail = async (workOrderSeq) => {
   try {
     const response = await axios.get(`workOrder/${workOrderSeq}`, {});
     console.log(response.data);
-    // workOrderDetail.value = response.data.workOrderDetail;
     workOrderDetail.value = {
       ...response.data.workOrderDetail,
       workOrderIndicatedDate: formatDateToInput(response.data.workOrderDetail.workOrderIndicatedDate),
@@ -67,10 +53,9 @@ const fetchSalesOrderById = async (salesOrderSeq) => {
     const response = await axios.get(`sales-order/${salesOrderSeq}`);
     console.log('주문서 상세:', response.data);
 
-    // salesOrder.value = response.data; // 주문서 정보 저장
     salesOrder.value = {
       ...response.data,
-      salesOrderDueDate: formatDateToInputDate(response.data.salesOrderDueDate),
+      salesOrderDueDate: formatDateToInput(response.data.salesOrderDueDate),
     };
     stockStatusList.value = response.data.salesOrderItem; // 주문서 품목 목록 저장
   } catch (error) {

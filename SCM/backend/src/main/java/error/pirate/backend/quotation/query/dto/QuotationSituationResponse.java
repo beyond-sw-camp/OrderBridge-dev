@@ -1,12 +1,10 @@
 package error.pirate.backend.quotation.query.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.time.LocalDate;
 
 @Getter
-@AllArgsConstructor
 public class QuotationSituationResponse {
     private LocalDate quotationQuotationDate;
     private String quotationName;

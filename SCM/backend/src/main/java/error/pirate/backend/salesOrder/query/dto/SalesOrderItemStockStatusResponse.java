@@ -21,4 +21,10 @@ public class SalesOrderItemStockStatusResponse {
     private Boolean isStockEnough;   // 재고 충분 여부
     private String salesOrderItemNote;    // 품목 비고
 
+    public void calculateStockStatus() {
+        this.isStockEnough = availableQuantity >= requiredQuantity;
+        this.insufficientQuantity = (availableQuantity >= requiredQuantity)
+                ? 0
+                : requiredQuantity - availableQuantity;
+    }
 }

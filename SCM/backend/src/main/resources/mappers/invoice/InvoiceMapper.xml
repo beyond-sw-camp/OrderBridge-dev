@@ -87,15 +87,17 @@
     </select>
 
     <!--  거래 명세서 현황 조회  -->
-    <select id="selectInvoiceSituation" resultType="error.pirate.backend.invoice.query.dto.InvoiceSituationDTO">
+    <select id="selectInvoiceSituation" resultType="error.pirate.backend.invoice.query.dto.InvoiceSituationResponse">
         SELECT
-            tb_invoice.invoice_seq,
             tb_invoice.invoice_sale_date,
             tb_invoice.invoice_name,
             tb_invoice.invoice_total_quantity,
             tb_invoice.invoice_extended_price,
             tb_client.client_name,
-            tb_invoice.invoice_note
+            tb_invoice.invoice_note,
+            DATE_FORMAT(tb_invoice.invoice_sale_date, '%Y-%m') as invoice_sale_month,
+            IFNULL(SUM(tb_invoice.invoice_extended_price), 0) as invoice_month_price,
+            IFNULL(SUM(tb_invoice.invoice_total_quantity), 0) as invoice_month_quantity
         FROM tb_invoice
         JOIN tb_sales_order USING (sales_order_seq)
         JOIN tb_client USING (client_seq)
@@ -109,6 +111,9 @@
         <if test="clientName != null">
             AND tb_client.client_name LIKE CONCAT('%', #{clientName}, '%')
         </if>
+        GROUP BY
+            DATE_FORMAT(tb_invoice.invoice_sale_date, '%Y-%m'),
+        tb_invoice.invoice_sale_date WITH ROLLUP;
     </select>
 
     <!--  거래 명세서 품목 값 확인  -->
@@ -138,6 +143,30 @@
             tb_invoice.invoice_extended_price,
             tb_invoice.invoice_note
         FROM tb_invoice
+        WHERE tb_invoice.invoice_status NOT IN ("DELETE")
+        <if test="startDate != null"><![CDATA[
+            AND #{startDate} <= tb_invoice.invoice_sale_date
+        ]]></if>
+        <if test="endDate != null"><![CDATA[
+            AND #{endDate} >= tb_invoice.invoice_sale_date
+        ]]></if>
+        <if test="clientName != null">
+            AND tb_client.client_name LIKE CONCAT('%', #{clientName}, '%')
+        </if>
+    </select>
+
+    <!--  거래 명세서 현황 엑셀 다운로드  -->
+    <select id="selectInvoiceSituationExcel" resultType="error.pirate.backend.invoice.query.dto.InvoiceSituationExcelDTO">
+        SELECT
+            tb_invoice.invoice_sale_date,
+            tb_invoice.invoice_name,
+            tb_invoice.invoice_total_quantity,
+            tb_invoice.invoice_extended_price,
+            tb_client.client_name,
+            tb_invoice.invoice_note
+        FROM tb_invoice
+        JOIN tb_sales_order USING (sales_order_seq)
+        JOIN tb_client USING (client_seq)
         WHERE tb_invoice.invoice_status NOT IN ("DELETE")
         <if test="startDate != null"><![CDATA[
             AND #{startDate} <= tb_invoice.invoice_sale_date
