@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -31,13 +32,14 @@ class WorkOrderQueryServiceTest {
                 // 페이지와 기본 조건만 설정
                 new WorkOrderFilterDTO(null, null, LocalDate.of(2024, 1, 1), LocalDate.of(2024, 12, 31), 1, 5),
                 // 특정 상태 필터링
-                new WorkOrderFilterDTO(null, WorkOrderStatus.ONGOING, LocalDate.of(2024, 1, 1), LocalDate.of(2024, 12, 31), 1, 5),
+                new WorkOrderFilterDTO(null, Collections.singletonList(WorkOrderStatus.ONGOING), LocalDate.of(2024, 1, 1), LocalDate.of(2024, 12, 31), 1, 5),
                 // 특정 창고 필터링
                 new WorkOrderFilterDTO("생산창고", null, LocalDate.of(2024, 1, 1), LocalDate.of(2024, 12, 31), 1, 5),
                 // 특정 기간 필터링
-                new WorkOrderFilterDTO(null, null, LocalDate.of(2024, 3, 1), LocalDate.of(2024, 6, 30), 1, 5),
+                new WorkOrderFilterDTO(null, null, LocalDate.of(2024, 3, 1), LocalDate.of(2024, 6, 30), 1, 5)
+                ,
                 // 모든 조건 조합
-                new WorkOrderFilterDTO("생산창고", WorkOrderStatus.COMPLETE, LocalDate.of(2024, 1, 1), LocalDate.of(2024, 12, 31), 1, 5)
+                new WorkOrderFilterDTO("생산창고", Collections.singletonList(WorkOrderStatus.COMPLETE), LocalDate.of(2024, 1, 1), LocalDate.of(2024, 12, 31), 1, 5)
         );
     }
 

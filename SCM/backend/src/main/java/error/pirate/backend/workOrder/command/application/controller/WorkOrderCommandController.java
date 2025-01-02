@@ -1,5 +1,6 @@
 package error.pirate.backend.workOrder.command.application.controller;
 
+import error.pirate.backend.security.AuthUtil;
 import error.pirate.backend.workOrder.command.application.dto.CreateWorkOrderRequest;
 import error.pirate.backend.workOrder.command.application.dto.UpdateWorkOrderRequest;
 import error.pirate.backend.workOrder.command.application.service.WorkOrderService;
@@ -28,7 +29,8 @@ public class WorkOrderCommandController {
     public ResponseEntity<Void> createWorkOrder(@Valid @RequestBody CreateWorkOrderRequest request
     ) {
         log.info("-------------- POST /api/v1/workOrder 작업지시서 등록 요청 - request:{} --------------", request);
-        workOrderService.createWorkOrderForItem(request);
+        String userNo = AuthUtil.getAuthUser();
+        workOrderService.createWorkOrderForItem(request, userNo);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
@@ -39,7 +41,8 @@ public class WorkOrderCommandController {
     public ResponseEntity<Void> updateWorkOrder(@PathVariable Long workOrderSeq,
                                                  @Valid @RequestBody UpdateWorkOrderRequest request) {
         log.info("-------------- PUT /api/v1/workOrder/{} 작업지시서 수정 요청 - request:{} --------------", workOrderSeq, request);
-        workOrderService.updateWorkOrder(workOrderSeq, request);
+        String userNo = AuthUtil.getAuthUser();
+        workOrderService.updateWorkOrder(workOrderSeq, request, userNo);
 
         return ResponseEntity.status(HttpStatus.OK).build();
     }
@@ -89,7 +92,8 @@ public class WorkOrderCommandController {
     @Operation(summary = "작업지시서 삭제", description = "선택한 작업지시서를 삭제한다.")
     public ResponseEntity<Void> deleteWorkOrder(@PathVariable Long workOrderSeq) {
         log.info("-------------- DELETE /api/v1/workOrder/{} 작업지시서 삭제 요청 -  --------------", workOrderSeq);
-        workOrderService.deleteWorkOrder(workOrderSeq);
+        String userNo = AuthUtil.getAuthUser();
+        workOrderService.deleteWorkOrder(workOrderSeq, userNo);
 
         return ResponseEntity.ok().build();
     }

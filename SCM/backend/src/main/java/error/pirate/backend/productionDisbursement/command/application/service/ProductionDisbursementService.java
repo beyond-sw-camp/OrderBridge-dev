@@ -8,6 +8,8 @@ import error.pirate.backend.item.command.domain.aggregate.entity.Item;
 import error.pirate.backend.item.command.domain.repository.ItemRepository;
 import error.pirate.backend.item.command.domain.service.BomItemDomainService;
 import error.pirate.backend.item.command.domain.service.ItemDomainService;
+import error.pirate.backend.notification.command.domain.aggregate.entity.NotificationType;
+import error.pirate.backend.notification.command.domain.service.NotificationDomainService;
 import error.pirate.backend.productionDisbursement.command.application.dto.CreateAndUpdateProductionDisbursementRequest;
 import error.pirate.backend.productionDisbursement.command.application.dto.ProductionDisbursementItemRequest;
 import error.pirate.backend.productionDisbursement.command.domain.aggregate.entity.ProductionDisbursement;
@@ -17,6 +19,7 @@ import error.pirate.backend.productionDisbursement.command.domain.aggregate.repo
 import error.pirate.backend.productionDisbursement.command.domain.aggregate.service.ProductionDisbursementDomainService;
 import error.pirate.backend.salesOrder.command.domain.service.SalesOrderDomainService;
 import error.pirate.backend.user.command.domain.aggregate.entity.User;
+import error.pirate.backend.user.command.domain.service.UserDomainService;
 import error.pirate.backend.warehouse.command.domain.aggregate.entity.Warehouse;
 import error.pirate.backend.warehouse.command.domain.repository.WarehouseRepository;
 import error.pirate.backend.workOrder.command.domain.aggregate.entity.WorkOrder;
@@ -24,7 +27,6 @@ import error.pirate.backend.workOrder.command.domain.aggregate.entity.WorkOrderS
 import error.pirate.backend.workOrder.command.domain.service.WorkOrderDomainService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.jdbc.Work;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,10 +49,12 @@ public class ProductionDisbursementService {
     private final ItemRepository itemRepository;
     private final WarehouseRepository warehouseRepository;
     private final SalesOrderDomainService salesOrderDomainService;
+    private final UserDomainService userDomainService;
+    private final NotificationDomainService notificationDomainService;
 
     // 등록
     @Transactional
-    public void createProductionDisbursement(CreateAndUpdateProductionDisbursementRequest request) {
+    public void createProductionDisbursement(CreateAndUpdateProductionDisbursementRequest request, String userNo) {
         log.info("-------------- 생산불출 등록 서비스 진입 :등록요청 조건 - request: {} --------------", request);
 
         // 작업지시서 상태 확인
@@ -64,8 +68,8 @@ public class ProductionDisbursementService {
             throw new CustomException(ErrorCodeType.PRODUCTION_DISBURSEMENT_DUPLICATE);
         }
 
-        // 사용자 설정 - 작업지시서 작성 유저
-        User user = workOrder.getUser();
+        // 현재 로그인한 유저로 설정
+        User user = userDomainService.findByUserEmployeeNo(userNo);
 
         // 생산불출명 설정
         String productionDisbursementName = nameGenerator.nameGenerator(ProductionDisbursement.class);
@@ -153,15 +157,22 @@ public class ProductionDisbursementService {
 
         // 생산불출 저장
         productionDisbursementDomainService.saveProductionDisbursement(newProductionDisbursement);
+
+        //알림 생성
+        notificationDomainService.createNotificationMessage(NotificationType.productionDisbursement, newProductionDisbursement.getProductionDisbursementSeq(), newProductionDisbursement.getProductionDisbursementName());
     }
 
     // 수정
     @Transactional
-    public void updateWorkOrder(Long productionDisbursementSeq, CreateAndUpdateProductionDisbursementRequest request) {
+    public void updateWorkOrder(Long productionDisbursementSeq, CreateAndUpdateProductionDisbursementRequest request, String userNo) {
         log.info("-------------- 생산불출 수정 서비스 진입 - {}번 수정, 수정요청 조건 - request: {}   --------------", productionDisbursementSeq, request);
 
         // 기존 생산불출 조회
         ProductionDisbursement productionDisbursement = productionDisbursementDomainService.findByProductionDisbursementSeq(productionDisbursementSeq);
+
+        // 현재 로그인한 유저가 작성자인지 확인
+        User user = userDomainService.findByUserEmployeeNo(userNo);
+        productionDisbursementDomainService.checkUser(productionDisbursement, user);
 
         // 수정 가능한 상태인지 확인
         productionDisbursementDomainService.checkProductionDisbursementStatus(productionDisbursement.getProductionDisbursementStatus());
@@ -223,11 +234,15 @@ public class ProductionDisbursementService {
 
     // 삭제
     @Transactional
-    public void deleteProductionDisbursement(Long productionDisbursementSeq) {
+    public void deleteProductionDisbursement(Long productionDisbursementSeq, String userNo) {
         log.info("-------------- 생산불출 삭제 서비스 진입 - {}번 삭제 --------------", productionDisbursementSeq);
 
         // 작업지시서 찾기
         ProductionDisbursement productionDisbursement = productionDisbursementDomainService.findByProductionDisbursementSeq(productionDisbursementSeq);
+
+        // 현재 로그인한 유저가 작성자인지 확인
+        User user = userDomainService.findByUserEmployeeNo(userNo);
+        productionDisbursementDomainService.checkUser(productionDisbursement, user);
 
         // 삭제가능한 상태인지 체크
         productionDisbursementDomainService.checkProductionDisbursementStatus(productionDisbursement.getProductionDisbursementStatus());

@@ -17,6 +17,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
@@ -47,27 +48,28 @@ class WorkOrderServiceTest {
         CreateWorkOrderRequest request = new CreateWorkOrderRequest();
         request.setSalesOrderSeq(1L);
         request.setSalesOrderItemSeq(1L);
-        request.setUserSeq(1L);
+//        request.setUserSeq(1L);
         request.setWarehouseSeq(1L);
-        request.setWorkOrderName("2024/12/13 - 1");
-        request.setWorkOrderIndicatedDate(LocalDate.now());
-        request.setWorkOrderDueDate(LocalDate.now().plusDays(7));
-        request.setWorkOrderIndicatedQuantity(100);
+//        request.setWorkOrderName("2024/12/13 - 1");
+        request.setWorkOrderIndicatedDate(LocalDateTime.now());
+        request.setWorkOrderDueDate(LocalDateTime.now().plusDays(7));
+//        request.setWorkOrderIndicatedQuantity(100);
         request.setWorkOrderNote("테스트 작업지시서");
+        String userNo = "2";
 
         // when & then
-        assertDoesNotThrow(() -> workOrderService.createWorkOrderForItem(request));
+        assertDoesNotThrow(() -> workOrderService.createWorkOrderForItem(request, userNo));
     }
 
     private static List<UpdateWorkOrderRequest> getUpdateWorkOrderRequest() {
         UpdateWorkOrderRequest request1 = new UpdateWorkOrderRequest();
-        request1.setWorkOrderIndicatedDate(LocalDate.now());
-        request1.setWorkOrderDueDate(LocalDate.now().plusDays(2));
+        request1.setWorkOrderIndicatedDate(LocalDateTime.now());
+        request1.setWorkOrderDueDate(LocalDateTime.now().plusDays(2));
         request1.setWorkOrderIndicatedQuantity(100);
 
         UpdateWorkOrderRequest request2 = new UpdateWorkOrderRequest();
-        request2.setWorkOrderIndicatedDate(LocalDate.now());
-        request2.setWorkOrderDueDate(LocalDate.now().plusDays(2));
+        request2.setWorkOrderIndicatedDate(LocalDateTime.now());
+        request2.setWorkOrderDueDate(LocalDateTime.now().plusDays(2));
         request2.setWorkOrderIndicatedQuantity(100);
 
         List<UpdateWorkOrderRequest> requests = new ArrayList<>();
@@ -100,7 +102,7 @@ class WorkOrderServiceTest {
     @MethodSource("updateWorkOrderParam")
     @DisplayName("작업지시서 상태별 수정 테스트")
     void updateWorkOrderTest(Long workOrderSeq, String status,
-                             LocalDate workOrderIndicatedDate, LocalDate workOrderDueDate,
+                             LocalDateTime workOrderIndicatedDate, LocalDateTime workOrderDueDate,
                              Integer workOrderIndicatedQuantity, String workOrderNote,
                              boolean expectedSuccess) {
         // Given: 작업지시서 요청 데이터 생성
@@ -109,15 +111,16 @@ class WorkOrderServiceTest {
         request.setWorkOrderDueDate(workOrderDueDate);
         request.setWorkOrderIndicatedQuantity(workOrderIndicatedQuantity);
         request.setWorkOrderNote(workOrderNote);
+        String  userNo = "1";
 
         WorkOrder.updateTestWorkOrder(WorkOrderStatus.valueOf(status));
 
         if (expectedSuccess) {
             // When & Then: 성공 케이스
-            assertDoesNotThrow(() -> workOrderService.updateWorkOrder(workOrderSeq, request));
+            assertDoesNotThrow(() -> workOrderService.updateWorkOrder(workOrderSeq, request, userNo));
         } else {
             // When & Then: 실패 케이스
-            assertThrows(CustomException.class, () -> workOrderService.updateWorkOrder(workOrderSeq, request));
+            assertThrows(CustomException.class, () -> workOrderService.updateWorkOrder(workOrderSeq, request, userNo));
         }
     }
 
@@ -132,8 +135,11 @@ class WorkOrderServiceTest {
     @ParameterizedTest
     @MethodSource("deleteWorkOrderParam")
     void deleteWorkOrderTest(Long workOrderSeq) {
+        // given
+        String userNo = "1";
+
         // when & then
-        assertDoesNotThrow(() -> workOrderService.deleteWorkOrder(workOrderSeq));
+        assertDoesNotThrow(() -> workOrderService.deleteWorkOrder(workOrderSeq, userNo));
     }
 
     private static Stream<Arguments> updateWorkOrderStatusParam() {
