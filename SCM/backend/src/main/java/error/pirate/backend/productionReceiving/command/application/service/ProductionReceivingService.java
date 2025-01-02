@@ -2,6 +2,7 @@ package error.pirate.backend.productionReceiving.command.application.service;
 
 import error.pirate.backend.common.NameGenerator;
 import error.pirate.backend.common.NullCheck;
+import error.pirate.backend.common.SecurityUtil;
 import error.pirate.backend.exception.CustomException;
 import error.pirate.backend.exception.ErrorCodeType;
 import error.pirate.backend.item.command.domain.aggregate.entity.Item;
@@ -48,12 +49,13 @@ public class ProductionReceivingService {
     private final SalesOrderRepository salesOrderRepository;
     private final ItemInventoryRepository itemInventoryRepository;
     private final NameGenerator nameGenerator;
+    private final SecurityUtil securityUtil;
 
     @Transactional
     public void createProductionReceiving(ProductionReceivingCreateRequest request) {
 
         request.setUserSeq(1L);
-        User user = userRepository.findById(request.getUserSeq()).orElseThrow(() -> new CustomException(ErrorCodeType.USER_NOT_FOUND));
+        User user = userRepository.findByUserEmployeeNo(securityUtil.getCurrentUserEmployeeNo()).orElseThrow(() -> new CustomException(ErrorCodeType.USER_NOT_FOUND));
 
         request.setProductionReceivingName(nameGenerator.nameGenerator(ProductionReceiving.class));
         ProductionReceiving productionReceiving = ProductionReceiving.createProductionReceiving(user, request);

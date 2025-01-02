@@ -66,6 +66,26 @@
         ORDER BY tpi.purchase_item_seq
     </select>
 
+    <select id="readPurchase" resultType="error.pirate.backend.purchase.query.dto.PurchaseResponse">
+        SELECT
+            tp.purchase_seq,
+            tp.purchase_name,
+            tp.purchase_status,
+            tp.purchase_reg_date,
+            tp.purchase_contract_date,
+            tp.purchase_extended_price,
+            tp.purchase_note,
+            tu.user_name,
+            tu.user_phone_no,
+            tc.client_name
+        FROM tb_purchase tp
+        JOIN tb_user tu USING (user_seq)
+        JOIN tb_purchase_order tpo USING (purchase_order_seq)
+        JOIN tb_client tc ON (tpo.client_seq = tc.client_seq)
+        WHERE tp.purchase_status != 'DELETE'
+        AND tp.purchase_seq = #{purchaseSeq}
+    </select>
+
     <select id="readPurchaseListCount" resultType="int">
         SELECT
             COUNT(*)

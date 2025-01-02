@@ -1,5 +1,5 @@
 <script setup>
-import {computed, defineProps, ref, watch} from 'vue';
+import {defineProps, ref, watch} from 'vue';
 import searchIcon from "@/assets/searchIcon.svg";
 import trashIcon from "@/assets/trashIcon.svg";
 import editIcon from "@/assets/editIcon.svg";
@@ -277,6 +277,7 @@ function numberThree(number) {
   <ShippingInstructionPrintPreview
       :isVisible="isModalVisible"
       :shippingInstruction="selectedShippingInstruction"
+      :isList=true
       @close="closePrintPreview"
   />
 </template>

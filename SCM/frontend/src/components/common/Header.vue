@@ -13,6 +13,7 @@ import { ref } from "vue";
 import axios from "@/axios";
 import Chatbot from "@/components/common/Chatbot.vue";
 import PurchaseOrderPrintPreviewModal from "@/components/purchaseOrder/PurchaseOrderPrintPreview.vue";
+import PurchasePrintPreviewModal from "@/components/purchase/PurchasePrintPreview.vue";
 import ShippingInstructionPrintPreview from "@/components/shippingInstruction/ShippingInstructionPrintPreview.vue";
 import ShippingSlipPrintPreview from "@/components/shippingSlip/ShippingSlipPrintPreview.vue";
 import ProductionDisbursementPrintPreview from "@/components/productionDisbursement/ProductionDisbursementPrintPreview.vue";
@@ -171,6 +172,7 @@ function chatbotOn() {
     <PurchaseOrderPrintPreviewModal
         :isVisible="isModalVisible"
         :purchaseOrder="selectedData"
+        :isList=false
         @close="closePrintPreview"
     />
   </template>
@@ -178,6 +180,7 @@ function chatbotOn() {
     <ShippingInstructionPrintPreview
         :isVisible="isModalVisible"
         :shippingInstruction="selectedData"
+        :isList=false
         @close="closePrintPreview"
     />
   </template>
@@ -185,6 +188,14 @@ function chatbotOn() {
     <ShippingSlipPrintPreview
         :isVisible="isModalVisible"
         :shippingSlip="selectedData"
+        :isList=false
+        @close="closePrintPreview"
+    />
+  </template>
+  <template v-else-if="selectedNotificationType === 'purchase'">
+    <PurchasePrintPreviewModal
+        :isVisible="isModalVisible"
+        :purchase="selectedData"
         @close="closePrintPreview"
     />
   </template>

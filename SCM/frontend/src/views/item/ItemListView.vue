@@ -32,6 +32,7 @@ const itemDivisionList = [
 ];
 
 const findItemsByFilter = async () => {
+  itemDTO.value = null;
   try {
     const minHour = minExpiration.value != null ? minExpiration.value * 24 : null;
     const maxHour = maxExpiration.value != null ? maxExpiration.value * 24 : null;
@@ -44,6 +45,7 @@ const findItemsByFilter = async () => {
         itemDivisions: selectedDivisions.value.length > 0 ? selectedDivisions.value : null,
         minExpirationHour: minHour,
         maxExpirationHour: maxHour,
+        sort: "itemSeq,desc"
       },
       paramsSerializer: (params) => {
         const searchParams = new URLSearchParams();
@@ -61,13 +63,17 @@ const findItemsByFilter = async () => {
       }
     });
 
-    rows.value = response.data.totalElements;
-    items.value = response.data.content;
-    loadingImages.value = new Set(items.value.map((item) => item.itemSeq));
+
+    if (response.data && response.data.content) {
+      rows.value = response.data.totalElements;
+      items.value = response.data.content;
+      loadingImages.value = new Set(items.value.map((item) => item.itemSeq));
+    }
   } catch (error) {
     console.error("데이터 불러오기 실패:", error);
   }
 };
+
 const handleImageLoad = (itemSeq) => {
   loadingImages.value.delete(itemSeq);
 };
@@ -87,6 +93,7 @@ function checkItemDivision(key) {
   } else {
     selectedDivisions.value.push(key);
   }
+  currentPage.value = 1;
   findItemsByFilter();
 }
 
@@ -113,9 +120,16 @@ watch(itemInventoryCurrentPage, () => {
   itemInventory.value = itemInventoryList.value[itemInventoryCurrentPage.value - 1];
 });
 
-watch(searchName, findItemsByFilter);
+watch(searchName, () => {
+  currentPage.value = 1;
+  findItemsByFilter();
+});
 watch(currentPage, findItemsByFilter);
-watch([minExpiration, maxExpiration], findItemsByFilter);
+
+watch([minExpiration, maxExpiration], () => {
+  currentPage.value = 1;
+  findItemsByFilter();
+});
 
 onMounted(() => {
   findItemsByFilter();
@@ -127,10 +141,36 @@ const handleItemUpdate = (itemSeq) => {
 
 const itemDelete = async (itemSeq) => {
   try {
-    await axios.delete(`item/${itemSeq}`);
-    findItemsByFilter();
+    const token = localStorage.getItem('accessToken');
+    await axios.delete(`item/${itemSeq}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    // 성공 알림
+    alert('삭제되었습니다.');
+
+    // 현재 items 배열에서 삭제된 아이템 제거
+    items.value = items.value.filter(item => item.itemSeq !== itemSeq);
+
+    // 전체 아이템 수 감소
+    rows.value = rows.value - 1;
+
+    currentPage.value = 1;
+    await findItemsByFilter();
+
+
   } catch (error) {
-    alert(`품목 삭제 실패`);
+    if (error.response?.status === 401) {
+      alert('세션이 만료되었습니다. 다시 로그인해주세요.');
+      localStorage.removeItem('accessToken');
+      router.push('/login');
+    } else {
+      console.error('삭제 실패:', error);
+      alert('삭제에 실패했습니다.');
+    }
   }
 };
 </script>
@@ -217,7 +257,7 @@ const itemDelete = async (itemSeq) => {
                 <p class="item-name">{{ item.itemName }}</p>
                 <ul>
                   <li>품목: {{ itemDivisionMap[item.itemDivision] || item.itemDivision }}</li>
-                  <li>유통기한: {{ (item.itemExpirationHour / 24).toFixed(0) }} 일</li>
+                  <li>유통기한: {{ item.itemExpirationHour }} 시간</li>
                   <li>단가: {{ item.itemPrice.toLocaleString() }} ₩</li>
                 </ul>
                 <div class="d-flex justify-content-end mt-3">

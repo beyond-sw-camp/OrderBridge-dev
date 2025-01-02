@@ -2,10 +2,10 @@ package error.pirate.backend.item.command.application.service;
 
 import error.pirate.backend.common.FileUploadUtil;
 import error.pirate.backend.common.NullCheck;
+import error.pirate.backend.common.SecurityUtil;
 import error.pirate.backend.exception.CustomException;
 import error.pirate.backend.exception.ErrorCodeType;
 import error.pirate.backend.item.command.application.dto.BomItemDTO;
-import error.pirate.backend.item.command.application.dto.ItemDTO;
 import error.pirate.backend.item.command.application.dto.ItemCreateRequest;
 import error.pirate.backend.item.command.application.dto.ItemUpdateRequest;
 import error.pirate.backend.item.command.domain.aggregate.entity.BomItem;
@@ -21,6 +21,7 @@ import error.pirate.backend.warehouse.command.domain.aggregate.entity.Warehouse;
 import error.pirate.backend.warehouse.command.domain.repository.WarehouseRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -30,19 +31,20 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ItemService {
 
     private final ItemRepository itemRepository;
     private final ItemUnitRepository itemUnitRepository;
     private final UserRepository userRepository;
     private final BomItemRepository bomItemRepository;
-    private final ModelMapper modelMapper;
     private final WarehouseRepository warehouseRepository;
     private final FileUploadUtil fileUploadUtil;
+    private final SecurityUtil securityUtil;
 
     @Transactional
     public void createItem(ItemCreateRequest request, MultipartFile file) throws IOException {
-        User user = userRepository.findById(request.getUserSeq())
+        User user = userRepository.findByUserEmployeeNo(securityUtil.getCurrentUserEmployeeNo())
                 .orElseThrow(() -> new CustomException(ErrorCodeType.USER_NOT_FOUND));
 
         ItemUnit itemUnit = itemUnitRepository.findById(request.getItemUnitSeq())
@@ -51,12 +53,11 @@ public class ItemService {
         Warehouse warehouse = warehouseRepository.findById(request.getWarehouseSeq())
                 .orElseThrow(() -> new CustomException(ErrorCodeType.WAREHOUSE_NOT_FOUND));
 
-        ItemDTO itemDTO = modelMapper.map(request, ItemDTO.class);
-        itemDTO.setUser(user);
-        itemDTO.setItemUnit(itemUnit);
-        itemDTO.setWarehouse(warehouse);
-        itemDTO.setItemImageUrl(fileUploadUtil.uploadFile(file));
-        Item item = modelMapper.map(itemDTO, Item.class);
+        if(file != null) {
+            request.setItemImageUrl(fileUploadUtil.uploadFile(file));
+        }
+
+        Item item = Item.createItem(user, itemUnit, warehouse, request);
 
         // bom 등록
         if(NullCheck.nullCheck(request.getBomItemList())) {
@@ -72,17 +73,11 @@ public class ItemService {
     }
 
     @Transactional
-    public void updateItem(Long itemSeq, ItemUpdateRequest request) {
-
-        // userSeq는 나중에 토큰에서 빼올 것
-        // Long loginUserSeq = CustomUtil.getUserSeq();
-
-        Long loginUserSeq = 1L;
-
+    public void updateItem(Long itemSeq, ItemUpdateRequest request, MultipartFile file) throws IOException {
         // 기존 품목 조회
         Item item = itemRepository.findById(itemSeq)
                 .orElseThrow(() -> new CustomException(ErrorCodeType.ITEM_NOT_FOUND));
-        if(!ItemStatus.ACTIVE.equals(item.getItemStatus())) {
+        if (!ItemStatus.ACTIVE.equals(item.getItemStatus())) {
             throw new CustomException(ErrorCodeType.ITEM_STATUS_ERROR);
         }
 
@@ -92,13 +87,17 @@ public class ItemService {
         Warehouse warehouse = warehouseRepository.findById(request.getWarehouseSeq())
                 .orElseThrow(() -> new CustomException(ErrorCodeType.WAREHOUSE_NOT_FOUND));
 
+        // 파일 업로드 처리
+        if(file != null) {
+            request.setItemImageUrl(fileUploadUtil.uploadFile(file));
+        }
+
         item.updateItem(itemUnit, warehouse, request);
 
-
         /* bom 수정 로직
-        * 1. 해당 부모 item의 bom 전체 삭제
-        * 2. bom 재등록
-        * */
+         * 1. 해당 부모 item의 bom 전체 삭제
+         * 2. bom 재등록
+         * */
         bomItemRepository.deleteAllByParentItem(item);
 
         if(NullCheck.nullCheck(request.getBomItemList())) {

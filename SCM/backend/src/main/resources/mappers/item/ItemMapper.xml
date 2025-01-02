@@ -4,11 +4,11 @@
 
 <mapper namespace="error.pirate.backend.item.query.mapper.ItemMapper">
 
-    <!-- 전체 데이터 개수 조회 -->
     <select id="countItemsByFilter" resultType="int">
         SELECT COUNT(*)
         FROM tb_item
         WHERE 1=1
+        AND item_status != 'DELETED'
         <if test="itemName != null and itemName != ''">
             AND item_name LIKE CONCAT('%', #{itemName}, '%')
         </if>
@@ -29,19 +29,20 @@
     <!-- 품목 목록 조회 -->
     <select id="findItemListByFilter" resultType="error.pirate.backend.item.query.dto.ItemResponse">
         SELECT
-            item_seq AS itemSeq,
-            item_name AS itemName,
-            item_division AS itemDivision,
-            item_expiration_hour AS itemExpirationHour,
-            item_image_url AS itemImageUrl,
-            item_price AS itemPrice,
-            item_reg_date AS itemRegDate,
-            item_mod_date AS itemModDate,
-            item_unit_title as itemUnit
+        item_seq AS itemSeq,
+        item_name AS itemName,
+        item_division AS itemDivision,
+        item_expiration_hour AS itemExpirationHour,
+        item_image_url AS itemImageUrl,
+        item_price AS itemPrice,
+        item_reg_date AS itemRegDate,
+        item_mod_date AS itemModDate,
+        item_unit_title as itemUnit
         FROM tb_item i
         JOIN tb_item_unit iu
-            ON i.item_unit_seq = iu.item_unit_seq
+        ON i.item_unit_seq = iu.item_unit_seq
         WHERE 1=1
+        AND item_status != 'DELETED'
 
         <if test="itemName != null and itemName != ''">
             AND item_name LIKE CONCAT('%', #{itemName}, '%')
@@ -58,7 +59,7 @@
         <if test="maxExpirationHour != null">
             AND item_expiration_hour <![CDATA[<=]]> #{maxExpirationHour}
         </if>
-        ORDER BY item_seq ASC
+        ORDER BY item_seq DESC
         LIMIT #{size} OFFSET #{offset}
     </select>
 

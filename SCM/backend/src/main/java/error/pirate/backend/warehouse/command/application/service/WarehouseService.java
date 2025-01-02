@@ -1,6 +1,7 @@
 package error.pirate.backend.warehouse.command.application.service;
 
 import error.pirate.backend.client.command.domain.aggregate.entity.Client;
+import error.pirate.backend.common.SecurityUtil;
 import error.pirate.backend.exception.CustomException;
 import error.pirate.backend.exception.ErrorCodeType;
 import error.pirate.backend.user.command.domain.aggregate.entity.User;
@@ -23,11 +24,12 @@ public class WarehouseService {
     private final WarehouseRepository warehouseRepository;
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
+    private final SecurityUtil securityUtil;
 
     @Transactional
     public WarehouseResponse createWarehouse(WarehouseCreateRequest request) {
         // 사용자 조회
-        User user = userRepository.findById(request.getUserSeq())
+        User user = userRepository.findByUserEmployeeNo(securityUtil.getCurrentUserEmployeeNo())
                 .orElseThrow(() -> new CustomException(ErrorCodeType.USER_NOT_FOUND));
 
         // 요청을 Warehouse 엔티티로 매핑
