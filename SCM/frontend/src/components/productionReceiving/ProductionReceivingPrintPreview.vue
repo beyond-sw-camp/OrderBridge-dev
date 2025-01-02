@@ -7,6 +7,7 @@ import Swal from "sweetalert2";
 const props = defineProps({
   isVisible: Boolean,
   productionReceiving: Object,
+  isList: Boolean,
 });
 
 // 부모에서 넘어오는 발주서 시퀀스로 이미지를 가져옴
@@ -169,7 +170,7 @@ const clearCanvas = () => {
               <tbody>
               <tr>
                 <td class="to-column" style="height: 30px;">입고일자 &nbsp; : &nbsp;</td>
-                <td colspan="5" style="height: 30px;">{{ dayjs(productionReceiving.productionReceivingDTO.productionReceivingReceiptDate).format('YYYY년 MM월 DD일')}}</td>
+                <td colspan="5" style="height: 30px;">{{ dayjs(productionReceiving?.productionReceivingDTO.productionReceivingReceiptDate).format('YYYY년 MM월 DD일')}}</td>
               </tr>
               </tbody>
             </table>
@@ -183,13 +184,15 @@ const clearCanvas = () => {
               </tr>
               <tr>
                 <td colspan="5" style="height: 30px;">
-                  {{ productionReceiving.productionReceivingDTO?.userName }}
+                  {{ productionReceiving?.productionReceivingDTO?.userName }}
                 </td>
                 <td colspan="5" style="height: 30px;" class="image-gallery">
                   <img class="image-item" v-if="notification.notificationImageUrl != undefined" :src="notification.notificationImageUrl" alt="승인자 서명" style="width: 100px; height: auto;" />
                   <span v-else>
                     (서명 또는 인)
+                    <template v-if="!isList">
                      <input type="button" class="btn-print" @click="openModal(notification)" value="결재하기">
+                    </template>
                   </span>
 
 
@@ -200,18 +203,18 @@ const clearCanvas = () => {
             <br/><br/><br/>
 
             <table class="table first-table left" style="height: 140px">
-              <tbody v-if="productionReceiving.productionReceivingDTO">
+              <tbody v-if="productionReceiving?.productionReceivingDTO">
               <tr>
                 <td class="color-column align-content-center">생산입고 지시서명</td>
-                <td class="align-content-center">{{ productionReceiving.productionReceivingDTO.productionReceivingName }}</td>
+                <td class="align-content-center">{{ productionReceiving?.productionReceivingDTO.productionReceivingName }}</td>
                 <td class="color-column align-content-center">담당사</td>
                 <td class="align-content-center">Order Bridge</td>
               </tr>
               <tr>
                 <td class="color-column align-content-center">담당자</td>
-                <td class="align-content-center">{{ productionReceiving.productionReceivingDTO.userName }}</td>
+                <td class="align-content-center">{{ productionReceiving?.productionReceivingDTO.userName }}</td>
                 <td class="color-column align-content-center">연락처</td>
-                <td class="align-content-center">{{ productionReceiving.productionReceivingDTO.userPhoneNo }}</td>
+                <td class="align-content-center">{{ productionReceiving?.productionReceivingDTO.userPhoneNo }}</td>
               </tr>
               <tr>
                 <td class="color-column align-content-center">주소</td>
@@ -219,7 +222,7 @@ const clearCanvas = () => {
               </tr>
               <tr>
                 <td class="color-column align-content-center">생산입고일</td>
-                <td class="align-content-center" colspan="3">{{ dayjs(productionReceiving.productionReceivingDTO.productionReceivingReceiptDate).format('YYYY-MM-DD') }}</td>
+                <td class="align-content-center" colspan="3">{{ dayjs(productionReceiving?.productionReceivingDTO.productionReceivingReceiptDate).format('YYYY-MM-DD') }}</td>
               </tr>
               </tbody>
             </table>

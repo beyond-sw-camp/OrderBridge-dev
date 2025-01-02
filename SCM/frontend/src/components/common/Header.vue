@@ -220,6 +220,7 @@ function chatbotOn() {
     <ProductionReceivingPrintPreviewModal
         :isVisible="isModalVisible"
         :productionReceiving="selectedData"
+        :isList=false
         @close="closePrintPreview"
     />
   </template>

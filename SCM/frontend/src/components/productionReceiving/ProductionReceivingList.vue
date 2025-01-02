@@ -7,6 +7,7 @@ import router from "@/router/index.js";
 import printIcon from "@/assets/printIcon.svg"
 import editIcon from "@/assets/editIcon.svg"
 import trashIcon from "@/assets/trashIcon.svg"
+import ProductionReceivingPrintPreviewModal from "@/components/productionReceiving/ProductionReceivingPrintPreview.vue";
 
 const totalCount = ref(0);
 const pageSize = ref(10);
@@ -47,6 +48,24 @@ const fetchProductionReceivingList = async () => {
   } catch (error) {
     console.error("생산입고 불러오기 실패 :", error);
   }
+};
+
+const isModalVisible = ref(false);
+const selectedProductionReceiving = ref(null);
+
+const openPrintPreview = (productionReceiving) => {
+  if (!productionReceiving) {
+    console.error('선택된 생산입고가 없습니다.');
+    return;
+  }
+
+  selectedProductionReceiving.value = productionReceiving;
+  isModalVisible.value = true;
+};
+
+const closePrintPreview = () => {
+  isModalVisible.value = false;
+  selectedProductionReceiving.value = null;
 };
 
 onMounted(() => {
@@ -141,7 +160,8 @@ const productionReceivingDetail = async (productionReceivingSeq) => {
         productionReceivingNote: response.data.productionReceivingDTO.productionReceivingNote,
         productionReceivingReceiptDate: response.data.productionReceivingDTO.productionReceivingReceiptDate,
         productionReceivingStatus: response.data.productionReceivingDTO.productionReceivingStatus,
-        productionReceivingItemList: response.data.productionReceivingItemList
+        productionReceivingItemList: response.data.productionReceivingItemList,
+        productionReceivingData: response.data,
       };
     } catch (error) {
       console.error("생산입고 상세조회 실패 :", error);
@@ -259,9 +279,9 @@ const productionReceivingDelete = async (productionReceivingSeq) => {
                           </div>
                         </div>
                         <div class="d-flex justify-content-end align-items-center">
-                          <printIcon class="me-3 icon" @click="productionReceivingPrint(productionReceiving.productionReceivingSeq)"/>
-                          <editIcon class="me-3 icon" @click="handleModify(productionReceiving.productionReceivingSeq)"/>
-                          <trashIcon class="icon" @click="productionReceivingDelete(productionReceiving.productionReceivingSeq)"/>
+                          <printIcon class="me-3 icon" @click.stop="openPrintPreview(detailProductionReceiving[productionReceiving.productionReceivingSeq].productionReceivingData)"/>
+                          <editIcon class="me-3 icon" @click.stop="handleModify(productionReceiving.productionReceivingSeq)"/>
+                          <trashIcon class="icon" @click.stop="productionReceivingDelete(productionReceiving.productionReceivingSeq)"/>
                         </div>
                       </div>
                     </div>
@@ -284,6 +304,13 @@ const productionReceivingDelete = async (productionReceivingSeq) => {
 
         </div>
     </div>
+
+  <ProductionReceivingPrintPreviewModal
+      :isVisible="isModalVisible"
+      :productionReceiving="selectedProductionReceiving"
+      :isList=true
+      @close="closePrintPreview"
+  />
 </template>
 
 <style scoped>

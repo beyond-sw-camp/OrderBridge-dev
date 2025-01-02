@@ -185,7 +185,7 @@ const clearCanvas = () => {
               <tbody>
               <tr>
                 <td class="to-column" style="height: 30px;">출하일 &nbsp; : &nbsp;</td>
-                <td colspan="5" style="height: 30px;">{{ dayjs(shippingSlip?.shippingSlipDTO.shippingSlipShippingDate).format('YYYY-MM-DD') }}</td>
+                <td colspan="5" style="height: 30px;">{{ dayjs(shippingSlip?.shippingSlipDTO.shippingSlipShippingDate).format('YYYY년 MM월 DD일') }}</td>
               </tr>
               <tr>
                 <td style="height: 30px;">거래처명 &nbsp; : &nbsp;</td>
