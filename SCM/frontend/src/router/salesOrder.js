@@ -4,4 +4,9 @@ export default [
         name: "SalesOrder",
         component: () => import("@/views/salesOrder/SalesOrderListView.vue")
     },
+    {
+        path: "/sales-order/input",
+        name: "SalesOrderInput",
+        component: () => import("@/views/salesOrder/SalesOrderInputView.vue")
+    }
 ]

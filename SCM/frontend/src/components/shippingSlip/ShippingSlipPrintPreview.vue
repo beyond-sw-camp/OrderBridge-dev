@@ -1,30 +1,59 @@
 <script setup>
 import dayjs from 'dayjs';
 import axios from "@/axios.js";
-import { ref, watch } from 'vue';
+import {computed, onMounted, ref, watch} from 'vue';
 import Swal from "sweetalert2";
 
 const props = defineProps({
   isVisible: Boolean,
-  purchaseOrder: Object,
+  shippingSlip: Object,
 });
 
+const seq = ref(null);
 // 부모에서 넘어오는 발주서 시퀀스로 이미지를 가져옴
 const notification  = ref('');
 const fetchImages = async () => {
 
   try {
-    const response = await axios.get( `notification/purchaseOrder/${props.purchaseOrder.purchaseOrderSeq}`);
+    const response = await axios.get( `notification/shippingSlip/${seq.value}`);
 
     notification.value = response.data;
+    console.log(notification.value);
   } catch (error) {
     console.error("결재 서류 데이터를 가져오는 중 오류 발생:", error);
   }
 }
 
+const shippingAddressList = ref([]);
+// 출하주소 목록 요청
+const fetchShippingAddressList = async () => {
+  try {
+    const response = await axios.get(`shipping-instruction/address`, {});
+
+    shippingAddressList.value = response.data;
+
+  } catch (error) {
+    console.error("출하주소 목록 불러오기 실패 :", error);
+  }
+};
+
+// 키를 값 반환
+function findValue(array, key) {
+  for (const item of array) {
+    if (item.key === key) {
+      return item.value
+    }
+  }
+}
+
+onMounted(() => {
+  fetchShippingAddressList();
+});
+
 // 발주 데이터가 조회된 후 fetchImages 실행
-watch(() => props.purchaseOrder, (newVal) => {
-  if (newVal && newVal.purchaseOrderSeq) {
+watch( () =>  props.shippingSlip, (newVal) => {
+  if (newVal && newVal.shippingSlipDTO.shippingSlipSeq) {
+    seq.value = props.shippingSlip.shippingSlipDTO.shippingSlipSeq
     fetchImages();
   }
 }, { immediate: true });
@@ -36,7 +65,7 @@ const closePrintModal = () => {
 };
 
 const printPage = () => {
-  const printContent = document.getElementById('print-area-purchaseOrder').innerHTML;
+  const printContent = document.getElementById('print-area').innerHTML;
   const originalContent = document.body.innerHTML; // 현재 페이지 내용 저장
 
   document.body.innerHTML = printContent;
@@ -99,10 +128,9 @@ const saveCanvas = async (selectedNotification) => {
       timer: 1500
     });
 
+    // 여기에 결재서류 상태 변경하는 코드 각자 추가해야함!!!!! TODO 아영
+    await axios.put(`shipping-slip/approval/${seq.value}`);
   }
-
-  // 여기에 결재서류 상태 변경하는 코드 각자 추가해야함!!!!! TODO 아영
-
 };
 
 // 드로잉 시작
@@ -135,7 +163,6 @@ const clearCanvas = () => {
   const canvas = canvasRef.value;
   context.value.clearRect(0, 0, canvas.width, canvas.height);
 };
-
 </script>
 
 <template>
@@ -143,7 +170,7 @@ const clearCanvas = () => {
     <div v-show="isVisible" class="modal-overlay" @click.self="closePrintModal">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
-        <div class="modal-body" id="print-area-purchaseOrder">
+        <div class="modal-body" id="print-area">
           <div class="d-flex justify-content-between">
             <button class="btn-print" @click="printPage">출력</button>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @click="closePrintModal" ></button>
@@ -151,17 +178,17 @@ const clearCanvas = () => {
 
           <div class="container mt-4">
 
-            <h2 class="text-center">발주서</h2>
+            <h2 class="text-center">출하전표</h2>
             <br/><br/>
             <table class="info-table-eft" style="float: left;">
               <tbody>
               <tr>
-                <td class="to-column" style="height: 30px;">발주일자 &nbsp; : &nbsp;</td>
-                <td colspan="5" style="height: 30px;">&nbsp;20&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;년 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;월 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;일</td>
+                <td class="to-column" style="height: 30px;">출하일 &nbsp; : &nbsp;</td>
+                <td colspan="5" style="height: 30px;">{{ dayjs(shippingSlip?.shippingSlipDTO.shippingSlipShippingDate).format('YYYY-MM-DD') }}</td>
               </tr>
               <tr>
                 <td style="height: 30px;">거래처명 &nbsp; : &nbsp;</td>
-                <td colspan="5" style="height: 30px;"> &nbsp; {{ purchaseOrder?.clientName!=null ? purchaseOrder.clientName : '' }}</td>
+                <td colspan="5" style="height: 30px;"> &nbsp; {{ shippingSlip?.shippingSlipDTO.clientName!=null ? shippingSlip.shippingSlipDTO.clientName : '' }}</td>
               </tr>
               </tbody>
             </table>
@@ -175,7 +202,7 @@ const clearCanvas = () => {
               </tr>
               <tr>
                 <td colspan="5" style="height: 30px;">
-                  {{ purchaseOrder?.userName }}
+                  {{ shippingSlip?.shippingSlipDTO.userName }}
                 </td>
                 <td colspan="5" style="height: 30px;" class="image-gallery">
                   <img class="image-item" v-if="notification.notificationImageUrl != undefined" :src="notification.notificationImageUrl" alt="승인자 서명" style="width: 100px; height: auto;" />
@@ -192,26 +219,26 @@ const clearCanvas = () => {
             <br/><br/><br/>
 
             <table class="table first-table left" style="height: 140px">
-              <tbody v-if="purchaseOrder">
+              <tbody v-if="shippingSlip">
               <tr>
-                <td class="color-column align-content-center">발주서명</td>
-                <td class="align-content-center">{{ purchaseOrder.purchaseOrderName }}</td>
+                <td class="color-column align-content-center">출하전표명</td>
+                <td class="align-content-center">{{ shippingSlip.shippingSlipDTO.shippingSlipName }}</td>
                 <td class="color-column align-content-center">담당사</td>
                 <td class="align-content-center">Order Bridge</td>
               </tr>
               <tr>
                 <td class="color-column align-content-center">담당자</td>
-                <td class="align-content-center">{{ purchaseOrder.userName }}</td>
+                <td class="align-content-center">{{ shippingSlip.shippingSlipDTO.userName }}</td>
                 <td class="color-column align-content-center">연락처</td>
-                <td class="align-content-center">{{ purchaseOrder.userPhoneNo }}</td>
+                <td class="align-content-center">{{ shippingSlip.shippingSlipDTO.userPhoneNo }}</td>
               </tr>
               <tr>
-                <td class="color-column align-content-center">주소</td>
-                <td class="align-content-center" colspan="3">서울특별시 동작구 보라매로 87 플레이데이터 3층</td>
+                <td class="color-column align-content-center">출하주소</td>
+                <td class="align-content-center" colspan="3">{{ findValue(shippingAddressList, shippingSlip.shippingSlipDTO.shippingAddress) }}</td>
               </tr>
               <tr>
-                <td class="color-column align-content-center">계약 납기일</td>
-                <td class="align-content-center" colspan="3">{{ dayjs(purchaseOrder.purchaseOrderDueDate).format('YYYY-MM-DD') }}</td>
+                <td class="color-column align-content-center">출하일</td>
+                <td class="align-content-center" colspan="3">{{ dayjs(shippingSlip.shippingSlipDTO.shippingSlipShippingDate).format('YYYY-MM-DD') }}</td>
               </tr>
               </tbody>
             </table>
@@ -221,25 +248,19 @@ const clearCanvas = () => {
               <tr>
                 <th>품목</th>
                 <th>수량</th>
-                <th>단가</th>
-                <th>금액</th>
               </tr>
               </thead>
-              <tbody v-if="purchaseOrder?.purchaseOrderItemResponseList?.length > 0">
-              <tr v-for="(purchaseOrderItem, idx) in purchaseOrder.purchaseOrderItemResponseList"
-                  :key="purchaseOrderItem.itemSeq || idx">
-                <td>{{ purchaseOrderItem.itemName }}</td>
-                <td>{{ purchaseOrderItem.purchaseOrderItemQuantity ? purchaseOrderItem.purchaseOrderItemQuantity.toLocaleString() : 0 }}</td>
-                <td>{{ purchaseOrderItem.purchaseOrderItemPrice ? purchaseOrderItem.purchaseOrderItemPrice.toLocaleString() : 0 }}</td>
-                <td>{{ (purchaseOrderItem.purchaseOrderItemQuantity * purchaseOrderItem.purchaseOrderItemPrice).toLocaleString() }}</td>
+              <tbody v-if="shippingSlip?.itemList?.length > 0">
+              <tr v-for="(item, idx) in shippingSlip.itemList"
+                  :key="item.itemSeq || idx">
+                <td>{{ item.itemName }}</td>
+                <td>{{ item.shippingSlipItemQuantity ? item.shippingSlipItemQuantity.toLocaleString() : 0 }}</td>
               </tr>
               </tbody>
               <tfoot>
               <tr>
                 <td>합계</td>
-                <td>{{ purchaseOrder?.purchaseOrderTotalQuantity ? purchaseOrder.purchaseOrderTotalQuantity.toLocaleString() : 0 }}</td>
-                <td> - </td>
-                <td>{{ purchaseOrder?.purchaseOrderExtendedPrice ? purchaseOrder.purchaseOrderExtendedPrice.toLocaleString() : 0 }}</td>
+                <td>{{ shippingSlip?.shippingSlipDTO.shippingSlipTotalQuantity }}</td>
               </tr>
               </tfoot>
             </table>

@@ -17,4 +17,6 @@ public interface PurchaseOrderMapper {
     List<PurchaseOrderSituationResponse> readPurchaseOrderSituationList(PurchaseOrderRequest request);
 
     List<PurchaseOrderStockSituationResponse> readPurchaseOrderStockSituationList(PurchaseOrderRequest request);
+
+    PurchaseOrderResponse readPurchaseOrder(Long purchaseOrderSeq);
 }

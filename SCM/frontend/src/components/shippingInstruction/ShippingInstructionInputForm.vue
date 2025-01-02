@@ -44,6 +44,21 @@ const addressOptions = computed(() =>
     }))
 );
 
+// 내일부터 날짜 및 시간 계산 함수
+const getTomorrowDateTime = () => {
+  const now = new Date();
+  now.setDate(now.getDate() + 1); // 하루 더하기
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const date = String(now.getDate()).padStart(2, '0');
+  const hours = '00'; // 내일 자정을 기본값으로 설정
+  const minutes = '00';
+  return `${year}-${month}-${date}T${hours}:${minutes}`;
+};
+
+// 내일 날짜 및 시간을 최소값으로 설정
+const minDateTime = ref(getTomorrowDateTime());
+
 // 상태 키로 값 반환
 function findStatusValue(array, key) {
   for (const item of array) {
@@ -69,6 +84,7 @@ defineExpose({ getData });
           type="datetime-local"
           id="shippingInstructionDate"
           v-model="formData.shippingInstructionDate"
+          :min="minDateTime"
           placeholder="출하지시일자를 입력해 주세요.">
     </b-form-group>
 

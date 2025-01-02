@@ -2,6 +2,8 @@
 import ShippingSlipList from "@/components/shippingSlip/ShippingSlipList.vue";
 import {onMounted, ref} from "vue";
 import axios from "@/axios"
+import ShippingSlipSituation from "@/components/shippingSlip/ShippingSlipSituation.vue";
+import ShippingInstructionList from "@/components/shippingInstruction/ShippingInstructionList.vue";
 
 const totalCount = ref(0);
 const pageSize = ref(10);
@@ -12,8 +14,7 @@ const shippingAddressList = ref([]);
 const searchStartDate = ref(null);
 const searchEndDate = ref(null);
 const searchName = ref(null);
-const expandShippingSlip = ref({});
-const expandItemList = ref({});
+const expandData = ref({});
 const itemDivisionList = ref([]);
 
 // 출하전표 목록 요청
@@ -48,8 +49,7 @@ const fetchShippingSlip = async (seq) => {
   try {
     const response = await axios.get(`shipping-slip/${seq}`, {});
 
-    expandShippingSlip.value[seq] = response.data.shippingSlipDTO; // ref 값에 추가
-    expandItemList.value[seq] = response.data.itemList;
+    expandData.value[seq] = response.data; // ref 값에 추가
 
   } catch (error) {
     console.error("상세 출하전표 불러오기 실패 :", error);
@@ -115,6 +115,37 @@ const excelDown = async () => {
   }
 }
 
+// 거래처 힌트 요청
+const clientHintList = ref(null);
+let clientSearchCount = 0;
+
+const fetchClientHint = async (clientName) => {
+  if (clientName.value === "") {
+    clientHintList.value = null;
+  } else {
+    try {
+      const response = await axios.get(`client/hint`, {
+        params: {
+          keyword: clientName.value
+        }
+      });
+      if (response.data.length > 0) {
+        clientHintList.value = response.data;
+        clientSearchCount = 0;
+      } else if (clientSearchCount > 2) {
+        clientHintList.value = null;
+      } else { clientSearchCount++; }
+    } catch (error) {
+      console.log(`거래처 힌트 요청 실패 ${error}`)
+    }
+  }
+  if (clientHintList.value) {
+    if (clientHintList.value.length === 1 && clientHintList.value[0] === searchClient.value) {
+      clientHintList.value = null;
+    }
+  }
+}
+
 onMounted(async () => {
   await fetchShippingSlipList();
 
@@ -127,6 +158,11 @@ const handlePage = (newPageNumber) => {
   pageNumber.value = Number(newPageNumber.value);
   fetchShippingSlipList();
 };
+
+// 거래처 추천
+const handleClient = (newClient) => {
+  fetchClientHint(newClient);
+}
 
 // 검색
 const handleSearch = (payload) => {
@@ -145,10 +181,9 @@ function search() {
 
 // 상세 정보 확장
 const handleExtendItem = (seq) => {
-  if (expandShippingSlip.value[seq] && expandItemList.value[seq]) {
+  if (expandData.value[seq]) {
     // 이미 확장된 상태면 축소
-    delete expandShippingSlip.value[seq];
-    delete expandItemList.value[seq];
+    delete expandData.value[seq];
   } else {
     // API로 데이터를 가져와서 저장
     fetchShippingSlip(seq);
@@ -166,10 +201,11 @@ const handleExtendItem = (seq) => {
                     :totalCount="totalCount"
                     :pageNumber="pageNumber"
                     :pageSize="pageSize"
-                    :expandShippingSlip="expandShippingSlip"
-                    :expandItemList="expandItemList"
+                    :expandData="expandData"
                     :itemDivisionList="itemDivisionList"
+                    :clientHintList="clientHintList"
                     @pageEvent="handlePage"
+                    @clientEvent="handleClient"
                     @searchEvent="handleSearch"
                     @extendItemEvent="handleExtendItem"
                     @excelEvent="excelDown"

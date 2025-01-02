@@ -48,6 +48,26 @@
         </if>
     </select>
 
+    <select id="readPurchaseOrder" resultType="error.pirate.backend.purchaseOrder.query.dto.PurchaseOrderResponse">
+        SELECT
+            tpo.purchase_order_seq,
+            tpo.purchase_order_name,
+            tpo.purchase_order_status,
+            tpo.purchase_order_due_date,
+            tpo.purchase_order_target_due_date,
+            tpo.purchase_order_extended_price,
+            tpo.purchase_order_total_quantity,
+            tpo.purchase_order_note,
+            tu.user_name,
+            tu.user_phone_no,
+            tc.client_name
+        FROM tb_purchase_order tpo
+        JOIN tb_user tu USING (user_seq)
+        JOIN tb_client tc USING (client_seq)
+        WHERE tpo.purchase_order_status != 'DELETE'
+        AND tpo.purchase_order_seq = #{purchaseOrderSeq}
+    </select>
+
     <select id="readPurchaseOrderItemList" resultType="error.pirate.backend.purchaseOrder.query.dto.PurchaseOrderItemResponse">
         SELECT
             tpoi.item_seq,

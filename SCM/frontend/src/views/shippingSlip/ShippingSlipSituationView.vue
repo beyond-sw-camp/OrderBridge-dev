@@ -2,6 +2,7 @@
 import axios from "@/axios"
 import {onMounted, ref} from "vue";
 import ShippingSlipSituation from "@/components/shippingSlip/ShippingSlipSituation.vue";
+import ShippingInstructionList from "@/components/shippingInstruction/ShippingInstructionList.vue";
 
 const searchStartDate = ref(null);
 const searchEndDate = ref(null);
@@ -83,10 +84,46 @@ const excelDown = async () => {
   }
 }
 
+// 거래처 힌트 요청
+const clientHintList = ref(null);
+let clientSearchCount = 0;
+
+const fetchClientHint = async (clientName) => {
+  if (clientName.value === "") {
+    clientHintList.value = null;
+  } else {
+    try {
+      const response = await axios.get(`client/hint`, {
+        params: {
+          keyword: clientName.value
+        }
+      });
+      if (response.data.length > 0) {
+        clientHintList.value = response.data;
+        clientSearchCount = 0;
+      } else if (clientSearchCount > 2) {
+        clientHintList.value = null;
+      } else { clientSearchCount++; }
+    } catch (error) {
+      console.log(`거래처 힌트 요청 실패 ${error}`)
+    }
+  }
+  if (clientHintList.value) {
+    if (clientHintList.value.length === 1 && clientHintList.value[0] === searchClient.value) {
+      clientHintList.value = null;
+    }
+  }
+}
+
 onMounted(async () => {
   await fetchShippingSlipSituationList();
   await fetchShippingAddressList()
 });
+
+// 거래처 추천
+const handleClient = (newClient) => {
+  fetchClientHint(newClient);
+}
 
 // 검색
 const handleSearch = (payload) => {
@@ -110,6 +147,8 @@ function search() {
                          :shippingSlipSituationList="shippingSlipSituationList"
                          :shippingSlipSituationTotal="shippingSlipSituationTotal"
                          :shippingAddressList="shippingAddressList"
+                         :clientHintList="clientHintList"
+                         @clientEvent="handleClient"
                          @searchEvent="handleSearch"
                          @excelEvent="excelDown"/>
 </template>

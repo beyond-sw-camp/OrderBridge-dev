@@ -60,11 +60,11 @@ public class QuotationQueryService {
     }
 
     // 견적서 현황 조회
-    public QuotationSituationResponse readQuotationSituation(
+    public List<QuotationSituationResponse> readQuotationSituation(
             LocalDate startDate, LocalDate endDate, String clientName) {
 
         // 견적서 현황 조회
-        return new QuotationSituationResponse(quotationMapper.selectQuotationSituation(startDate, endDate, clientName));
+        return quotationMapper.selectQuotationSituation(startDate, endDate, clientName);
     }
 
     // 견적서 합계 계산
@@ -79,6 +79,15 @@ public class QuotationQueryService {
         return excelDownBody.writeCells(
                 new String[] {"등록", "수정", "이름", "상태", "견적일", "만료일", "총 수량", "총 가격", "비고"},
                 quotationMapper.selectQuotationExcel(startDate, endDate, clientName, quotationStatus)
+        );
+    }
+
+    // 견적서 현황 엑셀 다운로드
+    public byte[] readQuotationSituationExcel(LocalDate startDate, LocalDate endDate, String clientName) {
+
+        return excelDownBody.writeCells(
+                new String[] {"견적일", "이름", "총 수량", "총 가격", "거래처", "비고"},
+                quotationMapper.selectQuotationSituationExcel(startDate, endDate, clientName)
         );
     }
 }
