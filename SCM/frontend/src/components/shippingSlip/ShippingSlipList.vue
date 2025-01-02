@@ -1,8 +1,6 @@
 <script setup>
-import {computed, defineProps, ref, watch} from 'vue';
+import {defineProps, ref, watch} from 'vue';
 import searchIcon from "@/assets/searchIcon.svg";
-import trashIcon from "@/assets/trashIcon.svg";
-import editIcon from "@/assets/editIcon.svg";
 import printIcon from "@/assets/printIcon.svg";
 import dayjs from "dayjs";
 import ShippingSlipPrintPreview from "@/components/shippingSlip/ShippingSlipPrintPreview.vue";
@@ -216,6 +214,7 @@ function numberThree(number) {
   <ShippingSlipPrintPreview
       :isVisible="isModalVisible"
       :shippingSlip="selectedShippingSlip"
+      :isList=true
       @close="closePrintPreview"
   />
 </template>
