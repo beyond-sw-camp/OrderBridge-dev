@@ -91,6 +91,8 @@ const saveCanvas = async (selectedNotification) => {
     isModalOpen.value = false;
     emit('close');
 
+    await axios.put(`purchase/complete/${props.purchase.purchaseSeq}`);
+
     await Swal.fire({
       position: "center",
       icon: "success",
@@ -100,7 +102,6 @@ const saveCanvas = async (selectedNotification) => {
     });
   }
 
-  await axios.put(`purchaseOrder/complete/${props.purchase.purchaseSeq}`);
 };
 
 // 드로잉 시작
