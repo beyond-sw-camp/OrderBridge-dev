@@ -3,6 +3,7 @@ package error.pirate.backend.productionDisbursement.command.application.controll
 import error.pirate.backend.productionDisbursement.command.application.dto.CreateAndUpdateProductionDisbursementRequest;
 import error.pirate.backend.productionDisbursement.command.application.service.ProductionDisbursementService;
 import error.pirate.backend.productionDisbursement.command.domain.aggregate.entity.ProductionDisbursementStatus;
+import error.pirate.backend.security.AuthUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -27,7 +28,8 @@ public class ProductionDisbursementController {
     public ResponseEntity<Void> createProductionDisbursement(@Valid @RequestBody CreateAndUpdateProductionDisbursementRequest request
     ) {
         log.info("-------------- POST /api/v1/productionDisbursement 생산불출 등록 요청 - request:{} --------------", request);
-        productionDisbursementService.createProductionDisbursement(request);
+        String userNo = AuthUtil.getAuthUser();
+        productionDisbursementService.createProductionDisbursement(request, userNo);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
@@ -36,9 +38,10 @@ public class ProductionDisbursementController {
     @PutMapping("/{productionDisbursementSeq}")
     @Operation(summary = "생산불출 수정", description = "작업지시서를 불러와 생산불출을 수정한다.")
     public ResponseEntity<Void> updateProductionDisbursement(@PathVariable Long productionDisbursementSeq,
-                                                @Valid @RequestBody CreateAndUpdateProductionDisbursementRequest request) {
+                                                             @Valid @RequestBody CreateAndUpdateProductionDisbursementRequest request) {
         log.info("-------------- PUT /api/v1/productionDisbursement/{} 생산불출 수정 요청 - request:{} --------------", productionDisbursementSeq, request);
-        productionDisbursementService.updateWorkOrder(productionDisbursementSeq, request);
+        String userNo = AuthUtil.getAuthUser();
+        productionDisbursementService.updateWorkOrder(productionDisbursementSeq, request, userNo);
 
         return ResponseEntity.status(HttpStatus.OK).build();
     }
@@ -48,16 +51,17 @@ public class ProductionDisbursementController {
     @Operation(summary = "생산불출 삭제", description = "선택한 생산불출을 삭제한다.")
     public ResponseEntity<Void> deleteProductionDisbursement(@PathVariable Long productionDisbursementSeq) {
         log.info("-------------- DELETE /api/v1/productionDisbursement/{} 생산불출 삭제 요청 -  --------------", productionDisbursementSeq);
-        productionDisbursementService.deleteProductionDisbursement(productionDisbursementSeq);
+        String userNo = AuthUtil.getAuthUser();
+        productionDisbursementService.deleteProductionDisbursement(productionDisbursementSeq, userNo);
 
         return ResponseEntity.ok().build();
     }
 
     /* 생산불출 상태변경(불출 후) */
-    @PutMapping("/after/{productionDisbursementSeq}")
+    @PutMapping("/approval/{productionDisbursementSeq}")
     @Operation(summary = "생산불출 결재상태변경", description = "선택한 생산불출의 상태를 변경한다. 불출 전 > 불출 후")
     public ResponseEntity<Void> updateProductionDisbursementAfter(@PathVariable Long productionDisbursementSeq) {
-        log.info("-------------- PUT /api/v1/productionDisbursement/after/{} 작업지시서 결재 상태 변경 요청 --------------", productionDisbursementSeq);
+        log.info("-------------- PUT /api/v1/productionDisbursement/approval/{} 작업지시서 결재 상태 변경 요청 --------------", productionDisbursementSeq);
         productionDisbursementService.updateProductionDisbursementStatus(productionDisbursementSeq, ProductionDisbursementStatus.AFTER);
 
         return ResponseEntity.status(HttpStatus.OK).build();

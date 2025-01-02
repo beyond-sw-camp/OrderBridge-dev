@@ -4,11 +4,14 @@ import error.pirate.backend.common.NameGenerator;
 import error.pirate.backend.common.NullCheck;
 import error.pirate.backend.exception.CustomException;
 import error.pirate.backend.exception.ErrorCodeType;
+import error.pirate.backend.notification.command.domain.aggregate.entity.NotificationType;
+import error.pirate.backend.notification.command.domain.service.NotificationDomainService;
 import error.pirate.backend.salesOrder.command.domain.aggregate.entity.SalesOrder;
 import error.pirate.backend.salesOrder.command.domain.aggregate.entity.SalesOrderItem;
 import error.pirate.backend.salesOrder.command.domain.service.SalesOrderDomainService;
 import error.pirate.backend.salesOrder.command.domain.service.SalesOrderItemDomainService;
 import error.pirate.backend.user.command.domain.aggregate.entity.User;
+import error.pirate.backend.user.command.domain.service.UserDomainService;
 import error.pirate.backend.warehouse.command.domain.aggregate.entity.Warehouse;
 import error.pirate.backend.warehouse.command.domain.service.WarehouseDomainService;
 import error.pirate.backend.workOrder.command.application.dto.CreateWorkOrderRequest;
@@ -33,11 +36,13 @@ public class WorkOrderService {
     private final SalesOrderItemDomainService salesOrderItemDomainService;
     private final WarehouseDomainService warehouseDomainService;
     private final NameGenerator nameGenerator;
+    private final NotificationDomainService notificationDomainService;
+    private final UserDomainService userDomainService;
 
     /* 작업지시서 등록 */
     @Transactional
-    public void createWorkOrderForItem(CreateWorkOrderRequest request) {
-        log.info("-------------- 작업지시서 등록 서비스 진입 :등록요청 조건 - request: {} --------------", request);
+    public void createWorkOrderForItem(CreateWorkOrderRequest request, String userNo) {
+        log.info("-------------- 작업지시서 등록 서비스 진입 :등록요청 조건 - request: {}, userNo: {} --------------", request, userNo);
 
         // 주문서 상태 확인
         SalesOrder salesOrder = salesOrderDomainService.findById(request.getSalesOrderSeq());
@@ -54,8 +59,8 @@ public class WorkOrderService {
         // 생산공장 확인
         Warehouse warehouse = warehouseDomainService.findById(request.getWarehouseSeq());
 
-        // 사용자 설정 - 주문서 작성 유저
-        User user = salesOrder.getUser();
+        // 현재 로그인한 유저로 설정
+        User user = userDomainService.findByUserEmployeeNo(userNo);
 
         // 작업지시서명 설정
         String workOrderName = nameGenerator.nameGenerator(WorkOrder.class);
@@ -112,17 +117,24 @@ public class WorkOrderService {
 
         // 작업지시서 저장
         workOrderDomainService.saveWorkOrder(workOrder);
+
+        //알림 생성
+        notificationDomainService.createNotificationMessage(NotificationType.workOrder, workOrder.getWorkOrderSeq(), workOrder.getWorkOrderName());
     }
 
     /* 작업지시서 수정 */
     @Transactional
-    public void updateWorkOrder(Long workOrderSeq, UpdateWorkOrderRequest request) {
+    public void updateWorkOrder(Long workOrderSeq, UpdateWorkOrderRequest request,String userNo) {
         log.info("-------------- 작업지시서 수정 서비스 진입 - {}번 수정, 수정요청 조건 - request: {}   --------------", workOrderSeq, request);
         log.info("workOrderIndicatedQuantity 값 확인: {}", request.getWorkOrderIndicatedQuantity());
 
         // 작업지시서 찾기
         WorkOrder workOrder = workOrderDomainService.findByWorkOrderSeq(workOrderSeq);
         log.info("작업지시서 조회 완료 - 작업지시서 번호: {}", workOrderSeq);
+
+        // 현재 로그인한 유저가 작성자인지 확인
+        User user = userDomainService.findByUserEmployeeNo(userNo);
+        workOrderDomainService.checkUser(workOrder, user);
 
         // 작업지시서 상태에 따른 수정 로직
         switch (workOrder.getWorkOrderStatus()) {
@@ -264,11 +276,15 @@ public class WorkOrderService {
 
     /* 작업지시서 삭제 */
     @Transactional
-    public void deleteWorkOrder(Long workOrderSeq) {
+    public void deleteWorkOrder(Long workOrderSeq,String userNo) {
         log.info("-------------- 작업지시서 삭제 서비스 진입 - {}번 삭제 --------------", workOrderSeq);
 
         // 작업지시서 찾기
         WorkOrder workOrder = workOrderDomainService.findByWorkOrderSeq(workOrderSeq);
+
+        // 현재 로그인한 유저가 작성자인지 확인
+        User user = userDomainService.findByUserEmployeeNo(userNo);
+        workOrderDomainService.checkUser(workOrder, user);
 
         // 삭제가능한 상태인지 체크
         workOrderDomainService.checkWorkOrderStatusDeletePossible(workOrder.getWorkOrderStatus());
