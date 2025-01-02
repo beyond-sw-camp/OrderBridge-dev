@@ -1,12 +1,19 @@
 package error.pirate.backend.salesOrder.query.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import java.util.List;
+import java.time.LocalDate;
 
 @Getter
-@AllArgsConstructor
 public class SalesOrderSituationResponse {
-    private List<SalesOrderSituationDTO> salesOrderSituationList;
+    private LocalDate salesOrderOrderDate;
+    private String salesOrderName;
+    private Integer salesOrderTotalQuantity;
+    private Integer salesOrderExtendedPrice;
+    private String clientName;
+    private String salesOrderNote;
+
+    private String salesOrderOrderMonte;
+    private Integer salesOrderMonthPrice;
+    private Integer salesOrderMonthQuantity;
 }
