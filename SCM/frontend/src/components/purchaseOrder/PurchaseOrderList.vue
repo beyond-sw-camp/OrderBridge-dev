@@ -323,6 +323,7 @@ const itemDelete = async (seq) => {
   <PrintPreviewModal
       :isVisible="isModalVisible"
       :purchaseOrder="selectedPurchaseOrder"
+      :isList=true
       @close="closePrintPreview"
   />
 
