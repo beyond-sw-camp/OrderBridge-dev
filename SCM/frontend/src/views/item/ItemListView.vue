@@ -32,6 +32,7 @@ const itemDivisionList = [
 ];
 
 const findItemsByFilter = async () => {
+  itemDTO.value = null;
   try {
     const minHour = minExpiration.value != null ? minExpiration.value * 24 : null;
     const maxHour = maxExpiration.value != null ? maxExpiration.value * 24 : null;
