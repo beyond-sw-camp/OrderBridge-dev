@@ -54,7 +54,7 @@ public class SalesOrderQueryController {
 
     @GetMapping("/situation")
     @Operation(summary = "주문서 현황 조회")
-    public ResponseEntity<SalesOrderSituationResponse> readSalesOrderSituation(
+    public ResponseEntity<List<SalesOrderSituationResponse>> readSalesOrderSituation(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
             @RequestParam(required = false) String clientName) {
@@ -86,6 +86,24 @@ public class SalesOrderQueryController {
                 .headers(httpHeaders)
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(salesOrderQueryService.readSalesOrderExcel(startDate, endDate, clientName, salesOrderStatus));
+    }
+
+    @GetMapping("/situation/excel")
+    @Operation(summary = "주문서 현황 엑셀 다운로드")
+    public ResponseEntity<byte[]> readSalesOrderSituationExcel(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @RequestParam(required = false) String clientName) {
+
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + URLEncoder.encode(
+                new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date()) + "_주문서_현황.xlsx"
+                , StandardCharsets.UTF_8));
+
+        return ResponseEntity.ok()
+                .headers(httpHeaders)
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(salesOrderQueryService.readSalesOrderSituationExcel(startDate, endDate, clientName));
     }
 
     /* 이미 작업지시가 등록된 주문서 물품 조회 */

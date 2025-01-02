@@ -8,13 +8,13 @@ import searchIcon from "@/assets/searchIcon.svg";
 const searchStartDate = ref('');
 const searchEndDate = ref('');
 const searchClient = ref('');
-const quotationSituationList = ref([]);
-const quotationSituationTotal = ref([]);
+const salesOrderSituationList = ref([]);
+const salesOrderSituationTotal = ref([]);
 
-// 견적서 현황 요청
-const fetchQuotationSituationList = async () => {
+// 주문서 현황 요청
+const fetchSalesOrderSituationList = async () => {
     try {
-        const response = await axios.get(`quotation/situation`, {
+        const response = await axios.get(`sales-order/situation`, {
             params: {
                 startDate: searchStartDate.value,
                 endDate: searchEndDate.value,
@@ -22,10 +22,10 @@ const fetchQuotationSituationList = async () => {
             }
         });
 
-        quotationSituationTotal.value = response.data.pop();
-        quotationSituationList.value = response.data;
+        salesOrderSituationTotal.value = response.data.pop();
+        salesOrderSituationList.value = response.data;
     } catch (error) {
-        console.error(`견적서 현황 불러오기 실패`, error);
+        console.error(`주문서 현황 불러오기 실패`, error);
         await sError(error);
     }
 };
@@ -62,11 +62,11 @@ const fetchClientHint = async (clientName) => {
 }
 
 onMounted(() => {
-    fetchQuotationSituationList();
+    fetchSalesOrderSituationList();
 });
 
 watch([searchStartDate, searchEndDate], () => {
-    fetchQuotationSituationList();
+    fetchSalesOrderSituationList();
 })
 
 watch(searchClient, () => {
@@ -75,7 +75,7 @@ watch(searchClient, () => {
 
 // 영역 프린트
 const printTable = () => {
-    const printContent = document.getElementById('print-area-quotation-situation').innerHTML;
+    const printContent = document.getElementById('print-area-sales-order-situation').innerHTML;
     const originalContent = document.body.innerHTML;
 
     document.body.innerHTML = printContent;
@@ -86,7 +86,7 @@ const printTable = () => {
 
 // 엑셀 다운로드
 const excelDown = async () => {
-    const response = await axios.get(`quotation/situation/excel`, {
+    const response = await axios.get(`sales-order/situation/excel`, {
         params: {
             startDate: searchStartDate.value,
             endDate: searchEndDate.value,
@@ -109,7 +109,7 @@ const excelDown = async () => {
 }
 
 function search() {
-    fetchQuotationSituationList();
+    fetchSalesOrderSituationList();
 }
 
 </script>
@@ -119,7 +119,7 @@ function search() {
     <div class="col-md-3">
         <div class="side-box card">
             <div class="card-body">
-                <p class="card-title">견적일</p>
+                <p class="card-title">주문일</p>
                 <input type="date" v-model="searchStartDate" style="max-width: 40%;"/> ~ <input type="date" v-model="searchEndDate" style="max-width: 40%;"/>
             </div>
         </div>
@@ -145,14 +145,14 @@ function search() {
                 <b-button @click="excelDown()" variant="light" size="sm" class="button ms-2 mb-3">엑셀 다운로드</b-button>
                 <b-button @click="printTable()" variant="light" size="sm" class="button ms-2 mb-3">인쇄</b-button>
             </div>
-        <div id="print-area-quotation-situation" class="content">
+        <div id="print-area-sales-order-situation" class="content">
             <div class="table-container">
             <!-- 테이블 -->
             <table>
                 <thead>
                     <tr>
                         <th>번호</th>
-                        <th>견적일</th>
+                        <th>주문일</th>
                         <th>이름</th>
                         <th>총 수량</th>
                         <th>총 가격</th>
@@ -160,24 +160,24 @@ function search() {
                         <th>비고</th>
                     </tr>
                     </thead>
-                <tbody v-if="quotationSituationList.length > 0">
+                <tbody v-if="salesOrderSituationList.length > 0">
                 <!-- 필터링된 결과 및 월별 합계 출력 -->
-                <template v-for="(quotationSituation, index) in quotationSituationList" :key="index">
-                    <tr v-if="quotationSituation.quotationQuotationDate">
+                <template v-for="(salesOrderSituation, index) in salesOrderSituationList" :key="index">
+                    <tr v-if="salesOrderSituation.salesOrderOrderDate">
                         <td>{{ index + 1 }}</td>
-                        <td>{{ dayjs(quotationSituation.quotationQuotationDate).format('YYYY/MM/DD') }}</td>
-                        <td>{{ quotationSituation.quotationName }}</td>
-                        <td>{{ quotationSituation.quotationTotalQuantity !== null ? quotationSituation.quotationTotalQuantity.toLocaleString() : '0' }}</td>
-                        <td> ￦ {{ quotationSituation.quotationExtendedPrice !== null ? quotationSituation.quotationExtendedPrice.toLocaleString() : '0' }}</td>
-                        <td>{{ quotationSituation.clientName }}</td>
-                        <td>{{ quotationSituation.quotationNote !== null ? quotationSituation.quotationNote : '-' }}</td>
+                        <td>{{ dayjs(salesOrderSituation.salesOrderOrderDate).format('YYYY/MM/DD') }}</td>
+                        <td>{{ salesOrderSituation.salesOrderName }}</td>
+                        <td>{{ salesOrderSituation.salesOrderTotalQuantity !== null ? salesOrderSituation.salesOrderTotalQuantity.toLocaleString() : '0' }}</td>
+                        <td> ￦ {{ salesOrderSituation.salesOrderExtendedPrice !== null ? salesOrderSituation.salesOrderExtendedPrice.toLocaleString() : '0' }}</td>
+                        <td>{{ salesOrderSituation.clientName }}</td>
+                        <td>{{ salesOrderSituation.salesOrderNote !== null ? salesOrderSituation.salesOrderNote : '-' }}</td>
                     </tr>
                     <tr v-else class="monthly-total">
                         <td></td>
-                        <td>{{ quotationSituation.quotationQuotationMonth }}</td>
+                        <td>{{ salesOrderSituation.salesOrderOrderMonth }}</td>
                         <td></td>
-                        <td>{{ quotationSituation.quotationMonthQuantity.toLocaleString() }}</td>
-                        <td> ￦ {{ quotationSituation.quotationMonthPrice.toLocaleString() }}</td>
+                        <td>{{ salesOrderSituation.salesOrderMonthQuantity.toLocaleString() }}</td>
+                        <td> ￦ {{ salesOrderSituation.salesOrderMonthPrice.toLocaleString() }}</td>
                         <td></td>
                         <td></td>
                     </tr>
@@ -185,14 +185,14 @@ function search() {
                 </tbody>
                 <tbody v-else>
                     <tr>
-                        <td colspan="6">해당 검색조건에 부합한 견적서가 존재하지 않습니다</td>
+                        <td colspan="6">해당 검색조건에 부합한 주문서가 존재하지 않습니다</td>
                     </tr>
                 </tbody>
                 <!-- 총합 -->
-                <tfoot v-if="quotationSituationTotal">
+                <tfoot v-if="salesOrderSituationTotal">
                     <tr>
                         <td colspan="5">총합</td>
-                        <td colspan="2">￦ {{ quotationSituationTotal.quotationMonthPrice ? quotationSituationTotal.quotationMonthPrice.toLocaleString() : null }}</td>
+                        <td colspan="2">￦ {{ salesOrderSituationTotal.salesOrderMonthPrice ? salesOrderSituationTotal.salesOrderMonthPrice.toLocaleString() : null }}</td>
                     </tr>
                 </tfoot>
             </table>

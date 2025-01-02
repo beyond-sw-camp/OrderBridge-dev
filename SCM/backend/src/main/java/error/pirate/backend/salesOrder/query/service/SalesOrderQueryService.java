@@ -58,12 +58,11 @@ public class SalesOrderQueryService {
     }
 
     // 주문서 현황 조회
-    public SalesOrderSituationResponse readSalesOrderSituation(
+    public List<SalesOrderSituationResponse> readSalesOrderSituation(
             LocalDate startDate, LocalDate endDate, String clientName) {
 
         // 주문서 현황 조회
-        return new SalesOrderSituationResponse(salesOrderMapper.selectSalesOrderSituation(
-                startDate, endDate, clientName));
+        return salesOrderMapper.selectSalesOrderSituation(startDate, endDate, clientName);
     }
 
     // 주문서 품목 값 확인
@@ -78,6 +77,15 @@ public class SalesOrderQueryService {
         return excelDownBody.writeCells(
                 new String[] {"등록", "수정", "이름", "상태", "주문일", "납기일", "총 수량", "총 가격", "비고"},
                 salesOrderMapper.selectSalesOrderExcel(startDate, endDate, clientName, salesOrderStatus)
+        );
+    }
+
+    // 주문서 현황 엑셀 다운로드
+    public byte[] readSalesOrderSituationExcel(LocalDate startDate, LocalDate endDate, String clientName) {
+
+        return excelDownBody.writeCells(
+                new String[] {"주문일", "이름", "총 수량", "총 가격", "거래처", "비고"},
+                salesOrderMapper.selectSalesOrderSituationExcel(startDate, endDate, clientName)
         );
     }
 

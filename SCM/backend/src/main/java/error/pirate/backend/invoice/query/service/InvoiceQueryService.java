@@ -46,10 +46,10 @@ public class InvoiceQueryService {
     }
 
     // 거래 명세서 현황 조회
-    public InvoiceSituationResponse readInvoiceSituation(LocalDate startDate, LocalDate endDate, String clientName) {
+    public List<InvoiceSituationResponse> readInvoiceSituation(LocalDate startDate, LocalDate endDate, String clientName) {
 
         // 거래 명세서 현황 조회
-        return new InvoiceSituationResponse(invoiceMapper.selectInvoiceSituation(startDate, endDate, clientName));
+        return invoiceMapper.selectInvoiceSituation(startDate, endDate, clientName);
     }
 
     // 거래 명세서 값 확인
@@ -63,6 +63,15 @@ public class InvoiceQueryService {
         return excelDownBody.writeCells(
                 new String[] {"등록", "수정", "이름", "판매일", "총 수량", "총 가격", "비고"},
                 invoiceMapper.selectInvoiceExcel(startDate, endDate, clientName)
+        );
+    }
+
+    // 거래 명세서 현황 엑셀 다운로드
+    public byte[] readInvoiceSituationExcel(LocalDate startDate, LocalDate endDate, String clientName) {
+
+        return excelDownBody.writeCells(
+                new String[] {"판매일", "이름", "총 수량", "총 가격", "거래처", "비고"},
+                invoiceMapper.selectInvoiceSituationExcel(startDate, endDate, clientName)
         );
     }
 }
