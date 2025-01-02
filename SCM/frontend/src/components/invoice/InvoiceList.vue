@@ -260,8 +260,8 @@ function numberThree(number) {
                                 </div>
                                 
                                 <div class="d-flex justify-content-end align-items-center">
-                                    <printIcon class="me-3 icon" @click.stop="printInvoice(invoice.invoiceSeq)"/>
-                                    <editIcon class="me-3 icon" @click.stop="modifyInvoice(invoice.invoiceSeq)"/>
+                                    <!--printIcon class="me-3 icon" @click.stop="printInvoice(invoice.invoiceSeq)"/>
+                                    <editIcon class="me-3 icon" @click.stop="modifyInvoice(invoice.invoiceSeq)"/-->
                                     <trashIcon class="icon" @click.stop="deleteInvoice(invoice.invoiceSeq)"/>
                                 </div>
                             </div>
