@@ -91,6 +91,7 @@
              , wo.work_order_indicated_quantity
              , wo.work_order_price
              , u.user_name
+             , u.user_phone_no
              , c.client_name
              , wo.work_order_reg_date
              , wo.work_order_mod_date

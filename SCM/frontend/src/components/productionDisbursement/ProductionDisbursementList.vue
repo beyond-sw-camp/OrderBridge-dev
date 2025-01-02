@@ -7,6 +7,8 @@ import printIcon from "@/assets/printIcon.svg"
 import editIcon from "@/assets/editIcon.svg"
 import trashIcon from "@/assets/trashIcon.svg"
 import router from "@/router/index.js";
+import ProductionDisbursementPrintPreview
+  from "@/components/productionDisbursement/ProductionDisbursementPrintPreview.vue";
 
 const productionDisbursementList = ref([]);
 const productionDisbursementStatusList = ref([]);
@@ -24,6 +26,24 @@ const searchSize = ref(10);
 const currentPage = ref(1);
 const totalPage = ref(1);
 const totalCount = ref(0);
+
+const isModalVisible = ref(false);
+const selectedProductionDisbursement2 = ref(null);
+
+const openPrintPreview = (productionDisbursementDetail) => {
+  if (!productionDisbursementDetail) {
+    console.error('선택된 생산불출이 없습니다.');
+    return;
+  }
+  console.log('openPrintPreview 호출됨, 선택된 생산불출:', productionDisbursementDetail);
+  selectedProductionDisbursement2.value = productionDisbursementDetail;
+  isModalVisible.value = true;
+};
+
+const closePrintPreview = () => {
+  isModalVisible.value = false;
+  selectedProductionDisbursement2.value = null;
+};
 
 // 목록조회
 const fetchProductionDisbursementList = async () => {
@@ -83,7 +103,9 @@ const fetchProductionDisbursementDetail = async (productionDisbursementSeq) => {
         workOrderName : response.data.productionDisbursementDetail.workOrderName,
         factorySeq : response.data.productionDisbursementDetail.factorySeq,
         factoryName : response.data.productionDisbursementDetail.factoryName,
+        clientName : response.data.productionDisbursementDetail.clientName,
         userName: response.data.productionDisbursementDetail.userName,
+        userPhoneNo: response.data.productionDisbursementDetail.userPhoneNo,
         productionDisbursementName : response.data.productionDisbursementDetail.productionDisbursementName,
         productionDisbursementTotalQuantity : response.data.productionDisbursementDetail.productionDisbursementTotalQuantity,
         productionDisbursementDepartureDate : response.data.productionDisbursementDetail.productionDisbursementDepartureDate,
@@ -125,23 +147,6 @@ function numberFormating(number) {
   return `${number.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}`;
 }
 
-// 상세보기 인쇄
-const productionDisbursementDetailPrint = (productionDisbursementSeq) => {
-  const printContent = document.getElementById(`print-area-${productionDisbursementSeq}`).innerHTML;
-  const originalContent = document.body.innerHTML;
-
-  // 선택된 영역만 표시
-  document.body.innerHTML = printContent;
-
-  window.print();
-
-  // 원래 내용 복원
-  document.body.innerHTML = originalContent;
-
-  // Vue 리렌더링 방지
-  location.reload();
-};
-
 // 생산불출 목록 엑셀 다운로드
   const excelDown = async () => {
     try{
@@ -172,7 +177,6 @@ const productionDisbursementDetailPrint = (productionDisbursementSeq) => {
     }
 
     a.download = fileName;
-    // a.download = decodeURIComponent(response.headers["content-disposition"].split('filename=')[1]);
     document.body.appendChild(a);
     a.click();
     a.remove();
@@ -201,6 +205,8 @@ const deleteProductionDisbursement = async (productionDisbursementSeq) => {
         alert(error.response.data.message);
       } else if (error.response.data.errorCode === 'PRODUCTION_DISBURSEMENT_ERROR_002') {
         alert('불출 전 상태만 삭제 가능합니다.');
+      } else if (error.response.data.errorCode === 'SECURITY_ERROR_001') {
+        alert('작성자만 삭제 가능합니다.');
       }  else {
         alert('삭제에 실패했습니다. 다시 시도해주세요.');
       }
@@ -221,6 +227,12 @@ const goToEdit = (productionDisbursementSeq) => {
 onMounted(() => {
   fetchProductionDisbursementList();
   fetchItemDivision();
+
+  const today = dayjs().format('YYYY-MM-DD'); // 오늘 날짜 (YYYY-MM-DD 형식)
+  const startOfMonth = dayjs().startOf('month').format('YYYY-MM-DD'); // 해당 달의 첫 날
+
+  searchStartDate.value = startOfMonth;
+  searchEndDate.value = today;
 });
 
 watch([searchStartDate, searchEndDate], () => {
@@ -246,7 +258,6 @@ function search() {
   fetchProductionDisbursementList();
 }
 
-
 </script>
 
 <template>
@@ -263,7 +274,7 @@ function search() {
         <div class="card-body">
           <p class="card-title">생산공장명</p>
           <b-input-group class="mt-3">
-            <b-form-input v-model="searchFactory"></b-form-input>
+            <b-form-input v-model="searchFactory" @keyup.enter="search()"></b-form-input>
             <b-button variant="light" class="button" @click="search()"><searchIcon class="icon"/></b-button>
           </b-input-group>
         </div>
@@ -343,7 +354,9 @@ function search() {
                     </div>
 
                     <div class="d-flex justify-content-end align-items-center">
-                      <printIcon class="me-3 icon" @click.stop="productionDisbursementDetailPrint(productionDisbursement.productionDisbursementSeq)"/>
+<!--                      <printIcon class="me-3 icon" @click.stop="productionDisbursementDetailPrint(productionDisbursement.productionDisbursementSeq)"/>-->
+                      <printIcon class="me-3 icon"  v-if="productionDisbursementDetail[productionDisbursement.productionDisbursementSeq]"
+                                 @click.stop="openPrintPreview(productionDisbursementDetail[productionDisbursement.productionDisbursementSeq])"/>
                       <editIcon class="me-3 icon" @click.stop="goToEdit(productionDisbursement.productionDisbursementSeq)"/>
                       <trashIcon class="icon" @click.stop="deleteProductionDisbursement(productionDisbursement.productionDisbursementSeq)"/>
                     </div>
@@ -368,6 +381,12 @@ function search() {
 
     </div>
   </div>
+
+  <ProductionDisbursementPrintPreview
+      :isVisible="isModalVisible"
+      :productionDisbursement="selectedProductionDisbursement2"
+      @close="closePrintPreview"
+  />
 </template>
 
 <style scoped>

@@ -7,6 +7,7 @@ import printIcon from "@/assets/printIcon.svg"
 import editIcon from "@/assets/editIcon.svg"
 import trashIcon from "@/assets/trashIcon.svg"
 import router from "@/router/index.js";
+import WorkOrderPrintPreview from "@/components/workOrder/WorkOrderPrintPreview.vue";
 
 const workOrderList = ref([]);
 const workOrderStatusList = ref([]);
@@ -23,6 +24,24 @@ const searchSize = ref(10);
 const currentPage = ref(1);
 const totalPage = ref(1);
 const totalCount = ref(0);
+
+const isModalVisible = ref(false);
+const selectedWorkOrder = ref(null);
+
+const openPrintPreview = (workOrderDetail) => {
+  if (!workOrderDetail) {
+    console.error('선택된 작업지시서가 없습니다.');
+    return;
+  }
+  console.log('openPrintPreview 호출됨, 선택된 작업지시서:', workOrderDetail);
+  selectedWorkOrder.value = workOrderDetail;
+  isModalVisible.value = true;
+};
+
+const closePrintPreview = () => {
+  isModalVisible.value = false;
+  selectedWorkOrder.value = null;
+};
 
 // 목록조회
 const fetchWorkOrderList = async () => {
@@ -69,12 +88,14 @@ const fetchWorkOrderDetail = async (workOrderSeq) => {
 
       workOrderDetail.value[workOrderSeq] = {
         workOrderSeq : response.data.workOrderDetail.workOrderSeq,
+        workOrderName : response.data.workOrderDetail.workOrderName,
         workOrderIndicatedDate : response.data.workOrderDetail.workOrderIndicatedDate,
         workOrderStatus : response.data.workOrderDetail.workOrderStatus,
         workOrderPrice : response.data.workOrderDetail.workOrderPrice,
         workOrderIndicatedQuantity : response.data.workOrderDetail.workOrderIndicatedQuantity,
         workOrderWorkQuantity: response.data.workOrderDetail.workOrderWorkQuantity ?? 0,
         userName : response.data.workOrderDetail.userName,
+        userPhoneNo : response.data.workOrderDetail.userPhoneNo,
         clientName : response.data.workOrderDetail.clientName,
         workOrderEndDate : response.data.workOrderDetail.workOrderEndDate,
         workOrderDueDate : response.data.workOrderDetail.workOrderDueDate,
@@ -119,23 +140,6 @@ function findStatusValue(array, key) {
   }
 }
 
-// 상세보기 인쇄
-const workOrderDetailPrint = (workOrderSeq) => {
-  const printContent = document.getElementById(`print-area-${workOrderSeq}`).innerHTML;
-  const originalContent = document.body.innerHTML;
-
-  // 선택된 영역만 표시
-  document.body.innerHTML = printContent;
-
-  window.print();
-
-  // 원래 내용 복원
-  document.body.innerHTML = originalContent;
-
-  // Vue 리렌더링 방지
-  location.reload();
-};
-
 // 작업지시서 목록 엑셀 다운로드
 const excelDown = async () => {
   try {
@@ -166,7 +170,6 @@ const excelDown = async () => {
     }
 
     a.download = fileName;
-    // a.download = decodeURIComponent(response.headers["content-disposition"].split('filename=')[1]);
     document.body.appendChild(a);
     a.click();
     a.remove();
@@ -195,6 +198,8 @@ const deleteWorkOrder = async (workOrderSeq) => {
         alert(error.response.data.message);
       } else if (error.response.data.errorCode === 'WORK_ORDER_ERROR_005') {
         alert('결재 전이거나 중단된 작업지시서만 삭제 가능합니다.');
+      } else if (error.response.data.errorCode === 'SECURITY_ERROR_001') {
+        alert('작성자만 삭제 가능합니다.');
       }  else {
         alert('삭제에 실패했습니다. 다시 시도해주세요.');
       }
@@ -220,6 +225,12 @@ function numberFormating(number) {
 onMounted(() => {
   fetchWorkOrderList();
   fetchItemDivision();
+
+  const today = dayjs().format('YYYY-MM-DD'); // 오늘 날짜 (YYYY-MM-DD 형식)
+  const startOfMonth = dayjs().startOf('month').format('YYYY-MM-DD'); // 해당 달의 첫 날
+
+  searchStartDate.value = startOfMonth;
+  searchEndDate.value = today;
 });
 
 watch([searchStartDate, searchEndDate], () => {
@@ -261,7 +272,7 @@ function search() {
         <div class="card-body">
           <p class="card-title">생산공장명</p>
           <b-input-group class="mt-3">
-            <b-form-input v-model="searchFactory"></b-form-input>
+            <b-form-input v-model="searchFactory" @keyup.enter="search()"></b-form-input>
             <b-button variant="light" class="button" @click="search()"><searchIcon class="icon"/></b-button>
           </b-input-group>
         </div>
@@ -329,7 +340,6 @@ function search() {
                             <small>{{ findStatusValue(itemDivisionList, workOrderItem.itemDivision) }}</small>
                             <div style="display: flex; justify-content: space-between;">
                               <b style="font-size: medium;">{{ workOrderItem.itemName }}</b>
-<!--                              <small>{{ workOrderItem.ingredientWarehouseName }}</small>-->
                             </div>
                             <small>{{ numberFormating( workOrderDetail[workOrder.workOrderSeq].workOrderIndicatedQuantity) }}개
                                     / 개당 {{ numberFormating(workOrderItem.itemPrice) }} 원</small><br>
@@ -343,7 +353,8 @@ function search() {
                       </template>
                     </div>
                     <div class="d-flex justify-content-end align-items-center">
-                      <printIcon class="me-3 icon" @click.stop="workOrderDetailPrint(workOrder.workOrderSeq)"/>
+                      <printIcon class="me-3 icon" v-if="workOrderDetail[workOrder.workOrderSeq]"
+                                 @click.stop="openPrintPreview(workOrderDetail[workOrder.workOrderSeq])"/>
                       <editIcon class="me-3 icon" @click.stop="goToEdit(workOrder.workOrderSeq)"/>
                       <trashIcon class="icon" @click.stop="deleteWorkOrder(workOrder.workOrderSeq)"/>
                     </div>
@@ -368,6 +379,12 @@ function search() {
 
     </div>
   </div>
+
+  <WorkOrderPrintPreview
+      :isVisible="isModalVisible"
+      :workOrder="selectedWorkOrder"
+      @close="closePrintPreview"
+  />
 </template>
 
 <style scoped>

@@ -59,7 +59,6 @@
             ON pd.production_disbursement_seq = pdi.production_disbursement_seq
           LEFT JOIN tb_work_order wo ON wo.work_order_seq = pd.work_order_seq
           JOIN tb_warehouse w1 ON wo.warehouse_seq = w1.warehouse_seq
-<!--          JOIN tb_warehouse w2 ON pdi.ingredients_warehouse_seq = w2.warehouse_seq-->
          WHERE pd.production_disbursement_status NOT IN ('DELETE')
         <if test="startDate != null">
             <![CDATA[
@@ -148,11 +147,14 @@
              , wo.warehouse_seq AS factory_seq
              , w.warehouse_name AS factory_name
              , u.user_name
-          FROM tb_production_disbursement pd
+             , u.user_phone_no
+             , c.client_name
+        FROM tb_production_disbursement pd
           LEFT JOIN tb_work_order wo ON pd.work_order_seq = wo.work_order_seq
           LEFT JOIN tb_warehouse w ON wo.warehouse_seq = w.warehouse_seq
           LEFT JOIN tb_user u ON pd.user_seq =u.user_seq
-         WHERE pd.production_disbursement_seq = #{productionDisbursementSeq}
+          LEFT JOIN tb_client c ON c.client_seq = wo.client_seq
+        WHERE pd.production_disbursement_seq = #{productionDisbursementSeq}
     </select>
 
     <!-- 상세 품목조회 -->
