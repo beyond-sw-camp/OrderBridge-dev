@@ -314,7 +314,7 @@ function search() {
                     <b>총 불출량 : </b>{{ selectedProductionDisbursement?.productionDisbursementTotalQuantity }} <br>
                     <b>담당자 : </b>{{ selectedProductionDisbursement?.userName }} <br>
                     <b>불출일 : </b>{{ dayjs(selectedProductionDisbursement?.productionDisbursementDepartureDate).format('YYYY-MM-DD HH:mm:ss') }}<br>
-                    <b>작업납기일 : </b>{{ dayjs(selectedProductionDisbursement?.workOrderDueDate).format('YYYY-MM-DD HH:mm:ss') }}<br>
+                    <b>작업목표일 : </b>{{ dayjs(selectedProductionDisbursement?.workOrderDueDate).format('YYYY-MM-DD HH:mm:ss') }}<br>
                     <b>생산불출 비고 : </b>{{ selectedProductionDisbursement?.productionDisbursementNote }}<br>
 
                     <!--  품목정보  -->

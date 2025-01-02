@@ -110,6 +110,10 @@ public class SalesOrderQueryService {
         List<SalesOrderItemStockStatusResponse> stockStatusList =
                 salesOrderMapper.selectSalesOrderItemStockStatus(salesOrderSeq, currentDateTime);
 
+        for (SalesOrderItemStockStatusResponse item : stockStatusList) {
+            item.calculateStockStatus(); // DTO의 재고 상태 계산
+        }
+
         return stockStatusList;
     }
 }
