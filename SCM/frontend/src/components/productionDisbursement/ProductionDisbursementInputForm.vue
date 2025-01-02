@@ -229,7 +229,7 @@ const createProductionDisbursement = async () => {
     } else if (error.response.data.errorCode === 'PRODUCTION_DISBURSEMENT_ERROR_003') {
       alert(error.response.data.message);
     } else if (error.response.data.errorCode === 'COMMON_ERROR_002') {
-      alert('불출일은 납기일보다 전이고, 작업지시일 이후여야 합니다.');
+      alert('불출일은 작업지시일 이후고, 작업목표일 전이어야 합니다.');
     } else if (error.response.data.errorCode === 'STOCK_ERROR_001') {
       alert(error.response.data.message);
     } else if (error.response.data.errorCode === 'PRODUCTION_DISBURSEMENT_ERROR_001') {

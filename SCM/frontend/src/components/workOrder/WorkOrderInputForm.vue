@@ -56,7 +56,7 @@ watch(props, () => {
 
   formData.value.salesOrder = props.salesOrder.salesOrderName;
   formData.value.salesOrderSeq = props.salesOrder.salesOrderSeq;
-  salesOrderDueDate.value = props.salesOrder.salesOrderDueDate;
+  salesOrderDueDate.value = formattedDate(props.salesOrder.salesOrderDueDate);
   formData.value.workOrderIndicatedQuantity = props.workOrderDetail.workOrderIndicatedQuantity;
   formData.value.warehouseSeq = props.workOrderDetail.warehouseSeq;
   formData.value.workOrderIndicatedDate = props.workOrderDetail.workOrderIndicatedDate;
@@ -190,6 +190,11 @@ function findStatusValue(array, key) {
     }
   }
 }
+
+// 목록/상세 조회에서 가져온 날짜 포맷 처리
+const formattedDate = (date) => {
+  return dayjs(date).format('YYYY-MM-DD');
+};
 
 // 선택한 주문서의 품목 재고 조회
 const fetchSalesOrderItemStock = async (salesOrderSeq) => {
@@ -372,7 +377,7 @@ const createWorkOrder = async () => {
     } else if (error.response.data.errorCode === 'WORK_ORDER_ERROR_003') {
       alert('작업지시일과 목표일을 선택해주세요');
     } else if (error.response.data.errorCode === 'COMMON_ERROR_002') {
-      alert('작업목표일은 주문납기일보다 전이어야 합니다.');
+      alert('작업목표일은 작업지시일 이후고, 주문납기일보다 빨라야 합니다.');
     } else {
       alert('등록에 실패했습니다. 다시 시도해주세요.');
     }
@@ -387,8 +392,8 @@ const submitWorkOrder = async () => {
     return;
   }
 
-  if(!formData.value.workOrderIndicatedDate) {alert('작업지시일을 선택해주세요')}
-  if(!formData.value.workOrderDueDate) {alert('작업목표일을 선택해주세요')}
+  // if(!formData.value.workOrderIndicatedDate) {alert('작업지시일을 선택해주세요')}
+  // if(!formData.value.workOrderDueDate) {alert('작업목표일을 선택해주세요')}
 
   if (props.isEditMode) {
     await updateWorkOrder(props.workOrderDetail.workOrderSeq);
@@ -402,7 +407,11 @@ const submitWorkOrder = async () => {
 const validateFormData = () => {
   if (!formData.value.salesOrderSeq || !formData.value.salesOrderItemSeq || !formData.value.warehouseSeq) {
     console.warn('필수 항목이 누락되었습니다.', formData.value);
-    alert('생산공장을 선택해주세요.')
+    if (!formData.value.salesOrderSeq || !formData.value.salesOrderItemSeq) {
+      alert('품목을 선택해주세요.');
+    } else if (!formData.value.warehouseSeq) {
+      alert('생산창고를 선택해주세요.');
+    }
     return false;
   }
   return true;
@@ -427,7 +436,7 @@ const validateFormData = () => {
       </b-form-group>
       <!-- 주문납기일자 -->
       <b-form-group label-cols="4" label-cols-lg="2" label="주문납기일" label-for="salesOrderDueDate">
-        <input class="form-control form-control-sm w-75" type="datetime-local" id="salesOrderDueDate"
+        <input class="form-control form-control-sm w-75" type="date" id="salesOrderDueDate"
                v-model="salesOrderDueDate" readonly=""/>
       </b-form-group>
     </div>
