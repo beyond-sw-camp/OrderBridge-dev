@@ -42,50 +42,11 @@ const itemImageUrl = ref('');
 const previewImageUrl = ref('');
 const warehouses = ref([]);
 const warehouseSeq = ref('');
-const isLoading = ref(false);
+const fileInput = ref(null);
 
 // 이미지 미리보기 업데이트
 const updatePreviewImage = () => {
   previewImageUrl.value = itemImageUrl.value || '';
-};
-
-// 파일 업로드 처리 함수
-const handleFileUpload = async (event) => {
-  const file = event.target.files[0];
-  if (file) {
-    // 파일 타입 체크
-    if (!file.type.startsWith('image/')) {
-      alert('이미지 파일만 업로드 가능합니다.');
-      return;
-    }
-
-    // 파일 확장자 체크
-    const extension = file.name.split('.').pop().toLowerCase();
-    if (!['jpg', 'png'].includes(extension)) {
-      alert('JPG, PNG 파일만 업로드 가능합니다.');
-      return;
-    }
-
-    try {
-      // FormData 생성
-      const formData = new FormData();
-      formData.append('file', file);
-
-      // 파일 업로드 API 호출
-      const response = await axios.post('api/upload', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      });
-
-      // 업로드 성공 시 URL 저장 및 미리보기 설정
-      itemImageUrl.value = response.data;
-      previewImageUrl.value = response.data;
-    } catch (error) {
-      console.error('파일 업로드 실패:', error);
-      alert('파일 업로드에 실패했습니다.');
-    }
-  }
 };
 
 // 품목 구분 데이터 가져오기
@@ -127,63 +88,96 @@ const fetchAllWarehouses = async () => {
   }
 };
 
-// 품목 등록 처리
-const registerItems = async () => {
-  if (!validateForm()) return;
-
-  const payload = {
-    userSeq: 1,
-    itemUnitSeq: itemUnitSeq.value,
-    itemName: itemName.value,
-    itemDivision: itemDivision.value,
-    itemExpirationHour: itemExpiration.value,
-    itemImageUrl: itemImageUrl.value,
-    itemPrice: itemPrice.value,
-    itemNote: itemNote.value,
-    warehouseSeq: warehouseSeq.value,
-    bomItemList: bomItems.value,
-  };
-
-  try {
-    isLoading.value = true;
-    await axios.post('item', payload); // 상대 경로 사용
-    alert('품목이 성공적으로 등록되었습니다.');
-    await router.push("/item");
-  } catch (error) {
-    console.error('품목 등록 실패:', error);
-    alert('품목 등록에 실패했습니다.');
-  } finally {
-    isLoading.value = false;
+// 파일 업로드 핸들러 추가
+const handleFileUpload = (event) => {
+  const file = event.target.files[0];
+  if (file) {
+    itemImageUrl.value = file.name; // 파일 이름 표시
+    previewImageUrl.value = URL.createObjectURL(file); // 이미지 미리보기 URL 생성
   }
 };
 
-// 품목 수정 처리
-const updateItem = async () => {
+const registerItems = async () => {
   if (!validateForm()) return;
 
-  const payload = {
+  const formData = new FormData();
+
+  formData.append('itemCreateRequest', JSON.stringify( {
     userSeq: 1,
     itemUnitSeq: itemUnitSeq.value,
     itemName: itemName.value,
     itemDivision: itemDivision.value,
     itemExpirationHour: itemExpiration.value,
-    itemImageUrl: itemImageUrl.value,
     itemPrice: itemPrice.value,
     itemNote: itemNote.value,
     warehouseSeq: warehouseSeq.value,
-    bomItemList: bomItems.value,
-  };
+
+    bomItemList: bomItems.value
+  }))
+
+  // 파일 추가
+  console.log(fileInput.value.files[0]);
+  if (fileInput.value.files[0]) {
+    formData.append('file', fileInput.value.files[0]);
+  }
 
   try {
-    isLoading.value = true;
-    await axios.put(`item/${props.itemDTO.itemSeq}`, payload); // 상대 경로 사용
-    alert('품목 수정이 완료되었습니다.');
-    await router.push("/item");
+
+    const response = await axios.post('item', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      }
+    });
+
+    if (response.status === 201) {
+      alert('품목이 성공적으로 등록되었습니다.');
+      await router.push("/item");
+    }
+  } catch (error) {
+    console.error('품목 등록 실패:', error);
+    alert('품목 등록에 실패했습니다.');
+  }
+};
+
+const updateItem = async () => {
+  if (!validateForm()) return;
+
+  const formData = new FormData();
+  const requestData = {
+    userSeq: 1,
+    itemUnitSeq: itemUnitSeq.value,
+    itemName: itemName.value,
+    itemDivision: itemDivision.value,
+    itemExpirationHour: itemExpiration.value,
+    itemPrice: itemPrice.value,
+    itemNote: itemNote.value,
+    warehouseSeq: warehouseSeq.value,
+
+    bomItemList: bomItems.value
+  };
+
+  const file = fileInput.value.files[0];
+  if (!file) {
+    alert('파일을 선택해주세요');
+    return;
+  }
+
+  formData.append('file', file);
+  formData.append('request', JSON.stringify(requestData));
+
+  try {
+
+    // 토큰 없이 직접 요청
+    const response = await axios.put(`item/${props.itemDTO.itemSeq}`, formData, {
+    });
+
+    if (response.status === 200) {
+      alert('품목이 성공적으로 수정되었습니다.');
+      await router.push("/item");
+    }
   } catch (error) {
     console.error('품목 수정 실패:', error);
     alert('품목 수정에 실패했습니다.');
-  } finally {
-    isLoading.value = false;
   }
 };
 
@@ -373,14 +367,7 @@ const itemDivisionMap = {
         <!-- 파일 선택 -->
         <b-form-group label-cols="3" label-size="default" label="이미지" label-for="itemImage">
           <b-input-group size="sm">
-            <input
-                type="file"
-                id="itemImage"
-                ref="fileInput"
-                accept="image/*"
-                style="display: none"
-                @change="handleFileUpload"
-            />
+            <input type="file" id="itemImage" ref="fileInput" accept="image/*" style="display: none" @change="handleFileUpload"/>
             <b-button
                 size="sm"
                 variant="light"
@@ -445,7 +432,7 @@ const itemDivisionMap = {
   <!-- 버튼 그룹 -->
   <div class="d-flex justify-content-end mt-3">
     <b-button v-if="props.itemDTO" @click="updateItem" variant="light" size="sm" class="button ms-2">수정</b-button>
-    <b-button v-else :disabled="isLoading" @click="registerItems" variant="light" size="sm" class="button ms-2">등록</b-button>
+    <b-button v-else @click="registerItems" variant="light" size="sm" class="button ms-2">등록</b-button>
   </div>
 
   <!-- bomItemModal -->

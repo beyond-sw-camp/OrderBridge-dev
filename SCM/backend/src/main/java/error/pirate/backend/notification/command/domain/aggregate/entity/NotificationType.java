@@ -12,7 +12,9 @@ public enum NotificationType {
     purchase("구매서"),
     purchaseOrder("발주서"),
     shippingInstruction("출하지시서"),
-    shippingSlip("출하전표");
+    shippingSlip("출하전표"),
+    workOrder("작업지시서"),
+    productionDisbursement("생산불출");
 
     private final String value;
 

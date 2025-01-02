@@ -8,5 +8,10 @@ export default [
         path: "/invoice/input",
         name: "InvoiceInput",
         component: () => import("@/views/invoice/InvoiceInputView.vue")
+    },
+    {
+        path: "/invoice/situation",
+        name: "InvoiceSituation",
+        component: () => import("@/views/invoice/InvoiceSituationView.vue")
     }
 ]

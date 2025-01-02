@@ -7,6 +7,7 @@ import Swal from "sweetalert2";
 const props = defineProps({
   isVisible: Boolean,
   purchaseOrder: Object,
+  isList: Boolean,
 });
 
 // 부모에서 넘어오는 발주서 시퀀스로 이미지를 가져옴
@@ -145,7 +146,7 @@ const clearCanvas = () => {
         <div class="modal-body" id="print-area-purchaseOrder">
           <div class="d-flex justify-content-between">
             <button class="btn-print" @click="printPage">출력</button>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @click="closePrintModal" ></button>
+            <button type="button" class="btn-close btn-print" data-bs-dismiss="modal" aria-label="Close" @click="closePrintModal" ></button>
           </div>
 
           <div class="container mt-4">
@@ -180,7 +181,9 @@ const clearCanvas = () => {
                   <img class="image-item" v-if="notification.notificationImageUrl != undefined" :src="notification.notificationImageUrl" alt="승인자 서명" style="width: 100px; height: auto;" />
                   <span v-else>
                     (서명 또는 인)
+                    <template v-if="!isList">
                      <input type="button" class="btn-print" @click="openModal(notification)" value="결재하기">
+                    </template>
                   </span>
 
 
@@ -323,8 +326,7 @@ const clearCanvas = () => {
   width: 100%;
   height: 100%;
   background-color: rgba(0, 0, 0, 0.7);
-  align-items: center;
-  justify-content: center;
+  overflow-y: scroll;
   z-index: 1000;
 }
 
