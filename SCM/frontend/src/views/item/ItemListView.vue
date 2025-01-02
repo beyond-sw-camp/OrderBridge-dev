@@ -62,12 +62,14 @@ const findItemsByFilter = async () => {
     });
 
     rows.value = response.data.totalElements;
-    items.value = response.data.content;
+    // 여기서 DELETED 상태가 아닌 아이템만 필터링
+    items.value = response.data.content.filter(item => item.itemStatus !== 'DELETED');
     loadingImages.value = new Set(items.value.map((item) => item.itemSeq));
   } catch (error) {
     console.error("데이터 불러오기 실패:", error);
   }
 };
+
 const handleImageLoad = (itemSeq) => {
   loadingImages.value.delete(itemSeq);
 };
@@ -127,10 +129,27 @@ const handleItemUpdate = (itemSeq) => {
 
 const itemDelete = async (itemSeq) => {
   try {
-    await axios.delete(`item/${itemSeq}`);
-    findItemsByFilter();
+    const token = localStorage.getItem('accessToken');
+    const response = await axios.delete(`item/${itemSeq}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      data: {
+        itemSeq: itemSeq,
+        itemStatus: 'DELETED'
+      }
+    });
+
+    if (response.data) {
+      alert('삭제되었습니다.');
+      // DELETED 상태가 아닌 아이템만 필터링
+      const updatedResponse = await axios.get('item');
+      items.value = updatedResponse.data.filter(item => item.itemStatus !== 'DELETED');
+    }
   } catch (error) {
-    alert(`품목 삭제 실패`);
+    console.error('삭제 실패:', error);
+    alert('삭제에 실패했습니다.');
   }
 };
 </script>

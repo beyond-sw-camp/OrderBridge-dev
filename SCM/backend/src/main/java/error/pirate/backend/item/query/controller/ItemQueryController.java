@@ -1,13 +1,13 @@
 package error.pirate.backend.item.query.controller;
 
-import error.pirate.backend.item.command.application.dto.BomItemDTO;
 import error.pirate.backend.item.command.domain.aggregate.entity.ItemDivision;
+import error.pirate.backend.item.command.domain.aggregate.entity.ItemUnit;
 import error.pirate.backend.item.query.dto.*;
 import error.pirate.backend.item.query.service.ItemQueryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/v1/item")
 @RequiredArgsConstructor
 @Tag(name = "Item", description = "품목 관리")
+@Slf4j
 public class ItemQueryController {
 
     private final ItemQueryService itemQueryService;
@@ -38,7 +39,7 @@ public class ItemQueryController {
         if (page < 0) page = 0;
         if (size <= 0) size = 8;
 
-
+        log.info("품목 조회");
         // 필터링 및 페이징 요청 객체 생성
         ItemFilterRequest itemFilterRequest = new ItemFilterRequest(page, size, itemName, itemDivisions, minExpirationHour, maxExpirationHour);
 
@@ -75,13 +76,6 @@ public class ItemQueryController {
     @Operation(summary = "품목 분류 조회")
     public ResponseEntity<List<ItemDivision.ItemDivisionResponse>> readItemDivision() {
         return ResponseEntity.ok(ItemDivision.readItemDivisionList());
-    }
-
-    @GetMapping("/bom-item/{itemSeq}")
-    @Operation(summary = "bom 품목 조회")
-    public ResponseEntity<List<BomItemDTO>> readBomItems(@PathVariable Long itemSeq) {
-        List<BomItemDTO> bomItems = itemQueryService.readBomItems(itemSeq);
-        return ResponseEntity.ok(bomItems);
     }
 }
 

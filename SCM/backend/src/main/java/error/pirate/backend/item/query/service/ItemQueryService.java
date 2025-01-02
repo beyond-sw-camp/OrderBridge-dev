@@ -62,7 +62,9 @@ public class ItemQueryService {
                 itemFilterRequest.getMaxExpirationHour(),
                 itemFilterRequest.getSize(),
                 offset
+
         );
+
 
         Map<String, Object> result = new HashMap<>();
         result.put("content", items);

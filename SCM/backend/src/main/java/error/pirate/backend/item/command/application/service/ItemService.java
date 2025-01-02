@@ -72,19 +72,16 @@ public class ItemService {
     }
 
     @Transactional
-    public void updateItem(Long itemSeq, ItemUpdateRequest request) {
-
-        // userSeq는 나중에 토큰에서 빼올 것
-        // Long loginUserSeq = CustomUtil.getUserSeq();
-
-        Long loginUserSeq = 1L;
-
+    public void updateItem(Long itemSeq, ItemUpdateRequest request, MultipartFile file) throws IOException {
         // 기존 품목 조회
         Item item = itemRepository.findById(itemSeq)
                 .orElseThrow(() -> new CustomException(ErrorCodeType.ITEM_NOT_FOUND));
-        if(!ItemStatus.ACTIVE.equals(item.getItemStatus())) {
+        if (!ItemStatus.ACTIVE.equals(item.getItemStatus())) {
             throw new CustomException(ErrorCodeType.ITEM_STATUS_ERROR);
         }
+
+        User user = userRepository.findById(request.getUserSeq())
+                .orElseThrow(() -> new CustomException(ErrorCodeType.USER_NOT_FOUND));
 
         ItemUnit itemUnit = itemUnitRepository.findById(request.getItemUnitSeq())
                 .orElseThrow(() -> new IllegalArgumentException("Invalid itemUnitSeq: " + request.getItemUnitSeq()));
@@ -92,13 +89,20 @@ public class ItemService {
         Warehouse warehouse = warehouseRepository.findById(request.getWarehouseSeq())
                 .orElseThrow(() -> new CustomException(ErrorCodeType.WAREHOUSE_NOT_FOUND));
 
-        item.updateItem(itemUnit, warehouse, request);
+        // 파일 업로드 처리
+        if (file != null && !file.isEmpty()) {
+            String itemImageUrl = fileUploadUtil.uploadFile(file);
+            item.setItemImageUrl(itemImageUrl);
+        }
+
+        item.updateItem(user, itemUnit, warehouse, request);
+        itemRepository.save(item);
 
 
         /* bom 수정 로직
-        * 1. 해당 부모 item의 bom 전체 삭제
-        * 2. bom 재등록
-        * */
+         * 1. 해당 부모 item의 bom 전체 삭제
+         * 2. bom 재등록
+         * */
         bomItemRepository.deleteAllByParentItem(item);
 
         if(NullCheck.nullCheck(request.getBomItemList())) {

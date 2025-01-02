@@ -57,7 +57,7 @@ public class Item {
     @Enumerated(EnumType.STRING)
     private ItemStatus itemStatus = ItemStatus.ACTIVE;
 
-    public void updateItem(ItemUnit itemUnit, Warehouse warehouse, ItemUpdateRequest request) {
+    public void updateItem(User user, ItemUnit itemUnit, Warehouse warehouse, ItemUpdateRequest request) {
         if(itemUnit != null) {
             this.itemUnit = itemUnit;
         }
@@ -86,6 +86,9 @@ public class Item {
     // 품목 삭제 메서드
     public void delete() {
         this.itemStatus = ItemStatus.DELETED;
+    }
+
+    public void setItemImageUrl(String ignoredItemImageUrl) {
     }
 }
 
