@@ -333,6 +333,8 @@ const updateWorkOrder = async (workOrderSeq) => {
       alert('하위품목 정보가 존재하지 않습니다.');
     } else if (error.response.data.errorCode === 'STOCK_ERROR_001') {
       alert('재료가 부족해 작업지시가 불가능합니다.\n 발주서를 작성해 재료를 먼저 구매해주세요.');
+    } else if (error.response.data.errorCode === 'SECURITY_ERROR_001') {
+      alert('작성자만 수정 가능합니다.');
     } else {
       alert('수정에 실패했습니다. 다시 시도해주세요.');
     }

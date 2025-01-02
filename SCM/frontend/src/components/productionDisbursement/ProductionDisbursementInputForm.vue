@@ -283,6 +283,8 @@ const updateProductionDisbursement = async (productionDisbursementSeq) => {
       alert('불출일은 납기일보다 전이고, 작업지시일 이후여야 합니다.');
     } else if (error.response.data.errorCode === 'STOCK_ERROR_001') {
       alert(error.response.data.message);
+    } else if (error.response.data.errorCode === 'SECURITY_ERROR_001') {
+      alert('작성자만 수정 가능합니다.');
     } else {
       alert('수정에 실패했습니다. 다시 시도해주세요.');
     }
