@@ -122,18 +122,6 @@ function chatbotOn() {
               <li><RouterLink to="/productionReceiving" class="dropdown-item">생산입고 관리</RouterLink></li>
             </ul>
           </li>
-          <li class="nav-item dropdown">
-            <a class="nav-link" href="" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              <statisticsIcon class="icon"/>통계
-            </a>
-            <ul class="dropdown-menu">
-              <li><RouterLink to="" class="dropdown-item">재고관리 현황</RouterLink></li>
-              <li><RouterLink to="" class="dropdown-item">영업관리 현황</RouterLink></li>
-              <li><RouterLink to="" class="dropdown-item">구매관리 현황</RouterLink></li>
-              <li><RouterLink to="/productionReceiving/situation" class="dropdown-item">생산입고 현황</RouterLink></li>
-              <li><RouterLink to="" class="dropdown-item">기타 현황</RouterLink></li>
-            </ul>
-          </li>
         </ul>
         <ul class="navbar-nav mb-lg-0 d-flex flex-row">
           <li class="nav-item"><RouterLink to="#" class="nav-link" @click.prevent="fetchNotifications"><notificationIcon class="icon-right"/></RouterLink></li>
