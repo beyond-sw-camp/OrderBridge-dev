@@ -1,5 +1,6 @@
 <script setup>
 import {defineProps, ref, watch} from 'vue';
+import { sConfirm } from '@/common/salert';
 import searchIcon from "@/assets/searchIcon.svg";
 import trashIcon from "@/assets/trashIcon.svg";
 import editIcon from "@/assets/editIcon.svg";
@@ -91,15 +92,15 @@ const itemEdit = (seq) => {
   emit('itemEditEvent', seq);
 }
 
-const itemDelete = (seq) => {
-  const result = confirm("정말 삭제하시겠습니까?");
+const itemDelete = async (seq) => {
+  const result = await sConfirm("정말 삭제하시겠습니까?");
   if (result) {
     emit('itemDeleteEvent', seq);
   }
 }
 
-const shippingSlipRegister = (seq) => {
-  const result = confirm("출하전표를 등록하시겠습니까?");
+const shippingSlipRegister = async (seq) => {
+  const result = await sConfirm("출하전표를 등록하시겠습니까?");
   if (result) {
     emit('shippingSlipRegisterEvent', seq);
   }

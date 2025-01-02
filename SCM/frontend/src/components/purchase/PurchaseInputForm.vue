@@ -1,5 +1,6 @@
 <script setup>
 import {computed, defineProps, onMounted, ref, watch} from "vue";
+import { sSuccess, sWarning } from '@/common/salert';
 import searchIcon from '@/assets/searchIcon.svg'
 import dayjs from "dayjs";
 import axios from "@/axios.js";
@@ -91,7 +92,7 @@ const removeItem = (salesOrderSeq) => {
   delete purchaseItemList.value[salesOrderSeq];
 };
 
-const addToOrderList = (purchaseOrder) => {
+const addToOrderList = async (purchaseOrder) => {
   const existingItem = purchaseList.value.find(
       (item) => item.itemSeq === purchaseOrder.purchaseOrderSeq
   );
@@ -116,19 +117,19 @@ const addToOrderList = (purchaseOrder) => {
       });
     };
   } else {
-    alert("이미 추가된 주문입니다.");
+    await sWarning("이미 추가된 주문입니다.");
   }
 
   closeModal();
 };
 
-function validationCheck() {
+async function validationCheck() {
   if(document.getElementById('workOrder').value === '') {
-    alert("발주서를 선택해주세요.");
+    await sWarning("발주서를 선택해주세요.");
     return false;
   }
   if(document.getElementById('purchaseContractDate').value === '') {
-    alert("구매 계약일을 선택해주세요.")
+    await sWarning("구매 계약일을 선택해주세요.")
     return false;
   }
 
@@ -148,12 +149,12 @@ const createPurchase = async () => {
             purchaseItemDtoList: purchaseItemList.value,
           });
 
-      alert('구매서가 등록되었습니다!');
+      await sSuccess('구매서가 등록되었습니다!');
       await router.push('/purchase')
 
     } catch (error) {
       if(error.response.data.errorCode == "PURCHASE_ERROR_001") {
-        alert("발주서의 상태가 결재후일 때만 등록이 가능합니다.");
+        await sWarning("발주서의 상태가 결재후일 때만 등록이 가능합니다.");
       }
       console.error('구매서 등록 실패', error);
       throw error;

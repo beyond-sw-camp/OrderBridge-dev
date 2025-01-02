@@ -1,5 +1,6 @@
 <script setup>
 import { onMounted, ref, watch } from 'vue';
+import { sSuccess, sError, sConfirm } from '@/common/salert';
 import axios from "@/axios";
 import { BInputGroup, BFormInput, BButton } from 'bootstrap-vue-3';
 import dayjs from "dayjs";
@@ -61,15 +62,15 @@ const toggleDetail = async (client) => {
 };
 
 const deleteClient = async (seq) => {
-  const result = confirm("정말 삭제하시겠습니까?");
+  const result = await sConfirm("정말 삭제하시겠습니까?");
   if (result) {
     try {
       await axios.delete(`client/${seq}`);
-      alert('거래처가 삭제되었습니다.');
+      await sSuccess('거래처가 삭제되었습니다.');
       findClientsByFilter();
     } catch (error) {
       console.error("삭제 실패:", error);
-      alert('삭제에 실패했습니다.');
+      await sError('삭제에 실패했습니다.');
     }
   }
 };

@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue';
-import { sConfirm } from "@/common/salert";
+import { sConfirm, sError, sSuccess } from "@/common/salert";
 import searchIcon from "@/assets/searchIcon.svg"
 import trashIcon from "@/assets/trashIcon.svg";
 import editIcon from "@/assets/editIcon.svg";
@@ -112,9 +112,11 @@ const deleteQuotation = async (quotationSeq) => {
         if (deleteConfirm) {
             const response = await axios.delete(`quotation/${quotationSeq}`);
             fetchQuotationList();
+            await sSuccess(`견적서가 삭제되었습니다.`);
         }
     } catch (error) {
         console.log(`견적서 삭제 요청 실패 ${error}`);
+        await sError(`견적서 삭제에 실패했습니다.`);
     }
 }
 

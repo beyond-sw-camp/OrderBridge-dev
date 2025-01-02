@@ -1,6 +1,6 @@
 <script setup>
 import { onMounted, ref, watch } from 'vue';
-import { sError } from "@/common/salert";
+import { sServerError } from "@/common/salert";
 import axios from "@/axios.js";
 import dayjs from "dayjs";
 import searchIcon from "@/assets/searchIcon.svg";
@@ -26,7 +26,7 @@ const fetchSalesOrderSituationList = async () => {
         salesOrderSituationList.value = response.data;
     } catch (error) {
         console.error(`주문서 현황 불러오기 실패`, error);
-        await sError(error);
+        await sServerError(error);
     }
 };
 

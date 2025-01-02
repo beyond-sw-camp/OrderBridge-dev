@@ -1,5 +1,6 @@
 <script setup>
 import {ref, onMounted, watch, defineProps} from 'vue';
+import { sSuccess, sError, sServerError, sWarning } from '@/common/salert';
 import axios from '@/axios';
 import searchIcon from '@/assets/searchIcon.svg';
 import dayjs from 'dayjs';
@@ -218,26 +219,26 @@ const createProductionDisbursement = async () => {
       itemRequests: formData.value.itemRequests // BOM 기반 품목 리스트
     });
     console.log(response.data);
-    alert('생산불출이 등록되었습니다!');
+    await sSuccess('생산불출이 등록되었습니다!');
     await router.push('/production-disbursement')
 
   } catch (error) {
     console.error("생산불출 등록 실패 :", error);
 
     if (error.response.data.errorCode === 'PRODUCTION_DISBURSEMENT_ERROR_004') {
-      alert('불출일을 입력해주세요');
+      await sWarning('불출일을 입력해주세요');
     } else if (error.response.data.errorCode === 'PRODUCTION_DISBURSEMENT_ERROR_003') {
-      alert(error.response.data.message);
+      await sServerError(error);
     } else if (error.response.data.errorCode === 'COMMON_ERROR_002') {
-      alert('불출일은 작업지시일 이후고, 작업목표일 전이어야 합니다.');
+      await sWarning('불출일은 작업지시일 이후고, 작업목표일 전이어야 합니다.');
     } else if (error.response.data.errorCode === 'STOCK_ERROR_001') {
-      alert(error.response.data.message);
+      await sServerError(error);
     } else if (error.response.data.errorCode === 'PRODUCTION_DISBURSEMENT_ERROR_001') {
-      alert(error.response.data.message);
+      await sServerError(error);
     } else if (error.response.data.errorCode === 'WORK_ORDER_STATE_BAD_REQUEST') {
-      alert('작업지시서의 상태가 결재 후일때만 등록 가능합니다.');
+      await sWarning('작업지시서의 상태가 결재 후일때만 등록 가능합니다.');
     } else {
-      alert('등록에 실패했습니다. 다시 시도해주세요.');
+      await sError('등록에 실패했습니다. 다시 시도해주세요.');
     }
   }
 };
@@ -266,27 +267,27 @@ const updateProductionDisbursement = async (productionDisbursementSeq) => {
       itemRequests: formData.value.itemRequests // BOM 기반 품목 리스트
     });
     console.log('itemRequests: ',formData.value.itemRequests);
-    alert('생산불출이 수정되었습니다!');
+    await sSuccess('생산불출이 수정되었습니다!');
     await router.push('/production-disbursement')
 
   } catch (error) {
     console.error("생산불출 수정 실패 :", error);
     if (error.response.data.errorCode === 'PRODUCTION_DISBURSEMENT_ERROR_002') {
-      alert('생산불출의 상태가 불출 전일때만 수정 가능합니다.');
+      await sWarning('생산불출의 상태가 불출 전일때만 수정 가능합니다.');
     } else if (error.response.data.errorCode === 'PRODUCTION_DISBURSEMENT_ERROR_003') {
-      alert(error.response.data.message);
+      await sServerError(error);
     } else if (error.response.data.errorCode === 'PRODUCTION_DISBURSEMENT_ERROR_004') {
-      alert('불출일을 입력해주세요');
+      await sWarning('불출일을 입력해주세요');
     } else if (error.response.data.errorCode === 'COMMON_ERROR_002') {
-      alert('불출일은 납기일보다 전이고, 작업지시일 이후여야 합니다.');
+      await sWarning('불출일은 납기일보다 전이고, 작업지시일 이후여야 합니다.');
     }else if (error.response.data.errorCode === 'COMMON_ERROR_002') {
-      alert('불출일은 납기일보다 전이고, 작업지시일 이후여야 합니다.');
+      await sWarning('불출일은 납기일보다 전이고, 작업지시일 이후여야 합니다.');
     } else if (error.response.data.errorCode === 'STOCK_ERROR_001') {
-      alert(error.response.data.message);
+      await sServerError(error);
     } else if (error.response.data.errorCode === 'SECURITY_ERROR_001') {
-      alert('작성자만 수정 가능합니다.');
+      await sWarning('작성자만 수정 가능합니다.');
     } else {
-      alert('수정에 실패했습니다. 다시 시도해주세요.');
+      await sError('수정에 실패했습니다. 다시 시도해주세요.');
     }
   }
 };

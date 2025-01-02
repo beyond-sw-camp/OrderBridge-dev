@@ -1,5 +1,6 @@
 <script setup>
 import {onMounted, ref, watch} from 'vue';
+import { sSuccess, sError, sConfirm } from '@/common/salert';
 import axios from "@/axios.js";
 import searchIcon from "@/assets/searchIcon.svg";
 import trashIcon from "@/assets/trashIcon.svg";
@@ -148,16 +149,16 @@ function register() {
 }
 
 const itemDelete = async (seq) => {
-  const result = confirm("정말 삭제하시겠습니까?");
+  const result = await sConfirm("정말 삭제하시겠습니까?");
   if (result) {
     try {
       const response = await axios.delete(`purchase/${seq}`);
-      alert('구매서의 상태가 변경되었습니다.');
+      await sSuccess('구매서의 상태가 변경되었습니다.');
 
       search(); // 삭제 후 목록 갱신
     } catch (error) {
       console.error("삭제 요청 실패:", error);
-      alert('삭제에 실패했습니다. 다시 시도해주세요.');
+      await sError('삭제에 실패했습니다. 다시 시도해주세요.');
     }
   }
 };

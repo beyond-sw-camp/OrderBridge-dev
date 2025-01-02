@@ -1,5 +1,6 @@
 <script setup>
 import {onMounted, ref, computed, watch} from "vue";
+import { sSuccess, sWarning } from '@/common/salert';
 import plusIcon from '@/assets/plus.svg'
 import axios from "@/axios.js";
 import router from "@/router/index.js";
@@ -107,7 +108,7 @@ const removeItem = (itemSeq) => {
   );
 };
 
-const addToOrderList = (selectedOrder) => {
+const addToOrderList = async (selectedOrder) => {
   const existingItem = addPurchaseOrderItemList.value.find(
       (item) => item.itemSeq === selectedOrder.itemSeq
   );
@@ -121,19 +122,19 @@ const addToOrderList = (selectedOrder) => {
       calculatePrice: (selectedOrder.itemPrice || 0) * (selectedOrder.salesOrderItemQuantity || 1) ,
     });
   } else {
-    alert("이미 추가된 품목입니다.");
+    await sWarning("이미 추가된 품목입니다.");
   }
 
   closeItemModal();
 };
 
-function validationCheck() {
+async function validationCheck() {
   if(document.getElementById('purchaseOrderDueDate').value === '') {
-    alert("계약 납기일을 선택해주세요.");
+    await sWarning("계약 납기일을 선택해주세요.");
     return false;
   }
   if(document.getElementById('purchaseOrderTargetDueDate').value === '') {
-    alert("목표 납기일을 선택해주세요.")
+    await sWarning("목표 납기일을 선택해주세요.")
     return false;
   }
 
@@ -155,7 +156,7 @@ const createPurchaseOrder = async () => {
           });
 
       console.log(response);
-      alert('발주서가 등록되었습니다');
+      await sSuccess('발주서가 등록되었습니다');
       // 조회 페이지 이동
       await router.push('/purchaseOrder')
 
