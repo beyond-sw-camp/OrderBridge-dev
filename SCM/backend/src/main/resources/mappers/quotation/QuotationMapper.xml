@@ -138,7 +138,8 @@
             SUM(tb_quotation_item.quotation_item_quantity * tb_quotation_item.quotation_item_price) AS quotation_extended_price,
             SUM(tb_quotation_item.quotation_item_quantity) AS quotation_total_quantity
         FROM tb_quotation_item
-        WHERE tb_quotation_item.quotation_seq = #{quotationSeq}
+        WHERE tb_quotation.quotation_status NOT IN ("DELETE")
+        AND tb_quotation_item.quotation_seq = #{quotationSeq}
     </select>
 
     <!--  견적서 목록 엑셀 다운로드  -->
