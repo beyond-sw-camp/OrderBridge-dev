@@ -295,7 +295,7 @@ const updateProductionReceiving = async () => {
       </div>
       <!-- 확인 버튼 -->
       <div class="mx-5 my-3 d-flex justify-content-end">
-        <b-button v-if="props" @click="updateProductionReceiving" variant="light" size="sm" class="button ms-2">수정</b-button>
+        <b-button v-if="props.productionReceivingDetail" @click="updateProductionReceiving" variant="light" size="sm" class="button ms-2">수정</b-button>
         <b-button v-else @click="createProductionReceiving" variant="light" size="sm" class="button ms-2">등록</b-button>
 
       </div>

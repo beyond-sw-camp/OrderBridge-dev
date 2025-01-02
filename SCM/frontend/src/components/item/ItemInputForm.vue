@@ -103,7 +103,6 @@ const registerItems = async () => {
   const formData = new FormData();
 
   formData.append('itemCreateRequest', JSON.stringify( {
-    userSeq: 1,
     itemUnitSeq: itemUnitSeq.value,
     itemName: itemName.value,
     itemDivision: itemDivision.value,
@@ -116,7 +115,6 @@ const registerItems = async () => {
   }))
 
   // 파일 추가
-  console.log(fileInput.value.files[0]);
   if (fileInput.value.files[0]) {
     formData.append('file', fileInput.value.files[0]);
   }
@@ -143,8 +141,8 @@ const updateItem = async () => {
   if (!validateForm()) return;
 
   const formData = new FormData();
-  const requestData = {
-    userSeq: 1,
+
+  formData.append('itemUpdateRequest', JSON.stringify( {
     itemUnitSeq: itemUnitSeq.value,
     itemName: itemName.value,
     itemDivision: itemDivision.value,
@@ -154,21 +152,20 @@ const updateItem = async () => {
     warehouseSeq: warehouseSeq.value,
 
     bomItemList: bomItems.value
-  };
+  }))
 
-  const file = fileInput.value.files[0];
-  if (!file) {
-    alert('파일을 선택해주세요');
-    return;
+  // 파일 추가
+  if (fileInput.value.files[0]) {
+    formData.append('file', fileInput.value.files[0]);
   }
-
-  formData.append('file', file);
-  formData.append('request', JSON.stringify(requestData));
 
   try {
 
     // 토큰 없이 직접 요청
     const response = await axios.put(`item/${props.itemDTO.itemSeq}`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      }
     });
 
     if (response.status === 200) {
