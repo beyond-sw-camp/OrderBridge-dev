@@ -293,8 +293,8 @@ function numberThree(number) {
                                 </div>
                                 
                                 <div class="d-flex justify-content-end align-items-center">
-                                    <printIcon class="me-3 icon" @click.stop="printSalesOrder(salesOrder.salesOrderSeq)"/>
-                                    <editIcon class="me-3 icon" @click.stop="modifySalesOrder(salesOrder.salesOrderSeq)"/>
+                                    <!--printIcon class="me-3 icon" @click.stop="printSalesOrder(salesOrder.salesOrderSeq)"/>
+                                    <editIcon class="me-3 icon" @click.stop="modifySalesOrder(salesOrder.salesOrderSeq)"/-->
                                     <trashIcon class="icon" @click.stop="deleteSalesOrder(salesOrder.salesOrderSeq)"/>
                                 </div>
                             </div>
