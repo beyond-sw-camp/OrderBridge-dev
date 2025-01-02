@@ -16,6 +16,7 @@ import PurchaseOrderPrintPreviewModal from "@/components/purchaseOrder/PurchaseO
 import ShippingInstructionPrintPreview from "@/components/shippingInstruction/ShippingInstructionPrintPreview.vue";
 import ShippingSlipPrintPreview from "@/components/shippingSlip/ShippingSlipPrintPreview.vue";
 import ProductionDisbursementPrintPreview from "@/components/productionDisbursement/ProductionDisbursementPrintPreview.vue";
+import WorkOrderPrintPreview from "@/components/workOrder/WorkOrderPrintPreview.vue";
 
 const userStore = useUserStore();
 const notificationList = ref([]);
@@ -191,10 +192,18 @@ function chatbotOn() {
     <ProductionDisbursementPrintPreview
         :isVisible="isModalVisible"
         :productionDisbursement="selectedData"
+        :isList=false
         @close="closePrintPreview"
     />
   </template>
-
+  <template v-else-if="selectedNotificationType === 'workOrder'">
+    <WorkOrderPrintPreview
+        :isVisible="isModalVisible"
+        :workOrder="selectedData"
+        :isList=false
+        @close="closePrintPreview"
+    />
+  </template>
 
 </template>
 <style scoped>

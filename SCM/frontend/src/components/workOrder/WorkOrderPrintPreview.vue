@@ -7,14 +7,18 @@ import Swal from "sweetalert2";
 const props = defineProps({
   isVisible: Boolean,
   workOrder: Object,
+  isList: Boolean,
 });
+
+const seq = ref(null);
 
 // 부모에서 넘어오는 작업지시서 시퀀스로 이미지를 가져옴
 const notification  = ref('');
 const fetchImages = async () => {
 
   try {
-    const response = await axios.get( `notification/workOrder/${props.workOrder.workOrderSeq}`);
+    // const response = await axios.get( `notification/workOrder/${props.workOrder.workOrderDetail.workOrderSeq}`);
+    const response = await axios.get( `notification/workOrder/${seq.value}`);
 
     notification.value = response.data;
   } catch (error) {
@@ -24,9 +28,13 @@ const fetchImages = async () => {
 
 // 작업지시서 데이터가 조회된 후 fetchImages 실행
 watch(() => props.workOrder, (newVal) => {
-  if (newVal && newVal.workOrderSeq) {
+  if (newVal && newVal.workOrderDetail?.workOrderSeq) {
+    // if (newVal && newVal.ProductionDisbursementDetailDTO?.productionDisbursementSeq) {
+    seq.value = props.workOrder.workOrderDetail.workOrderSeq
+  // if (newVal && newVal.workOrderDetail.workOrderSeq) {
     fetchImages();
   }
+
 }, { immediate: true });
 
 const emit = defineEmits(['close']);
@@ -47,7 +55,6 @@ const printPage = () => {
 
   location.reload();
 }
-
 
 const isModalOpen = ref(false);
 const selectedNotification = ref(null);
@@ -102,8 +109,10 @@ const saveCanvas = async (selectedNotification) => {
   }
 
   // 결재서류 상태 변경
-  console.log(props.workOrder.workOrderSeq)
-  await axios.put(`workOrder/approval/${props.workOrder.workOrderSeq}`);
+  // console.log('상태변경',props.workOrder.workOrderDetail.workOrderSeq)
+  console.log('결재변경:seq.value',seq.value)
+  // await axios.put(`workOrder/approval/${props.workOrder.workOrderDetail.workOrderSeq}`);
+  await axios.put(`workOrder/approval/${seq.value}`);
 };
 
 // 드로잉 시작
@@ -147,7 +156,7 @@ const clearCanvas = () => {
         <div class="modal-body" id="print-area-workOrder">
           <div class="d-flex justify-content-between">
             <button class="btn-print" @click="printPage">출력</button>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @click="closePrintModal" ></button>
+            <button type="button" class="btn-close btn-print" data-bs-dismiss="modal" aria-label="Close" @click="closePrintModal" ></button>
           </div>
 
           <div class="container mt-4">
@@ -158,12 +167,12 @@ const clearCanvas = () => {
               <tbody>
               <tr>
                 <td class="to-column" style="height: 30px;">작업지시일자 &nbsp; : &nbsp;</td>
-                <td colspan="5" style="height: 30px;">{{ dayjs(workOrder?.workOrderIndicatedDate).format('YYYY-MM-DD') }}</td>
+                <td colspan="5" style="height: 30px;">{{ dayjs(workOrder?.workOrderDetail.workOrderIndicatedDate).format('YYYY-MM-DD') }}</td>
 
               </tr>
               <tr>
                 <td style="height: 30px;">거래처명 &nbsp; : &nbsp;</td>
-                <td colspan="5" style="height: 30px;"> &nbsp; {{ workOrder?.clientName!=null ? workOrder.clientName : '' }}</td>
+                <td colspan="5" style="height: 30px;"> &nbsp; {{ workOrder?.workOrderDetail.clientName!=null ? workOrder.workOrderDetail.clientName : '' }}</td>
               </tr>
               </tbody>
             </table>
@@ -177,13 +186,15 @@ const clearCanvas = () => {
               </tr>
               <tr>
                 <td colspan="5" style="height: 30px;">
-                  {{ workOrder?.userName }}
+                  {{ workOrder?.workOrderDetail.userName }}
                 </td>
                 <td colspan="5" style="height: 30px;" class="image-gallery">
                   <img class="image-item" v-if="notification.notificationImageUrl != undefined" :src="notification.notificationImageUrl" alt="승인자 서명" style="width: 100px; height: auto;" />
                   <span v-else>
                     (서명 또는 인)
+                    <template v-if="!isList">
                      <input type="button" class="btn-print" @click="openModal(notification)" value="결재하기">
+                    </template>
                   </span>
 
 
@@ -197,25 +208,25 @@ const clearCanvas = () => {
               <tbody v-if="workOrder">
               <tr>
                 <td class="color-column align-content-center">작업지시서명</td>
-                <td class="align-content-center">{{ workOrder.workOrderName }}</td>
+                <td class="align-content-center">{{ workOrder.workOrderDetail.workOrderName }}</td>
                 <td class="color-column align-content-center">담당사</td>
                 <td class="align-content-center">Order Bridge</td>
               </tr>
               <tr>
                 <td class="color-column align-content-center">담당자</td>
-                <td class="align-content-center">{{ workOrder.userName }}</td>
+                <td class="align-content-center">{{ workOrder.workOrderDetail.userName }}</td>
                 <td class="color-column align-content-center">연락처</td>
-                <td class="align-content-center">{{ workOrder.userPhoneNo }}</td>
+                <td class="align-content-center">{{ workOrder.workOrderDetail.userPhoneNo }}</td>
               </tr>
               <tr>
                 <td class="color-column align-content-center">작업 지시일</td>
-                <td class="align-content-center">{{ dayjs(workOrder.workOrderIndicatedDate).format('YYYY-MM-DD') }}</td>
+                <td class="align-content-center">{{ dayjs(workOrder.workOrderDetail.workOrderIndicatedDate).format('YYYY-MM-DD') }}</td>
                 <td class="color-column align-content-center">작업 목표일</td>
-                <td class="align-content-center">{{ dayjs(workOrder.workOrderDueDate).format('YYYY-MM-DD') }}</td>
+                <td class="align-content-center">{{ dayjs(workOrder.workOrderDetail.workOrderDueDate).format('YYYY-MM-DD') }}</td>
               </tr>
               <tr>
                 <td class="color-column align-content-center">생산공장명</td>
-                <td class="align-content-center" colspan="3">{{ workOrder.warehouseName }}</td>
+                <td class="align-content-center" colspan="3">{{ workOrder.workOrderDetail.warehouseName }}</td>
               </tr>
               </tbody>
             </table>
@@ -229,13 +240,14 @@ const clearCanvas = () => {
                 <th>금액</th>
               </tr>
               </thead>
-              <tbody v-if="workOrder?.workOrderItem?.length > 0">
-              <tr v-for="(workOrderItem, idx) in workOrder.workOrderItem"
-                  :key="workOrderItem.itemSeq || idx">
-                <td>{{ workOrderItem.itemName }}</td>
-                <td>{{ workOrder.workOrderIndicatedQuantity ? workOrder.workOrderIndicatedQuantity.toLocaleString() : 0 }}</td>
-                <td>{{ workOrderItem.itemPrice ? workOrderItem.itemPrice.toLocaleString() : 0 }}</td>
-                <td>{{ (workOrderItem.itemPrice * workOrder.workOrderIndicatedQuantity).toLocaleString() }}</td>
+              <tbody v-if="workOrder?.workOrderItem">
+              <tr>
+<!--              <tr v-for="(item, idx) in workOrder.workOrderItem"-->
+<!--                  :key="item.itemSeq || idx">-->
+                <td>{{ workOrder.workOrderItem.itemName }}</td>
+                <td>{{ workOrder.workOrderDetail.workOrderIndicatedQuantity ? workOrder.workOrderDetail.workOrderIndicatedQuantity.toLocaleString() : 0 }}</td>
+                <td>{{ workOrder.workOrderItem.itemPrice ? workOrder.workOrderItem.itemPrice.toLocaleString() : 0 }}</td>
+                <td>{{ (workOrder.workOrderItem.itemPrice * workOrder.workOrderDetail?.workOrderIndicatedQuantity).toLocaleString() }}</td>
               </tr>
               </tbody>
             </table>
@@ -320,8 +332,7 @@ const clearCanvas = () => {
   width: 100%;
   height: 100%;
   background-color: rgba(0, 0, 0, 0.7);
-  align-items: center;
-  justify-content: center;
+  overflow-y: scroll;
   z-index: 1000;
 }
 

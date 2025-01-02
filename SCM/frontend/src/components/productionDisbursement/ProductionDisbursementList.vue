@@ -29,14 +29,15 @@ const totalCount = ref(0);
 
 const isModalVisible = ref(false);
 const selectedProductionDisbursement2 = ref(null);
+const fullDetail = ref({});
 
-const openPrintPreview = (productionDisbursementDetail) => {
-  if (!productionDisbursementDetail) {
+const openPrintPreview = (productionDisbursement) => {
+  if (!productionDisbursement) {
     console.error('선택된 생산불출이 없습니다.');
     return;
   }
-  console.log('openPrintPreview 호출됨, 선택된 생산불출:', productionDisbursementDetail);
-  selectedProductionDisbursement2.value = productionDisbursementDetail;
+  console.log('openPrintPreview 호출됨, 선택된 생산불출:', productionDisbursement);
+  selectedProductionDisbursement2.value = productionDisbursement;
   isModalVisible.value = true;
 };
 
@@ -114,8 +115,10 @@ const fetchProductionDisbursementDetail = async (productionDisbursementSeq) => {
         productionDisbursementNote : response.data.productionDisbursementDetail.productionDisbursementNote,
         itemList: response.data.itemList
       }
-
       selectedProductionDisbursement.value = productionDisbursementDetail.value[productionDisbursementSeq];
+
+      fullDetail.value[productionDisbursementSeq] = response.data;
+      console.log('fullDetail',fullDetail.value[productionDisbursementSeq]);
 
       console.log(response.data.productionDisbursementDetail);
       console.log(response.data.itemList);
@@ -228,11 +231,12 @@ onMounted(() => {
   fetchProductionDisbursementList();
   fetchItemDivision();
 
-  const today = dayjs().format('YYYY-MM-DD'); // 오늘 날짜 (YYYY-MM-DD 형식)
   const startOfMonth = dayjs().startOf('month').format('YYYY-MM-DD'); // 해당 달의 첫 날
+  // const today = dayjs().format('YYYY-MM-DD'); // 오늘 날짜 (YYYY-MM-DD 형식)
+  const endOfMonth = dayjs().endOf('month').format('YYYY-MM-DD')
 
   searchStartDate.value = startOfMonth;
-  searchEndDate.value = today;
+  searchEndDate.value = endOfMonth;
 });
 
 watch([searchStartDate, searchEndDate], () => {
@@ -316,7 +320,7 @@ function search() {
                   <div v-else>{{ productionDisbursement.itemName }}</div>
                 </div>
                 <div class="list-body col-2">{{ productionDisbursement.factoryName }}</div>
-                <div class="list-body col-3">{{ dayjs(productionDisbursement.productionDisbursementDepartureDate).format('YYYY-MM-DD HH:mm:ss') }}</div>
+                <div class="list-body col-3">{{ dayjs(productionDisbursement.productionDisbursementDepartureDate).format('YYYY/MM/DD') }}</div>
                 <div class="list-body col-2">{{ findStatusValue(productionDisbursementStatusList, productionDisbursement.productionDisbursementStatus) }}</div>
 
                 <!-- 확장된 상세 정보 표시 -->
@@ -354,9 +358,8 @@ function search() {
                     </div>
 
                     <div class="d-flex justify-content-end align-items-center">
-<!--                      <printIcon class="me-3 icon" @click.stop="productionDisbursementDetailPrint(productionDisbursement.productionDisbursementSeq)"/>-->
-                      <printIcon class="me-3 icon"  v-if="productionDisbursementDetail[productionDisbursement.productionDisbursementSeq]"
-                                 @click.stop="openPrintPreview(productionDisbursementDetail[productionDisbursement.productionDisbursementSeq])"/>
+                      <printIcon class="me-3 icon"  v-if="fullDetail[productionDisbursement.productionDisbursementSeq]"
+                                 @click.stop="openPrintPreview(fullDetail[productionDisbursement.productionDisbursementSeq])"/>
                       <editIcon class="me-3 icon" @click.stop="goToEdit(productionDisbursement.productionDisbursementSeq)"/>
                       <trashIcon class="icon" @click.stop="deleteProductionDisbursement(productionDisbursement.productionDisbursementSeq)"/>
                     </div>
@@ -385,6 +388,7 @@ function search() {
   <ProductionDisbursementPrintPreview
       :isVisible="isModalVisible"
       :productionDisbursement="selectedProductionDisbursement2"
+      :isList=true
       @close="closePrintPreview"
   />
 </template>

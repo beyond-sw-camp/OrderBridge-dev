@@ -7,6 +7,7 @@ import Swal from "sweetalert2";
 const props = defineProps({
   isVisible: Boolean,
   productionDisbursement: Object,
+  isList: Boolean,
 });
 
 const seq = ref(null);
@@ -16,7 +17,6 @@ const notification  = ref('');
 const fetchImages = async () => {
 
   try {
-    // const response = await axios.get( `notification/productionDisbursement/${props.productionDisbursement.productionDisbursementSeq}`);
     const response = await axios.get( `notification/productionDisbursement/${seq.value}`);
 
     notification.value = response.data;
@@ -29,9 +29,9 @@ const fetchImages = async () => {
 
 // 생산불출 데이터가 조회된 후 fetchImages 실행
 watch(() => props.productionDisbursement, (newVal) => {
-  if (newVal && newVal.productionDisbursementSeq) {
+  if (newVal && newVal.productionDisbursementDetail?.productionDisbursementSeq) {
   // if (newVal && newVal.ProductionDisbursementDetailDTO?.productionDisbursementSeq) {
-    seq.value = props.productionDisbursement.productionDisbursementSeq
+    seq.value = props.productionDisbursement.productionDisbursementDetail.productionDisbursementSeq
     fetchImages();
   }
 }, { immediate: true });
@@ -43,7 +43,7 @@ const closePrintModal = () => {
 };
 
 const printPage = () => {
-  const printContent = document.getElementById('print-area-workOrder').innerHTML;
+  const printContent = document.getElementById('print-area-productionDisbursement').innerHTML;
   const originalContent = document.body.innerHTML; // 현재 페이지 내용 저장
 
   document.body.innerHTML = printContent;
@@ -86,8 +86,6 @@ const saveCanvas = async (selectedNotification) => {
   if (!canvas) {
     throw new Error("캔버스를 찾을 수 없습니다.");
   }
-  console.log(props.productionDisbursement.productionDisbursementSeq)
-  console.log(seq.value)
   if(confirm("결재를 승인하시겠습니까?")) {
     const imageData = canvas.toDataURL("signImage/jpg");
 
@@ -110,9 +108,7 @@ const saveCanvas = async (selectedNotification) => {
   }
 
   // 결재서류 상태 변경
-  // console.log(props.productionDisbursement.productionDisbursementSeq)
-  // console.log(seq.value)
-  // await axios.put(`productionDisbursement/approval/${props.productionDisbursement.productionDisbursementSeq}`);
+  console.log('결재변경:seq.value',seq.value)
   await axios.put(`productionDisbursement/approval/${seq.value}`);
 };
 
@@ -157,7 +153,7 @@ const clearCanvas = () => {
         <div class="modal-body" id="print-area-productionDisbursement">
           <div class="d-flex justify-content-between">
             <button class="btn-print" @click="printPage">출력</button>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @click="closePrintModal" ></button>
+            <button type="button" class="btn-close btn-print" data-bs-dismiss="modal" aria-label="Close" @click="closePrintModal" ></button>
           </div>
 
           <div class="container mt-4">
@@ -168,12 +164,12 @@ const clearCanvas = () => {
               <tbody>
               <tr>
                 <td class="to-column" style="height: 30px;">생산불출일자 &nbsp; : &nbsp;</td>
-                <td colspan="5" style="height: 30px;">{{ dayjs(productionDisbursement?.productionDisbursementDepartureDate).format('YYYY-MM-DD') }}</td>
+                <td colspan="5" style="height: 30px;">{{ dayjs(productionDisbursement?.productionDisbursementDetail.productionDisbursementDepartureDate).format('YYYY-MM-DD') }}</td>
 
               </tr>
               <tr>
                 <td style="height: 30px;">거래처명 &nbsp; : &nbsp;</td>
-                <td colspan="5" style="height: 30px;"> &nbsp; {{ productionDisbursement?.clientName!=null ? productionDisbursement.clientName : '' }}</td>
+                <td colspan="5" style="height: 30px;"> &nbsp; {{ productionDisbursement?.productionDisbursementDetail.clientName!=null ? productionDisbursement.productionDisbursementDetail.clientName : '' }}</td>
               </tr>
               </tbody>
             </table>
@@ -187,13 +183,15 @@ const clearCanvas = () => {
               </tr>
               <tr>
                 <td colspan="5" style="height: 30px;">
-                  {{ productionDisbursement?.userName }}
+                  {{ productionDisbursement?.productionDisbursementDetail.userName }}
                 </td>
                 <td colspan="5" style="height: 30px;" class="image-gallery">
                   <img class="image-item" v-if="notification.notificationImageUrl != undefined" :src="notification.notificationImageUrl" alt="승인자 서명" style="width: 100px; height: auto;" />
                   <span v-else>
                     (서명 또는 인)
+                    <template v-if="!isList">
                      <input type="button" class="btn-print" @click="openModal(notification)" value="결재하기">
+                    </template>
                   </span>
 
                 </td>
@@ -206,23 +204,23 @@ const clearCanvas = () => {
               <tbody v-if="productionDisbursement">
               <tr>
                 <td class="color-column align-content-center">불출명</td>
-                <td class="align-content-center">{{ productionDisbursement.workOrderName }}</td>
+                <td class="align-content-center">{{ productionDisbursement.productionDisbursementDetail.productionDisbursementName }}</td>
                 <td class="color-column align-content-center">담당사</td>
                 <td class="align-content-center">Order Bridge</td>
               </tr>
               <tr>
                 <td class="color-column align-content-center">담당자</td>
-                <td class="align-content-center">{{ productionDisbursement.userName }}</td>
+                <td class="align-content-center">{{ productionDisbursement.productionDisbursementDetail.userName }}</td>
                 <td class="color-column align-content-center">연락처</td>
-                <td class="align-content-center">{{ productionDisbursement.userPhoneNo }}</td>
+                <td class="align-content-center">{{ productionDisbursement.productionDisbursementDetail.userPhoneNo }}</td>
               </tr>
               <tr>
                 <td class="color-column align-content-center">생산공장명</td>
-                <td class="align-content-center" colspan="3">{{ productionDisbursement.factoryName }}</td>
+                <td class="align-content-center" colspan="3">{{ productionDisbursement.productionDisbursementDetail.factoryName }}</td>
               </tr>
               <tr>
                 <td class="color-column align-content-center">작업 목표일</td>
-                <td class="align-content-center" colspan="3">{{ dayjs(productionDisbursement.workOrderDueDate).format('YYYY-MM-DD') }}</td>
+                <td class="align-content-center" colspan="3">{{ dayjs(productionDisbursement.productionDisbursementDetail.workOrderDueDate).format('YYYY-MM-DD') }}</td>
               </tr>
               </tbody>
             </table>
@@ -248,7 +246,7 @@ const clearCanvas = () => {
               <tfoot>
               <tr>
                 <td>합계</td>
-                <td>{{ productionDisbursement?.productionDisbursementTotalQuantity ? productionDisbursement.productionDisbursementTotalQuantity.toLocaleString() : 0 }}</td>
+                <td>{{ productionDisbursement?.productionDisbursementDetail.productionDisbursementTotalQuantity ? productionDisbursement.productionDisbursementDetail.productionDisbursementTotalQuantity.toLocaleString() : 0 }}</td>
                 <td> - </td>
                 <td> - </td>
               </tr>
@@ -335,8 +333,7 @@ const clearCanvas = () => {
   width: 100%;
   height: 100%;
   background-color: rgba(0, 0, 0, 0.7);
-  align-items: center;
-  justify-content: center;
+  overflow-y: scroll;
   z-index: 1000;
 }
 

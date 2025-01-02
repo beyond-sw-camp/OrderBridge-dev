@@ -27,14 +27,15 @@ const totalCount = ref(0);
 
 const isModalVisible = ref(false);
 const selectedWorkOrder = ref(null);
+const fullDetail = ref({});
 
-const openPrintPreview = (workOrderDetail) => {
-  if (!workOrderDetail) {
+const openPrintPreview = (workOrder) => {
+  if (!workOrder) {
     console.error('선택된 작업지시서가 없습니다.');
     return;
   }
-  console.log('openPrintPreview 호출됨, 선택된 작업지시서:', workOrderDetail);
-  selectedWorkOrder.value = workOrderDetail;
+  console.log('openPrintPreview 호출됨, 선택된 작업지시서:', workOrder);
+  selectedWorkOrder.value = workOrder;
   isModalVisible.value = true;
 };
 
@@ -105,6 +106,9 @@ const fetchWorkOrderDetail = async (workOrderSeq) => {
             ? response.data.workOrderItem
             : [response.data.workOrderItem || {}],
       }
+
+      fullDetail.value[workOrderSeq] = response.data;
+      console.log('fullDetail',fullDetail.value[workOrderSeq]);
 
       console.log(response.data.workOrderDetail);
       console.log(response.data.workOrderItem);
@@ -226,11 +230,12 @@ onMounted(() => {
   fetchWorkOrderList();
   fetchItemDivision();
 
-  const today = dayjs().format('YYYY-MM-DD'); // 오늘 날짜 (YYYY-MM-DD 형식)
   const startOfMonth = dayjs().startOf('month').format('YYYY-MM-DD'); // 해당 달의 첫 날
+  // const today = dayjs().format('YYYY-MM-DD'); // 오늘 날짜 (YYYY-MM-DD 형식)
+  const endOfMonth = dayjs().endOf('month').format('YYYY-MM-DD')
 
   searchStartDate.value = startOfMonth;
-  searchEndDate.value = today;
+  searchEndDate.value = endOfMonth;
 });
 
 watch([searchStartDate, searchEndDate], () => {
@@ -314,7 +319,7 @@ function search() {
                   <div v-else>{{ workOrder.itemName }}</div>
                 </div>
                 <div class="list-body col-2">{{ workOrder.warehouseName }}</div>
-                <div class="list-body col-3">{{ dayjs(workOrder.workOrderIndicatedDate).format('YYYY-MM-DD HH:mm:ss') }}</div>
+                <div class="list-body col-3">{{ dayjs(workOrder.workOrderIndicatedDate).format('YYYY/MM/DD') }}</div>
                 <div class="list-body col-2">{{ findStatusValue(workOrderStatusList, workOrder.workOrderStatus) }}</div>
 
                 <!-- 확장된 상세 정보 표시 -->
@@ -326,9 +331,9 @@ function search() {
                     <b>담당자 : </b>{{ workOrderDetail[workOrder.workOrderSeq].userName }} <br>
                     <b>납품처명 : </b>{{ workOrderDetail[workOrder.workOrderSeq].clientName}} <br>
                     <b>작업목표일 : </b>{{ dayjs(workOrderDetail[workOrder.workOrderSeq].workOrderDueDate).format('YYYY-MM-DD HH:mm:ss') }}<br>
-                    <b>작업완료일 : </b>
-                    <div v-if ="workOrderDetail[workOrder.workOrderSeq].workOrderEndDate != null"> {{ dayjs(workOrderDetail[workOrder.workOrderSeq].workOrderEndDate).format('YYYY-MM-DD HH:mm:ss') }}</div>
-                    <div v-else> 없음</div>
+<!--                    <b>작업완료일 : </b>-->
+                    <div v-if ="workOrderDetail[workOrder.workOrderSeq].workOrderEndDate != null"> <b>작업완료일 : </b>{{ dayjs(workOrderDetail[workOrder.workOrderSeq].workOrderEndDate).format('YYYY-MM-DD HH:mm:ss') }}</div>
+                    <div v-else><b>작업완료일 : </b> -</div>
                     <b>작업지시서 비고 : </b>{{ workOrderDetail[workOrder.workOrderSeq].workOrderNote }}<br>
 
                     <!--  품목정보  -->
@@ -353,8 +358,10 @@ function search() {
                       </template>
                     </div>
                     <div class="d-flex justify-content-end align-items-center">
-                      <printIcon class="me-3 icon" v-if="workOrderDetail[workOrder.workOrderSeq]"
-                                 @click.stop="openPrintPreview(workOrderDetail[workOrder.workOrderSeq])"/>
+<!--                      <printIcon class="me-3 icon" v-if="workOrderDetail[workOrder.workOrderSeq]"-->
+<!--                                 @click.stop="openPrintPreview(workOrderDetail[workOrder.workOrderSeq])"/>-->
+                      <printIcon class="me-3 icon"  v-if="fullDetail[workOrder.workOrderSeq]"
+                                 @click.stop="openPrintPreview(fullDetail[workOrder.workOrderSeq])"/>
                       <editIcon class="me-3 icon" @click.stop="goToEdit(workOrder.workOrderSeq)"/>
                       <trashIcon class="icon" @click.stop="deleteWorkOrder(workOrder.workOrderSeq)"/>
                     </div>
@@ -383,6 +390,7 @@ function search() {
   <WorkOrderPrintPreview
       :isVisible="isModalVisible"
       :workOrder="selectedWorkOrder"
+      :isList=true
       @close="closePrintPreview"
   />
 </template>
