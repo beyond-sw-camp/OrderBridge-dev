@@ -321,8 +321,7 @@ const clearCanvas = () => {
   width: 100%;
   height: 100%;
   background-color: rgba(0, 0, 0, 0.7);
-  align-items: center;
-  justify-content: center;
+  overflow-y: scroll;
   z-index: 1000;
 }
 
