@@ -173,7 +173,7 @@ function numberThree(number) {
 </script>
 
 <template>
-    <div class="d-flex justify-content-end mt-3">
+    <div class="col-md-10 d-flex justify-content-end mt-3">
         <RouterLink to="/quotation">
             <b-button variant="light" size="sm" class="button ms-2">목록</b-button>
         </RouterLink>
@@ -211,57 +211,60 @@ function numberThree(number) {
         <hr class="col-md-10 d-flex flex-column">
     </div>
 
-    <h5 class="px-4">견적서 품목</h5>
-    <div v-for="quotationItem in quotationItemList" class="mx-5 my-3">
-        <div class="d-flex flex-row border border-secondary rounded p-3 position-relative">
-            <div class="col-md-8">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h6 class="fw-bold">{{ quotationItem.itemName }}</h6>
+    <div class="col-md-10" style="margin: 0 auto;">
+        <h5 class="px-4">견적서 품목</h5>
+        
+        <div v-for="quotationItem in quotationItemList" class="mx-5 my-3">
+            <div class="d-flex flex-row border border-secondary rounded p-3 position-relative">
+                <div class="col-md-8">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h6 class="fw-bold">{{ quotationItem.itemName }}</h6>
+                    </div>
+                    <ul class="d-flex flex-wrap align-items-start">
+                        <li class="mb-3 col-md-6">· 품목명: {{ quotationItem.itemName }}</li>
+                        <li class="mb-3 col-md-6 d-flex align-items-center">· 품목 단가: ₩ <input type="number"
+                                class="form-control form-control-sm ms-2" style="width: 100px;"
+                                v-model.number="quotationItem.quotationItemPrice"
+                                @input="updatePrice(quotationItem.itemSeq)"
+                                :placeholder="quotationItem.quotationItemPrice ? '' : '가격 입력'" :min="1" /></li>
+                        <li class="mb-3 col-md-6 d-flex align-items-center">· 주문 개수:<input type="number"
+                                class="form-control form-control-sm ms-2" style="width: 100px;"
+                                v-model.number="quotationItem.quotationItemQuantity"
+                                @input="updatePrice(quotationItem.itemSeq)"
+                                :placeholder="quotationItem.quotationItemQuantity ? '' : '수량 입력'" :min="1" /></li>
+                        <li class="mb-3 col-md-6">· 품목 총 가격: ₩ {{ numberThree(quotationItem.quotationItemPrice * quotationItem.quotationItemQuantity) }} </li>
+                        <li class="mb-3 col-md-6 d-flex">· 품목 비고: <b-form-input type="text" size="sm" v-model="quotationItem.quotationItemNote" style="width: auto;"/></li>
+                    </ul>
                 </div>
-                <ul class="d-flex flex-wrap align-items-start">
-                    <li class="mb-3 col-md-6">· 품목명: {{ quotationItem.itemName }}</li>
-                    <li class="mb-3 col-md-6 d-flex align-items-center">· 품목 단가: ₩ <input type="number"
-                            class="form-control form-control-sm ms-2" style="width: 100px;"
-                            v-model.number="quotationItem.quotationItemPrice"
-                            @input="updatePrice(quotationItem.itemSeq)"
-                            :placeholder="quotationItem.quotationItemPrice ? '' : '가격 입력'" :min="1" /></li>
-                    <li class="mb-3 col-md-6 d-flex align-items-center">· 주문 개수:<input type="number"
-                            class="form-control form-control-sm ms-2" style="width: 100px;"
-                            v-model.number="quotationItem.quotationItemQuantity"
-                            @input="updatePrice(quotationItem.itemSeq)"
-                            :placeholder="quotationItem.quotationItemQuantity ? '' : '수량 입력'" :min="1" /></li>
-                    <li class="mb-3 col-md-6">· 품목 총 가격: ₩ {{ numberThree(quotationItem.quotationItemPrice * quotationItem.quotationItemQuantity) }} </li>
-                    <li class="mb-3 col-md-6 d-flex">· 품목 비고: <b-form-input type="text" size="sm" v-model="quotationItem.quotationItemNote" style="width: auto;"/></li>
-                </ul>
+                <div class="col-md-4 d-flex justify-content-center align-items-center">
+                    <img :src="quotationItem.itemImageUrl" alt="Item Image"
+                        class="img-fluid border border-secondary rounded" style="max-width: 150px; height: auto;">
+                </div>
+
+                <b-button @click="removeItem(quotationItem.itemSeq)" variant="light" size="sm"
+                    class="position-absolute btn-close" style="top: 10px; right: 10px;"></b-button>
             </div>
-            <div class="col-md-4 d-flex justify-content-center align-items-center">
-                <img :src="quotationItem.itemImageUrl" alt="Item Image"
-                    class="img-fluid border border-secondary rounded" style="max-width: 150px; height: auto;">
+        </div>
+
+        <div v-if="calculatePrice != 0" class="line-container mx-5">
+            <div class="custom-line d-flex justify-content-end">
+                <h6 class="fw-bold" style="margin-top: 17px; float:right;">총 가격 : ₩ {{ numberThree(calculatePrice) }}
+                </h6>
             </div>
+        </div> <br />
 
-            <b-button @click="removeItem(quotationItem.itemSeq)" variant="light" size="sm"
-                class="position-absolute btn-close" style="top: 10px; right: 10px;"></b-button>
+        <span data-bs-toggle="modal" data-bs-target="#openItemModal">
+            <b-input-group-text
+                class="mx-5 my-3 d-flex justify-content-center align-items-center border border-secondary rounded p-3"
+                style="cursor: pointer;" @click="fetchItemList()">
+                <plusIcon class="icon" />
+            </b-input-group-text>
+        </span>
+
+        <div class="mx-5 my-3 d-flex justify-content-end">
+            <b-button @click="createQuotation()" variant="light" size="sm" class="button ms-2">등록</b-button>
+
         </div>
-    </div>
-
-    <div v-if="calculatePrice != 0" class="line-container mx-5">
-        <div class="custom-line d-flex justify-content-end">
-            <h6 class="fw-bold" style="margin-top: 17px; float:right;">총 가격 : ₩ {{ numberThree(calculatePrice) }}
-            </h6>
-        </div>
-    </div> <br />
-
-    <span data-bs-toggle="modal" data-bs-target="#openItemModal">
-        <b-input-group-text
-            class="mx-5 my-3 d-flex justify-content-center align-items-center border border-secondary rounded p-3"
-            style="cursor: pointer;" @click="fetchItemList()">
-            <plusIcon class="icon" />
-        </b-input-group-text>
-    </span>
-
-    <div class="mx-5 my-3 d-flex justify-content-end">
-        <b-button @click="createQuotation()" variant="light" size="sm" class="button ms-2">등록</b-button>
-
     </div>
     <div class="d-flex justify-content-center">
 

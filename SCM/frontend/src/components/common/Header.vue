@@ -168,6 +168,7 @@ function chatbotOn() {
     <PurchaseOrderPrintPreviewModal
         :isVisible="isModalVisible"
         :purchaseOrder="selectedData"
+        :isList=false
         @close="closePrintPreview"
     />
   </template>
@@ -175,6 +176,7 @@ function chatbotOn() {
     <ShippingInstructionPrintPreview
         :isVisible="isModalVisible"
         :shippingInstruction="selectedData"
+        :isList=false
         @close="closePrintPreview"
     />
   </template>
@@ -182,6 +184,7 @@ function chatbotOn() {
     <ShippingSlipPrintPreview
         :isVisible="isModalVisible"
         :shippingSlip="selectedData"
+        :isList=false
         @close="closePrintPreview"
     />
   </template>

@@ -311,8 +311,8 @@ const updateProductionDisbursement = async (productionDisbursementSeq) => {
         <input class="form-control form-control-sm w-75" type="datetime-local" id="workOrderIndicatedDate"
                v-model="workOrderIndicatedDate" readonly=""/>
       </b-form-group>
-      <!-- 작업납기일자 -->
-      <b-form-group label-cols="4" label-cols-lg="2" label="작업납기일" label-for="workOrderDueDate">
+      <!-- 작업목표일자 -->
+      <b-form-group label-cols="4" label-cols-lg="2" label="작업목표일" label-for="workOrderDueDate">
         <input class="form-control form-control-sm w-75" type="datetime-local" id="workOrderDueDate"
                v-model="workOrderDueDate" readonly=""/>
       </b-form-group>
