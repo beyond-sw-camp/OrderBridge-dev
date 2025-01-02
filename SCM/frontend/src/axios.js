@@ -1,3 +1,4 @@
+import { sAlert } from '@/common/salert.js';
 import axios from 'axios';
 import router from './router';
 
@@ -27,13 +28,13 @@ instance.interceptors.request.use((config) => {
 // 응답 인터셉터
 instance.interceptors.response.use(
     (response) => response,
-    (error) => {
+    async (error) => {
       if (error.response && error.response.status === 401) {
         // 401 응답 시 로그아웃 처리
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
 
-        alert('로그인 이후 사용할 수 있습니다.');
+        await sAlert(``, `로그인 이후 사용할 수 있습니다.`, `error`);
         router.push('/login'); // 로그인 페이지로 이동
       }
       return Promise.reject(error);

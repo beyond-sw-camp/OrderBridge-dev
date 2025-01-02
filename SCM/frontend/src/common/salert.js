@@ -6,7 +6,7 @@ import salert from "sweetalert2";
 */
 
 async function sAlert(title, text, icon) {
-    salert.fire({
+    return await salert.fire({
         title: title,
         text: text,
         icon: icon
@@ -14,7 +14,7 @@ async function sAlert(title, text, icon) {
 }
 
 async function sSuccess(message) {
-    salert.fire({
+    return await salert.fire({
         title: `성공!`,
         text: message,
         icon: `success`
@@ -22,7 +22,7 @@ async function sSuccess(message) {
 }
 
 async function sError(error) {
-    salert.fire({
+    return await salert.fire({
         title: error.response.data.httpStatus || `Error`,
         text: error.response.data.message || `오류가 발생했습니다.`,
         icon: `error`
