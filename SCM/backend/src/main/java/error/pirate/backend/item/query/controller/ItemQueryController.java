@@ -1,5 +1,6 @@
 package error.pirate.backend.item.query.controller;
 
+import error.pirate.backend.item.command.application.dto.BomItemDTO;
 import error.pirate.backend.item.command.domain.aggregate.entity.ItemDivision;
 import error.pirate.backend.item.command.domain.aggregate.entity.ItemUnit;
 import error.pirate.backend.item.query.dto.*;
@@ -76,6 +77,13 @@ public class ItemQueryController {
     @Operation(summary = "품목 분류 조회")
     public ResponseEntity<List<ItemDivision.ItemDivisionResponse>> readItemDivision() {
         return ResponseEntity.ok(ItemDivision.readItemDivisionList());
+    }
+
+    @GetMapping("/bom-item/{itemSeq}")
+    @Operation(summary = "bom 품목 조회")
+    public ResponseEntity<List<BomItemDTO>> readBomItems(@PathVariable Long itemSeq) {
+        List<BomItemDTO> bomItems = itemQueryService.readBomItems(itemSeq);
+        return ResponseEntity.ok(bomItems);
     }
 }
 
