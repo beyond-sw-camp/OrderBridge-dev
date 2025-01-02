@@ -5,6 +5,9 @@ import error.pirate.backend.common.NameGenerator;
 import error.pirate.backend.exception.CustomException;
 import error.pirate.backend.exception.ErrorCodeType;
 import error.pirate.backend.item.command.domain.aggregate.entity.Item;
+import error.pirate.backend.notification.command.domain.aggregate.entity.NotificationType;
+import error.pirate.backend.notification.command.domain.service.NotificationDomainService;
+import error.pirate.backend.purchaseOrder.command.domain.aggregate.entity.PurchaseOrderStatus;
 import error.pirate.backend.quotation.command.domain.aggregate.entity.Quotation;
 import error.pirate.backend.quotation.command.domain.aggregate.entity.QuotationItem;
 import error.pirate.backend.quotation.command.domain.repository.QuotationItemRepository;
@@ -14,6 +17,7 @@ import error.pirate.backend.salesOrder.command.application.dto.UpdateSalesOrderI
 import error.pirate.backend.salesOrder.command.application.dto.UpdateSalesOrderRequest;
 import error.pirate.backend.salesOrder.command.domain.aggregate.entity.SalesOrder;
 import error.pirate.backend.salesOrder.command.domain.aggregate.entity.SalesOrderItem;
+import error.pirate.backend.salesOrder.command.domain.aggregate.entity.SalesOrderStatus;
 import error.pirate.backend.salesOrder.command.domain.repository.SalesOrderCommandRepository;
 import error.pirate.backend.salesOrder.command.domain.repository.SalesOrderItemRepository;
 import error.pirate.backend.salesOrder.command.domain.service.SalesOrderDomainService;
@@ -38,6 +42,7 @@ public class SalesOrderCommandService {
     private final SalesOrderCommandRepository salesOrderCommandRepository;
     private final SalesOrderItemRepository salesOrderItemRepository;
     private final SalesOrderDomainService salesOrderDomainService;
+    private final NotificationDomainService notificationDomainService;
     private final EntityManager entityManager;
     private final NameGenerator nameGenerator;
 
@@ -72,7 +77,7 @@ public class SalesOrderCommandService {
                 createSalesOrderRequest.getSalesOrderNote(),
                 salesOrderExtendedPrice, salesOrderTotalQuantity);
 
-        salesOrderCommandRepository.save(salesOrder);
+        SalesOrder salesOrderResponse = salesOrderCommandRepository.save(salesOrder);
 
         // 주문서 품목 등록
         for (SalesOrderItemRequest salesOrderItemRequest : createSalesOrderRequest.getSalesOrderItemList()) {
@@ -86,6 +91,9 @@ public class SalesOrderCommandService {
 
         // 견적서와 주문서의 품목 수량 비교
         salesOrderDomainService.validateItem(createSalesOrderRequest.getQuotationSeq());
+
+        //알림 생성
+        notificationDomainService.createNotificationMessage(NotificationType.salesOrder, salesOrderResponse.getSalesOrderSeq(), salesOrderResponse.getSalesOrderName());
     }
 
     // 견적서 품목과 주문서 품목에 대한 검증
@@ -162,4 +170,10 @@ public class SalesOrderCommandService {
 
         salesOrder.delete();
     }
+
+    @Transactional
+    public void updateSalesOrderComplete(Long salesOrderSeq) {
+        salesOrderDomainService.updateSalesOrderStatus(salesOrderSeq, SalesOrderStatus.AFTER);
+    }
+
 }

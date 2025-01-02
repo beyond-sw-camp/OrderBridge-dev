@@ -9,11 +9,13 @@ public enum NotificationType {
     // 각자 컨트롤러의 mapping url 입력해야함!! 프론트에서 통신할 때 `/notificationType` 으로 호출할거임
     // value 값은 알림 메세지에서 사용할거니까 결재서류명 입력해야함
 
+    salesOrder("주문서"),
     purchase("구매서"),
     purchaseOrder("발주서"),
     shippingInstruction("출하지시서"),
     shippingSlip("출하전표"),
     workOrder("작업지시서"),
+    productionReceiving("생산입고"),
     productionDisbursement("생산불출");
 
     private final String value;
