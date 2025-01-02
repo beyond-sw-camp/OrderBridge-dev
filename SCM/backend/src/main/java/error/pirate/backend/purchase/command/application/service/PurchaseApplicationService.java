@@ -5,6 +5,8 @@ import error.pirate.backend.exception.ErrorCodeType;
 import error.pirate.backend.item.command.domain.aggregate.entity.Item;
 import error.pirate.backend.item.command.domain.repository.ItemRepository;
 import error.pirate.backend.item.command.domain.service.ItemInventoryDomainService;
+import error.pirate.backend.notification.command.domain.aggregate.entity.NotificationType;
+import error.pirate.backend.notification.command.domain.service.NotificationDomainService;
 import error.pirate.backend.purchase.command.application.dto.PurchaseCreateRequest;
 import error.pirate.backend.purchase.command.application.dto.PurchaseItemDto;
 import error.pirate.backend.purchase.command.application.dto.PurchaseUpdateRequest;
@@ -41,6 +43,8 @@ public class PurchaseApplicationService {
     private final PurchaseItemDomainService purchaseItemDomainService;
 
     private final WarehouseDomainService warehouseDomainService;
+
+    private final NotificationDomainService notificationDomainService;
 
     private final UserDomainService userDomainService;
 
@@ -82,6 +86,10 @@ public class PurchaseApplicationService {
             }
             purchaseItemDomainService.createPurchaseItem(purchaseItems);
             itemInventoryDomainService.createPurchaseItem(items, request);
+
+            //알림 생성
+            notificationDomainService.createNotificationMessage(NotificationType.purchase, purchaseResponse.getPurchaseSeq(), purchaseResponse.getPurchaseName());
+
         } else {
             throw new CustomException(ErrorCodeType.PURCHASE_NOT_FOUND);
         }

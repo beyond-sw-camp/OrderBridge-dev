@@ -6,7 +6,7 @@ import Swal from "sweetalert2";
 
 const props = defineProps({
   isVisible: Boolean,
-  purchaseOrder: Object,
+  purchase: Object,
 });
 
 // 부모에서 넘어오는 발주서 시퀀스로 이미지를 가져옴
@@ -14,7 +14,7 @@ const notification  = ref('');
 const fetchImages = async () => {
 
   try {
-    const response = await axios.get( `notification/purchaseOrder/${props.purchaseOrder.purchaseOrderSeq}`);
+    const response = await axios.get( `notification/purchase/${props.purchase.purchaseSeq}`);
 
     notification.value = response.data;
   } catch (error) {
@@ -23,8 +23,8 @@ const fetchImages = async () => {
 }
 
 // 발주 데이터가 조회된 후 fetchImages 실행
-watch(() => props.purchaseOrder, (newVal) => {
-  if (newVal && newVal.purchaseOrderSeq) {
+watch(() => props.purchase, (newVal) => {
+  if (newVal && newVal.purchaseSeq) {
     fetchImages();
   }
 }, { immediate: true });
@@ -36,7 +36,7 @@ const closePrintModal = () => {
 };
 
 const printPage = () => {
-  const printContent = document.getElementById('print-area-purchaseOrder').innerHTML;
+  const printContent = document.getElementById('print-area-purchase').innerHTML;
   const originalContent = document.body.innerHTML; // 현재 페이지 내용 저장
 
   document.body.innerHTML = printContent;
@@ -98,10 +98,9 @@ const saveCanvas = async (selectedNotification) => {
       showConfirmButton: false,
       timer: 1500
     });
-
   }
 
-  await axios.put(`purchaseOrder/complete/${props.purchaseOrder.purchaseOrderSeq}`);
+  await axios.put(`purchaseOrder/complete/${props.purchase.purchaseSeq}`);
 };
 
 // 드로잉 시작
@@ -142,25 +141,25 @@ const clearCanvas = () => {
     <div v-show="isVisible" class="modal-overlay" @click.self="closePrintModal">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
-        <div class="modal-body" id="print-area-purchaseOrder">
+        <div class="modal-body" id="print-area-purchase">
           <div class="d-flex justify-content-between">
             <button class="btn-print" @click="printPage">출력</button>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @click="closePrintModal" ></button>
+            <button type="button" class="btn-close btn-print" data-bs-dismiss="modal" aria-label="Close" @click="closePrintModal" ></button>
           </div>
 
           <div class="container mt-4">
 
-            <h2 class="text-center">발주서</h2>
+            <h2 class="text-center">구매서</h2>
             <br/><br/>
             <table class="info-table-eft" style="float: left;">
               <tbody>
               <tr>
-                <td class="to-column" style="height: 30px;">발주일자 &nbsp; : &nbsp;</td>
+                <td class="to-column" style="height: 30px;">구매일자 &nbsp; : &nbsp;</td>
                 <td colspan="5" style="height: 30px;">&nbsp;20&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;년 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;월 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;일</td>
               </tr>
               <tr>
                 <td style="height: 30px;">거래처명 &nbsp; : &nbsp;</td>
-                <td colspan="5" style="height: 30px;"> &nbsp; {{ purchaseOrder?.clientName!=null ? purchaseOrder.clientName : '' }}</td>
+                <td colspan="5" style="height: 30px;"> &nbsp; {{ purchase?.clientName!=null ? purchase.clientName : '' }}</td>
               </tr>
               </tbody>
             </table>
@@ -174,7 +173,7 @@ const clearCanvas = () => {
               </tr>
               <tr>
                 <td colspan="5" style="height: 30px;">
-                  {{ purchaseOrder?.userName }}
+                  {{ purchase?.userName }}
                 </td>
                 <td colspan="5" style="height: 30px;" class="image-gallery">
                   <img class="image-item" v-if="notification.notificationImageUrl != undefined" :src="notification.notificationImageUrl" alt="승인자 서명" style="width: 100px; height: auto;" />
@@ -191,26 +190,26 @@ const clearCanvas = () => {
             <br/><br/><br/>
 
             <table class="table first-table left" style="height: 140px">
-              <tbody v-if="purchaseOrder">
+              <tbody v-if="purchase">
               <tr>
-                <td class="color-column align-content-center">발주서명</td>
-                <td class="align-content-center">{{ purchaseOrder.purchaseOrderName }}</td>
+                <td class="color-column align-content-center">구매서명</td>
+                <td class="align-content-center">{{ purchase.purchaseName }}</td>
                 <td class="color-column align-content-center">담당사</td>
                 <td class="align-content-center">Order Bridge</td>
               </tr>
               <tr>
                 <td class="color-column align-content-center">담당자</td>
-                <td class="align-content-center">{{ purchaseOrder.userName }}</td>
+                <td class="align-content-center">{{ purchase.userName }}</td>
                 <td class="color-column align-content-center">연락처</td>
-                <td class="align-content-center">{{ purchaseOrder.userPhoneNo }}</td>
+                <td class="align-content-center">{{ purchase.userPhoneNo }}</td>
               </tr>
               <tr>
                 <td class="color-column align-content-center">주소</td>
                 <td class="align-content-center" colspan="3">서울특별시 동작구 보라매로 87 플레이데이터 3층</td>
               </tr>
               <tr>
-                <td class="color-column align-content-center">계약 납기일</td>
-                <td class="align-content-center" colspan="3">{{ dayjs(purchaseOrder.purchaseOrderDueDate).format('YYYY-MM-DD') }}</td>
+                <td class="color-column align-content-center">구매 계약일</td>
+                <td class="align-content-center" colspan="3">{{ dayjs(purchase.purchaseContractDate).format('YYYY-MM-DD') }}</td>
               </tr>
               </tbody>
             </table>
@@ -224,27 +223,26 @@ const clearCanvas = () => {
                 <th>금액</th>
               </tr>
               </thead>
-              <tbody v-if="purchaseOrder?.purchaseOrderItemResponseList?.length > 0">
-              <tr v-for="(purchaseOrderItem, idx) in purchaseOrder.purchaseOrderItemResponseList"
-                  :key="purchaseOrderItem.itemSeq || idx">
-                <td>{{ purchaseOrderItem.itemName }}</td>
-                <td>{{ purchaseOrderItem.purchaseOrderItemQuantity ? purchaseOrderItem.purchaseOrderItemQuantity.toLocaleString() : 0 }}</td>
-                <td>{{ purchaseOrderItem.purchaseOrderItemPrice ? purchaseOrderItem.purchaseOrderItemPrice.toLocaleString() : 0 }}</td>
-                <td>{{ (purchaseOrderItem.purchaseOrderItemQuantity * purchaseOrderItem.purchaseOrderItemPrice).toLocaleString() }}</td>
+              <tbody v-if="purchase?.purchaseItemResponseList?.length > 0">
+              <tr v-for="(purchaseItem, idx) in purchase.purchaseItemResponseList"
+                  :key="purchaseItem.itemSeq || idx">
+                <td>{{ purchaseItem.itemName }}</td>
+                <td>{{ purchaseItem.purchaseItemQuantity ? purchaseItem.purchaseItemQuantity.toLocaleString() : 0 }}</td>
+                <td>{{ purchaseItem.purchaseItemPrice ? purchaseItem.purchaseItemPrice.toLocaleString() : 0 }}</td>
+                <td>{{ (purchaseItem.purchaseItemQuantity * purchaseItem.purchaseItemPrice).toLocaleString() }}</td>
               </tr>
               </tbody>
               <tfoot>
               <tr>
                 <td>합계</td>
-                <td>{{ purchaseOrder?.purchaseOrderTotalQuantity ? purchaseOrder.purchaseOrderTotalQuantity.toLocaleString() : 0 }}</td>
+                <td>{{ purchase?.purchaseTotalQuantity ? purchase.purchaseTotalQuantity.toLocaleString() : 0 }}</td>
                 <td> - </td>
-                <td>{{ purchaseOrder?.purchaseOrderExtendedPrice ? purchaseOrder.purchaseOrderExtendedPrice.toLocaleString() : 0 }}</td>
+                <td>{{ purchase?.purchaseExtendedPrice ? purchase.purchaseExtendedPrice.toLocaleString() : 0 }}</td>
               </tr>
               </tfoot>
             </table>
 
             <ul class="notes">
-              <li>상기 자재를 발주하오니 납기를 준수하여 입고 바랍니다.</li>
               <li>기타 의문사항이나 관련사항시 사전 관련부서에 통보하여 주십시오.</li>
             </ul>
 

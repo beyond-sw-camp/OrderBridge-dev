@@ -16,6 +16,8 @@ public class PurchaseResponse {
 
     private String userName; // 회원 이름
 
+    private String userPhoneNo; // 회원 이름
+
     private String clientName; // 거래처 이름
 
     private String purchaseName; // 구매처명

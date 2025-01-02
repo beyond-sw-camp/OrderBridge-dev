@@ -4,6 +4,8 @@ import error.pirate.backend.common.ExcelDownLoad;
 import error.pirate.backend.common.Pagination;
 import error.pirate.backend.purchase.query.dto.*;
 import error.pirate.backend.purchase.query.mapper.PurchaseMapper;
+import error.pirate.backend.purchaseOrder.query.dto.PurchaseOrderItemResponse;
+import error.pirate.backend.purchaseOrder.query.dto.PurchaseOrderResponse;
 import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -41,6 +43,14 @@ public class PurchaseService {
                 .pagination(pagination)
                 .build();
 
+    }
+
+    public PurchaseResponse readPurchase(Long purchaseSeq) {
+        PurchaseResponse purchaseResponse = purchaseMapper.readPurchase(purchaseSeq);
+        List<PurchaseItemResponse> purchaseItemResponseList = purchaseMapper.readPurchaseItemList(purchaseResponse.getPurchaseSeq());
+        purchaseResponse.setPurchaseItemResponseList(purchaseItemResponseList);
+
+        return purchaseResponse;
     }
 
     public byte[] purchaseExcelDown(PurchaseRequest request) {
