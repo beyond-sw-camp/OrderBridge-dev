@@ -42,7 +42,7 @@ const userStore = useUserStore();
   justify-content: space-between;
   background-color: #fff8e7;
   height: 100vh;
-  padding: 0 4% 0 2%;
+  padding: 0 4% 0 0;
 }
 
 .hero-left {

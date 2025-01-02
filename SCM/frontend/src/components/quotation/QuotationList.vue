@@ -293,8 +293,8 @@ function numberThree(number) {
                                 </div>
                                 
                                 <div class="d-flex justify-content-end align-items-center">
-                                    <printIcon class="me-3 icon" @click.stop="printQuotation(quotation.quotationSeq)"/>
-                                    <editIcon class="me-3 icon" @click.stop="modifyQuotation(quotation.quotationSeq)"/>
+                                    <!--printIcon class="me-3 icon" @click.stop="printQuotation(quotation.quotationSeq)"/>
+                                    <editIcon class="me-3 icon" @click.stop="modifyQuotation(quotation.quotationSeq)"/-->
                                     <trashIcon class="icon" @click.stop="deleteQuotation(quotation.quotationSeq)"/>
                                 </div>
                             </div>
