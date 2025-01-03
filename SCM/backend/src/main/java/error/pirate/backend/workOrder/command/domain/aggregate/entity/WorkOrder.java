@@ -98,7 +98,8 @@ public class WorkOrder {
         workOrder.salesOrder = salesOrder;
         workOrder.client = salesOrder.getClient(); // 클라이언트 설정
 
-        workOrder.workOrderPrice = salesOrder.getSalesOrderExtendedPrice(); // 금액 설정
+//        workOrder.workOrderPrice = salesOrder.getSalesOrderExtendedPrice(); // 금액 설정
+        workOrder.workOrderPrice = workOrderIndicatedQuantity * salesOrderItem.getSalesOrderItemQuantity();
         workOrder.specifyItem(salesOrderItem.getItem()); // 품목 설정
 
         workOrder.warehouse = warehouse;
