@@ -179,6 +179,7 @@ const fetchBomItems = async (itemSeq) => {
       bomChildItemQuantity: item.bomChildItemQuantity,
       parentItemName: item.parentItemName,
       storeName: item.storeName,
+      itemImageUrl: item.itemImageUrl,
       note: ''
     }));
 
@@ -191,6 +192,7 @@ const fetchBomItems = async (itemSeq) => {
       itemName: item.childItemName,
       storeName: item.storeName,
       bomChildItemQuantity: item.bomChildItemQuantity,
+      itemImageUrl: item.itemImageUrl,
       note: item.note
     })));
 
