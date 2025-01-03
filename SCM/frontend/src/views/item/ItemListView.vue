@@ -1,5 +1,6 @@
 <script setup>
 import { onMounted, ref, watch } from 'vue';
+import { sSuccess, sError, sWarning } from '@/common/salert';
 import axios from '@/axios'; // axios 인스턴스 사용
 import { BInputGroup, BFormInput, BFormCheckbox, BButton, BInputGroupText, BPagination } from 'bootstrap-vue-3';
 import { useRouter } from "vue-router";
@@ -150,7 +151,7 @@ const itemDelete = async (itemSeq) => {
     });
 
     // 성공 알림
-    alert('삭제되었습니다.');
+    await sSuccess('삭제되었습니다.');
 
     // 현재 items 배열에서 삭제된 아이템 제거
     items.value = items.value.filter(item => item.itemSeq !== itemSeq);
@@ -164,12 +165,12 @@ const itemDelete = async (itemSeq) => {
 
   } catch (error) {
     if (error.response?.status === 401) {
-      alert('세션이 만료되었습니다. 다시 로그인해주세요.');
+      await sWarning('세션이 만료되었습니다. 다시 로그인해주세요.');
       localStorage.removeItem('accessToken');
       router.push('/login');
     } else {
       console.error('삭제 실패:', error);
-      alert('삭제에 실패했습니다.');
+      await sError('삭제에 실패했습니다.');
     }
   }
 };

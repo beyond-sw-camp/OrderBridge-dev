@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useRouter, useRoute } from "vue-router";
+import { sSuccess, sError, sWarning } from '@/common/salert';
 import axios from '@/axios';
 
 const router = useRouter();
@@ -31,24 +32,24 @@ const fetchWarehouseData = async () => {
     };
   } catch (error) {
     console.error('창고 정보 조회 실패:', error);
-    alert('창고 정보를 불러오는데 실패했습니다.');
+    await sError('창고 정보를 불러오는데 실패했습니다.');
     router.push('/warehouse'); // 실패 시 창고 목록으로 이동
   }
 };
 
 const updateWarehouse = async () => {
   if (!formData.value.warehouseName.trim()) {
-    alert('창고명을 입력해주세요.');
+    await sWarning('창고명을 입력해주세요.');
     return;
   }
 
   try {
     await axios.put(`warehouse/${warehouseSeq}`, formData.value); // 상대 경로 사용
-    alert('창고 정보가 수정되었습니다.');
+    await sSuccess('창고 정보가 수정되었습니다.');
     router.push('/warehouse'); // 수정 후 창고 목록으로 이동
   } catch (error) {
     console.error('창고 수정 실패:', error);
-    alert('창고 수정에 실패했습니다.');
+    await sError('창고 수정에 실패했습니다.');
   }
 };
 

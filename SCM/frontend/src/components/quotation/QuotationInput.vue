@@ -1,5 +1,6 @@
 <script setup>
 import { ref, onMounted, watch, computed } from "vue";
+import { sSuccess, sWarning } from '@/common/salert';
 import plusIcon from '@/assets/plus.svg'
 import searchIcon from "@/assets/searchIcon.svg";
 import router from "@/router/index.js";
@@ -87,7 +88,7 @@ const createQuotation = async () => {
                 quotationItem: quotationItemList.value
             });
 
-        alert('견적서가 등록되었습니다');
+        await sSuccess('견적서가 등록되었습니다');
         await router.push('/quotation');
     } catch (error) {
         console.error(`견적서 등록 실패 ${error}`);
@@ -116,7 +117,7 @@ function setClient(object) {
 }
 
 // 모달에서 품목 선택
-function addItemList(selectedItem) {
+async function addItemList(selectedItem) {
 
     const existingItem = quotationItemList.value.find(
         (item) => item.itemSeq === selectedItem.itemSeq
@@ -131,7 +132,7 @@ function addItemList(selectedItem) {
             quotationItemNote: selectedItem.quotationItemNote
         });
     } else {
-        alert(`이미 추가된 품목입니다.`);
+        await sWarning(`이미 추가된 품목입니다.`);
     }
 
     document.getElementById(`closeItemModal`).click();

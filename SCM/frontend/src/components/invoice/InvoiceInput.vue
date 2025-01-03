@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, watch, computed } from "vue";
-import { sSuccess, sError } from "@/common/salert";
+import { sSuccess, sServerError } from "@/common/salert";
 import searchIcon from "@/assets/searchIcon.svg";
 import router from "@/router/index.js";
 import axios from "@/axios"
@@ -39,7 +39,7 @@ const fetchSalesOrderList = async () => {
         salesOrderList.value = response.data.salesOrder;
         salesOrderTotalCount.value = response.data.totalSalesOrder;
     } catch (error) {
-        await sError(error);
+        await sServerError(error);
         console.error(`거래처 목록 요청 실패`, error);
     }
 }
@@ -54,7 +54,7 @@ const fetchSalesOrderItemList = async (salesOrderSeq) => {
         salesOrderItemList.value = response.data.salesOrderItem;
         requestClient.value = response.data.clientSeq;
     } catch (error) {
-        await sError(error);
+        await sServerError(error);
         console.error(`주문서 상세 요청 실패`, error);
     }
 }
@@ -77,7 +77,7 @@ const fetchItemList = async () => {
         itemList.value = Array.isArray(response.data.content) ? response.data.content : [];
         itemTotalCount.value = response.data.totalElements;
     } catch (error) {
-        await sError(error);
+        await sServerError(error);
         console.error(`품목 목록 요청 실패`, error);
     }
 };
@@ -91,7 +91,7 @@ const fetchItem = async (itemSeq) => {
 
         itemDetail.value = response.data.itemDTO;
     } catch (error) {
-        await sError(error);
+        await sServerError(error);
         console.error(`품목 상세 요청 실패`, error);
     }
 }
@@ -105,7 +105,7 @@ const fetchItemDivision = async () => {
 
         itemDivisionList.value = response.data;
     } catch (error) {
-        await sError(error);
+        await sServerError(error);
         console.error(`품목 분류 요청 실패`, error);
     }
 }
@@ -124,7 +124,7 @@ const createInvoice = async () => {
         sSuccess(`거래 명세서가 등록되었습니다.`);
         await router.push('/invoice');
     } catch (error) {
-        await sError(error);
+        await sServerError(error);
         console.error(`거래 명세서 등록 요청 실패`, error);
     }
 }
@@ -138,7 +138,7 @@ const fetchInvoiceStatus = async () => {
 
         salesOrderStatusList.value = response.data;
     } catch (error) {
-        await sError(error);
+        await sServerError(error);
         console.error(`주문서 상태 분류 목록 요청 실패`, error);
     }
 }

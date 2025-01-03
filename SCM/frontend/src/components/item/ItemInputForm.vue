@@ -1,5 +1,6 @@
 <script setup>
 import { ref, onMounted, watch, defineProps } from 'vue';
+import { sSuccess, sError, sWarning } from '@/common/salert.js'
 import axios from '@/axios';
 import { BButton, BPagination } from "bootstrap-vue-3";
 import plusIcon from "@/assets/plus.svg";
@@ -56,7 +57,7 @@ const fetchItemDivisions = async () => {
     itemDivisions.value = response.data;
   } catch (error) {
     console.error('품목 구분 데이터 가져오기 실패:', error);
-    alert('품목 구분 데이터를 불러오는 데 실패했습니다.');
+    await sError('품목 구분 데이터를 불러오는 데 실패했습니다.');
   }
 };
 
@@ -67,7 +68,7 @@ const fetchItemUnits = async () => {
     itemUnits.value = response.data;
   } catch (error) {
     console.error('품목 단위 목록 가져오기 실패:', error);
-    alert('품목 단위 목록을 불러오는 데 실패했습니다.');
+    await sError('품목 단위 목록을 불러오는 데 실패했습니다.');
   }
 };
 
@@ -128,12 +129,12 @@ const registerItems = async () => {
     });
 
     if (response.status === 201) {
-      alert('품목이 성공적으로 등록되었습니다.');
+      await sSuccess('품목이 성공적으로 등록되었습니다.');
       await router.push("/item");
     }
   } catch (error) {
     console.error('품목 등록 실패:', error);
-    alert('품목 등록에 실패했습니다.');
+    await sError('품목 등록에 실패했습니다.');
   }
 };
 
@@ -169,44 +170,44 @@ const updateItem = async () => {
     });
 
     if (response.status === 200) {
-      alert('품목이 성공적으로 수정되었습니다.');
+      await sSuccess('품목이 성공적으로 수정되었습니다.');
       await router.push("/item");
     }
   } catch (error) {
     console.error('품목 수정 실패:', error);
-    alert('품목 수정에 실패했습니다.');
+    await sError('품목 수정에 실패했습니다.');
   }
 };
 
 // 폼 데이터 유효성 검사
-const validateForm = () => {
+const validateForm = async () => {
   if (!itemName.value) {
-    alert('품목명을 입력해주세요.');
+    await sWarning('품목명을 입력해주세요.');
     return false;
   }
   if (!itemDivision.value) {
-    alert('품목 구분을 선택해주세요.');
+    await sWarning('품목 구분을 선택해주세요.');
     return false;
   }
   if (!itemExpiration.value) {
-    alert('품목 유통기한을 입력해주세요.');
+    await sWarning('품목 유통기한을 입력해주세요.');
     return false;
   }
   if (!itemPrice.value) {
-    alert('품목 단가를 입력해주세요.');
+    await sWarning('품목 단가를 입력해주세요.');
     return false;
   }
   if (!itemUnitSeq.value) {
-    alert('품목 단위를 선택해주세요.');
+    await sWarning('품목 단위를 선택해주세요.');
     return false;
   }
   if (!warehouseSeq.value) {
-    alert('보관 창고를 입력해주세요.');
+    await sWarning('보관 창고를 입력해주세요.');
     return false;
   }
   for (const bomItem of bomItems.value) {
     if (!(bomItem.bomChildItemQuantity > 0)) {
-      alert(`${bomItem.itemName} 품목의 수량을 입력해주세요.`);
+      await sWarning(`${bomItem.itemName} 품목의 수량을 입력해주세요.`);
       return false;
     }
   }

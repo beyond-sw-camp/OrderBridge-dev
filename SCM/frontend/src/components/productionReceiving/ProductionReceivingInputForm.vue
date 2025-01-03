@@ -1,5 +1,6 @@
 <script setup>
 import {defineProps, onMounted, ref, watch} from "vue";
+import { sSuccess, sWarning } from '@/common/salert';
 import searchIcon from '@/assets/searchIcon.svg'
 import dayjs from "dayjs";
 import axios from "@/axios";
@@ -142,16 +143,16 @@ const formData = ref({
 const createProductionReceiving = async () => {
   formData.value.workOrderSeqList = Array.from(checkWorkOrderSeqSet.value);
   if(formData.value.workOrderSeqList.length === 0) {
-    alert("작업지시서를 선택해주세요.")
+    await sWarning("작업지시서를 선택해주세요.")
     return;
   }
   console.log(formData.value.productionReceivingReceiptDate);
   if(formData.value.productionReceivingReceiptDate === '') {
-    alert("생산입고일을 지정해주세요.")
+    await sWarning("생산입고일을 지정해주세요.")
     return;
   }
   if(formData.value.productionReceivingExtendedPrice === 0) {
-    alert("생산입고 총액을 입력해주세요.")
+    await sWarning("생산입고 총액을 입력해주세요.")
     return;
   }
   try {
@@ -166,7 +167,7 @@ const createProductionReceiving = async () => {
         });
 
     console.log(response);
-    alert('생산입고가 등록되었습니다!');
+    await sSuccess('생산입고가 등록되었습니다!');
     // 조회 페이지 이동
     await router.push('/productionReceiving')
 
@@ -192,16 +193,16 @@ function closeModal() {
 const updateProductionReceiving = async () => {
   formData.value.workOrderSeqList = Array.from(checkWorkOrderSeqSet.value);
   if(formData.value.workOrderSeqList.length === 0) {
-    alert("작업지시서를 선택해주세요.")
+    await sWarning("작업지시서를 선택해주세요.")
     return;
   }
   console.log(formData.value.productionReceivingReceiptDate);
   if(formData.value.productionReceivingReceiptDate === '') {
-    alert("생산입고일을 지정해주세요.")
+    await sWarning("생산입고일을 지정해주세요.")
     return;
   }
   if(formData.value.productionReceivingExtendedPrice === 0) {
-    alert("생산입고 총액을 입력해주세요.")
+    await sWarning("생산입고 총액을 입력해주세요.")
     return;
   }
   try {
@@ -216,7 +217,7 @@ const updateProductionReceiving = async () => {
         });
 
     console.log(response);
-    alert('생산입고가 수정되었습니다!');
+    await sSuccess('생산입고가 수정되었습니다!');
     // 조회 페이지 이동
     await router.push('/productionReceiving')
 

@@ -3,6 +3,7 @@ import { ref } from 'vue';
 import { useRouter } from "vue-router";
 import axios from '@/axios';
 import { BButton, BFormGroup, BFormInput } from 'bootstrap-vue-3';
+import { sSuccess, sError, sWarning } from '@/common/salert';
 
 const router = useRouter();
 const formData = ref({
@@ -16,21 +17,21 @@ const formData = ref({
 
 const registerClient = async () => {
   if (!formData.value.clientName.trim()) {
-    alert('거래처명을 입력해주세요.');
+    await sWarning('거래처명을 입력해주세요.');
     return;
   }
   if (!formData.value.clientRegistrationNo.trim()) {
-    alert('사업자등록번호를 입력해주세요.');
+    await sWarning('사업자등록번호를 입력해주세요.');
     return;
   }
 
   try {
     await axios.post('client', formData.value);
-    alert('거래처가 등록되었습니다.');
+    await sSuccess('거래처가 등록되었습니다.');
     router.push('/client');
   } catch (error) {
     console.error('거래처 등록 실패:', error);
-    alert('거래처 등록에 실패했습니다.');
+    await sError('거래처 등록에 실패했습니다.');
   }
 };
 </script>

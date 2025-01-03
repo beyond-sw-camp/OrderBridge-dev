@@ -1,5 +1,6 @@
 <script setup>
 import { onMounted, ref, watch } from 'vue';
+import { sSuccess, sError, sConfirm } from '@/common/salert';
 import axios from "@/axios";
 import { BInputGroup, BFormInput, BFormCheckbox, BButton } from 'bootstrap-vue-3';
 import { useRouter } from "vue-router";
@@ -79,15 +80,15 @@ const toggleDetails = async (index, warehouse) => {
 };
 
 const deleteWarehouse = async (seq) => {
-  const result = confirm("정말 삭제하시겠습니까?");
+  const result = await sConfirm("정말 삭제하시겠습니까?");
   if (result) {
     try {
       await axios.delete(`warehouse/${seq}`); // 상대 경로 사용
-      alert('창고가 삭제되었습니다.');
+      await sSuccess('창고가 삭제되었습니다.');
       findWarehousesByFilter(); // 삭제 후 목록 갱신
     } catch (error) {
       console.error("삭제 요청 실패:", error);
-      alert('삭제에 실패했습니다. 다시 시도해주세요.');
+      await sError('삭제에 실패했습니다. 다시 시도해주세요.');
     }
   }
 };

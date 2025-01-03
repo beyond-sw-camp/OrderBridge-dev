@@ -3,6 +3,7 @@ import axios from "@/axios"
 import dayjs from "dayjs";
 import searchIcon from "@/assets/searchIcon.svg";
 import {onMounted, ref, watch} from "vue";
+import { sServerError } from '@/common/salert';
 
 const searchStartDate = ref(null);
 const searchEndDate = ref(null);
@@ -35,7 +36,7 @@ const fetchProductionDisbursementSituationList = async () => {
     productionDisbursementSituationList.value = response.data.monthlySituations;
   } catch (error) {
     if (error.response.data.errorCode === 'COMMON_ERROR_002') {
-      alert(error.response.data.message);
+      await sServerError(error);
     }
     console.error("생산불출 현황 불러오기 실패 :", error);
   }
@@ -95,7 +96,7 @@ const excelDown = async () => {
   } catch (error) {
     console.error('Excel 다운로드 실패:', error);
     if (error.response.data.errorCode === 'EXCEL_DOWN_ERROR_001') {
-      alert(error.response.data.message);
+      await sServerError(error);
     }
   }
 };

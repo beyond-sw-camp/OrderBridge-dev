@@ -1,5 +1,6 @@
 <script setup>
 import {defineProps, ref, watch} from "vue";
+import { sWarning } from '@/common/salert';
 import trashIcon from '@/assets/trashIcon.svg'
 
 const props = defineProps({
@@ -30,10 +31,10 @@ watch(() => props.itemList, (newItemList) => {
 });
 
 // 특정 아이템 삭제
-const deleteItem = (index) => {
+const deleteItem = async (index) => {
   // 아이템이 하나만 남아 있으면 삭제 불가능
   if (itemData.value.length <= 1) {
-    alert("최소 하나의 품목은 등록해야 합니다."); // 사용자 알림
+    await sWarning("최소 하나의 품목은 등록해야 합니다."); // 사용자 알림
     return;
   }
 
