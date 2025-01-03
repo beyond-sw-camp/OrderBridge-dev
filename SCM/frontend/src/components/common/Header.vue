@@ -67,7 +67,6 @@ const openPrintPreview = async (notification) => {
 
 const closePrintPreview = () => {
   isModalVisible.value = false;
-  selectedData.value = null;
 };
 
 const chatbot = ref(null);
