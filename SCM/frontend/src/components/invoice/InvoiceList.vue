@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue';
-import { sConfirm } from "@/common/salert";
+import { sSuccess, sConfirm, sError } from "@/common/salert";
 import searchIcon from "@/assets/searchIcon.svg"
 import trashIcon from "@/assets/trashIcon.svg";
 import editIcon from "@/assets/editIcon.svg";
@@ -97,9 +97,11 @@ const deleteInvoice = async (invoiceSeq) => {
         if (deleteConfirm) {
             const response = await axios.delete(`invoice/${invoiceSeq}`);
             fetchInvoiceList();
+            await sSuccess(`거래 명세서가 삭제되었습니다.`);
         }
     } catch (error) {
         console.log(`거래 명세서 삭제 요청 실패 ${error}`);
+        await sError(`거래 명세서 삭제에 실패했습니다.`);
     }
 }
 

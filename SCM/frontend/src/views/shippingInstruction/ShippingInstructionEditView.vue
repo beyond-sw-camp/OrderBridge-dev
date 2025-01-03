@@ -1,5 +1,6 @@
 <script setup>
 import {onMounted, ref} from "vue";
+import { sSuccess, sServerError, sWarning } from '@/common/salert';
 import axios from "@/axios"
 import router from "@/router/index.js";
 import {useRoute} from "vue-router";
@@ -124,7 +125,7 @@ const fetchSalesOrder = async (salesOrderSeq) => {
       // 서버에서 반환된 상태 코드에 따른 처리
       if (error.response.status === 400) {
         console.error(`주문서 상세 품목 불러오기 실패 : ${error.response.data.message}`);
-        alert(`${error.response.data.message}`);
+        await sServerError(error);
       } else {
         console.error(`주문서 상세 품목 불러오기 : 상태 코드 ${error.response.status}`);
       }
@@ -184,7 +185,7 @@ const updateShippingInstruction = async (formData, itemData, seq) => {
         }, {});
 
     console.log(response);
-    alert('출하지시서가 수정되었습니다!');
+    await sSuccess('출하지시서가 수정되었습니다!');
     // 조회 페이지 이동
     await router.push("/shipping-instruction");
 
@@ -192,7 +193,7 @@ const updateShippingInstruction = async (formData, itemData, seq) => {
     if (error.response) {
       // 서버에서 반환된 상태 코드에 따른 처리
       console.error(`출하지시서 수정 실패 : ${error.response.data.message}`);
-      alert(`${error.response.data.message}`);
+      await sServerError(error);
     }
   }
 };
@@ -233,15 +234,15 @@ const handleUpdate = async (itemList) => {
 
     // formData 값이 널 또는 빈 값일 경우 각각 알림창 출력
     if (!formData.value.salesOrderSeq) {
-      alert("주문서를 선택해주세요.");
+      await sWarning("주문서를 선택해주세요.");
       return;
     }
     if (!formData.value.shippingInstructionDate) {
-      alert("출하지시일를 입력해주세요.");
+      await sWarning("출하지시일를 입력해주세요.");
       return;
     }
     if (!formData.value.address) {
-      alert("주소를 선택해주세요.");
+      await sWarning("주소를 선택해주세요.");
       return;
     }
 
@@ -255,7 +256,7 @@ const handleUpdate = async (itemList) => {
     });
 
     if (invalidItem) {
-      alert(`품목 수량을 확인해 주세요. 0이하거나 원래 수량보다 많습니다.`);
+      await sWarning(`품목 수량을 확인해 주세요. 0이하거나 원래 수량보다 많습니다.`);
       return;
     }
 
@@ -263,7 +264,7 @@ const handleUpdate = async (itemList) => {
     await updateShippingInstruction(formData, itemData, route.params.seq);
 
   } else {
-    alert("자식 컴포넌트가 준비되지 않았습니다.");
+    await sWarning("자식 컴포넌트가 준비되지 않았습니다.");
   }
 }
 </script>

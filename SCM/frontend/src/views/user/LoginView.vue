@@ -2,6 +2,7 @@
 import {onMounted, ref} from "vue";
 import { useUserStore } from "@/stores/UserStore.js";
 import { useRoute, useRouter } from 'vue-router'; // Vue Router 사용
+import { sError } from '@/common/salert';
 
 const userEmployeeNo = ref("");
 const userPwd = ref("");
@@ -16,13 +17,13 @@ const handleLogin = async() => {
     const redirect = route.query.redirect || '/'; // 리다이렉트 경로가 없으면 홈으로 이동
     await router.push(redirect);
   } else {
-    alert(userStore.error)
+    await sError(userStore.error)
   }
 }
 </script>
 
 <template>
-  <div class="d-flex justify-content-center align-items-center vh-100 m-0">
+  <div class="d-flex justify-content-center align-items-center m-0">
     <div class="card login-card p-4">
       <div class="text-center mb-4">
         <h4 class="fw-bold">로그인</h4>

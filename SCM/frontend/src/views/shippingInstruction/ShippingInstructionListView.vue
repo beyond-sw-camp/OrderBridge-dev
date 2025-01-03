@@ -1,6 +1,7 @@
 <script setup>
 import ShippingInstructionList from "@/components/shippingInstruction/ShippingInstructionList.vue";
 import {onMounted, reactive, ref, watch} from "vue";
+import { sSuccess, sServerError, sWarning } from '@/common/salert';
 import axios from "@/axios"
 import router from "@/router/index.js";
 
@@ -64,14 +65,14 @@ const deleteShippingInstruction = async (seq) => {
   try {
     const response = await axios.delete(`shipping-instruction/${seq}`, {});
 
-    alert("출하지시서가 삭제되었습니다.");
+    await sSuccess("출하지시서가 삭제되었습니다.");
 
   } catch (error) {
     if (error.response) {
       // 서버에서 반환된 상태 코드에 따른 처리
       if (error.response.status === 400) {
         console.error("상세 출하지시서 삭제 실패 : 결재후");
-        alert("이미 결재 후이므로 삭제하실 수 없습니다.");
+        await sWarning("이미 결재 후이므로 삭제하실 수 없습니다.");
       } else {
         console.error(`상세 출하지시서 삭제 실패 : 상태 코드 ${error.response.status}`);
       }
@@ -166,7 +167,7 @@ const createShippingSlip = async (seq) => {
           })),
         }, {});
 
-    alert('출하전표가 등록되었습니다!');
+    await sSuccess('출하전표가 등록되었습니다!');
     // 조회 페이지 이동
     await router.push("/shipping-instruction");
 
@@ -175,7 +176,7 @@ const createShippingSlip = async (seq) => {
       // 서버에서 반환된 상태 코드에 따른 처리
       if (error.response.status === 400) {
         console.error(`출하전표 등록 실패 : ${error.response.data.message}`);
-        alert(`${error.response.data.message}`);
+        await sServerError(error);
       } else {
         console.error(`출하전표 등록 실패 : 상태 코드 ${error.response.status}`);
       }

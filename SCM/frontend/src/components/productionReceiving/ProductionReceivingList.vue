@@ -1,5 +1,6 @@
 <script setup>
 import {onMounted, ref, watch} from 'vue';
+import { sSuccess } from '@/common/salert';
 import axios from "@/axios";
 import searchIcon from "@/assets/searchIcon.svg";
 import dayjs from "dayjs";
@@ -182,7 +183,7 @@ const productionReceivingDelete = async (productionReceivingSeq) => {
     try {
       await axios.delete(`productionReceiving/${productionReceivingSeq}`);
 
-      alert("삭제가 완료되었습니다.");
+      await sSuccess("삭제가 완료되었습니다.");
       search();
     } catch (error) {
       console.error("생산입고 삭제 실패 :", error);

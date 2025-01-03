@@ -1,6 +1,7 @@
 <script setup>
 import axios from "@/axios"
 import {onMounted, ref, watch} from "vue";
+import { sSuccess, sError, sServerError, sWarning, sConfirm } from '@/common/salert';
 import searchIcon from "@/assets/searchIcon.svg";
 import dayjs from "dayjs";
 import printIcon from "@/assets/printIcon.svg"
@@ -76,7 +77,7 @@ const fetchProductionDisbursementList = async () => {
     console.log(productionDisbursementList.value);
   } catch (error) {
     if (error.response.data.errorCode === 'COMMON_ERROR_002') {
-      alert(error.response.data.message);
+      await sServerError(error);
     }
     console.log("생산불출 불러오기 실패: ", error);
   }
@@ -124,7 +125,7 @@ const fetchProductionDisbursementDetail = async (productionDisbursementSeq) => {
       console.log(response.data.itemList);
     } catch (error) {
       if (error.response.data.errorCode === 'PRODUCTION_DISBURSEMENT_ERROR_001') {
-        alert(error.response.data.message);
+        await sServerError(error);
       }
 
       console.error("생산불출 상세 불러오기 실패 :", error);
@@ -188,30 +189,30 @@ function numberFormating(number) {
       console.error('Excel 다운로드 실패:', error);
 
       if (error.response.data.errorCode === 'EXCEL_DOWN_ERROR_001') {
-        alert(error.response.data.message);
+        await sServerError(error);
       }
     }
 };
 
 const deleteProductionDisbursement = async (productionDisbursementSeq) => {
-  const result = confirm("이 생산불출을 삭제하시겠습니까?");
+  const result = await sConfirm("이 생산불출을 삭제하시겠습니까?");
   console.log("삭제요청 생산불출 번호", productionDisbursementSeq);
   if (result) {
     try {
       const response = await axios.delete(`productionDisbursement/${productionDisbursementSeq}`);
-      alert('삭제가 완료되었습니다.');
+      await sSuccess('삭제가 완료되었습니다.');
 
       search(); // 삭제 후 목록 갱신
     } catch (error) {
       console.error("생산불출 삭제 요청 실패:", error);
       if (error.response.data.errorCode === 'PRODUCTION_DISBURSEMENT_ERROR_001') {
-        alert(error.response.data.message);
+        await sServerError(error);
       } else if (error.response.data.errorCode === 'PRODUCTION_DISBURSEMENT_ERROR_002') {
-        alert('불출 전 상태만 삭제 가능합니다.');
+        await sWarning('불출 전 상태만 삭제 가능합니다.');
       } else if (error.response.data.errorCode === 'SECURITY_ERROR_001') {
-        alert('작성자만 삭제 가능합니다.');
+        await sWarning('작성자만 삭제 가능합니다.');
       }  else {
-        alert('삭제에 실패했습니다. 다시 시도해주세요.');
+        await sError('삭제에 실패했습니다. 다시 시도해주세요.');
       }
     }
   }

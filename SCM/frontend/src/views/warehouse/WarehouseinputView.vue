@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from "vue-router";
+import { sSuccess, sError } from '@/common/salert';
 import axios from '@/axios';
 
 const router = useRouter();
@@ -20,11 +21,11 @@ const warehouseTypeOptions = [
 const registerWarehouse = async () => {
   try {
     await axios.post('warehouse', formData.value); // 상대 경로 사용
-    alert('창고가 등록되었습니다.');
+    await sSuccess('창고가 등록되었습니다.');
     router.push('/warehouse'); // 창고 목록으로 이동
   } catch (error) {
     console.error('창고 등록 실패:', error);
-    alert('창고 등록에 실패했습니다.');
+    await sError('창고 등록에 실패했습니다.');
   }
 };
 </script>

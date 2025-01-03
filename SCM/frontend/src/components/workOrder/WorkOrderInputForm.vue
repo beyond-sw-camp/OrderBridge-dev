@@ -1,5 +1,6 @@
 <script setup>
 import {ref, onMounted, watch, defineProps} from 'vue';
+import { sSuccess, sError, sServerError, sWarning } from '@/common/salert';
 import axios from '@/axios';
 import searchIcon from '@/assets/searchIcon.svg';
 import dayjs from 'dayjs';
@@ -207,7 +208,7 @@ const fetchSalesOrderItemStock = async (salesOrderSeq) => {
   } catch (error) {
     console.error('품목 재고 조회 실패:', error);
     if (error.response.data.errorCode === 'SALES_ORDER_ITEM_ERROR_001') {
-      alert('주문서에 품목이 없습니다.');
+      await sWarning('주문서에 품목이 없습니다.');
     }
   }
 };
@@ -218,9 +219,9 @@ const goToOrderPage = () => {
 };
 
 // 등록페이지에서 수정 구분
-const handleItemSelection = (index) => {
+const handleItemSelection = async (index) => {
   // props.isEditMode가 false(수정모드가 아니)고 이미 등록된 품목일 때
-    alert('이미 작업지시서가 등록된 주문서입니다. \n 상세보기에서 수정 버튼을 눌러주세요.');
+    await sWarning('이미 작업지시서가 등록된 주문서입니다. \n 상세보기에서 수정 버튼을 눌러주세요.');
     router.push('/work-order'); // 목록 페이지로 이동
 };
 
@@ -319,29 +320,29 @@ const updateWorkOrder = async (workOrderSeq) => {
     });
     console.log(response.data);
     console.log(formData.value.workOrderIndicatedQuantity);
-    alert('작업지시서가 수정되었습니다!');
+    await sSuccess('작업지시서가 수정되었습니다!');
     await router.push('/work-order')
 
   } catch (error) {
     console.error("작업지시서 수정 실패 :", error);
     if (error.response.data.errorCode === 'WORK_ORDER_ERROR_005') {
-      alert('작업지시서의 상태가 결재 전이거나 진행중일때만 수정 가능합니다.');
+      await sWarning('작업지시서의 상태가 결재 전이거나 진행중일때만 수정 가능합니다.');
     } else if (error.response.data.errorCode === 'COMMON_ERROR_002') {
-      alert('작업목표일은 주문납기일보다 전이어야 합니다.');
+      await sWarning('작업목표일은 주문납기일보다 전이어야 합니다.');
     } else if (error.response.data.errorCode === 'WORK_ORDER_ERROR_006') {
-      alert('지시수량은 이미 완료된 수량보다 적을 수 없습니다.');
+      await sWarning('지시수량은 이미 완료된 수량보다 적을 수 없습니다.');
     } else if (error.response.data.errorCode === 'SALES_ORDER_ERROR_002') {
-      alert('주문서의 상태가 결재 후일때만 수정 가능합니다.');
+      await sWarning('주문서의 상태가 결재 후일때만 수정 가능합니다.');
     } else if (error.response.data.errorCode === 'WORK_ORDER_ERROR_004') {
-      alert(error.response.data.message);
+      await sServerError(error);
     } else if (error.response.data.errorCode === 'ITEM_ERROR_003') {
-      alert('하위품목 정보가 존재하지 않습니다.');
+      await sWarning('하위품목 정보가 존재하지 않습니다.');
     } else if (error.response.data.errorCode === 'STOCK_ERROR_001') {
-      alert('재료가 부족해 작업지시가 불가능합니다.\n 발주서를 작성해 재료를 먼저 구매해주세요.');
+      await sWarning('재료가 부족해 작업지시가 불가능합니다.\n 발주서를 작성해 재료를 먼저 구매해주세요.');
     } else if (error.response.data.errorCode === 'SECURITY_ERROR_001') {
-      alert('작성자만 수정 가능합니다.');
+      await sWarning('작성자만 수정 가능합니다.');
     } else {
-      alert('수정에 실패했습니다. 다시 시도해주세요.');
+      await sError('수정에 실패했습니다. 다시 시도해주세요.');
     }
   }
 };
@@ -360,26 +361,26 @@ const createWorkOrder = async () => {
       workOrderNote: formData.value.workOrderNote,
     });
       console.log(response.data);
-      alert('작업지시서가 등록되었습니다!');
+      await sSuccess('작업지시서가 등록되었습니다!');
       await router.push('/work-order')
 
   } catch (error) {
     console.error("작업지시서 등록 실패 :", error);
 
     if (error.response.data.errorCode ===  'SALES_ORDER_ERROR_002') {
-      alert('주문서의 상태가 결재 후일때만 등록 가능합니다.');
+      await sWarning('주문서의 상태가 결재 후일때만 등록 가능합니다.');
     } else if (error.response.data.errorCode === 'WORK_ORDER_ERROR_006') {
-      alert(error.response.data.message);
+      await sServerError(error);
     }  else if (error.response.data.errorCode === 'WORK_ORDER_ERROR_004') {
-      alert(error.response.data.message);
+      await sServerError(error);
     }   else if (error.response.data.errorCode === 'STOCK_ERROR_001') {
-      alert('재료가 부족해 작업지시가 불가능합니다.\n 발주서를 작성해 재료를 먼저 구매해주세요.');
+      await sWarning('재료가 부족해 작업지시가 불가능합니다.\n 발주서를 작성해 재료를 먼저 구매해주세요.');
     } else if (error.response.data.errorCode === 'WORK_ORDER_ERROR_003') {
-      alert('작업지시일과 목표일을 선택해주세요');
+      await sWarning('작업지시일과 목표일을 선택해주세요');
     } else if (error.response.data.errorCode === 'COMMON_ERROR_002') {
-      alert('작업목표일은 작업지시일 이후고, 주문납기일보다 빨라야 합니다.');
+      await sWarning('작업목표일은 작업지시일 이후고, 주문납기일보다 빨라야 합니다.');
     } else {
-      alert('등록에 실패했습니다. 다시 시도해주세요.');
+      await sError('등록에 실패했습니다. 다시 시도해주세요.');
     }
 
   }
@@ -404,13 +405,13 @@ const submitWorkOrder = async () => {
 };
 
 // 폼 데이터 검증
-const validateFormData = () => {
+const validateFormData = async () => {
   if (!formData.value.salesOrderSeq || !formData.value.salesOrderItemSeq || !formData.value.warehouseSeq) {
     console.warn('필수 항목이 누락되었습니다.', formData.value);
     if (!formData.value.salesOrderSeq || !formData.value.salesOrderItemSeq) {
-      alert('품목을 선택해주세요.');
+      await sWarning('품목을 선택해주세요.');
     } else if (!formData.value.warehouseSeq) {
-      alert('생산창고를 선택해주세요.');
+      await sWarning('생산창고를 선택해주세요.');
     }
     return false;
   }

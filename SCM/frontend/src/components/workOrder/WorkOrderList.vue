@@ -1,6 +1,7 @@
 <script setup>
 import axios from "@/axios"
 import {onMounted, ref, watch} from "vue";
+import { sSuccess, sError, sServerError, sWarning, sConfirm } from '@/common/salert';
 import searchIcon from "@/assets/searchIcon.svg";
 import dayjs from "dayjs";
 import printIcon from "@/assets/printIcon.svg"
@@ -74,7 +75,7 @@ const fetchWorkOrderList = async () => {
     console.log(workOrderList.value);
   } catch (error) {
     if (error.response.data.errorCode === 'COMMON_ERROR_002') {
-      alert(error.response.data.message);
+      await sServerError(error);
     }
     console.log("작업지시서 불러오기 실패: ", error);
   }
@@ -114,7 +115,7 @@ const fetchWorkOrderDetail = async (workOrderSeq) => {
       console.log(response.data.workOrderItem);
     } catch (error) {
       if (error.response.data.errorCode === 'WORK_ORDER_ERROR_001') {
-        alert(error.response.data.message);
+        await sServerError(error);
       }
 
       console.error("작업지시서 상세 불러오기 실패 :", error);
@@ -181,31 +182,31 @@ const excelDown = async () => {
   } catch (error) {
         console.error('Excel 다운로드 실패:', error);
     if (error.response.data.errorCode === 'EXCEL_DOWN_ERROR_001') {
-      alert(error.response.data.message);
+      await sServerError(error);
     }
   }
 };
 
 // 삭제
 const deleteWorkOrder = async (workOrderSeq) => {
-  const result = confirm("이 작업지시서를 삭제하시겠습니까?");
+  const result = await sConfirm("이 작업지시서를 삭제하시겠습니까?");
   console.log("삭제요청 작업지시서 번호", workOrderSeq);
   if (result) {
     try {
       const response = await axios.delete(`workOrder/${workOrderSeq}`);
-      alert('삭제가 완료되었습니다.');
+      await sSuccess('삭제가 완료되었습니다.');
 
       search(); // 삭제 후 목록 갱신
     } catch (error) {
       console.error("작업지시서 삭제 요청 실패:", error);
       if (error.response.data.errorCode === 'WORK_ORDER_ERROR_001') {
-        alert(error.response.data.message);
+        await sServerError(error);
       } else if (error.response.data.errorCode === 'WORK_ORDER_ERROR_005') {
-        alert('결재 전이거나 중단된 작업지시서만 삭제 가능합니다.');
+        await sWarning('결재 전이거나 중단된 작업지시서만 삭제 가능합니다.');
       } else if (error.response.data.errorCode === 'SECURITY_ERROR_001') {
-        alert('작성자만 삭제 가능합니다.');
+        await sWarning('작성자만 삭제 가능합니다.');
       }  else {
-        alert('삭제에 실패했습니다. 다시 시도해주세요.');
+        await sError('삭제에 실패했습니다. 다시 시도해주세요.');
       }
     }
   }
