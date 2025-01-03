@@ -237,20 +237,20 @@ const clearCanvas = () => {
               </tr>
               </thead>
               <tbody v-if="productionReceiving?.productionReceivingItemList?.length > 0">
-              <tr v-for="(productionReceiving, idx) in productionReceiving.productionReceivingItemList"
-                  :key="productionReceiving.itemSeq || idx">
-                <td>{{ productionReceiving.itemName }}</td>
-                <td>{{ productionReceiving.productionReceivingItemQuantity ? productionReceiving.productionReceivingItemQuantity.toLocaleString() : 0 }}</td>
-                <td>{{ productionReceiving.productionReceivingUnitPrice ? productionReceiving.productionReceivingUnitPrice.toLocaleString() : 0 }}</td>
-                <td>{{ (productionReceiving.productionReceivingItemQuantity * productionReceiving.productionReceivingUnitPrice).toLocaleString() }}</td>
-              </tr>
+                <tr v-for="(productionReceiving, idx) in productionReceiving.productionReceivingItemList"
+                    :key="productionReceiving.itemSeq || idx">
+                  <td>{{ productionReceiving.itemName }}</td>
+                  <td>{{ productionReceiving.productionReceivingItemQuantity ? productionReceiving.productionReceivingItemQuantity.toLocaleString() : 0 }}</td>
+                  <td>{{ productionReceiving.productionReceivingUnitPrice ? productionReceiving.productionReceivingUnitPrice.toLocaleString() : 0 }}</td>
+                  <td>{{ (productionReceiving.productionReceivingItemQuantity * productionReceiving.productionReceivingUnitPrice).toLocaleString() }}</td>
+                </tr>
               </tbody>
               <tfoot>
               <tr>
                 <td>합계</td>
-                <td>{{ productionReceiving?.productionReceivingItemQuantity ? productionReceiving.productionReceivingItemQuantity.toLocaleString() : 0 }}</td>
                 <td> - </td>
-                <td>{{ productionReceiving?.productionReceivingUnitPrice ? productionReceiving.purchaseproductionReceivingUnitPricextendedPrice.toLocaleString() : 0 }}</td>
+                <td> - </td>
+                <td>{{ productionReceiving?.productionReceivingDTO.productionReceivingExtendedPrice ? productionReceiving.productionReceivingDTO.productionReceivingExtendedPrice.toLocaleString() : 0 }}</td>
               </tr>
               </tfoot>
             </table>
