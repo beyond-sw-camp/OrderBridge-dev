@@ -4,7 +4,7 @@ import SalesOrderSituation from '@/components/salesOrder/SalesOrderSituation.vue
 </script>
 
 <template>
-    <h4 class="title">영업관리 > 주문서 현황황</h4>
+    <h4 class="title">영업관리 > 주문서 현황</h4>
     <SalesOrderSituation />
 </template>
 
