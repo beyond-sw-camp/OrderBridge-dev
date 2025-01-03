@@ -42,7 +42,7 @@ const fetchChatbot = async () => {
 // 질문인지 답변인지 체크
 const canQuestion = computed(() => {
   // items 배열의 마지막 role이 'model'인지 확인
-  return items.value.length > 0 && items.value[items.value.length - 1].role === 'model';
+  return items.value.length === 0 || (items.value.length > 0 && items.value[items.value.length - 1].role === 'model');
 });
 
 // 질문은 답변이후에만 다시 할 수 있음

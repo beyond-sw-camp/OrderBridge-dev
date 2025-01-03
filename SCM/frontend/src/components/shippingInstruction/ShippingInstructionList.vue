@@ -100,7 +100,7 @@ const itemDelete = async (seq) => {
 }
 
 const shippingSlipRegister = async (seq) => {
-  const result = await sConfirm("출하전표를 등록하시겠습니까?");
+  const result = confirm("출하전표를 등록하시겠습니까?");
   if (result) {
     emit('shippingSlipRegisterEvent', seq);
   }
