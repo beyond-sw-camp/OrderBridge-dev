@@ -215,3 +215,7 @@ order bridge 프로젝트는 기내식 공급의 효율적인 관리를 목표�
 
 ### 4-2. CI/CD 계획서 
 [CI/CD 계획서](https://docs.google.com/spreadsheets/d/1gk9vqAHkigayGrVtWXJ4dcw1HV_7WgMIkAVy064mc1k/edit?gid=1079293076#gid=1079293076)
+
+### 4-3. CI/CD 결과
+<img alt="CD" src="img/CD.png">
+<img alt="Workflow" src="img/Workflow.png">
