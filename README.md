@@ -84,7 +84,7 @@ order bridge 프로젝트는 기내식 공급의 효율적인 관리를 목표�
     <img alt="창고 등록" src="/gif/02_창고%20-%20등록.gif">
     <div>2-2. 창고 조회</div>
     <img alt="창고 조회" src="/gif/02_창고%20-%20조회.gif">
-    <div>2-2. 창고 삭제</div>
+    <div>2-3. 창고 삭제</div>
     <img alt="창고 삭제" src="/gif/02_창고%20-%20삭제.gif">
 </details>
 
