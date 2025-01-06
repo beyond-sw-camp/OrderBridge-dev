@@ -52,9 +52,9 @@ public class ProductionDisbursementQueryController {
 
     /* 상세조회 */
     @GetMapping("/{productionDisbursementSeq}")
-    @Operation(summary = "작업지시서 상세조회", description = "작업지시서 상세내용을 조회한다.")
+    @Operation(summary = "생산불출 상세조회", description = "생산불출 상세내용을 조회한다.")
     public ResponseEntity<ProductionDisbursementResponse> readProductionDisbursement(@PathVariable Long productionDisbursementSeq) {
-        log.info("-------------- GET /api/v1/productionDisbursement/{} 작업지시서 상세조회 요청 --------------", productionDisbursementSeq);
+        log.info("-------------- GET /api/v1/productionDisbursement/{} 생산불출 상세조회 요청 --------------", productionDisbursementSeq);
         ProductionDisbursementResponse response = productionDisbursementQueryService.readProductionDisbursement(productionDisbursementSeq);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
@@ -104,14 +104,14 @@ public class ProductionDisbursementQueryController {
 
     /* 현황 엑셀 다운로드 */
     @GetMapping("/situation/excelDownload")
-    @Operation(summary = "생산불출 목록조회 엑셀 다운로드", description = "생산불출 목록을 엑셀로 다운로드한다.")
+    @Operation(summary = "생산불출 현황조회 엑셀 다운로드", description = "생산불출 현황을 엑셀로 다운로드한다.")
     public ResponseEntity<byte[]> productionDisbursementSituationExcelDown(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
             @RequestParam(required = false) String factoryName,
             @RequestParam(required = false) String storeName
     ) {
-        log.info("-------------- GET /api/v1/productionDisbursement/situation/excelDownload 생산불출 엑셀 다운로드 요청 --------------");
+        log.info("-------------- GET /api/v1/productionDisbursement/situation/excelDownload 생산불출 현황 엑셀 다운로드 요청 --------------");
 
         byte[] excelData = productionDisbursementQueryService.readProductionDisbursementSituationExcel(startDate, endDate, factoryName, storeName);
 
