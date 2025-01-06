@@ -63,6 +63,10 @@ jobs:
               username: \${RDS_USERNAME}
               password: \${RDS_PASSWORD}
               driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+              hikari:
+                idle-timeout: 300000
+                max-lifetime: 1800000
+                pool-name: HikariPool-1
             jpa:
               show-sql: true
               hibernate:
@@ -94,7 +98,7 @@ jobs:
             level:
               root: info
               org.springframework.web: info
-              com.zaxxer.hikari: info
+              com.zaxxer.hikari: debug
               log4jdbc.log4j2: error
               jdbc.sqlonly: info
               jdbc.resultsettable: info
@@ -231,6 +235,10 @@ jobs:
               username: \${RDS_USERNAME}
               password: \${RDS_PASSWORD}
               driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+              hikari:
+                idle-timeout: 300000
+                max-lifetime: 1800000
+                pool-name: HikariPool-1
             jpa:
               show-sql: true
               hibernate:
@@ -262,7 +270,7 @@ jobs:
             level:
               root: info
               org.springframework.web: info
-              com.zaxxer.hikari: info
+              com.zaxxer.hikari: debug
               log4jdbc.log4j2: error
               jdbc.sqlonly: info
               jdbc.resultsettable: info
