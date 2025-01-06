@@ -264,6 +264,18 @@ const createPurchaseOrder = async () => {
         <div class="modal-body">
           <div style="max-height: 500px; overflow-y: scroll" class="d-flex row justify-content-center align-items-center">
 
+            <b-input-group >
+              <b-form-input v-model="searchClient"></b-form-input>
+              <b-button variant="light" class="button" @click="search()"><searchIcon class="icon"/></b-button>
+            </b-input-group>
+            <div class="clientHint" style="position: absolute; z-index: 5;">
+              <ul class="list-group">
+                <template v-for="hint in clientHintList">
+                  <li class="list-group-item list-group-item-action" @click="searchClient = hint">{{ hint }}</li>
+                </template>
+              </ul>
+            </div>
+
             <div class="list-headline row">
               <div class="list-head col-5">품목명</div>
               <div class="list-head col-2">가격</div>

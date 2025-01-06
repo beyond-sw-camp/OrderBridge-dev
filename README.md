@@ -17,7 +17,7 @@ order bridge 프로젝트는 기내식 공급의 효율적인 관리를 목표�
 ## 1. 프로젝트 기획
 
 ### 1-1. 프로젝트 기획서
-[기획서](https://drive.google.com/file/d/16-nRm353jOGMHSPJCbj4NXpgWPW4UUv4/view?usp=sharing)
+[기획서](gif%2F%EA%B8%B0%ED%9A%8D%EC%84%9C.pdf)
 
 ### 1-2. 요구사항 명세서
 <details>
@@ -71,6 +71,140 @@ order bridge 프로젝트는 기내식 공급의 효율적인 관리를 목표�
 ## 3. 프론트엔드 설계 및 구축
 
 ### 3-1. UI/UX 단위 테스트
+
+<details>
+  <summary>1. 로그인</summary>
+    <img alt="로그인" src="/gif/01_로그인.gif">
+</details>
+
+<details>
+  <summary>2. 창고</summary>
+    <div>2-1. 창고 등록</div>
+    <img alt="창고 등록" src="/gif/02_창고%20-%20등록.gif">
+    <div>2-2. 창고 조회</div>
+    <img alt="창고 조회" src="/gif/02_창고%20-%20조회.gif">
+    <div>2-2. 창고 삭제</div>
+    <img alt="창고 삭제" src="/gif/02_창고%20-%20삭제.gif">
+</details>
+
+<details>
+  <summary>3. 거래처</summary>
+    <div>3-1. 거래처 등록</div>
+    <img alt="거래처 등록" src="/gif/03_거래처%20-%20등록.gif">
+    <div>3-2. 거래처 조회</div>
+    <img alt="거래처 조회" src="/gif/03_거래처%20-%20조회.gif">
+    <div>3-2. 거래처 삭제</div>
+    <img alt="거래처 삭제" src="/gif/03_거래처%20-%20삭제.gif">
+</details>
+
+<details>
+  <summary>4. 품목</summary>
+    <div>4-1. 품목 등록</div>
+    <img alt="품목 등록" src="/gif/04_품목%20-%20등록.gif">
+</details>
+
+<details>
+  <summary>5. 견적서</summary>
+    <div>5-1. 견적서 등록</div>
+    <img alt="견적서 등록" src="/gif/05_견적%20-%20등록.gif">
+    <div>5-2. 견적서 조회, 엑셀다운로드</div>
+    <img alt="견적서 조회" src="/gif/05_견적%20-%20조회,%20엑셀다운.gif">
+    <div>5-2. 견적 현황 조회</div>
+    <img alt="견적서 현황" src="/gif/05_견적%20-%20현황.gif">
+</details>
+
+<details>
+  <summary>6. 주문서</summary>
+    <div>6-1. 주문서 등록</div>
+    <img alt="주문서 등록" src="/gif/06_주문%20-%20등록.gif">
+</details>
+
+<details>
+  <summary>7. 발주서</summary>
+    <div>7-1. 발주서 등록</div>
+    <img alt="발주서 등록" src="/gif/07_발주%20-%20등록.gif">
+    <div>7-2. 발주서 결재승인</div>
+    <img alt="발주서 결재승인" src="/gif/07_발주%20-%20결재승인.gif">
+</details>
+
+<details>
+  <summary>8. 구매서</summary>
+    <div>8-1. 구매서 등록</div>
+    <img alt="구매서 등록" src="/gif/08_구매%20-%20등록.gif">
+    <div>8-2. 구매서 조회</div>
+    <img alt="구매서 조회" src="/gif/09_구매%20-%20조회.gif">
+    <div>8-3. 구매서 삭제</div>
+    <img alt="구매서 삭제" src="/gif/09_구매%20-%20삭제.gif">
+</details>
+
+<details>
+  <summary>9. 판매</summary>
+    <div>9-1. 거래명세서 등록</div>
+    <img alt="구매서 등록" src="/gif/09_판매%20-%20등록.gif">
+</details>
+
+<details>
+  <summary>10. 작업지시서</summary>
+    <div>10-1. 작업지시서 등록</div>
+    <img alt="구매서 등록" src="/gif/10.작업지시서%20-%20등록.gif">
+    <div>10-2. 작업지시서 수정</div>
+    <img alt="작업지시서 수정" src="/gif/10.작업지시서%20-%20수정.gif">
+    <div>10-3. 작업지시서 삭제</div>
+    <img alt="작업지시서 삭제" src="/gif/10.작업지시서%20-%20삭제.gif">
+</details>
+
+<details>
+  <summary>11. 생산불출</summary>
+    <div>11-1. 생산불출 조회</div>
+    <img alt="생산불출 등록" src="/gif/11.생산불출%20-%20검색.gif">
+    <div>11-2. 생산불출 엑셀 다운로드</div>
+    <img alt="생산불출 엑셀 다운로드" src="/gif/11.생산불출%20-%20엑셀.gif">
+    <div>11-3. 생산불출 수정</div>
+    <img alt="생산불출 수정" src="/gif/11.생산불출%20-%20수정.gif">
+    <div>11-4. 생산불출 삭제</div>
+    <img alt="생산불출 삭제" src="/gif/11.생산불출%20-%20삭제.gif">
+</details>
+
+<details>
+  <summary>12. 생산입고</summary>
+    <div>12-1. 생산입고 등록</div>
+    <img alt="생산입고 등록" src="/gif/12_생산입고%20-%20등록.gif">
+</details>
+
+<details>
+  <summary>13. 출하지시서</summary>
+    <div>13-1. 출하지시서 등록</div>
+    <img alt="출하지시서 등록" src="/gif/13_출하지시서%20-%20등록.gif">
+    <div>13-2. 출하지시서 엑셀 다운로드</div>
+    <img alt="출하지시서 엑셀 다운로드" src="/gif/13_출하지시서%20-%20엑셀,%20인쇄.gif">
+    <div>13-3. 출하지시서 수정</div>
+    <img alt="출하지시서 수정" src="/gif/13_출하지시서%20-%20수정.gif">
+    <div>13-4. 출하지시서 삭제</div>
+    <img alt="출하지시서 삭제" src="/gif/13_출하지시서%20-%20삭제.gif">
+</details>
+
+<details>
+  <summary>14. 출하전표</summary>
+    <div>14-1. 출하전표 등록</div>
+    <img alt="출하전표 등록" src="/gif/14_출하전표%20-%20등록.gif">
+    <div>14-2. 출하전표 엑셀 다운로드</div>
+    <img alt="출하전표 엑셀 다운로드" src="/gif/14_출하전표%20-%20엑셀.gif">
+    <div>14-3. 출하전표 인쇄</div>
+    <img alt="출하전표 인쇄" src="/gif/14_출하전표%20-%20인쇄.gif">
+</details>
+
+<details>
+  <summary>15. 챗봇</summary>
+    <img alt="챗봇" src="/gif/15_챗봇.gif">
+</details>
+
+<details>
+  <summary>16. 알림, 전자결재</summary>
+    <div>16-1. 알림</div>
+    <img alt="알림" src="/gif/16_알림%20-%20조회.gif">
+    <div>16-2. 전자결재</div>
+    <img alt="알림" src="/gif/16_결재.gif">
+</details>
 
 <br>
 
