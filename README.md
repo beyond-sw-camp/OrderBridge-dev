@@ -30,10 +30,7 @@ order bridge 프로젝트는 기내식 공급의 효율적인 관리를 목표�
   </div>
 </details>
 
-### 1-3. 기능 명세서
-[기능 명세서](https://docs.google.com/spreadsheets/d/e/2PACX-1vQxM_rIHvmLTbkV9LnaKnpo5b7QTwlGp9VqwIbPuwNH_rs0f3UpjXx70gHiFa4FGKJpYlsRoGB4w7w5/pubhtml?gid=213070244&single=true)
-
-### 1-4. 시스템 아키텍처
+### 1-3. 시스템 아키텍처
 <details>
   <summary>시스템 아키텍처</summary>
   <div markdown="1">
@@ -43,14 +40,14 @@ order bridge 프로젝트는 기내식 공급의 효율적인 관리를 목표�
   </div>
 </details>
 
-### 1-5. WBS
+### 1-4. WBS
 [WBS](https://docs.google.com/spreadsheets/d/e/2PACX-1vQxM_rIHvmLTbkV9LnaKnpo5b7QTwlGp9VqwIbPuwNH_rs0f3UpjXx70gHiFa4FGKJpYlsRoGB4w7w5/pubhtml?gid=1397057023&single=true)
 
-### 1-6. ERD
+### 1-5. ERD
 [ERD Cloud](https://www.erdcloud.com/d/KDXZgBYk6EeukmEa2)
 
 
-### 1-7. 화면 설계서
+### 1-6. 화면 설계서
 [Figma](https://www.figma.com/design/75SMKjrV0RAYySz6nuMzhf/%EC%97%90%EB%9F%AC-%ED%95%B4%EC%A0%81%EB%8B%A8?node-id=0-1&t=DVRxg4B582bo3SLt-1)
 
 <br>
@@ -65,8 +62,11 @@ order bridge 프로젝트는 기내식 공급의 효율적인 관리를 목표�
 |         RDS          |    db.t3.medium(2 vCPU, 4GB RAM), MariaDB     |
 |          S3          |   5GB 표준 스토리지, 총 2개의 버킷(프론트엔드 프로젝트, 업로드 파일)   |
 
-### 2-2. 단위 테스트 결과서
+### 2-2. API 명세서
+[API 명세서](https://docs.google.com/spreadsheets/d/e/2PACX-1vQxM_rIHvmLTbkV9LnaKnpo5b7QTwlGp9VqwIbPuwNH_rs0f3UpjXx70gHiFa4FGKJpYlsRoGB4w7w5/pubhtml?gid=741938621&single=true)
 
+### 2-3. 단위 테스트 결과서
+[단위 테스트 결과서](https://docs.google.com/spreadsheets/d/e/2PACX-1vQxM_rIHvmLTbkV9LnaKnpo5b7QTwlGp9VqwIbPuwNH_rs0f3UpjXx70gHiFa4FGKJpYlsRoGB4w7w5/pubhtml?gid=1211451507&single=true)
 <br>
 
 ## 3. 프론트엔드 설계 및 구축
@@ -94,7 +94,7 @@ order bridge 프로젝트는 기내식 공급의 효율적인 관리를 목표�
     <img alt="거래처 등록" src="/gif/03_거래처%20-%20등록.gif">
     <div>3-2. 거래처 조회</div>
     <img alt="거래처 조회" src="/gif/03_거래처%20-%20조회.gif">
-    <div>3-2. 거래처 삭제</div>
+    <div>3-3. 거래처 삭제</div>
     <img alt="거래처 삭제" src="/gif/03_거래처%20-%20삭제.gif">
 </details>
 
@@ -110,7 +110,7 @@ order bridge 프로젝트는 기내식 공급의 효율적인 관리를 목표�
     <img alt="견적서 등록" src="/gif/05_견적%20-%20등록.gif">
     <div>5-2. 견적서 조회, 엑셀다운로드</div>
     <img alt="견적서 조회" src="/gif/05_견적%20-%20조회,%20엑셀다운.gif">
-    <div>5-2. 견적 현황 조회</div>
+    <div>5-3. 견적 현황 조회</div>
     <img alt="견적서 현황" src="/gif/05_견적%20-%20현황.gif">
 </details>
 
@@ -212,9 +212,10 @@ order bridge 프로젝트는 기내식 공급의 효율적인 관리를 목표�
 ## 4. 시스템 통합
 
 ### 4-1. 통합 테스트 결과서
+[통합 테스트 결과서](https://docs.google.com/spreadsheets/d/e/2PACX-1vQxM_rIHvmLTbkV9LnaKnpo5b7QTwlGp9VqwIbPuwNH_rs0f3UpjXx70gHiFa4FGKJpYlsRoGB4w7w5/pubhtml?gid=496279577&single=true)
 
 ### 4-2. CI/CD 계획서 
-[CI/CD 계획서](https://docs.google.com/spreadsheets/d/1gk9vqAHkigayGrVtWXJ4dcw1HV_7WgMIkAVy064mc1k/edit?gid=1079293076#gid=1079293076)
+[CI/CD 계획서](https://docs.google.com/spreadsheets/d/e/2PACX-1vQxM_rIHvmLTbkV9LnaKnpo5b7QTwlGp9VqwIbPuwNH_rs0f3UpjXx70gHiFa4FGKJpYlsRoGB4w7w5/pubhtml?gid=1079293076&single=true)
 
 ### 4-3. CI/CD 결과
 <img alt="CD" src="img/CD.png">
