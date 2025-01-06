@@ -298,7 +298,6 @@ const printItem = (index) => {
                   </div>
                   <div class="d-flex justify-content-end align-items-center">
                     <printIcon class="me-3 icon" v-if="purchase" @click.stop="openPrintPreview(purchase)"/>
-                    <editIcon class="me-3 icon" @click.stop=""/>
                     <trashIcon class="icon" @click.stop="itemDelete(purchase.purchaseSeq)"/>
                   </div>
                 </div>

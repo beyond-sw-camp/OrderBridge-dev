@@ -52,13 +52,9 @@ public class FileUploadUtil {
     public String uploadImagePath(String base64Image) {
         try {
             String fileName = "sign_" + System.currentTimeMillis() + ".jpg";
-            String localFilePath = "uploads/" + fileName;
 
             String base64Data = base64Image.split(",")[1]; // Base64 데이터 분리
             byte[] decodedBytes = java.util.Base64.getDecoder().decode(base64Data);
-
-            java.nio.file.Files.createDirectories(java.nio.file.Paths.get("uploads"));
-            java.nio.file.Files.write(java.nio.file.Paths.get(localFilePath), decodedBytes);
 
             amazonS3Client.putObject(bucket, fileName, new ByteArrayInputStream(decodedBytes), null);
 

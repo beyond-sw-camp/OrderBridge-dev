@@ -296,7 +296,6 @@ const itemDelete = async (seq) => {
                   </div>
                   <div class="d-flex justify-content-end align-items-center">
                     <printIcon class="me-3 icon" v-if="purchaseOrder" @click.stop="openPrintPreview(purchaseOrder)"/>
-                    <editIcon class="me-3 icon" @click.stop=""/>
                     <trashIcon class="icon" @click.stop="itemDelete(purchaseOrder.purchaseOrderSeq)"/>
                   </div>
                 </div>
