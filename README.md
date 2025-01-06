@@ -58,11 +58,12 @@ order bridge 프로젝트는 기내식 공급의 효율적인 관리를 목표�
 ## 2. 백엔드 설계 및 구축
 
 ### 2-1. 프로그램 사양서
-| 헤더1       | 헤더2       | 헤더3       |
-|:-----------:|:-----------:|:-----------:|
-| 데이터1-1   | 데이터1-2   | 데이터1-3   |
-| 데이터2-1   | 데이터2-2   | 데이터2-3   |
-| 데이터3-1   | 데이터3-2   | 데이터3-3   |
+|        구성 요소         |                      사양                       |
+|:--------------------:|:---------------------------------------------:|
+| CloudFront(Frontend) |                 Vue.js, Vite                  |
+|  Elastic Beanstalk   | t3.large(2 vCPU, 8GB RAM), Nginx, Spring Boot |
+|         RDS          |    db.t3.medium(2 vCPU, 4GB RAM), MariaDB     |
+|          S3          |   5GB 표준 스토리지, 총 2개의 버킷(프론트엔드 프로젝트, 업로드 파일)   |
 
 ### 2-2. 단위 테스트 결과서
 
@@ -83,7 +84,7 @@ order bridge 프로젝트는 기내식 공급의 효율적인 관리를 목표�
     <img alt="창고 등록" src="/gif/02_창고%20-%20등록.gif">
     <div>2-2. 창고 조회</div>
     <img alt="창고 조회" src="/gif/02_창고%20-%20조회.gif">
-    <div>2-2. 창고 삭제</div>
+    <div>2-3. 창고 삭제</div>
     <img alt="창고 삭제" src="/gif/02_창고%20-%20삭제.gif">
 </details>
 
@@ -213,4 +214,8 @@ order bridge 프로젝트는 기내식 공급의 효율적인 관리를 목표�
 ### 4-1. 통합 테스트 결과서
 
 ### 4-2. CI/CD 계획서 
+[CI/CD 계획서](https://docs.google.com/spreadsheets/d/1gk9vqAHkigayGrVtWXJ4dcw1HV_7WgMIkAVy064mc1k/edit?gid=1079293076#gid=1079293076)
 
+### 4-3. CI/CD 결과
+<img alt="CD" src="img/CD.png">
+<img alt="Workflow" src="img/Workflow.png">
