@@ -26,7 +26,7 @@ order bridge 프로젝트는 기내식 공급의 효율적인 관리를 목표�
 
 [요구사항 명세서](https://docs.google.com/spreadsheets/d/e/2PACX-1vQxM_rIHvmLTbkV9LnaKnpo5b7QTwlGp9VqwIbPuwNH_rs0f3UpjXx70gHiFa4FGKJpYlsRoGB4w7w5/pubhtml?gid=594562128&single=true)
 
-![image](https://github.com/user-attachments/assets/302f70d5-4497-4d7c-af3a-8910d614f1ea)
+<img alt="요구사항 명세서" src="/img/요구사항 명세서.jpg">
   </div>
 </details>
 
@@ -44,7 +44,7 @@ order bridge 프로젝트는 기내식 공급의 효율적인 관리를 목표�
 [WBS](https://docs.google.com/spreadsheets/d/e/2PACX-1vQxM_rIHvmLTbkV9LnaKnpo5b7QTwlGp9VqwIbPuwNH_rs0f3UpjXx70gHiFa4FGKJpYlsRoGB4w7w5/pubhtml?gid=1397057023&single=true)
 
 ### 1-5. ERD
-[ERD Cloud](https://www.erdcloud.com/d/KDXZgBYk6EeukmEa2)
+[ERD Cloud](https://www.erdcloud.com/d/DSSX6ipKCoLho4uYd)
 
 
 ### 1-6. 화면 설계서
