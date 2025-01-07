@@ -29,7 +29,6 @@ const formatDateToInputDateTime = (dateString) => {
 const fetchProductionDisbursementDetail = async (productionDisbursementSeq) => {
   try {
     const response = await axios.get(`productionDisbursement/${productionDisbursementSeq}`, {});
-    console.log(response.data);
     productionDisbursementDetail.value = {
       ...response.data.productionDisbursementDetail,
       productionDisbursementDepartureDate: formatDateToInputDateTime(response.data.productionDisbursementDetail.productionDisbursementDepartureDate),
@@ -45,12 +44,10 @@ const fetchProductionDisbursementDetail = async (productionDisbursementSeq) => {
       itemImageUrl: item.itemImageUrl
     }));
 
-    console.log('productionDisbursementItem:', productionDisbursementItem.value);
 
     if (productionDisbursementDetail.value.workOrderSeq) {
     }
   } catch (error) {
-    console.error('생산불출 상세 정보 불러오기 실패:', error);
   }
 };
 

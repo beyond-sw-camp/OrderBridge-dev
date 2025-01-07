@@ -32,10 +32,8 @@ const fullDetail = ref({});
 
 const openPrintPreview = (workOrder) => {
   if (!workOrder) {
-    console.error('선택된 작업지시서가 없습니다.');
     return;
   }
-  console.log('openPrintPreview 호출됨, 선택된 작업지시서:', workOrder);
   selectedWorkOrder.value = workOrder;
   isModalVisible.value = true;
 };
@@ -65,19 +63,16 @@ const fetchWorkOrderList = async () => {
         return new URLSearchParams(filteredParams).toString();
       }
     });
-    console.log(response.data);
     workOrderList.value = response.data.workOrderList;
     workOrderStatusList.value = response.data.workOrderStatusList;
 
     totalCount.value = response.data.totalItems;
     currentPage.value = response.data.currentPage;
     totalPage.value = response.data.totalPages;
-    console.log(workOrderList.value);
   } catch (error) {
     if (error.response.data.errorCode === 'COMMON_ERROR_002') {
       await sServerError(error);
     }
-    console.log("작업지시서 불러오기 실패: ", error);
   }
 };
 
@@ -86,7 +81,6 @@ const fetchWorkOrderDetail = async (workOrderSeq) => {
   if(workOrderDetail.value[workOrderSeq] === undefined) {
     try {
       const response = await axios.get(`workOrder/${workOrderSeq}`, {});
-      console.log(response.data);
 
       workOrderDetail.value[workOrderSeq] = {
         workOrderSeq : response.data.workOrderDetail.workOrderSeq,
@@ -109,16 +103,12 @@ const fetchWorkOrderDetail = async (workOrderSeq) => {
       }
 
       fullDetail.value[workOrderSeq] = response.data;
-      console.log('fullDetail',fullDetail.value[workOrderSeq]);
 
-      console.log(response.data.workOrderDetail);
-      console.log(response.data.workOrderItem);
     } catch (error) {
       if (error.response.data.errorCode === 'WORK_ORDER_ERROR_001') {
         await sServerError(error);
       }
 
-      console.error("작업지시서 상세 불러오기 실패 :", error);
     }
   } else {
     workOrderDetail.value[workOrderSeq] = undefined;
@@ -132,7 +122,6 @@ const fetchItemDivision = async () => {
 
     itemDivisionList.value = response.data;
   } catch (error) {
-    console.log(`품목 분류 요청 실패 ${error}`);
   }
 }
 
@@ -180,7 +169,6 @@ const excelDown = async () => {
     a.remove();
     window.URL.revokeObjectURL(url);
   } catch (error) {
-        console.error('Excel 다운로드 실패:', error);
     if (error.response.data.errorCode === 'EXCEL_DOWN_ERROR_001') {
       await sServerError(error);
     }
@@ -190,7 +178,6 @@ const excelDown = async () => {
 // 삭제
 const deleteWorkOrder = async (workOrderSeq) => {
   const result = await sConfirm("이 작업지시서를 삭제하시겠습니까?");
-  console.log("삭제요청 작업지시서 번호", workOrderSeq);
   if (result) {
     try {
       const response = await axios.delete(`workOrder/${workOrderSeq}`);
@@ -198,7 +185,6 @@ const deleteWorkOrder = async (workOrderSeq) => {
 
       search(); // 삭제 후 목록 갱신
     } catch (error) {
-      console.error("작업지시서 삭제 요청 실패:", error);
       if (error.response.data.errorCode === 'WORK_ORDER_ERROR_001') {
         await sServerError(error);
       } else if (error.response.data.errorCode === 'WORK_ORDER_ERROR_005') {

@@ -75,9 +75,7 @@ watch(props, () => {
 
     if (matchedItem) {
       formData.value.salesOrderItemSeq = matchedItem.salesOrderItemSeq;
-      console.log('매칭된 salesOrderItemSeq:', matchedItem.salesOrderItemSeq);
     } else {
-      console.warn('해당하는 salesOrderItemSeq를 찾을 수 없습니다.');
     }
   }
 });
@@ -98,12 +96,10 @@ const fetchSalesOrderList = async () => {
         return new URLSearchParams(filteredParams).toString();
       },
     });
-    console.log(response.data);
 
     salesOrderList.value = response.data.salesOrder;
     totalCount.value = response.data.totalSalesOrder;
   } catch (error) {
-    console.error('주문서 불러오기 실패:', error);
   }
 };
 
@@ -124,13 +120,10 @@ const fetchWarehouses = async () => {
       }
     });
 
-    console.log(response.data)
-
     warehouses.value = response.data.warehouses;
     warehouseTotalCount.value = response.data.totalCount;
 
   } catch (error) {
-    console.error('창고 목록 불러오기 실패:', error);
   }
 };
 
@@ -142,7 +135,6 @@ const fetchSalesOrderStatusList = async () => {
     salesOrderStatusList.value = response.data;
 
   } catch (error) {
-    console.error("주문서 상태 목록 불러오기 실패 :", error);
   }
 };
 
@@ -155,12 +147,8 @@ const selectSalesOrder = (salesOrder) => {
   formData.value.salesOrder = salesOrder.salesOrderName;
   if (salesOrder && salesOrder.salesOrderDueDate) {
     salesOrderDueDate.value = salesOrder.salesOrderDueDate || ''; // 납기일 설정
-    console.log('납기일:', salesOrder.salesOrderDueDate); // 납기일 확인
   } else {
-    console.log('선택된 주문서에 납기일이 없습니다.');
   }
-
-  console.log('선택된 주문서:', selectedSalesOrder.value);
 
   fetchSalesOrderItemStock(salesOrder.salesOrderSeq); // 재고 상태 조회
 };
@@ -203,10 +191,8 @@ const fetchSalesOrderItemStock = async (salesOrderSeq) => {
     const response = await axios.get(`sales-order/${salesOrderSeq}/available-quantity`);
 
     stockStatusList.value = response.data;
-    console.log('품목 재고 상태 목록:', stockStatusList.value);
 
   } catch (error) {
-    console.error('품목 재고 조회 실패:', error);
     if (error.response.data.errorCode === 'SALES_ORDER_ITEM_ERROR_001') {
       await sWarning('주문서에 품목이 없습니다.');
     }
@@ -228,7 +214,6 @@ const handleItemSelection = async (index) => {
 // 선택한 주문서 품목 저장
 const selectItem = async (index) => {
   const item = stockStatusList.value[index];
-  console.log('선택된 아이템:', item);
 
   selectedItem.value = {
     ...item,
@@ -241,9 +226,7 @@ const selectItem = async (index) => {
   formData.value.workOrderIndicatedDate = '';
   formData.value.workOrderDueDate = '';
   formData.value.workOrderNote = '';
-  console.log('폼 데이터 초기화 완료:', formData.value);
 
-  console.log('선택된 품목:', selectedItem.value);
   await fetchRegisteredItems(selectedSalesOrder.value.salesOrderSeq);
 
   createOrUpdateWorkOrder(selectedItem.value);
@@ -252,13 +235,11 @@ const selectItem = async (index) => {
 // 주문서 품목의 작업지시서 등록여부 조회
 const fetchRegisteredItems = async (salesOrderSeq) => {
   if (!salesOrderSeq) {
-    console.warn('salesOrderSeq 가 존재하지 않습니다.');
     return;
   }
 
   try {
     const response = await axios.get(`sales-order/${salesOrderSeq}/registered-items`);
-    console.log(response.data);
 
     const registeredItemSeqs = response.data.map(Number);
 
@@ -267,7 +248,6 @@ const fetchRegisteredItems = async (salesOrderSeq) => {
       isRegistered: registeredItemSeqs.includes(Number(item.salesOrderItemSeq))
     }));
 
-    console.log('등록 여부 조회된 품목 목록:', stockStatusList.value);
 
     if (selectedItem.value) {
       const updatedItem = stockStatusList.value.find(item =>
@@ -278,20 +258,16 @@ const fetchRegisteredItems = async (salesOrderSeq) => {
         selectedItem.value = updatedItem;
         createOrUpdateWorkOrder(updatedItem);
       } else {
-        console.warn('선택된 품목을 stockStatusList 에서 찾을 수 없습니다.');
       }
     }
 
-
   } catch (error) {
-    console.error('등록여부 조회 실패:', error);
   }
 
 };
 
 const createOrUpdateWorkOrder = (item) => {
   if (!item) {
-    console.warn('writeWorkOrder: item이 존재하지 않습니다.');
     return;
   }
 
@@ -306,7 +282,6 @@ const createOrUpdateWorkOrder = (item) => {
 // 작업지시서 수정
 const updateWorkOrder = async (workOrderSeq) => {
   if (!workOrderSeq) {
-    console.warn('workOrderSeq 값이 존재하지 않습니다.');
     return;
   }
 
@@ -318,13 +293,10 @@ const updateWorkOrder = async (workOrderSeq) => {
       workOrderDueDate: formData.value.workOrderDueDate,
       workOrderNote: formData.value.workOrderNote,
     });
-    console.log(response.data);
-    console.log(formData.value.workOrderIndicatedQuantity);
     await sSuccess('작업지시서가 수정되었습니다!');
     await router.push('/work-order')
 
   } catch (error) {
-    console.error("작업지시서 수정 실패 :", error);
     if (error.response.data.errorCode === 'WORK_ORDER_ERROR_005') {
       await sWarning('작업지시서의 상태가 결재 전이거나 진행중일때만 수정 가능합니다.');
     } else if (error.response.data.errorCode === 'COMMON_ERROR_002') {
@@ -350,7 +322,6 @@ const updateWorkOrder = async (workOrderSeq) => {
 // 작업지시서 등록
 const createWorkOrder = async () => {
   try {
-    console.log('폼 데이터:', formData.value);
 
     const response = await axios.post(`workOrder`, {
       salesOrderSeq: formData.value.salesOrderSeq,
@@ -360,12 +331,10 @@ const createWorkOrder = async () => {
       workOrderDueDate: formData.value.workOrderDueDate,
       workOrderNote: formData.value.workOrderNote,
     });
-      console.log(response.data);
       await sSuccess('작업지시서가 등록되었습니다!');
       await router.push('/work-order')
 
   } catch (error) {
-    console.error("작업지시서 등록 실패 :", error);
 
     if (error.response.data.errorCode ===  'SALES_ORDER_ERROR_002') {
       await sWarning('주문서의 상태가 결재 후일때만 등록 가능합니다.');
@@ -389,7 +358,6 @@ const createWorkOrder = async () => {
 // 작업지시서 제출
 const submitWorkOrder = async () => {
   if (!validateFormData()) {
-    console.warn('폼 데이터가 완전하지 않습니다.');
     return;
   }
 
@@ -398,7 +366,6 @@ const submitWorkOrder = async () => {
 
   if (props.isEditMode) {
     await updateWorkOrder(props.workOrderDetail.workOrderSeq);
-    console.log(props.workOrderDetail.workOrderSeq)
   } else {
     await createWorkOrder();
   }
@@ -407,7 +374,6 @@ const submitWorkOrder = async () => {
 // 폼 데이터 검증
 const validateFormData = async () => {
   if (!formData.value.salesOrderSeq || !formData.value.salesOrderItemSeq || !formData.value.warehouseSeq) {
-    console.warn('필수 항목이 누락되었습니다.', formData.value);
     if (!formData.value.salesOrderSeq || !formData.value.salesOrderItemSeq) {
       await sWarning('품목을 선택해주세요.');
     } else if (!formData.value.warehouseSeq) {

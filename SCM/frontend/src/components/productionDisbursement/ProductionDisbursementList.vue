@@ -34,10 +34,8 @@ const fullDetail = ref({});
 
 const openPrintPreview = (productionDisbursement) => {
   if (!productionDisbursement) {
-    console.error('선택된 생산불출이 없습니다.');
     return;
   }
-  console.log('openPrintPreview 호출됨, 선택된 생산불출:', productionDisbursement);
   selectedProductionDisbursement2.value = productionDisbursement;
   isModalVisible.value = true;
 };
@@ -67,19 +65,16 @@ const fetchProductionDisbursementList = async () => {
         return new URLSearchParams(filteredParams).toString();
       }
     });
-    console.log(response.data);
     productionDisbursementList.value = response.data.productionDisbursementList;
     productionDisbursementStatusList.value = response.data.productionDisbursementStatusList;
 
     totalCount.value = response.data.totalItems;
     currentPage.value = response.data.currentPage;
     totalPage.value = response.data.totalPages;
-    console.log(productionDisbursementList.value);
   } catch (error) {
     if (error.response.data.errorCode === 'COMMON_ERROR_002') {
       await sServerError(error);
     }
-    console.log("생산불출 불러오기 실패: ", error);
   }
 };
 
@@ -97,7 +92,6 @@ const fetchProductionDisbursementDetail = async (productionDisbursementSeq) => {
   if(productionDisbursementDetail.value[productionDisbursementSeq] === undefined) {
     try {
       const response = await axios.get(`productionDisbursement/${productionDisbursementSeq}`, {});
-      console.log(response.data);
 
       productionDisbursementDetail.value[productionDisbursementSeq] = {
         productionDisbursementSeq : response.data.productionDisbursementDetail.productionDisbursementSeq,
@@ -119,16 +113,12 @@ const fetchProductionDisbursementDetail = async (productionDisbursementSeq) => {
       selectedProductionDisbursement.value = productionDisbursementDetail.value[productionDisbursementSeq];
 
       fullDetail.value[productionDisbursementSeq] = response.data;
-      console.log('fullDetail',fullDetail.value[productionDisbursementSeq]);
 
-      console.log(response.data.productionDisbursementDetail);
-      console.log(response.data.itemList);
     } catch (error) {
       if (error.response.data.errorCode === 'PRODUCTION_DISBURSEMENT_ERROR_001') {
         await sServerError(error);
       }
 
-      console.error("생산불출 상세 불러오기 실패 :", error);
     }
   } else {
     productionDisbursementDetail.value[productionDisbursementSeq] = undefined;
@@ -142,7 +132,6 @@ const fetchItemDivision = async () => {
 
     itemDivisionList.value = response.data;
   } catch (error) {
-    console.log(`품목 분류 요청 실패 ${error}`);
   }
 }
 
@@ -186,7 +175,6 @@ function numberFormating(number) {
     a.remove();
     window.URL.revokeObjectURL(url);
   } catch (error) {
-      console.error('Excel 다운로드 실패:', error);
 
       if (error.response.data.errorCode === 'EXCEL_DOWN_ERROR_001') {
         await sServerError(error);
@@ -196,7 +184,6 @@ function numberFormating(number) {
 
 const deleteProductionDisbursement = async (productionDisbursementSeq) => {
   const result = await sConfirm("이 생산불출을 삭제하시겠습니까?");
-  console.log("삭제요청 생산불출 번호", productionDisbursementSeq);
   if (result) {
     try {
       const response = await axios.delete(`productionDisbursement/${productionDisbursementSeq}`);
@@ -204,7 +191,6 @@ const deleteProductionDisbursement = async (productionDisbursementSeq) => {
 
       search(); // 삭제 후 목록 갱신
     } catch (error) {
-      console.error("생산불출 삭제 요청 실패:", error);
       if (error.response.data.errorCode === 'PRODUCTION_DISBURSEMENT_ERROR_001') {
         await sServerError(error);
       } else if (error.response.data.errorCode === 'PRODUCTION_DISBURSEMENT_ERROR_002') {

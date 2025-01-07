@@ -22,7 +22,6 @@ const fetchImages = async () => {
 
     notification.value = response.data;
   } catch (error) {
-    console.error("결재 서류 데이터를 가져오는 중 오류 발생:", error);
   }
 }
 
@@ -109,9 +108,6 @@ const saveCanvas = async (selectedNotification) => {
   }
 
   // 결재서류 상태 변경
-  // console.log('상태변경',props.workOrder.workOrderDetail.workOrderSeq)
-  console.log('결재변경:seq.value',seq.value)
-  // await axios.put(`workOrder/approval/${props.workOrder.workOrderDetail.workOrderSeq}`);
   await axios.put(`workOrder/approval/${seq.value}`);
 };
 

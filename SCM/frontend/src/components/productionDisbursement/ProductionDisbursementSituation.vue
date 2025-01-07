@@ -28,17 +28,13 @@ const fetchProductionDisbursementSituationList = async () => {
         return new URLSearchParams(filteredParams).toString();
       }
     });
-    console.log(response.data);
-    console.log(response.data.monthlySituations);
 
     productionDisbursementSituationTotal.value = response.data.totalQuantity;
-    console.log(productionDisbursementSituationTotal.value)
     productionDisbursementSituationList.value = response.data.monthlySituations;
   } catch (error) {
     if (error.response.data.errorCode === 'COMMON_ERROR_002') {
       await sServerError(error);
     }
-    console.error("생산불출 현황 불러오기 실패 :", error);
   }
 };
 
@@ -94,7 +90,6 @@ const excelDown = async () => {
     a.remove();
     window.URL.revokeObjectURL(url);
   } catch (error) {
-    console.error('Excel 다운로드 실패:', error);
     if (error.response.data.errorCode === 'EXCEL_DOWN_ERROR_001') {
       await sServerError(error);
     }

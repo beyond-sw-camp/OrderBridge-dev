@@ -30,7 +30,6 @@ const formatDateToInput = (dateString) => {
 const fetchWorkOrderDetail = async (workOrderSeq) => {
   try {
     const response = await axios.get(`workOrder/${workOrderSeq}`, {});
-    console.log(response.data);
     workOrderDetail.value = {
       ...response.data.workOrderDetail,
       workOrderIndicatedDate: formatDateToInput(response.data.workOrderDetail.workOrderIndicatedDate),
@@ -43,7 +42,6 @@ const fetchWorkOrderDetail = async (workOrderSeq) => {
       await fetchSalesOrderById(workOrderDetail.value.salesOrderSeq);
     }
   } catch (error) {
-    console.error('작업지시서 상세 정보 불러오기 실패:', error);
   }
 };
 
@@ -51,7 +49,6 @@ const fetchWorkOrderDetail = async (workOrderSeq) => {
 const fetchSalesOrderById = async (salesOrderSeq) => {
   try {
     const response = await axios.get(`sales-order/${salesOrderSeq}`);
-    console.log('주문서 상세:', response.data);
 
     salesOrder.value = {
       ...response.data,
@@ -59,7 +56,6 @@ const fetchSalesOrderById = async (salesOrderSeq) => {
     };
     stockStatusList.value = response.data.salesOrderItem; // 주문서 품목 목록 저장
   } catch (error) {
-    console.error('주문서 상세 불러오기 실패:', error);
   }
 };
 

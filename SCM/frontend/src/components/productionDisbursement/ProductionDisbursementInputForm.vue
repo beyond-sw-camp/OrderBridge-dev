@@ -103,12 +103,10 @@ const fetchWorkOrderList = async () => {
         return new URLSearchParams(filteredParams).toString();
       },
     });
-    console.log(response.data);
 
     workOrderList.value = response.data.workOrderList;
     totalCount.value = response.data.totalItems;
   } catch (error) {
-    console.error('작업지시서 불러오기 실패:', error);
   }
 };
 
@@ -120,7 +118,6 @@ const fetchWorkOrderStatusList = async () => {
     workOrderStatusList.value = response.data;
 
   } catch (error) {
-    console.error("작업지시서 상태 목록 불러오기 실패 :", error);
   }
 };
 
@@ -137,7 +134,6 @@ const selectWorkOrder = (workOrder) => {
   if (workOrder && workOrder.workOrderDueDate) {
     workOrderDueDate.value = workOrder.workOrderDueDate  // 납기일 설정
   }
-  console.log('선택된 작업지시서:', selectWorkOrder.value);
 
   fetchBomItems(workOrder.itemSeq);
 };
@@ -171,7 +167,6 @@ function findStatusValue(array, key) {
 const fetchBomItems = async (itemSeq) => {
   try {
     const response = await axios.get(`item/bom-item/${itemSeq}`, {});
-    console.log('BOM 품목 데이터:', response.data);
 
     const fetchedItems = response.data.map(item => ({
       childItemSeq: item.childItemSeq,
@@ -196,10 +191,7 @@ const fetchBomItems = async (itemSeq) => {
       note: item.note
     })));
 
-    console.log('bomItems:', bomItems.value);
-
   } catch (error) {
-    console.error("bom 품목 불러오기 실패 :", error);
   }
 };
 
@@ -211,7 +203,6 @@ const updateNote = (index, note) => {
 // 생산불출 등록
 const createProductionDisbursement = async () => {
   try {
-    console.log('폼 데이터:', formData.value);
 
     const response = await axios.post(`productionDisbursement`, {
       workOrderSeq: formData.value.workOrderSeq,
@@ -220,12 +211,10 @@ const createProductionDisbursement = async () => {
       productionDisbursementNote: formData.value.productionDisbursementNote,
       itemRequests: formData.value.itemRequests // BOM 기반 품목 리스트
     });
-    console.log(response.data);
     await sSuccess('생산불출이 등록되었습니다!');
     await router.push('/production-disbursement')
 
   } catch (error) {
-    console.error("생산불출 등록 실패 :", error);
 
     if (error.response.data.errorCode === 'PRODUCTION_DISBURSEMENT_ERROR_004') {
       await sWarning('불출일을 입력해주세요');
@@ -248,17 +237,8 @@ const createProductionDisbursement = async () => {
 // 생산불출 수정
 const updateProductionDisbursement = async (productionDisbursementSeq) => {
   if (!productionDisbursementSeq) {
-    console.warn('productionDisbursementSeq 값이 존재하지 않습니다.');
     return;
   }
-  console.log("수정요청 생산불출 번호", productionDisbursementSeq);
-  console.log("보내는 데이터:", {
-    workOrderSeq: formData.value.workOrderSeq,
-    ingredientsWarehouseSeq: formData.value.storeName,
-    productionDisbursementDepartureDate: formData.value.productionDisbursementDepartureDate,
-    productionDisbursementNote: formData.value.productionDisbursementNote,
-    itemRequests: formData.value.itemRequests
-  });
 
   try {
     const response = await axios.put(`productionDisbursement/${productionDisbursementSeq}`, {
@@ -268,12 +248,10 @@ const updateProductionDisbursement = async (productionDisbursementSeq) => {
       productionDisbursementNote: formData.value.productionDisbursementNote,
       itemRequests: formData.value.itemRequests // BOM 기반 품목 리스트
     });
-    console.log('itemRequests: ',formData.value.itemRequests);
     await sSuccess('생산불출이 수정되었습니다!');
     await router.push('/production-disbursement')
 
   } catch (error) {
-    console.error("생산불출 수정 실패 :", error);
     if (error.response.data.errorCode === 'PRODUCTION_DISBURSEMENT_ERROR_002') {
       await sWarning('생산불출의 상태가 불출 전일때만 수정 가능합니다.');
     } else if (error.response.data.errorCode === 'PRODUCTION_DISBURSEMENT_ERROR_003') {

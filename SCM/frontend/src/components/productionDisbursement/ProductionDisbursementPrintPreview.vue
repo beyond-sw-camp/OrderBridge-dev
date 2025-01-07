@@ -20,10 +20,7 @@ const fetchImages = async () => {
     const response = await axios.get( `notification/productionDisbursement/${seq.value}`);
 
     notification.value = response.data;
-    console.log('알림:', response.data )
-    console.log(notification)
   } catch (error) {
-    console.error("결재 서류 데이터를 가져오는 중 오류 발생:", error);
   }
 }
 
@@ -108,7 +105,6 @@ const saveCanvas = async (selectedNotification) => {
   }
 
   // 결재서류 상태 변경
-  console.log('결재변경:seq.value',seq.value)
   await axios.put(`productionDisbursement/approval/${seq.value}`);
 };
 
